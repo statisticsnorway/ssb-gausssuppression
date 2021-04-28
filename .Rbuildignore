@@ -1,0 +1,6 @@
+README.md
+LICENSE
+^.*\.Rproj$
+^\.Rproj\.user$
+.bat
+.pdf
