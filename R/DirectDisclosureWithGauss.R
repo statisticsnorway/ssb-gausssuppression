@@ -22,10 +22,10 @@
 #'                   v2 = c('i','i', 'i','h','h','h','i','i','i','h','h','h'),
 #'                   v3 = c('y', 'y', 'y', 'y', 'y', 'y','z','z', 'z', 'z', 'z', 'z'),
 #'                   freq = c(0,0,5,0,2,3,1,0,3,1,1,2))
-#' DisclosiveSuppression(tex, c("v1", "v2", "v3"), "freq")
-#' DisclosiveSuppression(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
+#' DirectDisclosureWithGauss(tex, c("v1", "v2", "v3"), "freq")
+#' DirectDisclosureWithGauss(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
                   
-DisclosiveSuppression <- function(data, dimVar, freqVar, ...) {
+DirectDisclosureWithGauss <- function(data, dimVar, freqVar, ...) {
   
   mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE)
   
