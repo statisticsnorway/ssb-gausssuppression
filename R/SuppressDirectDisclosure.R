@@ -25,7 +25,10 @@
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq")
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
                   
-SuppressDirectDisclosure <- function(data, dimVar, freqVar, ...) {
+SuppressDirectDisclosure <- function(data, dimVar, freqVar,
+                                     secondaryZeros = T,
+                                     singleton = NULL,
+                                     ...) {
   
   mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE)
   
@@ -35,8 +38,8 @@ SuppressDirectDisclosure <- function(data, dimVar, freqVar, ...) {
   GaussSuppressionFromData(data, dimVar, freqVar, 
                            primary = SSBtools::FindDisclosiveCells, 
                            x = mm$modelMatrix, crossTable = mm$crossTable,
-                           singleton = NULL,
-                           secondaryZeros = T,
+                           singleton = singleton,
+                           secondaryZeros = secondaryZeros,
                            ...)
   
 }
