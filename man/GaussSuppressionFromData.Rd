@@ -21,7 +21,7 @@ GaussSuppressionFromData(
   forced = NULL,
   hidden = NULL,
   singleton = SingletonDefault,
-  singletonMethod = "anySum",
+  singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
   printInc = TRUE,
   output = "data.frame",
   x = NULL,

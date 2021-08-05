@@ -81,7 +81,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            forced = NULL,
                            hidden = NULL,
                            singleton = SingletonDefault,
-                           singletonMethod = "anySum",
+                           singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
                            printInc = TRUE,
                            output = "data.frame", x = NULL, crossTable = NULL,
                            preAggregate = FALSE, ...){  # Fix i ModelMatrix for ... input, 
@@ -251,12 +251,9 @@ CandidatesDefault <- function(freq, x, secondaryZeros, weight, ...) {
 #' @export
 #' @keywords internal
 SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
-  if (!protectZeros & secondaryZeros) 
-    return(rep(FALSE, NROW(data)))
-  
-  if (protectZeros) 
+  if (protectZeros | secondaryZeros){ 
     return(data[[freqVar]] == 0)
-  
+  }
   data[[freqVar]] == 1
 }
 
