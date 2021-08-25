@@ -26,20 +26,50 @@
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
                   
 SuppressDirectDisclosure <- function(data, dimVar, freqVar,
-                                     secondaryZeros = T,
-                                     singleton = NULL,
+                                     coalition = 1,
+                                     secondaryZeros = coalition,
+                                     # singleton = NULL,
+                                     candidates = DirectDisclosureCandidates,
                                      ...) {
   
   mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE)
   
   if (ncol(mm$crossTable) < length(dimVar))
     stop("Hierarchies have been detected. This method does not currently support hierarchical data.")
-  
   GaussSuppressionFromData(data, dimVar, freqVar, 
                            primary = SSBtools::FindDisclosiveCells, 
                            x = mm$modelMatrix, crossTable = mm$crossTable,
-                           singleton = singleton,
+                           # singleton = singleton,
                            secondaryZeros = secondaryZeros,
+                           candidates = candidates,
+                           coalition = coalition,
                            ...)
   
+}
+
+DirectDisclosureCandidates <- function(freq, x, secondaryZeros, weight, ...) {
+  if(is.null(weight))
+    weight <- 1
+  else{
+    if(min(weight)<0){
+      weight[weight<0] = 0
+      warning("Negative weights treated as zero")
+    }
+    if(min(weight)==0){
+      weight <- weight + max(weight)*1E-20
+    } 
+  }
+  tie <- as.matrix(Matrix::crossprod(x, x %*% ((freq+1)*weight)))
+  tie <- tie/max(tie)
+  # freqOrd <- ((freq+1)*weight + 0.99 * tie)[, 1, drop = TRUE]
+  freqOrd <- sapply(freq, function(x) {
+                  if (x == 0) return(secondaryZeros)
+                  if (x <= secondaryZeros) return(x-1)
+                  return(x)
+                  })
+  if (!secondaryZeros) {
+      freqOrd[freq == 0] <- 0.01 + max(freqOrd) + freqOrd[freq == 0]  
+  }
+  candidates <- order(freqOrd, decreasing = TRUE)
+  candidates
 }
