@@ -85,7 +85,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                                     hierarchies = NULL, formula = NULL,
                            maxN = 3, 
                            protectZeros = TRUE, 
-                           secondaryZeros = FALSE,
+                           secondaryZeros = 0,
                            candidates = CandidatesDefault,
                            primary = PrimaryDefault,
                            forced = NULL,
