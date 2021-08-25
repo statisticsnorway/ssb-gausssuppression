@@ -17,7 +17,8 @@ x[k] <- x[sample_k]
 
 
 test_that("Advanced with integer overflow", {
-  a <- GaussSuppressionFromData(z3, c(1:6), 7, x = mm$modelMatrix , crossTable = mm$crossTable, printInc <- FALSE, maxN = 5, printInc = printInc)
+  
+  a <- GaussSuppressionFromData(z3, c(1:6), 7, x = mm$modelMatrix , crossTable = mm$crossTable, maxN = 5, printInc = printInc)
   expect_identical(sum(which(a$suppressed)), 599685L)
   
   # This test involves integer overflow in AnyProportionalGaussInt  
