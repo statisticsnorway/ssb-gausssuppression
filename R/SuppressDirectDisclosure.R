@@ -28,7 +28,6 @@
 SuppressDirectDisclosure <- function(data, dimVar, freqVar,
                                      coalition = 1,
                                      secondaryZeros = coalition,
-                                     # singleton = NULL,
                                      candidates = DirectDisclosureCandidates,
                                      ...) {
   
@@ -39,7 +38,6 @@ SuppressDirectDisclosure <- function(data, dimVar, freqVar,
   GaussSuppressionFromData(data, dimVar, freqVar, 
                            primary = SSBtools::FindDisclosiveCells, 
                            x = mm$modelMatrix, crossTable = mm$crossTable,
-                           # singleton = singleton,
                            secondaryZeros = secondaryZeros,
                            candidates = candidates,
                            coalition = coalition,
