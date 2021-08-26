@@ -12,6 +12,9 @@
 #' @param freqVar variable name containing frequency counts
 #' @param ... optional parameters that can be passed to the primary suppression
 #' method. See \link[SSBtools]{FindDisclosiveCells} for details.
+#' @param coalition numeric variable, parameter for primary suppression. Default value is 1.
+#' @param secondaryZeros logical or numeric value for secondary suppression. If logical, it is converted to resp numeric value (0 or 1). If numeric, it describes the largest number that is prioritized over zeroes in secondary suppression. Default value is equal to coalition.
+#' @param candidates function parameter for gauss suppression.
 #'
 #' @importFrom SSBtools FindDisclosiveCells
 #' @return data.frame containing the result of the suppression
@@ -35,6 +38,10 @@ SuppressDirectDisclosure <- function(data, dimVar, freqVar,
   
   if (ncol(mm$crossTable) < length(dimVar))
     stop("Hierarchies have been detected. This method does not currently support hierarchical data.")
+  if (is.logical(secondaryZeros)) {
+    if (secondaryZeros) secondaryZeros <- coalition
+    else secondaryZeros <- 0
+  }
   GaussSuppressionFromData(data, dimVar, freqVar, 
                            primary = SSBtools::FindDisclosiveCells, 
                            x = mm$modelMatrix, crossTable = mm$crossTable,
