@@ -5,7 +5,7 @@
 #' \link[SSBtools]{FindDisclosiveCells} function, and applies a secondary suppression
 #' using Gauss suppression (see \link{GaussSuppressionFromData}).
 #' 
-#' Currently, the method has no support for hierarchical data.
+#' SuppressDirectDisclosure has no support for hierarchical data. SuppressDirectDisclosure2 has, but is less general in other ways.
 #'
 #' @param data the input data
 #' @param dimVar character vector containing variable names for the output table
@@ -27,6 +27,12 @@
 #'                   freq = c(0,0,5,0,2,3,1,0,3,1,1,2))
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq")
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
+#' 
+#' z3 <- SSBtools::SSBtoolsData("z3")
+#' a1 <- SuppressDirectDisclosure(z3, c(1, 4, 5), 7)
+#' a2 <- SuppressDirectDisclosure2(z3, c(1, 4, 5), 7)
+#' b1 <- try(SuppressDirectDisclosure(z3, 1:6, 7))
+#' b2 <- SuppressDirectDisclosure2(z3, 1:6, 7)
                   
 SuppressDirectDisclosure <- function(data, dimVar, freqVar,
                                      coalition = 1,
@@ -37,7 +43,7 @@ SuppressDirectDisclosure <- function(data, dimVar, freqVar,
   mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE)
   
   if (ncol(mm$crossTable) < length(dimVar))
-    stop("Hierarchies have been detected. This method does not currently support hierarchical data.")
+    stop("Try SuppressDirectDisclosure2? - Hierarchies have been detected. This method does not currently support hierarchical data.")
   if (is.logical(secondaryZeros)) {
     if (secondaryZeros) secondaryZeros <- coalition
     else secondaryZeros <- 0
