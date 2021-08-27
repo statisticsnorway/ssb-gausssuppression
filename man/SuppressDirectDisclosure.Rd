@@ -8,8 +8,9 @@ SuppressDirectDisclosure(
   data,
   dimVar,
   freqVar,
-  secondaryZeros = T,
-  singleton = NULL,
+  coalition = 1,
+  secondaryZeros = coalition,
+  candidates = DirectDisclosureCandidates,
   ...
 )
 }
@@ -19,6 +20,12 @@ SuppressDirectDisclosure(
 \item{dimVar}{character vector containing variable names for the output table}
 
 \item{freqVar}{variable name containing frequency counts}
+
+\item{coalition}{numeric variable, parameter for primary suppression. Default value is 1.}
+
+\item{secondaryZeros}{logical or numeric value for secondary suppression. If logical, it is converted to resp numeric value (0 or 1). If numeric, it describes the largest number that is prioritized over zeroes in secondary suppression. Default value is equal to coalition.}
+
+\item{candidates}{function parameter for gauss suppression.}
 
 \item{...}{optional parameters that can be passed to the primary suppression
 method. See \link[SSBtools]{FindDisclosiveCells} for details.}
