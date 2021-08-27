@@ -54,6 +54,7 @@
 #' z2 <- SSBtoolsData("z2")
 #' GaussSuppressionFromData(z2, 1:4, 5, protectZeros = FALSE)
 #' 
+#' 
 #' # Data as in GaussSuppression examples
 #' df <- data.frame(values = c(1, 1, 1, 5, 5, 9, 9, 9, 9, 9, 0, 0, 0, 7, 7), 
 #'                  var1 = rep(1:3, each = 5), var2 = c("A", "B", "C", "D", "E"))
@@ -71,6 +72,15 @@
 #'        singleton = NULL, protectZeros = FALSE, secondaryZeros = FALSE)
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
 #'        protectZeros = FALSE, secondaryZeros = FALSE)
+#' 
+#'               
+#' # Examples with zeros as singletons
+#' z <- data.frame(row = rep(1:3, each = 3), col = 1:3, freq = c(0, 2, 5, 0, 0, 6:9))
+#' GaussSuppressionFromData(z, 1:2, 3, singleton = NULL) 
+#' GaussSuppressionFromData(z, 1:2, 3, singletonMethod = "none") # as above 
+#' GaussSuppressionFromData(z, 1:2, 3)
+#' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE, singleton = NULL)
+#' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE)      
 GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies = NULL, formula = NULL,
                            maxN = 3, 
@@ -81,7 +91,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            forced = NULL,
                            hidden = NULL,
                            singleton = SingletonDefault,
-                           singletonMethod = "anySum",
+                           singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
                            printInc = TRUE,
                            output = "data.frame", x = NULL, crossTable = NULL,
                            preAggregate = FALSE, ...){  # Fix i ModelMatrix for ... input, 
@@ -166,7 +176,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     primary = primary[[1]]
   }
   
-  secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc)
+  secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
   
   suppressed <- rep(FALSE, m)
   suppressed[primary] <- TRUE
@@ -251,12 +261,9 @@ CandidatesDefault <- function(freq, x, secondaryZeros, weight, ...) {
 #' @export
 #' @keywords internal
 SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
-  if (!protectZeros & secondaryZeros) 
-    return(rep(FALSE, NROW(data)))
-  
-  if (protectZeros) 
+  if (protectZeros | secondaryZeros){ 
     return(data[[freqVar]] == 0)
-  
+  }
   data[[freqVar]] == 1
 }
 
