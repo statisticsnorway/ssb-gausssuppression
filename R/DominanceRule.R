@@ -12,7 +12,6 @@
 #' @param n parameter `n` in dominance rule. 
 #' @param k parameter `k` in dominance rule.
 #' @param ... 
-#' @importFrom GaussSuppression MaxContribution
 #' @return logical vector that is `TRUE` in positions corresponding to cells breaching the dominance rules.
 #' @export
 #'
