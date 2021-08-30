@@ -26,7 +26,9 @@ GaussSuppressionFromData(
   output = "data.frame",
   x = NULL,
   crossTable = NULL,
-  preAggregate = FALSE,
+  preAggregate = is.null(freqVar),
+  xReturn = FALSE,
+  innerReturn = FALSE,
   ...
 )
 }
@@ -76,6 +78,10 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
 This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
+
+\item{xReturn}{Dummy matrix in output when \code{TRUE} (as input parameter x)}
+
+\item{innerReturn}{Input data in output when \code{TRUE} (possibly pre-aggregated). To return only inner data, use \code{innerReturn = 1}.}
 
 \item{...}{Further arguments to be passed to the supplied functions.}
 }

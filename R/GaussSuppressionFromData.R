@@ -38,6 +38,8 @@
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
+#' @param xReturn	Dummy matrix in output when `TRUE` (as input parameter x)
+#' @param innerReturn	Input data in output when `TRUE` (possibly pre-aggregated). To return only inner data, use `innerReturn = 1`. 
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -45,6 +47,7 @@
 #' @importFrom SSBtools GaussSuppression ModelMatrix
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
+#' @importFrom utils flush.console
 #'
 #' @examples
 #' 
@@ -94,8 +97,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
                            printInc = TRUE,
                            output = "data.frame", x = NULL, crossTable = NULL,
-                           preAggregate = FALSE, ...){  # Fix i ModelMatrix for ... input, 
+                           preAggregate = is.null(freqVar),  
+                           xReturn = FALSE,
+                           innerReturn = FALSE,
+                           ...){ 
 
+  force(preAggregate)
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
@@ -103,22 +110,60 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   weightVar <- names(data[1, weightVar, drop = FALSE])
   charVar <- names(data[1, charVar, drop = FALSE])
   
-  
-  if (preAggregate) {
-    print(dim(data))
+  if (preAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
+    if (printInc & preAggregate) {
+      cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
+      flush.console()
+    }
     if (!is.null(hierarchies)) {
       dVar <- names(hierarchies)
     } else {
       if (!is.null(formula)) {
         dVar <- row.names(attr(delete.response(terms(as.formula(formula))), "factors"))
       } else {
-        dVar <- dimVar
+        if (length(dimVar)){
+          dVar <- dimVar
+        } else {
+          freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
+          if (!length(freqPlusVarName)){
+            dVar <- names(data)
+          } else {
+            dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
+          }
+        }
       }
     }
-    data <- aggregate(data[, unique(c(freqVar, numVar, weightVar)), drop = FALSE], data[, unique(c(dVar, charVar)), drop = FALSE], sum)
-    print(dim(data))
+    dVar <- unique(dVar)
+    
+    if (!length(dimVar)){
+      dimVar <- dVar
+    }
+    
+    if (preAggregate) {
+      if (!length(freqVar)) {
+        if ("freq" %in% names(data)) {
+          freqVar <- "f_Re_qVa_r"
+        } else {
+          freqVar <- "freq"
+        }
+        data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
+      } 
+      data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
+      if (printInc) {
+        cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
+        flush.console()
+      }
+    } else {
+      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
+    }
   }
 
+  if (is.numeric(innerReturn)) {
+    if (innerReturn == 1) {
+      return(data)
+    }
+  }
+  
   
   if (is.null(x)) {
     if (is.null(formula) & is.null(hierarchies)) {
@@ -185,7 +230,20 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   suppressed[hidden] <- NA
 
   
-  cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
+  publish <- cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
+  
+  if (xReturn) {
+    if (innerReturn) {
+      return(list(publish = publish, inner = data, x = x))
+    } 
+    return(list(publish = publish, x = x))
+  }
+  
+  if (innerReturn) {
+    return(list(publish = publish, inner = data))
+  }
+  
+  publish
 }
 
 
