@@ -4,6 +4,12 @@
 #' @importFrom methods as 
 #' @export
 SuppressDirectDisclosure2 <- function(data, dimVar = NULL, freqVar, coalition = 1, ...){
+  
+  if (hasArg("primaryDims"))        warning('Parameter "primaryDims" is not supported by SuppressDirectDisclosure2.')
+  if (hasArg("unknowns"))           warning('Parameter "unknowns" is not supported by SuppressDirectDisclosure2.')
+  if (hasArg("unknown.threshold"))  warning('Parameter "unknown.threshold"  is not supported by SuppressDirectDisclosure2.')
+  if (hasArg("suppressSmallCells")) warning('Parameter "suppressSmallCells" is not supported by SuppressDirectDisclosure2.')
+  
   GaussSuppressionFromData(data, dimVar, freqVar, 
                            primary = FindDisclosiveCells2,
                            protectZeros = FALSE,
