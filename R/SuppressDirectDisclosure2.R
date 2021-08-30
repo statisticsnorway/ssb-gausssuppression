@@ -3,7 +3,7 @@
 #' @importFrom Matrix colSums crossprod
 #' @importFrom methods as 
 #' @export
-SuppressDirectDisclosure2 <- function(data, dimVar, freqVar, coalition = 1, ...){
+SuppressDirectDisclosure2 <- function(data, dimVar = NULL, freqVar, coalition = 1, ...){
   GaussSuppressionFromData(data, dimVar, freqVar, 
                            primary = FindDisclosiveCells2,
                            protectZeros = FALSE,

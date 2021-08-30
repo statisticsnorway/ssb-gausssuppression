@@ -16,7 +16,7 @@ SuppressDirectDisclosure(
   ...
 )
 
-SuppressDirectDisclosure2(data, dimVar, freqVar, coalition = 1, ...)
+SuppressDirectDisclosure2(data, dimVar = NULL, freqVar, coalition = 1, ...)
 }
 \arguments{
 \item{data}{the input data}
@@ -32,7 +32,8 @@ SuppressDirectDisclosure2(data, dimVar, freqVar, coalition = 1, ...)
 \item{candidates}{function parameter for gauss suppression.}
 
 \item{...}{optional parameters that can be passed to the primary suppression
-method. See \link[SSBtools]{FindDisclosiveCells} for details.}
+method. See \link[SSBtools]{FindDisclosiveCells} for details.
+In the case of SuppressDirectDisclosure2, \code{...} are parameters to GaussSuppressionFromData.}
 }
 \value{
 data.frame containing the result of the suppression
@@ -44,7 +45,8 @@ detects and primary suppresses directly-disclosive cells with the
 using Gauss suppression (see \link{GaussSuppressionFromData}).
 }
 \details{
-SuppressDirectDisclosure has no support for hierarchical data. SuppressDirectDisclosure2 has, but is less general in other ways.
+SuppressDirectDisclosure has no support for hierarchical data.
+SuppressDirectDisclosure2 has, but is less general in other ways.
 }
 \examples{
 tex <- data.frame(v1 = rep(c('a', 'b', 'c'), times = 4),
@@ -59,4 +61,6 @@ a1 <- SuppressDirectDisclosure(z3, c(1, 4, 5), 7)
 a2 <- SuppressDirectDisclosure2(z3, c(1, 4, 5), 7)
 b1 <- try(SuppressDirectDisclosure(z3, 1:6, 7))
 b2 <- SuppressDirectDisclosure2(z3, 1:6, 7)
+b3 <- SuppressDirectDisclosure2(z3, freqVar = 7, 
+               formula = ~region * hovedint * mnd2 + (fylke + kostragr) * hovedint * mnd)
 }

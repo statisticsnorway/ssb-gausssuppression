@@ -5,13 +5,15 @@
 #' \link[SSBtools]{FindDisclosiveCells} function, and applies a secondary suppression
 #' using Gauss suppression (see \link{GaussSuppressionFromData}).
 #' 
-#' SuppressDirectDisclosure has no support for hierarchical data. SuppressDirectDisclosure2 has, but is less general in other ways.
+#' SuppressDirectDisclosure has no support for hierarchical data. 
+#' SuppressDirectDisclosure2 has, but is less general in other ways.
 #'
 #' @param data the input data
 #' @param dimVar character vector containing variable names for the output table
 #' @param freqVar variable name containing frequency counts
 #' @param ... optional parameters that can be passed to the primary suppression
 #' method. See \link[SSBtools]{FindDisclosiveCells} for details.
+#' In the case of SuppressDirectDisclosure2, `...` are parameters to GaussSuppressionFromData. 
 #' @param coalition numeric variable, parameter for primary suppression. Default value is 1.
 #' @param secondaryZeros logical or numeric value for secondary suppression. If logical, it is converted to resp numeric value (0 or 1). If numeric, it describes the largest number that is prioritized over zeroes in secondary suppression. Default value is equal to coalition.
 #' @param candidates function parameter for gauss suppression.
@@ -33,6 +35,8 @@
 #' a2 <- SuppressDirectDisclosure2(z3, c(1, 4, 5), 7)
 #' b1 <- try(SuppressDirectDisclosure(z3, 1:6, 7))
 #' b2 <- SuppressDirectDisclosure2(z3, 1:6, 7)
+#' b3 <- SuppressDirectDisclosure2(z3, freqVar = 7, 
+#'                formula = ~region * hovedint * mnd2 + (fylke + kostragr) * hovedint * mnd)
                   
 SuppressDirectDisclosure <- function(data, dimVar, freqVar,
                                      coalition = 1,
