@@ -4,7 +4,15 @@
 \alias{GaussSuppressDec}
 \title{GaussSuppressDec}
 \usage{
-GaussSuppressDec(data, ..., output = "both", digits = 9, nRep = 1, rmse = pi/3)
+GaussSuppressDec(
+  data,
+  ...,
+  output = NULL,
+  digits = 9,
+  nRep = NULL,
+  rmse = pi/3,
+  rndSeed = 123
+)
 }
 \arguments{
 \item{data}{Input daata as a data frame}
@@ -18,6 +26,8 @@ GaussSuppressDec(data, ..., output = "both", digits = 9, nRep = 1, rmse = pi/3)
 \item{nRep}{nRep}
 
 \item{rmse}{rmse}
+
+\item{rndSeed}{If non-NULL, a random generator seed to be used locally within the function without affecting the random value stream in R.}
 }
 \value{
 
@@ -27,5 +37,6 @@ GaussSuppressDec
 }
 \examples{
 z1 <- SSBtoolsData("z1")
-GaussSuppressDec(z1, 1:2, 3, nRep =3)$b
+GaussSuppressDec(z1, 1:2, 3)
+GaussSuppressDec(z1, freqVar = "ant", formula = ~ region + hovedint, maxN = 10)
 }
