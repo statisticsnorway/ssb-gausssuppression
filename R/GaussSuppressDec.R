@@ -13,7 +13,6 @@
 #'
 #' @return
 #' 
-#' @importFrom RegSDC SuppressDec
 #' @importFrom SSBtools RoundWhole Match
 #' @importFrom Matrix crossprod
 #' @export
