@@ -27,6 +27,7 @@ GaussSuppressDec = function(data,
                             digits = 9, 
                             nRep = NULL,
                             rmse = pi/3,
+                            sparseLimit = 500,
                             rndSeed = 123){
 
   if (!is.null(rndSeed)) {
@@ -63,7 +64,7 @@ GaussSuppressDec = function(data,
   z <- as.matrix(a$publish["freq"])
   y <- as.matrix(a$inner[innerFreqName])
   
-  yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse)
+  yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
   zDec <- RoundWhole(as.matrix(Matrix::crossprod(a$x, yDec)), digits = digits)
   
   # print(max(abs(zDec - as.matrix(Matrix::crossprod(a$x, yDec)))))

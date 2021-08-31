@@ -11,6 +11,7 @@ GaussSuppressDec(
   digits = 9,
   nRep = NULL,
   rmse = pi/3,
+  sparseLimit = 500,
   rndSeed = 123
 )
 }
