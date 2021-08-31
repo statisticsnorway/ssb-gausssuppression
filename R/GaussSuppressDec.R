@@ -1,17 +1,23 @@
 
 
 
-#' GaussSuppressDec
+#' Cell suppression with synthetic decimal numbers
+#' 
+#' \code{\link{GaussSuppressionFromData}} is run and decimal numbers are added to output by
+#' a modified (for sparse matrix efficiency) version of \code{\link{SuppressDec}}. 
 #'
 #' @param data Input daata as a data frame 
 #' @param ... Further parameters to \code{\link{GaussSuppressionFromData}}
-#' @param output output
-#' @param digits digits 
-#' @param nRep nRep
-#' @param rmse rmse
+#' @param output NULL (default), `"publish"`, `"inner"`, `"both"`, or `"all"` (x also).
+#' @param digits Parameter to \code{\link{RoundWhole}}. Values close to whole numbers will be rounded.
+#' @param nRep NULL or an integer. When >1, several decimal numbers will be generated.
+#' @param rmse Desired root mean square error of decimal numbers. 
+#'            Variability around the expected, according to the linear model, inner frequencies.
+#'            The expected frequencies are calculated from the non-suppressed publishable frequencies.     
+#' @param sparseLimit Limit for the number of rows of a reduced x-matrix within the algorithm. When exceeded, a new sparse algorithm is used.
 #' @param rndSeed If non-NULL, a random generator seed to be used locally within the function without affecting the random value stream in R. 
 #'
-#' @return
+#' @return A data frame where inner cells and cells to be published are combined or output according to parameter `output`. 
 #' 
 #' @importFrom SSBtools RoundWhole Match
 #' @importFrom Matrix crossprod
@@ -77,7 +83,7 @@ GaussSuppressDec = function(data,
   a$inner <- cbind(a$inner, yDec)
   
   if (any(a$publish$suppressed == (a$publish[["freq"]] == a$publish[[freqDecNames[1]]]))) 
-    warning("problem")
+    warning("Mismatch between whole numbers and suppression (only first replicate tested).")
   
   if (output == "all") 
     return(a)

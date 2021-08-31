@@ -1,4 +1,6 @@
 
+# Code in this file is copied from package RegSDC and modified to do sparse algorithm within IpsoExtra   
+
 
 SuppressDec <- function(x, z = NULL, y = NULL, suppressed = NULL, digits = 9, nRep = 1, yDeduct = NULL, resScale = NULL, rmse = NULL, sparseLimit) {
   origY <- !is.null(y)
@@ -77,8 +79,8 @@ SuppressDec <- function(x, z = NULL, y = NULL, suppressed = NULL, digits = 9, nR
 
 
 
-#' @importFrom RegSDC GenQR Z2Yhat EnsureIntercept EnsureMatrix
-#' @importFrom SSBtools SeqInc
+#' @importFrom RegSDC GenQR ReduceX Z2Yhat EnsureIntercept EnsureMatrix
+#' @importFrom SSBtools SeqInc DummyDuplicated GaussIndependent
 #' @importFrom stats rnorm runif
 #' @importFrom Matrix which solve crossprod
 NULL

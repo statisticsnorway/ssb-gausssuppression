@@ -2,7 +2,7 @@
 % Please edit documentation in R/GaussSuppressDec.R
 \name{GaussSuppressDec}
 \alias{GaussSuppressDec}
-\title{GaussSuppressDec}
+\title{Cell suppression with synthetic decimal numbers}
 \usage{
 GaussSuppressDec(
   data,
@@ -20,21 +20,26 @@ GaussSuppressDec(
 
 \item{...}{Further parameters to \code{\link{GaussSuppressionFromData}}}
 
-\item{output}{output}
+\item{output}{NULL (default), \code{"publish"}, \code{"inner"}, \code{"both"}, or \code{"all"} (x also).}
 
-\item{digits}{digits}
+\item{digits}{Parameter to \code{\link{RoundWhole}}. Values close to whole numbers will be rounded.}
 
-\item{nRep}{nRep}
+\item{nRep}{NULL or an integer. When >1, several decimal numbers will be generated.}
 
-\item{rmse}{rmse}
+\item{rmse}{Desired root mean square error of decimal numbers.
+Variability around the expected, according to the linear model, inner frequencies.
+The expected frequencies are calculated from the non-suppressed publishable frequencies.}
+
+\item{sparseLimit}{Limit for the number of rows of a reduced x-matrix within the algorithm. When exceeded, a new sparse algorithm is used.}
 
 \item{rndSeed}{If non-NULL, a random generator seed to be used locally within the function without affecting the random value stream in R.}
 }
 \value{
-
+A data frame where inner cells and cells to be published are combined or output according to parameter \code{output}.
 }
 \description{
-GaussSuppressDec
+\code{\link{GaussSuppressionFromData}} is run and decimal numbers are added to output by
+a modified (for sparse matrix efficiency) version of \code{\link{SuppressDec}}.
 }
 \examples{
 z1 <- SSBtoolsData("z1")
