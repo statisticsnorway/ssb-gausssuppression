@@ -113,6 +113,12 @@ GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2
       primary = function(freq, crossTable, maxN, ...) 
                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
                    
+GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, primary = 
+                 c(function(freq, maxN, ...) freq >= 45,
+                   function(freq, maxN, ...) freq <= maxN,
+                   function(crossTable, ...) NA & crossTable[[2]] == "C", # NA means never primary suppress 
+                   function(crossTable, ...) NA & crossTable[[1]]== "Total" & crossTable[[2]]== "Total"))                    
+                   
 # Similar to GaussSuppression examples
 GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
        candidates = NULL, singleton = NULL, protectZeros = FALSE, secondaryZeros = TRUE)

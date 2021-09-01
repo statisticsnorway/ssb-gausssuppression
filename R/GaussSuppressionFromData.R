@@ -65,6 +65,12 @@
 #'       primary = function(freq, crossTable, maxN, ...) 
 #'                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
 #'                    
+#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, primary = 
+#'                  c(function(freq, maxN, ...) freq >= 45,
+#'                    function(freq, maxN, ...) freq <= maxN,
+#'                    function(crossTable, ...) NA & crossTable[[2]] == "C", # NA means never primary suppress 
+#'                    function(crossTable, ...) NA & crossTable[[1]]== "Total" & crossTable[[2]]== "Total"))                    
+#'                    
 #' # Similar to GaussSuppression examples
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
 #'        candidates = NULL, singleton = NULL, protectZeros = FALSE, secondaryZeros = TRUE)
@@ -153,7 +159,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
   
-  if (is.function(primary))       primary <-     primary(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  if (is.function(primary) | is.list(primary))  
+                                  primary <-     Primary(primary = primary, crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
   if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
   
@@ -187,6 +194,46 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
 }
+
+
+
+
+Primary <- function(primary, crossTable, ...) {
+  num <- NULL
+  pri <- 1L
+  n <- nrow(crossTable)
+  if (is.function(primary)) {
+    primary <- c(primary)  # this is a list
+  }
+  for (i in seq_along(primary)) {
+    a <- primary[[i]](crossTable, ...)
+    if (is.list(a)) {
+      if (is.null(num)) {
+        num <- a[[2]]
+      } else {
+        num <- cbind(num, a[[2]])
+      }
+      a <- a[[1]]
+    }
+    if (!is.logical(a)) {
+      aInd <- a
+      a <- rep(FALSE, n)
+      a[aInd] <- TRUE
+    }
+    if (length(a) != n)
+      stop("wrong length of primary function output")
+    pri <- pri * as.integer(!a)
+  }
+  pri <- !as.logical(pri)
+  pri[is.na(pri)] <- FALSE
+  
+  if (is.null(num)) {
+    return(pri)
+  }
+  list(primary = pri, numExtra = num)
+  
+}
+
 
 
 #' PrimaryDefault
