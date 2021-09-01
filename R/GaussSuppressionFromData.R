@@ -515,6 +515,7 @@ Ncontributors <- function(x, groups) {
 #' @param holdingInd  Vector of holding group categories
 #' 
 #' @return Vector of numbers of unique groups
+#' @importFrom Matrix colSums
 #' @export
 NcontributorsHolding <- function(x, groups, holdingInd=NULL) { # holding-indicator
   if (is.null(holdingInd)){
