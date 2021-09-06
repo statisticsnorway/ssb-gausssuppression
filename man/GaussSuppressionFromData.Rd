@@ -93,6 +93,8 @@ The supplied functions for generating \code{\link{GaussSuppression}} input takes
 where the two first are  \code{\link{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 Similarly, \code{num}, is a data frame of aggregated numerical variables.
+It is possible to supply several primary functions joined by \code{c}, e.g. (\code{c(FunPrim1, FunPrim2)}).
+All \code{NA}s returned from any of the functions force the corresponding cells not to be primary suppressed.
 }
 \examples{
 
@@ -113,11 +115,14 @@ GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2
       primary = function(freq, crossTable, maxN, ...) 
                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
                    
-GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, primary = 
-                 c(function(freq, maxN, ...) freq >= 45,
+# Combining several primary functions 
+# Note that NA & c(TRUE, FALSE) equals c(NA, FALSE)                      
+GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
+       primary = c(function(freq, maxN, ...) freq >= 45,
                    function(freq, maxN, ...) freq <= maxN,
-                   function(crossTable, ...) NA & crossTable[[2]] == "C", # NA means never primary suppress 
-                   function(crossTable, ...) NA & crossTable[[1]]== "Total" & crossTable[[2]]== "Total"))                    
+                   function(crossTable, ...) NA & crossTable[[2]] == "C",  
+                   function(crossTable, ...) NA & crossTable[[1]]== "Total" 
+                                                & crossTable[[2]]== "Total"))                    
                    
 # Similar to GaussSuppression examples
 GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
