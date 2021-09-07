@@ -15,7 +15,9 @@ GaussSuppressDec(
   rndSeed = 123,
   runIpf = FALSE,
   eps = 0.01,
-  iter = 100
+  iter = 100,
+  whenDuplicatedInner = NULL,
+  whenMixedDuplicatedInner = warning
 )
 }
 \arguments{
@@ -42,6 +44,12 @@ The expected frequencies are calculated from the non-suppressed publishable freq
 \item{eps}{Parameter to \code{\link{Mipf}}.}
 
 \item{iter}{Parameter to \code{\link{Mipf}}.}
+
+\item{whenDuplicatedInner}{Function to be called when default output and when cells marked as inner correspond to
+several input cells (aggregated) since they correspond to published cells.}
+
+\item{whenMixedDuplicatedInner}{Function to be called in the case above when some inner cells correspond
+to published cells (aggregated) and some not (not aggregated).}
 }
 \value{
 A data frame where inner cells and cells to be published are combined or output according to parameter \code{output}.
