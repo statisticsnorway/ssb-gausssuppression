@@ -210,7 +210,7 @@ Primary <- function(primary, crossTable, ...) {
     primary <- c(primary)  # This is a list
   }
   for (i in seq_along(primary)) {
-    a <- primary[[i]](crossTable, ...)
+    a <- primary[[i]](crossTable = crossTable, ...)
     if (is.list(a)) {
       if (is.null(num)) {
         num <- a[[2]]
