@@ -23,12 +23,10 @@ GaussSuppressionFromData(
   singleton = SingletonDefault,
   singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
   printInc = TRUE,
-  output = "data.frame",
+  output = "publish",
   x = NULL,
   crossTable = NULL,
   preAggregate = is.null(freqVar),
-  xReturn = FALSE,
-  innerReturn = FALSE,
   ...
 )
 }
@@ -70,7 +68,10 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
-\item{output}{If not "data.frame" (default), input to supplied functions are returned}
+\item{output}{One of \code{"publish"} (default), \code{"inner"}, \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"},
+\code{"inner_x"}, and \code{"input2functions"} (input to supplied functions).
+Here "inner" means input data (possibly pre-aggregated) and
+"x" means dummy matrix (as input parameter x).}
 
 \item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}}
 
@@ -78,10 +79,6 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
 This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
-
-\item{xReturn}{Dummy matrix in output when \code{TRUE} (as input parameter x)}
-
-\item{innerReturn}{Input data in output when \code{TRUE} (possibly pre-aggregated). To return only inner data, use \code{innerReturn = 1}.}
 
 \item{...}{Further arguments to be passed to the supplied functions.}
 }

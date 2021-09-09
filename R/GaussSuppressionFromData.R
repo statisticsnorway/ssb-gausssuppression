@@ -34,13 +34,14 @@
 #' @param singleton  GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}
 #' @param singletonMethod \code{\link{GaussSuppression}} input 
 #' @param printInc        \code{\link{GaussSuppression}} input
-#' @param output If not "data.frame" (default), input to supplied functions are returned 
+#' @param output One of `"publish"` (default), `"inner"`, `"publish_inner"`, `"publish_inner_x"`, `"publish_x"`, 
+#'                      `"inner_x"`, and `"input2functions"` (input to supplied functions). 
+#'               Here "inner" means input data (possibly pre-aggregated) and 
+#'               "x" means dummy matrix (as input parameter x).   
 #' @param x `x` (`modelMatrix`) and `crossTable` can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
-#' @param xReturn	Dummy matrix in output when `TRUE` (as input parameter x)
-#' @param innerReturn	Input data in output when `TRUE` (possibly pre-aggregated). To return only inner data, use `innerReturn = 1`. 
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -106,11 +107,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            singleton = SingletonDefault,
                            singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
                            printInc = TRUE,
-                           output = "data.frame", x = NULL, crossTable = NULL,
+                           output = "publish", x = NULL, crossTable = NULL,
                            preAggregate = is.null(freqVar),  
-                           xReturn = FALSE,
-                           innerReturn = FALSE,
                            ...){ 
+  
+  
+  if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions" )))
+    stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
+  
+  
+  innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
 
   force(preAggregate)
   
@@ -172,12 +178,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     attr(data, "freqVar") <- freqVar
   }
 
-  if (is.numeric(innerReturn)) {
-    if (innerReturn == 1) {
-      return(data)
-    }
+  if (output == "inner") {
+    return(data)
   }
-  
   
   if (is.null(x)) {
     if (is.null(formula) & is.null(hierarchies)) {
@@ -187,6 +190,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     }
     crossTable <- as.data.frame(x$crossTable)  # fix i ModelMatrix 
     x <- x$modelMatrix
+  }
+  
+  if (output == "inner_x") {
+    return(list(inner = data, x = x))
   }
   
   if (!length(freqVar)) {
@@ -208,7 +215,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     weight <- as.vector(as.matrix(crossprod(x, as.matrix(data[, weightVar, drop = FALSE]))))
   }
   
-  if (output != "data.frame")                return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...))
+  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...))
   
   if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
   
@@ -247,15 +254,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   publish <- cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
   
-  if (xReturn) {
-    if (innerReturn) {
-      return(list(publish = publish, inner = data, x = x))
-    } 
-    return(list(publish = publish, x = x))
+  if (output == "publish_inner_x") {
+    return(list(publish = publish, inner = data, x = x))
   }
   
-  if (innerReturn) {
+  if (output == "publish_inner") {
     return(list(publish = publish, inner = data))
+  }
+  
+  if (output == "publish_x") {
+    return(list(publish = publish, x = x))
   }
   
   publish
