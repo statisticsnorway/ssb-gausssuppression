@@ -104,6 +104,7 @@ GaussSuppressDec = function(data,
   
   
   a$publish <- cbind(a$publish, zDec)
+  rownames(a$publish) <- NULL
   a$inner <- cbind(a$inner, yDec)
   
   if (nRep) {
