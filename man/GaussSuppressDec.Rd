@@ -25,7 +25,7 @@ GaussSuppressDec(
 
 \item{...}{Further parameters to \code{\link{GaussSuppressionFromData}}}
 
-\item{output}{NULL (default), \code{"publish"}, \code{"inner"}, \code{"both"}, or \code{"all"} (x also).}
+\item{output}{NULL (default), \code{"publish"}, \code{"inner"}, \code{"publish_inner"}, or \code{"publish_inner_x"} (x also).}
 
 \item{digits}{Parameter to \code{\link{RoundWhole}}. Values close to whole numbers will be rounded.}
 

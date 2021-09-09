@@ -8,7 +8,7 @@
 #'
 #' @param data Input daata as a data frame 
 #' @param ... Further parameters to \code{\link{GaussSuppressionFromData}}
-#' @param output NULL (default), `"publish"`, `"inner"`, `"both"`, or `"all"` (x also).
+#' @param output NULL (default), `"publish"`, `"inner"`, `"publish_inner"`, or `"publish_inner_x"` (x also).
 #' @param digits Parameter to \code{\link{RoundWhole}}. Values close to whole numbers will be rounded.
 #' @param nRep NULL or an integer. When >1, several decimal numbers will be generated.
 #' @param rmse Desired root mean square error of decimal numbers. 
@@ -57,8 +57,8 @@ GaussSuppressDec = function(data,
   }
   
   if(!is.null(output)){
-    if(!(output %in% c("all", "both", "inner", "publish")))
-      stop('Allowed non-NULL values of parameter output are "all", "both", "inner" and "publish".')
+    if(!(output %in% c("publish_inner_x", "publish_inner", "inner", "publish")))
+      stop('Allowed non-NULL values of parameter output are "publish_inner_x", "publish_inner", "inner" and "publish".')
     
   } else {
     output <- ""
@@ -71,7 +71,7 @@ GaussSuppressDec = function(data,
     freqDecNames <- paste0("freqDec", paste(seq_len(nRep)))[seq_len(nRep)]
   }
   
-  a <- GaussSuppressionFromData(data, ..., xReturn = TRUE, innerReturn = TRUE)
+  a <- GaussSuppressionFromData(data, ..., output = "publish_inner_x")
   
   dimVarPub <- colnames(a$publish)
   dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed"))]
@@ -111,10 +111,10 @@ GaussSuppressDec = function(data,
       warning("Mismatch between whole numbers and suppression (only first replicate tested).")
   }
   
-  if (output == "all") 
+  if (output == "publish_inner_x") 
     return(a)
   
-  if (output == "both") 
+  if (output == "publish_inner") 
     return(a[c("publish", "inner")])
   
   if (output == "publish") 
