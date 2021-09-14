@@ -16,6 +16,7 @@ GaussSuppressDec(
   runIpf = FALSE,
   eps = 0.01,
   iter = 100,
+  mismatchWarning = TRUE,
   whenDuplicatedInner = NULL,
   whenMixedDuplicatedInner = warning
 )
@@ -44,6 +45,11 @@ The expected frequencies are calculated from the non-suppressed publishable freq
 \item{eps}{Parameter to \code{\link{Mipf}}.}
 
 \item{iter}{Parameter to \code{\link{Mipf}}.}
+
+\item{mismatchWarning}{Whether to produce the warning "\verb{Mismatch between whole numbers and suppression}", when relevant.
+When \code{nRep>1}, all replicates must satisfy the whole number requirement for non-suppressed cells.
+When \code{mismatchWarning} is integer (\verb{>0}), this will be used as parameter \code{digits} to \code{\link{RoundWhole}}
+when doing mismatch checking (can be quite low when \code{nRep>1}).}
 
 \item{whenDuplicatedInner}{Function to be called when default output and when cells marked as inner correspond to
 several input cells (aggregated) since they correspond to published cells.}
