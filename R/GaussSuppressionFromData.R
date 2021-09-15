@@ -43,7 +43,8 @@
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param extraAggregate When `TRUE`, the data will be aggregated by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
-#'                       The aggregated data and the corresponding x-matrix will only be as input to the singleton function and \code{\link{GaussSuppression}}. 
+#'                       The aggregated data and the corresponding x-matrix will only be used as input to the singleton 
+#'                       function and \code{\link{GaussSuppression}}. 
 #'                       This extra aggregation is useful when parameter `charVar` is used. 
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
@@ -284,7 +285,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       as.matrix(crossprod(xExtra, as.matrix(dataExtra[, c(freqVar, numVar, weightVar), drop = FALSE]))), 
       cbind(freq, num, weight),
       check.attributes = FALSE, check.names = FALSE)))
-      stop("(freq, num, weight) all not equal")
+      warning("(freq, num, weight) all not equal when checked by all.equal")
     if (printInc) {
       cat(".\n")
       flush.console()

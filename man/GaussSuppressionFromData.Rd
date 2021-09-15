@@ -82,7 +82,8 @@ Here "inner" means input data (possibly pre-aggregated) and
 This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
 
 \item{extraAggregate}{When \code{TRUE}, the data will be aggregated by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula}.
-The aggregated data and the corresponding x-matrix will only be as input to the singleton function and \code{\link{GaussSuppression}}.
+The aggregated data and the corresponding x-matrix will only be used as input to the singleton
+function and \code{\link{GaussSuppression}}.
 This extra aggregation is useful when parameter \code{charVar} is used.}
 
 \item{...}{Further arguments to be passed to the supplied functions.}
