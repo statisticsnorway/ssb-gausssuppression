@@ -42,6 +42,9 @@
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
+#' @param extraAggregate When `TRUE`, the data will be aggregated by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
+#'                       The aggregated data and the corresponding x-matrix will only be as input to the singleton function and \code{\link{GaussSuppression}}. 
+#'                       This extra aggregation is useful when parameter `charVar` is used. 
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -108,7 +111,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
                            printInc = TRUE,
                            output = "publish", x = NULL, crossTable = NULL,
-                           preAggregate = is.null(freqVar),  
+                           preAggregate = is.null(freqVar),
+                           extraAggregate = preAggregate & !is.null(charVar), 
                            ...){ 
   
   
@@ -119,6 +123,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
 
   force(preAggregate)
+  force(extraAggregate)
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
@@ -126,7 +131,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   weightVar <- names(data[1, weightVar, drop = FALSE])
   charVar <- names(data[1, charVar, drop = FALSE])
   
-  if (preAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
+  if (preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
     if (printInc & preAggregate) {
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
@@ -171,6 +176,19 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       }
     } else {
       data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
+    }
+  }
+  
+  
+  if(extraAggregate){
+    if (printInc) {
+      cat("[extraAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
+      flush.console()
+    }
+    dataExtra <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(dVar)], sum)
+    if (printInc) {
+      cat(dim(dataExtra)[1], "*", dim(dataExtra)[2], "] ", sep = "")
+      flush.console()
     }
   }
   
@@ -226,8 +244,28 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
   
+  if (!extraAggregate)
   if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
-
+  
+  if(extraAggregate){
+    if (is.null(formula) & is.null(hierarchies)) {
+      xExtra <- SSBtools::ModelMatrix(dataExtra[, dimVar, drop = FALSE], crossTable = TRUE)
+    } else {
+      xExtra <- SSBtools::ModelMatrix(dataExtra, hierarchies = hierarchies, formula = formula, crossTable = TRUE)
+    }
+    crossTableExtra <- as.data.frame(xExtra$crossTable)  # fix i ModelMatrix 
+    xExtra <- xExtra$modelMatrix
+    if (printInc) {
+      cat("Checking crossTables ..")
+      flush.console()
+    }
+    if(!isTRUE(all.equal(crossTable, crossTableExtra))){
+      stop("crossTables not equal")
+    }
+    if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = xExtra, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = dataExtra, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  }
+  
+  
   m <- ncol(x)
   
   if (is.null(candidates)) candidates <- 1:m
@@ -237,14 +275,33 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   if (is.null(num)) num <- matrix(0, m, 0)
   if (is.null(weight)) weight <- matrix(0, m, 0)
   
+  if(extraAggregate){
+    if (printInc) {
+      cat(". Checking (freq, num, weight) ..")
+      flush.console()
+    }
+    if(!isTRUE(all.equal(
+      as.matrix(crossprod(xExtra, as.matrix(dataExtra[, c(freqVar, numVar, weightVar), drop = FALSE]))), 
+      cbind(freq, num, weight),
+      check.attributes = FALSE, check.names = FALSE)))
+      stop("(freq, num, weight) all not equal")
+    if (printInc) {
+      cat(".\n")
+      flush.console()
+    }
+  }
+  
   # hack
   if(is.list(primary)){
     num = cbind(num, primary[[2]])
     primary = primary[[1]]
   }
   
-  secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
-  
+  if(extraAggregate){
+    secondary <- GaussSuppression(x = xExtra, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+  } else {
+    secondary <-      GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+  }
   suppressed <- rep(FALSE, m)
   suppressed[primary] <- TRUE
   primary <- suppressed
