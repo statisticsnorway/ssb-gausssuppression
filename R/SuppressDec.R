@@ -125,6 +125,9 @@ IpsoExtra <- function(y, x = NULL, ensureIntercept = TRUE, returnParts = FALSE, 
       x <- x[ , !dd, drop = FALSE]
     }
     x <- x[ , GaussIndependent(x, printInc = printInc)[[2]], drop = FALSE]
+    if (printInc) {
+      cat("\n")
+    }
     NROW_xQ <- nrow(x)
     NCOL_xQ <- ncol(x)
     crossprod_x <- crossprod(x) 
