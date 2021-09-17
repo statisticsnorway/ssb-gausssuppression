@@ -181,6 +181,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
   }
+  
+  if(innerReturn){
+    attr(data, "freqVar") <- freqVar
+  }
+  
 
   if (output == "inner") {
     return(data)
