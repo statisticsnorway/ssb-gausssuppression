@@ -8,8 +8,8 @@
 #' Currently, the method has no support for hierarchical data.
 #'
 #' @param data the input data
-#' @param dimVar vector containing variable names (or their indices) for the output table
-#' @param freqVar variable  containing frequency counts
+#' @param dimVar main dimensional variables for the output table
+#' @param freqVar variable containing frequency counts
 #' @param ... optional parameters that can be passed to the primary suppression
 #' method. See \link[SSBtools]{FindDisclosiveCells} for details.
 #' @param coalition numeric variable, parameter for primary suppression. Default value is 1.
