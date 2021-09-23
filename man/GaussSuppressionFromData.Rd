@@ -100,7 +100,7 @@ secondary suppression by Gaussian elimination by \code{\link{GaussSuppression}}
 }
 \details{
 The supplied functions for generating \code{\link{GaussSuppression}} input takes the following arguments:
-\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar} and \code{...}.
+\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
 where the two first are  \code{\link{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 Similarly, \code{num}, is a data frame of aggregated numerical variables.
