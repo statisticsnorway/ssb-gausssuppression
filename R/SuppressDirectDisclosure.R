@@ -15,7 +15,6 @@
 #' @param coalition numeric variable, parameter for primary suppression. Default value is 1.
 #' @param secondaryZeros logical or numeric value for secondary suppression. If logical, it is converted to resp numeric value (0 or 1). If numeric, it describes the largest number that is prioritized over zeroes in secondary suppression. Default value is equal to coalition.
 #' @param candidates function parameter for gauss suppression.
-#' @param ... unused parameters
 #'
 #' @importFrom SSBtools FindDisclosiveCells
 #' @return data.frame containing the result of the suppression
