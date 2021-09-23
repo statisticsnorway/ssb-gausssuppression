@@ -32,6 +32,8 @@
 #' @importFrom SSBtools RoundWhole Match Mipf
 #' @importFrom Matrix crossprod
 #' @export
+#' 
+#' @author Øyvind Langrsud
 #'
 #' @examples
 #' z1 <- SSBtoolsData("z1")
