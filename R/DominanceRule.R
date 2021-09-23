@@ -15,7 +15,8 @@
 #' @return logical vector that is `TRUE` in positions corresponding to cells breaching the dominance rules.
 #' @export
 #'
-#' @examples
+#' @author Daniel Lupp 
+#' 
 DominanceRule <- function(data, x, crossTable, numVar, n = 1:2, k = c(90,95), ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")

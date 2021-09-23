@@ -30,3 +30,6 @@ Supports application of multiple values for \code{n} and \code{k}. Defaults are 
 \details{
 Currently the implementation only supports a single numeric variable.
 }
+\author{
+Daniel Lupp
+}

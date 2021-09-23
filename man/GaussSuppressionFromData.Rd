@@ -152,3 +152,6 @@ GaussSuppressionFromData(z, 1:2, 3)
 GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE, singleton = NULL)
 GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE)      
 }
+\author{
+Øyvind Langsrud and Daniel Lupp
+}

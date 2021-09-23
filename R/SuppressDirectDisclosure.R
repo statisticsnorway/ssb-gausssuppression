@@ -19,6 +19,8 @@
 #' @importFrom SSBtools FindDisclosiveCells
 #' @return data.frame containing the result of the suppression
 #' @export
+#' 
+#' @author Daniel Lupp
 #'
 #' @examples
 #' tex <- data.frame(v1 = rep(c('a', 'b', 'c'), times = 4),

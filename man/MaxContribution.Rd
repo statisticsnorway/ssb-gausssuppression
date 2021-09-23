@@ -46,3 +46,6 @@ cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10))
 \seealso{
 \code{\link{ModelMatrix}}
 }
+\author{
+Øyvind Langsrud
+}

@@ -56,6 +56,8 @@
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
+#' 
+#' @author Øyvind Langsrud and Daniel Lupp
 #'
 #' @examples
 #' 
@@ -467,6 +469,8 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
+#' 
+#' @author Øyvind Langsrud
 #'
 #' @examples
 #' library(SSBtools)
@@ -541,6 +545,8 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE, index = FALSE) {
 #' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
+#' 
+#' @author Øyvind Langsrud
 #'
 #' @examples
 #' library(SSBtools)
@@ -633,6 +639,9 @@ Ncontributors <- function(x, groups) {
 #' @return Vector of numbers of unique groups
 #' @importFrom Matrix colSums
 #' @export
+#' 
+#' @author Øyvind Langsrud
+#' 
 NcontributorsHolding <- function(x, groups, holdingInd=NULL) { # holding-indicator
   if (is.null(holdingInd)){
     return(Ncontributors(x, groups))

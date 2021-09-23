@@ -50,3 +50,6 @@ tex <- data.frame(v1 = rep(c('a', 'b', 'c'), times = 4),
 SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq")
 SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
 }
+\author{
+Daniel Lupp
+}

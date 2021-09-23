@@ -17,6 +17,8 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
+#' 
+#' @author Øyvind Langsrud 
 #'
 #' @examples
 #' z2 <- SSBtoolsData("z2")
