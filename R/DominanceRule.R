@@ -2,7 +2,7 @@
 
 #' Dominance `(n,k)` rule for magnitude tables
 #' 
-#' Supports application of multiple values for `n` and `k`. Defaults are set to standard values at Statistics Norway `(1,90)` and `(2, 95)`. The function works on magnitude tables containing negative cell values by calculating contribution based on absolute values.
+#' Supports application of multiple values for `n` and `k`. The function works on magnitude tables containing negative cell values by calculating contribution based on absolute values.
 #' 
 #' Currently the implementation only supports a single numeric variable.
 #' @param data the dataset
@@ -16,7 +16,7 @@
 #' @export
 #'
 #' @examples
-DominanceRule <- function(data, x, crossTable, numVar, n = 1:2, k = c(90,95), ...) {
+DominanceRule <- function(data, x, crossTable, numVar, n, k, ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
   if (length(numVar) != 1)
