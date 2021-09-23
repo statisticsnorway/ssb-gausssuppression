@@ -11,7 +11,7 @@
 #' @param numVar vector containing numeric vectors in the data set
 #' @param n parameter `n` in dominance rule. 
 #' @param k parameter `k` in dominance rule.
-#' @param ... 
+#' @param ... unused parameters
 #' @return logical vector that is `TRUE` in positions corresponding to cells breaching the dominance rules.
 #' @export
 #'

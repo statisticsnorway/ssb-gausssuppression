@@ -19,7 +19,7 @@ DominanceRule(data, x, crossTable, numVar, n = 1:2, k = c(90, 95), ...)
 
 \item{k}{parameter \code{k} in dominance rule.}
 
-\item{...}{}
+\item{...}{unused parameters}
 }
 \value{
 logical vector that is \code{TRUE} in positions corresponding to cells breaching the dominance rules.
