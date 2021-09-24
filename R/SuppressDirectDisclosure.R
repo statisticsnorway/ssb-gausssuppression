@@ -29,7 +29,7 @@
 #'                   freq = c(0,0,5,0,2,3,1,0,3,1,1,2))
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq")
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
-                  
+                   
 SuppressDirectDisclosure <- function(data, dimVar, freqVar,
                                      coalition = 1,
                                      secondaryZeros = coalition,
