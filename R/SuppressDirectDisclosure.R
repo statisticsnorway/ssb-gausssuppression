@@ -1,6 +1,6 @@
 #' Suppression of directly-disclosive cells
 #' 
-#' Function for suppressing disclosive cells in frequency tables. The method
+#' Function for suppressing directly-disclosive cells in frequency tables. The method
 #' detects and primary suppresses directly-disclosive cells with the
 #' \link[SSBtools]{FindDisclosiveCells} function, and applies a secondary suppression
 #' using Gauss suppression (see \link{GaussSuppressionFromData}).
@@ -9,8 +9,8 @@
 #' SuppressDirectDisclosure2 has, but is less general in other ways.
 #'
 #' @param data the input data
-#' @param dimVar character vector containing variable names for the output table
-#' @param freqVar variable name containing frequency counts
+#' @param dimVar main dimensional variables for the output table
+#' @param freqVar variable containing frequency counts
 #' @param ... optional parameters that can be passed to the primary suppression
 #' method. See \link[SSBtools]{FindDisclosiveCells} for details.
 #' In the case of SuppressDirectDisclosure2, `...` are parameters to GaussSuppressionFromData. 
@@ -21,6 +21,8 @@
 #' @importFrom SSBtools FindDisclosiveCells
 #' @return data.frame containing the result of the suppression
 #' @export
+#' 
+#' @author Daniel Lupp
 #'
 #' @examples
 #' tex <- data.frame(v1 = rep(c('a', 'b', 'c'), times = 4),
@@ -77,7 +79,6 @@ DirectDisclosureCandidates <- function(freq, x, secondaryZeros, weight, ...) {
   }
   tie <- as.matrix(Matrix::crossprod(x, x %*% ((freq+1)*weight)))
   tie <- tie/max(tie)
-  # freqOrd <- ((freq+1)*weight + 0.99 * tie)[, 1, drop = TRUE]
   freqOrd <- sapply(freq, function(x) {
                   if (x == 0) return(secondaryZeros)
                   if (x <= secondaryZeros) return(x-1)

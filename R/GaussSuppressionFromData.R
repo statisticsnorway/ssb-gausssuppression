@@ -8,11 +8,12 @@
 #' secondary suppression by Gaussian elimination by \code{\link{GaussSuppression}} 
 #' 
 #' The supplied functions for generating \code{\link{GaussSuppression}} input takes the following arguments: 
-#' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar` and `...`. 
+#' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` and `...`. 
 #' where the two first are  \code{\link{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
 #' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
 #' Similarly, `num`, is a data frame of aggregated numerical variables.   
-#' 
+#' It is possible to supply several primary functions joined by `c`, e.g. (`c(FunPrim1, FunPrim2)`). 
+#' All `NA`s returned from any of the functions force the corresponding cells not to be primary suppressed.
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -33,11 +34,20 @@
 #' @param singleton  GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}
 #' @param singletonMethod \code{\link{GaussSuppression}} input 
 #' @param printInc        \code{\link{GaussSuppression}} input
-#' @param output If not "data.frame" (default), input to supplied functions are returned 
+#' @param output One of `"publish"` (default), `"inner"`, `"publish_inner"`, `"publish_inner_x"`, `"publish_x"`, 
+#'                      `"inner_x"`, and `"input2functions"` (input to supplied functions). 
+#'               Here "inner" means input data (possibly pre-aggregated) and 
+#'               "x" means dummy matrix (as input parameter x).   
 #' @param x `x` (`modelMatrix`) and `crossTable` can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
+#' @param extraAggregate When `TRUE`, the data will be aggregated by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
+#'                       The aggregated data and the corresponding x-matrix will only be used as input to the singleton 
+#'                       function and \code{\link{GaussSuppression}}. 
+#'                       This extra aggregation is useful when parameter `charVar` is used.
+#'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
+#'                       Supply `"inner"` or `"input2functions"` to obtain other results. 
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -45,6 +55,9 @@
 #' @importFrom SSBtools GaussSuppression ModelMatrix
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
+#' @importFrom utils flush.console
+#' 
+#' @author Øyvind Langsrud and Daniel Lupp
 #'
 #' @examples
 #' 
@@ -64,6 +77,15 @@
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
 #'       primary = function(freq, crossTable, maxN, ...) 
 #'                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
+#'                    
+#' # Combining several primary functions 
+#' # Note that NA & c(TRUE, FALSE) equals c(NA, FALSE)                      
+#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
+#'        primary = c(function(freq, maxN, ...) freq >= 45,
+#'                    function(freq, maxN, ...) freq <= maxN,
+#'                    function(crossTable, ...) NA & crossTable[[2]] == "C",  
+#'                    function(crossTable, ...) NA & crossTable[[1]]== "Total" 
+#'                                                 & crossTable[[2]]== "Total"))                    
 #'                    
 #' # Similar to GaussSuppression examples
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
@@ -93,9 +115,20 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            singleton = SingletonDefault,
                            singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
                            printInc = TRUE,
-                           output = "data.frame", x = NULL, crossTable = NULL,
-                           preAggregate = FALSE, ...){  # Fix i ModelMatrix for ... input, 
+                           output = "publish", x = NULL, crossTable = NULL,
+                           preAggregate = is.null(freqVar),
+                           extraAggregate = preAggregate & !is.null(charVar), 
+                           ...){ 
+  
+  
+  if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions" )))
+    stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
+  
+  
+  innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
 
+  force(preAggregate)
+  force(extraAggregate)
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
@@ -103,22 +136,62 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   weightVar <- names(data[1, weightVar, drop = FALSE])
   charVar <- names(data[1, charVar, drop = FALSE])
   
-  
-  if (preAggregate) {
-    print(dim(data))
+  if (preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
+    if (printInc & preAggregate) {
+      cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
+      flush.console()
+    }
     if (!is.null(hierarchies)) {
       dVar <- names(hierarchies)
     } else {
       if (!is.null(formula)) {
         dVar <- row.names(attr(delete.response(terms(as.formula(formula))), "factors"))
       } else {
-        dVar <- dimVar
+        if (length(dimVar)){
+          dVar <- dimVar
+        } else {
+          freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
+          if (!length(freqPlusVarName)){
+            dVar <- names(data)
+          } else {
+            dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
+          }
+        }
       }
     }
-    data <- aggregate(data[, unique(c(freqVar, numVar, weightVar)), drop = FALSE], data[, unique(c(dVar, charVar)), drop = FALSE], sum)
-    print(dim(data))
+    dVar <- unique(dVar)
+    
+    if (!length(dimVar)){
+      dimVar <- dVar
+    }
+    
+    if (preAggregate) {
+      if (!length(freqVar)) {
+        if ("freq" %in% names(data)) {
+          freqVar <- "f_Re_qVa_r"
+        } else {
+          freqVar <- "freq"
+        }
+        data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
+      } 
+      data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
+      if (printInc) {
+        cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
+        flush.console()
+      }
+    } else {
+      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
+    }
   }
+  
+  if(innerReturn){
+    attr(data, "freqVar") <- freqVar
+  }
+  
 
+  if (output == "inner") {
+    return(data)
+  }
   
   if (is.null(x)) {
     if (is.null(formula) & is.null(hierarchies)) {
@@ -128,6 +201,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     }
     crossTable <- as.data.frame(x$crossTable)  # fix i ModelMatrix 
     x <- x$modelMatrix
+  }
+  
+  if (output == "inner_x") {
+    return(list(inner = data, x = x))
   }
   
   if (!length(freqVar)) {
@@ -149,18 +226,52 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     weight <- as.vector(as.matrix(crossprod(x, as.matrix(data[, weightVar, drop = FALSE]))))
   }
   
-  if (output != "data.frame")                return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...))
+  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...))
   
-  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
-  if (is.function(primary))       primary <-     primary(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  if (is.function(primary) | is.list(primary))  
+               primary <-     Primary(primary = primary, crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
-  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
-  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
-  if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
-
+  
+  
+  if(extraAggregate){
+    if (printInc) {
+      cat("[extraAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
+      flush.console()
+    }
+    data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(dVar)], sum)
+    if (printInc) {
+      cat(dim(data)[1], "*", dim(data)[2], "] ", sep = "")
+      flush.console()
+    }
+    
+    if(innerReturn){
+      attr(data, "freqVar") <- freqVar
+    }
+  
+    if (is.null(formula) & is.null(hierarchies)) {
+      xExtra <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE)
+    } else {
+      xExtra <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE)
+    }
+    if (printInc) {
+      cat("Checking crossTables ..")
+      flush.console()
+    }
+    if(!isTRUE(all.equal(crossTable, as.data.frame(xExtra$crossTable)))){
+      stop("crossTables not equal")
+    }
+    x <- xExtra$modelMatrix
+    rm(xExtra)
+  }
+  
+  if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
   m <- ncol(x)
   
   if (is.null(candidates)) candidates <- 1:m
@@ -169,6 +280,22 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   if (is.null(freq)) freq <- matrix(0, m, 0)
   if (is.null(num)) num <- matrix(0, m, 0)
   if (is.null(weight)) weight <- matrix(0, m, 0)
+  
+  if(extraAggregate){
+    if (printInc) {
+      cat(". Checking (freq, num, weight) ..")
+      flush.console()
+    }
+    if(!isTRUE(all.equal(
+      as.matrix(crossprod(x, as.matrix(data[, c(freqVar, numVar, weightVar), drop = FALSE]))), 
+      cbind(freq, num, weight),
+      check.attributes = FALSE, check.names = FALSE)))
+      warning("(freq, num, weight) all not equal when checked by all.equal")
+    if (printInc) {
+      cat(".\n")
+      flush.console()
+    }
+  }
   
   # hack
   if(is.list(primary)){
@@ -185,8 +312,61 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   suppressed[hidden] <- NA
 
   
-  cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
+  publish <- cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
+  
+  if (output == "publish_inner_x") {
+    return(list(publish = publish, inner = data, x = x))
+  }
+  
+  if (output == "publish_inner") {
+    return(list(publish = publish, inner = data))
+  }
+  
+  if (output == "publish_x") {
+    return(list(publish = publish, x = x))
+  }
+  
+  publish
 }
+
+
+
+# combination of primary functions 
+Primary <- function(primary, crossTable, ...) {
+  num <- NULL
+  pri <- 1L
+  n <- nrow(crossTable)    # This line is why crossTable is parameter
+  if (is.function(primary)) {
+    primary <- c(primary)  # This is a list
+  }
+  for (i in seq_along(primary)) {
+    a <- primary[[i]](crossTable = crossTable, ...)
+    if (is.list(a)) {
+      if (is.null(num)) {
+        num <- a[[2]]
+      } else {
+        num <- cbind(num, a[[2]])
+      }
+      a <- a[[1]]
+    }
+    if (!is.logical(a)) { # Indices instead are allowed/possible  
+      aInd <- a
+      a <- rep(FALSE, n)
+      a[aInd] <- TRUE
+    }
+    if (length(a) != n)
+      stop("wrong length of primary function output")
+    pri <- pri * as.integer(!a)    # zeros (=TRUE since !) and NA’s are preserved
+  }
+  pri <- !as.logical(pri)
+  pri[is.na(pri)] <- FALSE    # No suppression when any NA
+  
+  if (is.null(num)) {
+    return(pri)
+  }
+  list(primary = pri, numExtra = num)
+}
+
 
 
 #' PrimaryDefault
@@ -289,6 +469,8 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
+#' 
+#' @author Øyvind Langsrud
 #'
 #' @examples
 #' library(SSBtools)
@@ -363,6 +545,8 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE, index = FALSE) {
 #' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
+#' 
+#' @author Øyvind Langsrud
 #'
 #' @examples
 #' library(SSBtools)
@@ -453,7 +637,11 @@ Ncontributors <- function(x, groups) {
 #' @param holdingInd  Vector of holding group categories
 #' 
 #' @return Vector of numbers of unique groups
+#' @importFrom Matrix colSums
 #' @export
+#' 
+#' @author Øyvind Langsrud
+#' 
 NcontributorsHolding <- function(x, groups, holdingInd=NULL) { # holding-indicator
   if (is.null(holdingInd)){
     return(Ncontributors(x, groups))

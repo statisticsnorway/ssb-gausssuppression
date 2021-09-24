@@ -23,10 +23,11 @@ GaussSuppressionFromData(
   singleton = SingletonDefault,
   singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
   printInc = TRUE,
-  output = "data.frame",
+  output = "publish",
   x = NULL,
   crossTable = NULL,
-  preAggregate = FALSE,
+  preAggregate = is.null(freqVar),
+  extraAggregate = preAggregate & !is.null(charVar),
   ...
 )
 }
@@ -68,7 +69,10 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
-\item{output}{If not "data.frame" (default), input to supplied functions are returned}
+\item{output}{One of \code{"publish"} (default), \code{"inner"}, \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"},
+\code{"inner_x"}, and \code{"input2functions"} (input to supplied functions).
+Here "inner" means input data (possibly pre-aggregated) and
+"x" means dummy matrix (as input parameter x).}
 
 \item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}}
 
@@ -76,6 +80,13 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
 This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
+
+\item{extraAggregate}{When \code{TRUE}, the data will be aggregated by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula}.
+The aggregated data and the corresponding x-matrix will only be used as input to the singleton
+function and \code{\link{GaussSuppression}}.
+This extra aggregation is useful when parameter \code{charVar} is used.
+Supply \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"} or \code{"inner_x"} as \code{output} to obtain extra aggregated results.
+Supply \code{"inner"} or \code{"input2functions"} to obtain other results.}
 
 \item{...}{Further arguments to be passed to the supplied functions.}
 }
@@ -89,10 +100,12 @@ secondary suppression by Gaussian elimination by \code{\link{GaussSuppression}}
 }
 \details{
 The supplied functions for generating \code{\link{GaussSuppression}} input takes the following arguments:
-\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar} and \code{...}.
+\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
 where the two first are  \code{\link{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 Similarly, \code{num}, is a data frame of aggregated numerical variables.
+It is possible to supply several primary functions joined by \code{c}, e.g. (\code{c(FunPrim1, FunPrim2)}).
+All \code{NA}s returned from any of the functions force the corresponding cells not to be primary suppressed.
 }
 \examples{
 
@@ -113,6 +126,15 @@ GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2
       primary = function(freq, crossTable, maxN, ...) 
                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
                    
+# Combining several primary functions 
+# Note that NA & c(TRUE, FALSE) equals c(NA, FALSE)                      
+GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
+       primary = c(function(freq, maxN, ...) freq >= 45,
+                   function(freq, maxN, ...) freq <= maxN,
+                   function(crossTable, ...) NA & crossTable[[2]] == "C",  
+                   function(crossTable, ...) NA & crossTable[[1]]== "Total" 
+                                                & crossTable[[2]]== "Total"))                    
+                   
 # Similar to GaussSuppression examples
 GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
        candidates = NULL, singleton = NULL, protectZeros = FALSE, secondaryZeros = TRUE)
@@ -129,4 +151,7 @@ GaussSuppressionFromData(z, 1:2, 3, singletonMethod = "none") # as above
 GaussSuppressionFromData(z, 1:2, 3)
 GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE, singleton = NULL)
 GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE)      
+}
+\author{
+Øyvind Langsrud and Daniel Lupp
 }
