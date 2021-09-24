@@ -17,9 +17,9 @@ SuppressDirectDisclosure(
 \arguments{
 \item{data}{the input data}
 
-\item{dimVar}{character vector containing variable names for the output table}
+\item{dimVar}{main dimensional variables for the output table}
 
-\item{freqVar}{variable name containing frequency counts}
+\item{freqVar}{variable containing frequency counts}
 
 \item{coalition}{numeric variable, parameter for primary suppression. Default value is 1.}
 
@@ -34,7 +34,7 @@ method. See \link[SSBtools]{FindDisclosiveCells} for details.}
 data.frame containing the result of the suppression
 }
 \description{
-Function for suppressing disclosive cells in frequency tables. The method
+Function for suppressing directly-disclosive cells in frequency tables. The method
 detects and primary suppresses directly-disclosive cells with the
 \link[SSBtools]{FindDisclosiveCells} function, and applies a secondary suppression
 using Gauss suppression (see \link{GaussSuppressionFromData}).
@@ -49,4 +49,7 @@ tex <- data.frame(v1 = rep(c('a', 'b', 'c'), times = 4),
                   freq = c(0,0,5,0,2,3,1,0,3,1,1,2))
 SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq")
 SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
+}
+\author{
+Daniel Lupp
 }

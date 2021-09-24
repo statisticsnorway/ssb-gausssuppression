@@ -56,3 +56,6 @@ z2$freqDec <- a$freqDec
 b <- SuppressionFromDecimals(z2, dimVar = c("region", "kostragr", "hovedint"), 
                              freqVar = "ant", decVar = "freqDec")
 }
+\author{
+Øyvind Langsrud
+}

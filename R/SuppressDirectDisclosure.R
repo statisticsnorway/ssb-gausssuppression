@@ -69,7 +69,6 @@ DirectDisclosureCandidates <- function(freq, x, secondaryZeros, weight, ...) {
   }
   tie <- as.matrix(Matrix::crossprod(x, x %*% ((freq+1)*weight)))
   tie <- tie/max(tie)
-  # freqOrd <- ((freq+1)*weight + 0.99 * tie)[, 1, drop = TRUE]
   freqOrd <- sapply(freq, function(x) {
                   if (x == 0) return(secondaryZeros)
                   if (x <= secondaryZeros) return(x-1)

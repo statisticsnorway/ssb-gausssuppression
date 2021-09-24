@@ -38,3 +38,6 @@ cbind(as.data.frame(a$crossTable), nUnique_ths_per = Ncontributors(a$modelMatrix
 \seealso{
 \code{\link{ModelMatrix}}
 }
+\author{
+Øyvind Langsrud
+}

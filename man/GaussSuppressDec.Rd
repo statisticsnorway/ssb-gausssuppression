@@ -69,3 +69,6 @@ z1 <- SSBtoolsData("z1")
 GaussSuppressDec(z1, 1:2, 3)
 GaussSuppressDec(z1, freqVar = "ant", formula = ~ region + hovedint, maxN = 10)
 }
+\author{
+Øyvind Langrsud
+}

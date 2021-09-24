@@ -8,7 +8,7 @@
 #' secondary suppression by Gaussian elimination by \code{\link{GaussSuppression}} 
 #' 
 #' The supplied functions for generating \code{\link{GaussSuppression}} input takes the following arguments: 
-#' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar` and `...`. 
+#' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` and `...`. 
 #' where the two first are  \code{\link{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
 #' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
 #' Similarly, `num`, is a data frame of aggregated numerical variables.   
@@ -56,6 +56,8 @@
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
+#' 
+#' @author Øyvind Langsrud and Daniel Lupp
 #'
 #' @examples
 #' 
@@ -224,16 +226,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     weight <- as.vector(as.matrix(crossprod(x, as.matrix(data[, weightVar, drop = FALSE]))))
   }
   
-  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...))
+  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...))
   
-  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
   if (is.function(primary) | is.list(primary))  
                primary <-     Primary(primary = primary, crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
-  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
-  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
   
   
@@ -268,7 +270,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     rm(xExtra)
   }
   
-  if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, ...)
+  if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
   m <- ncol(x)
   
@@ -467,6 +469,8 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
+#' 
+#' @author Øyvind Langsrud
 #'
 #' @examples
 #' library(SSBtools)
@@ -541,6 +545,8 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE, index = FALSE) {
 #' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
+#' 
+#' @author Øyvind Langsrud
 #'
 #' @examples
 #' library(SSBtools)
@@ -633,6 +639,9 @@ Ncontributors <- function(x, groups) {
 #' @return Vector of numbers of unique groups
 #' @importFrom Matrix colSums
 #' @export
+#' 
+#' @author Øyvind Langsrud
+#' 
 NcontributorsHolding <- function(x, groups, holdingInd=NULL) { # holding-indicator
   if (is.null(holdingInd)){
     return(Ncontributors(x, groups))

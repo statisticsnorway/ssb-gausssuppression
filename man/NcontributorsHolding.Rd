@@ -26,3 +26,6 @@ The one with maximal column sum of \code{x} is chosen as the representative.
 Normally this will be an aggregate representing the holding group total.
 When holdingInd is NULL (default), the function is equivalent to \code{\link{Ncontributors}}.
 }
+\author{
+Øyvind Langsrud
+}
