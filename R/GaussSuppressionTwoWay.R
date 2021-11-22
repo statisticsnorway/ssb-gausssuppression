@@ -40,6 +40,7 @@
 #'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
 #'                       Supply `"inner"` or `"input2functions"` to obtain other results. 
 #' @param  colVar  Hierarchy variables for the column groups (others in row group)  
+#' @param  removeEmpty	When TRUE, empty columns (only zeros) are not included in output
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -61,6 +62,7 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
                            preAggregate = is.null(freqVar),
                            extraAggregate = preAggregate & !is.null(charVar), 
                            colVar = names(hierarchies)[1],
+                           removeEmpty = TRUE, 
                            ...){ 
   
   if (is.null(hierarchies)) {
