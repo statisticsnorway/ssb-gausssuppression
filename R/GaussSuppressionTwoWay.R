@@ -40,7 +40,7 @@
 #' @return Aggregated data with suppression information
 #' @export
 #' 
-GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
+GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies, formula = NULL,
                            maxN = 3, 
                            protectZeros = TRUE, 
@@ -70,7 +70,6 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
 
   force(preAggregate)
-  force(extraAggregate)
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
@@ -78,7 +77,7 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
   weightVar <- names(data[1, weightVar, drop = FALSE])
   charVar <- names(data[1, charVar, drop = FALSE])
   
-  if (preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
+  if (preAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
     if (printInc & preAggregate) {
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
@@ -136,6 +135,42 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
   }
   
   # New code starts from here
+  
+  if (is.null(colVar)) {
+    colVar <- names(hierarchies)[1]
+  }
+  
+  # Trick with index-input
+  data$iN_dEx <- seq_len(nrow(data))
+  
+  # Two HierarchyCompute runs. 
+  
+  # matrixComponents output with "index"
+  hc1 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = "iN_dEx", colVar = colVar, output = "matrixComponents", inputInOutput = inputInOutput)
+  
+  if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
+    stop("Index method failed. Duplicated combinations?")
+  }
+  
+  
+  # All numerical variables including "index"
+  hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c("iN_dEx", freqVar, numVar, weightVar), colVar = colVar, inputInOutput = inputInOutput)
+  
+
+  
+  
+  if (is.function(primary) | is.list(primary))  
+    primary <-     Primary(primary = primary, 
+                           crossTable = hc2[names(hierarchies)], # x = x,    ## x not possible here
+                           freq = hc2[[freqVar]], 
+                           num = hc2[numVar], 
+                           weight = hc2[[weightVar]], 
+                           maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
+  
+  
+  
+  list(hc1 = hc1, hc2 = hc2)
   
   
 }
