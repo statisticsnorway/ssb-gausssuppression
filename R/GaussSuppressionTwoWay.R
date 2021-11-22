@@ -1,19 +1,10 @@
 
 
-#' Cell suppression from input data containing inner cells
+#' Two-way iteration algorithm 
 #' 
+#' Utilizing HierarchyCompute2
 #' 
-#' Aggregates are generated followed by 
-#' primary suppression followed by 
-#' secondary suppression by Gaussian elimination by \code{\link{GaussSuppression}} 
-#' 
-#' The supplied functions for generating \code{\link{GaussSuppression}} input takes the following arguments: 
-#' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` and `...`. 
-#' where the two first are  \code{\link{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
-#' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
-#' Similarly, `num`, is a data frame of aggregated numerical variables.   
-#' It is possible to supply several primary functions joined by `c`, e.g. (`c(FunPrim1, FunPrim2)`). 
-#' All `NA`s returned from any of the functions force the corresponding cells not to be primary suppressed.
+#' In this version: Global calculation of primary and local calculations otherwise 
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -52,58 +43,8 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix
-#' @importFrom Matrix crossprod as.matrix
-#' @importFrom stats aggregate as.formula delete.response terms
-#' @importFrom utils flush.console
 #' 
-#' @author Øyvind Langsrud and Daniel Lupp
-#'
-#' @examples
-#' 
-#' z1 <- SSBtoolsData("z1")
-#' GaussSuppressionFromData(z1, 1:2, 3)
-#' 
-#' z2 <- SSBtoolsData("z2")
-#' GaussSuppressionFromData(z2, 1:4, 5, protectZeros = FALSE)
-#' 
-#' 
-#' # Data as in GaussSuppression examples
-#' df <- data.frame(values = c(1, 1, 1, 5, 5, 9, 9, 9, 9, 9, 0, 0, 0, 7, 7), 
-#'                  var1 = rep(1:3, each = 5), var2 = c("A", "B", "C", "D", "E"))
-#' 
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values")
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10)
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
-#'       primary = function(freq, crossTable, maxN, ...) 
-#'                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
-#'                    
-#' # Combining several primary functions 
-#' # Note that NA & c(TRUE, FALSE) equals c(NA, FALSE)                      
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
-#'        primary = c(function(freq, maxN, ...) freq >= 45,
-#'                    function(freq, maxN, ...) freq <= maxN,
-#'                    function(crossTable, ...) NA & crossTable[[2]] == "C",  
-#'                    function(crossTable, ...) NA & crossTable[[1]]== "Total" 
-#'                                                 & crossTable[[2]]== "Total"))                    
-#'                    
-#' # Similar to GaussSuppression examples
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
-#'        candidates = NULL, singleton = NULL, protectZeros = FALSE, secondaryZeros = TRUE)
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
-#'        singleton = NULL, protectZeros = FALSE, secondaryZeros = FALSE)
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 * var2, 
-#'        protectZeros = FALSE, secondaryZeros = FALSE)
-#' 
-#'               
-#' # Examples with zeros as singletons
-#' z <- data.frame(row = rep(1:3, each = 3), col = 1:3, freq = c(0, 2, 5, 0, 0, 6:9))
-#' GaussSuppressionFromData(z, 1:2, 3, singleton = NULL) 
-#' GaussSuppressionFromData(z, 1:2, 3, singletonMethod = "none") # as above 
-#' GaussSuppressionFromData(z, 1:2, 3)
-#' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE, singleton = NULL)
-#' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE)      
-GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
+GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies = NULL, formula = NULL,
                            maxN = 3, 
                            protectZeros = TRUE, 
