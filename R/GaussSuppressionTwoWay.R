@@ -39,13 +39,14 @@
 #'                       This extra aggregation is useful when parameter `charVar` is used.
 #'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
 #'                       Supply `"inner"` or `"input2functions"` to obtain other results. 
+#' @param  colVar  Hierarchy variables for the column groups (others in row group)  
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
 #' @export
 #' 
 GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
-                                    hierarchies = NULL, formula = NULL,
+                                    hierarchies, formula = NULL,
                            maxN = 3, 
                            protectZeros = TRUE, 
                            secondaryZeros = FALSE,
@@ -59,8 +60,12 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
                            output = "publish", x = NULL, crossTable = NULL,
                            preAggregate = is.null(freqVar),
                            extraAggregate = preAggregate & !is.null(charVar), 
+                           colVar = names(hierarchies)[1],
                            ...){ 
   
+  if (is.null(hierarchies)) {
+    stop("Hierarchies must be specified")
+  }
   
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions" )))
     stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
