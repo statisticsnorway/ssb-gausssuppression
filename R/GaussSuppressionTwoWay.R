@@ -225,12 +225,35 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     weightCol <- hc2[idxTotalRow, weightVar, drop = TRUE]
   }
   
+  if (is.function(candidates)){ # An alternative is two functions as input
+    candidatesROW <-  candidates(crossTable = hc2[idxTotalCol, rowVar , drop = FALSE], 
+                                 x = xRow, freq = freqRow, num = numRow, weight = weightRow, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, 
+                                 data = dataRow, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+    candidatesCol <-  candidates(crossTable = hc2[idxTotalRow, colVar , drop = FALSE], 
+                                 x = xCol, freq = freqCol, num = numCol, weight = weightCol, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, 
+                                 data = dataCol, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+    
+  }
+  
+  
+  if(is.list(primary)){
+    ###num = cbind(num, primary[[2]])   fix here 
+    primary = primary[[1]]
+  }
+  
+  SupprMatrix = matrix(a$primary,ncol= nColOutput)
+  
+  #singleton = NULL og/eller singletonMethod = "none" 
+  #whenEmptySuppressed = NULL og whenEmptyUnsuppressed = NULL
   
   
   list(hc1 = hc1, hc2 = hc2, dataRow = dataRow, dataCol = dataCol, 
        freqRow = freqRow, freqCol = freqCol, 
        numRow = numRow, numCol = numCol, 
-       weightRow = weightRow, weightCol = weightCol)
+       weightRow = weightRow, weightCol = weightCol,
+       hc2[idxTotalCol, , drop = FALSE],
+       hc2[idxTotalRow, , drop = FALSE], candidatesROW =candidatesROW, candidatesCol =candidatesCol, primary=primary
+       )
 
   
 }
