@@ -33,12 +33,6 @@
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
-#' @param extraAggregate When `TRUE`, the data will be aggregated by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
-#'                       The aggregated data and the corresponding x-matrix will only be used as input to the singleton 
-#'                       function and \code{\link{GaussSuppression}}. 
-#'                       This extra aggregation is useful when parameter `charVar` is used.
-#'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
-#'                       Supply `"inner"` or `"input2functions"` to obtain other results. 
 #' @param  colVar  Hierarchy variables for the column groups (others in row group)  
 #' @param  removeEmpty	When TRUE, empty columns (only zeros) are not included in output
 #' @param ... Further arguments to be passed to the supplied functions.
@@ -60,7 +54,6 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
                            printInc = TRUE,
                            output = "publish", x = NULL, crossTable = NULL,
                            preAggregate = is.null(freqVar),
-                           extraAggregate = preAggregate & !is.null(charVar), 
                            colVar = names(hierarchies)[1],
                            removeEmpty = TRUE, 
                            ...){ 
