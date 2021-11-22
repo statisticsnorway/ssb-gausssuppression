@@ -38,6 +38,8 @@
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
+#' 
+#' @importFrom Matrix t rowSums
 #' @export
 #' 
 GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
@@ -136,9 +138,13 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   # New code starts from here
   
+  
   if (is.null(colVar)) {
     colVar <- names(hierarchies)[1]
   }
+  
+  rowVar <- names(hierarchies)[!(names(hierarchies) %in% colVar)]
+  
   
   # Trick with index-input
   data$iN_dEx <- seq_len(nrow(data))
@@ -167,11 +173,65 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            weight = hc2[[weightVar]], 
                            maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
+  totalRow <- which.max(rowSums(hc1$hcRow$dataDummyHierarchy))
+  totalCol <- which.max(rowSums(hc1$hcCol$dataDummyHierarchy))
+  
+  
+  nRowOutput <- nrow(hc1$hcRow$dataDummyHierarchy)
+  nColOutput <- nrow(hc1$hcCol$dataDummyHierarchy)
+  
+  idxTotalCol <- seq_len(nRowOutput) + (nRowOutput * (totalCol - 1))
+  idxTotalRow <- totalRow + (seq_len(nColOutput) - 1) * nRowOutput
+  
+  value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
+  
+  data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], unique(colVar), drop = FALSE]
+  
+  
+  dataRow <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[rowVar], sum)
+  dataRow <- dataRow[Match(dataRow[rowVar], hc1$hcRow$fromCrossCode), , drop = FALSE]
+  
+  dataCol <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[colVar], sum)
+  dataCol <- dataCol[Match(dataCol[colVar], data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], colVar, drop = FALSE]), , drop = FALSE]
   
   
   
-  list(hc1 = hc1, hc2 = hc2)
+  xRow <- t(hc1$hcRow$dataDummyHierarchy)
+  xCol <- t(hc1$hcCol$dataDummyHierarchy)
   
+  
+  if (!length(freqVar)) {
+    freqRow <- NULL
+    freqCol <- NULL
+  } else {
+    freqRow <- hc2[idxTotalCol, freqVar, drop = TRUE]
+    freqCol <- hc2[idxTotalRow, freqVar, drop = TRUE]
+  }
+  
+  if (!length(numVar)) {
+    numRow <- NULL
+    numCol <- NULL
+  } else {
+    numRow <- hc2[idxTotalCol, numVar, drop = FALSE]
+    numCol <- hc2[idxTotalRow, numVar, drop = FALSE]
+  }
+  
+  
+  if (!length(weightVar)) {
+    weightRow <- NULL
+    weightCol <- NULL
+  } else {
+    weightRow <- hc2[idxTotalCol, weightVar, drop = TRUE]
+    weightCol <- hc2[idxTotalRow, weightVar, drop = TRUE]
+  }
+  
+  
+  
+  list(hc1 = hc1, hc2 = hc2, dataRow = dataRow, dataCol = dataCol, 
+       freqRow = freqRow, freqCol = freqCol, 
+       numRow = numRow, numCol = numCol, 
+       weightRow = weightRow, weightCol = weightCol)
+
   
 }
 
