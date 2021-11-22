@@ -29,8 +29,6 @@
 #'                      `"inner_x"`, and `"input2functions"` (input to supplied functions). 
 #'               Here "inner" means input data (possibly pre-aggregated) and 
 #'               "x" means dummy matrix (as input parameter x).   
-#' @param x `x` (`modelMatrix`) and `crossTable` can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}
-#' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param  colVar  Hierarchy variables for the column groups (others in row group)  
@@ -52,7 +50,7 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
                            singleton = SingletonDefault,
                            singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
                            printInc = TRUE,
-                           output = "publish", x = NULL, crossTable = NULL,
+                           output = "publish", 
                            preAggregate = is.null(freqVar),
                            colVar = names(hierarchies)[1],
                            removeEmpty = TRUE, 
