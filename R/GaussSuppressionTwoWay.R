@@ -33,6 +33,8 @@
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param  colVar  Hierarchy variables for the column groups (others in row group)  
 #' @param  removeEmpty	When TRUE, empty columns (only zeros) are not included in output
+#' @param inputInOutput Logical vector (possibly recycled) for each element of hierarchies.
+#'         TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -54,6 +56,7 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
                            preAggregate = is.null(freqVar),
                            colVar = names(hierarchies)[1],
                            removeEmpty = TRUE, 
+                           inputInOutput = TRUE,
                            ...){ 
   
   if (is.null(hierarchies)) {
@@ -134,7 +137,7 @@ GaussSuppressionFromTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar 
   
   # New code starts from here
   
-
+  
 }
 
 
