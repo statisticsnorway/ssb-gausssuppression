@@ -291,7 +291,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   supprSumRow <- colSums(supprMatrix)
   supprSumRow_old <- 0L * supprSumRow
   
-  t(xRow) %*% hc1$hcRow$valueMatrix %*%  xCol
+  # t(xRow) %*% hc1$hcRow$valueMatrix %*%  xCol
   
   # When TRUE: Output corresponding to zero data rows in input will never be secondary suppressed  
   
