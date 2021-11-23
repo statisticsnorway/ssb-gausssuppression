@@ -65,6 +65,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     stop("Hierarchies must be specified")
   }
   
+  total = "Total"
+  hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, total = total, 
+                                     hierarchyVarNames = c(mapsFrom = "mapsFrom", mapsTo = "mapsTo", sign = "sign", level = "level"))
+  
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions" )))
     stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
   
@@ -237,8 +241,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   
   if (is.list(primary)) {
-    ### num <- cbind(num, primary[[2]]) fix here
+    numExtra <- primary[[2]]
     primary <- primary[[1]]
+  } else {
+    numExtra <- matrix(0, nrow(hc2), 0)
   }
   
   supprMatrix <- matrix(primary, ncol = nColOutput)
@@ -285,7 +291,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
   }
   
-  
+  hc2 = cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix))
   
   #singleton = NULL og/eller singletonMethod = "none" 
   #whenEmptySuppressed = NULL og whenEmptyUnsuppressed = NULL
