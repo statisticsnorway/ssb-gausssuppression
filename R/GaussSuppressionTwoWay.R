@@ -32,7 +32,8 @@
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param  colVar  Hierarchy variables for the column groups (others in row group)  
-#' @param  removeEmpty	When TRUE, empty columns (only zeros) are not included in output
+#' @param  removeEmpty	When TRUE (not implemented), empty output corresponding to empty input is removed. 
+#'                      When NULL (default), removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.
 #' @param inputInOutput Logical vector (possibly recycled) for each element of hierarchies.
 #'         TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.
 #' @param ... Further arguments to be passed to the supplied functions.
@@ -73,13 +74,25 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            output = "publish",                                                        
                            preAggregate = is.null(freqVar),
                            colVar = names(hierarchies)[1],
-                           removeEmpty = TRUE,                                                        # Parameter not treated yet
+                           removeEmpty = NULL,
                            inputInOutput = TRUE,
                            ...){ 
   
   if (is.null(hierarchies)) {
     stop("Hierarchies must be specified")
   }
+  
+  if(is.null(removeEmpty)){
+    removeEmpty_in_x <- TRUE
+    removeEmpty <- FALSE
+  } else {
+    removeEmpty_in_x <- removeEmpty 
+  }
+  
+  if(removeEmpty){
+    stop("removeEmpty=TRUE is not implementyed. Usen NULL and remove rows where iN_dEx is 0")
+  }
+  
   
   total = "Total"
   hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, total = total, 
@@ -172,7 +185,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   # Two HierarchyCompute runs. 
   
   # matrixComponents output with "index"
-  hc1 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = "iN_dEx", colVar = colVar, output = "matrixComponents", inputInOutput = inputInOutput)
+  hc1 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = "iN_dEx", colVar = colVar, output = "matrixComponents", inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   
   if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
     stop("Index method failed. Duplicated combinations?")
@@ -180,9 +193,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   
   # All numerical variables including "index"
-  hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c("iN_dEx", freqVar, numVar, weightVar), colVar = colVar, inputInOutput = inputInOutput)
-  
-
+  hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c("iN_dEx", freqVar, numVar, weightVar), colVar = colVar, inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   
   
   if (is.function(primary) | is.list(primary))  
@@ -192,6 +203,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            num = hc2[numVar], 
                            weight = hc2[[weightVar]], 
                            maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
   
   totalRow <- which.max(rowSums(hc1$hcRow$dataDummyHierarchy))
   totalCol <- which.max(rowSums(hc1$hcCol$dataDummyHierarchy))
@@ -205,7 +217,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
   
-  data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], unique(colVar), drop = FALSE]
+  #data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], unique(colVar), drop = FALSE]
   
   
   dataRow <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[rowVar], sum)
@@ -253,6 +265,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     weightCol <- hc2[idxTotalRow, weightVar, drop = TRUE]
   }
   
+  
+  
   if (is.function(candidates)){ # An alternative is two functions as input
     candidatesROW <-  candidates(crossTable = hc2[idxTotalCol, rowVar , drop = FALSE], 
                                  x = xRow, freq = freqRow, num = numRow, weight = weightRow, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, 
@@ -277,13 +291,29 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   supprSumRow <- colSums(supprMatrix)
   supprSumRow_old <- 0L * supprSumRow
   
+  t(xRow) %*% hc1$hcRow$valueMatrix %*%  xCol
+  
+  # When TRUE: Output corresponding to zero data rows in input will never be secondary suppressed  
+  
+  xRow_i <- xRow
+  xCol_i <- xCol
+  
   while (sum(supprSumRow) > sum(supprSumRow_old)) {
     
     for (i in seq_len(nColOutput)) {
       if (supprSumRow[i] > supprSumRow_old[i]) {
         
         cat("col", i, ",", supprSumRow[i] - supprSumRow_old[i], "extra : ")
-        secondary <- GaussSuppression(x = xRow, candidates = candidatesROW, 
+        
+        if(removeEmpty_in_x){
+          rr <- as.vector(as.matrix(hc1$hcRow$valueMatrix %*%  xCol[, i, drop=FALSE])) > 0
+          if(any(!rr)){
+            cat("-",sum(!rr)," ", sep="")
+          }
+          xRow_i <- xRow[rr, ,drop=FALSE] 
+        }
+        
+        secondary <- GaussSuppression(x = xRow_i, candidates = candidatesROW, 
                                       primary = supprMatrix[, i], 
                                       forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
@@ -300,7 +330,16 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
       if (supprSumCol[i] > supprSumCol_old[i]) {
         
         cat("row", i, ",", supprSumCol[i] - supprSumCol_old[i], "extra : ")
-        secondary <- GaussSuppression(x = xCol, candidates = candidatesCol, 
+        
+        if(removeEmpty_in_x){
+          rr <- as.vector(as.matrix(t(hc1$hcRow$valueMatrix) %*%  xRow[, i, drop=FALSE])) > 0
+          if(any(!rr)){
+            cat("-",sum(!rr)," ", sep="")
+          }
+          xCol_i <- xCol[rr, ,drop=FALSE] 
+        }
+        
+        secondary <- GaussSuppression(x = xCol_i, candidates = candidatesCol, 
                                       primary = supprMatrix[i, ], 
                                       forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
@@ -323,6 +362,11 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   #     hc2[idxTotalRow, , drop = FALSE], candidatesROW =candidatesROW, candidatesCol =candidatesCol, primary=primary,  supprMatrix= supprMatrix
   #     )
 
+  if(removeEmpty){
+    cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix))
+  }
+  
+  
   cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix))
   
   
