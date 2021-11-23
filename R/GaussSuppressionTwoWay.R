@@ -40,8 +40,24 @@
 #' @return Aggregated data with suppression information
 #' 
 #' @importFrom Matrix t rowSums
+#' @importFrom SSBtools AutoHierarchies HierarchyCompute HierarchyCompute2
 #' @export
 #' 
+#' @examples 
+#' z3 <- SSBtoolsData("z3")
+#' 
+#' dimListsA <- SSBtools::FindDimLists(z3[, 1:6])
+#' dimListsB <- SSBtools::FindDimLists(z3[, c(1, 4, 5)])
+#' 
+#' 
+#' out1 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+#'                                colVar = c("hovedint"))
+#' out2 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+#'                                colVar = c("hovedint", "mnd"))
+#' out3 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+#'                                colVar = c("region"))
+#' out4 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+#'                                colVar = c("hovedint", "region"))
 GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies, formula = NULL,
                            maxN = 3, 

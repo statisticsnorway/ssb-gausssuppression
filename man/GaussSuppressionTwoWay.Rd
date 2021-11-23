@@ -95,3 +95,19 @@ Utilizing HierarchyCompute2
 \details{
 In this version: Global calculation of primary and local calculations otherwise
 }
+\examples{
+z3 <- SSBtoolsData("z3")
+
+dimListsA <- SSBtools::FindDimLists(z3[, 1:6])
+dimListsB <- SSBtools::FindDimLists(z3[, c(1, 4, 5)])
+
+
+out1 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+                               colVar = c("hovedint"))
+out2 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+                               colVar = c("hovedint", "mnd"))
+out3 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+                               colVar = c("region"))
+out4 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+                               colVar = c("hovedint", "region"))
+}
