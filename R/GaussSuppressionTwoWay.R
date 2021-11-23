@@ -49,15 +49,15 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            secondaryZeros = FALSE,
                            candidates = CandidatesDefault,
                            primary = PrimaryDefault,
-                           forced = NULL,
-                           hidden = NULL,
-                           singleton = SingletonDefault,
-                           singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),
+                           forced = NULL,                                                             # Parameter not treated yet
+                           hidden = NULL,                                                             # Parameter not treated yet
+                           singleton = SingletonDefault,                                              # Parameter not treated yet 
+                           singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),    # Parameter not treated yet
                            printInc = TRUE,
-                           output = "publish", 
+                           output = "publish",                                                        
                            preAggregate = is.null(freqVar),
                            colVar = names(hierarchies)[1],
-                           removeEmpty = TRUE, 
+                           removeEmpty = TRUE,                                                        # Parameter not treated yet
                            inputInOutput = TRUE,
                            ...){ 
   
@@ -193,10 +193,18 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   
   dataRow <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[rowVar], sum)
-  dataRow <- dataRow[Match(dataRow[rowVar], hc1$hcRow$fromCrossCode), , drop = FALSE]
+  ma <- Match(dataRow[rowVar], hc1$hcRow$fromCrossCode)
+  if( any(range(diff(sort(ma))) != c(1L, 1L)) ){
+    stop("Matching failed")
+  }
+  dataRow <- dataRow[ ma, , drop = FALSE]
   
   dataCol <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[colVar], sum)
-  dataCol <- dataCol[Match(dataCol[colVar], data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], colVar, drop = FALSE]), , drop = FALSE]
+  ma <- Match(dataCol[colVar], data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], colVar, drop = FALSE])
+  if( any(range(diff(sort(ma))) != c(1L, 1L)) ){
+    stop("Matching failed")
+  }
+  dataCol <- dataCol[ ma, , drop = FALSE]
   
   
   
@@ -268,10 +276,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
       }
     }
     
-    supprSumRow_old <- supprSumRow
+    supprSumRow_old <- colSums(supprMatrix)
     supprSumCol <- rowSums(supprMatrix)
     
-    # print(supprSumCol) print(supprSumCol_old)
     
     for (i in seq_len(nRowOutput)) {
       if (supprSumCol[i] > supprSumCol_old[i]) {
@@ -291,20 +298,17 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
   }
   
-  hc2 = cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix))
   
-  #singleton = NULL og/eller singletonMethod = "none" 
-  #whenEmptySuppressed = NULL og whenEmptyUnsuppressed = NULL
-  
-  
-  list(hc1 = hc1, hc2 = hc2, dataRow = dataRow, dataCol = dataCol, 
-       freqRow = freqRow, freqCol = freqCol, 
-       numRow = numRow, numCol = numCol, 
-       weightRow = weightRow, weightCol = weightCol,
-       hc2[idxTotalCol, , drop = FALSE],
-       hc2[idxTotalRow, , drop = FALSE], candidatesROW =candidatesROW, candidatesCol =candidatesCol, primary=primary,  supprMatrix= supprMatrix
-       )
+  #list(hc1 = hc1, hc2 = hc2, dataRow = dataRow, dataCol = dataCol, 
+  #     freqRow = freqRow, freqCol = freqCol, 
+  #     numRow = numRow, numCol = numCol, 
+  #     weightRow = weightRow, weightCol = weightCol,
+  #     hc2[idxTotalCol, , drop = FALSE],
+  #     hc2[idxTotalRow, , drop = FALSE], candidatesROW =candidatesROW, candidatesCol =candidatesCol, primary=primary,  supprMatrix= supprMatrix
+  #     )
 
+  cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix))
+  
   
 }
 
