@@ -236,12 +236,56 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   }
   
   
-  if(is.list(primary)){
-    ###num = cbind(num, primary[[2]])   fix here 
-    primary = primary[[1]]
+  if (is.list(primary)) {
+    ### num <- cbind(num, primary[[2]]) fix here
+    primary <- primary[[1]]
   }
   
-  SupprMatrix = matrix(a$primary,ncol= nColOutput)
+  supprMatrix <- matrix(primary, ncol = nColOutput)
+  
+  supprSumCol_old <- rowSums(supprMatrix)
+  supprSumRow <- colSums(supprMatrix)
+  supprSumRow_old <- 0L * supprSumRow
+  
+  while (sum(supprSumRow) > sum(supprSumRow_old)) {
+    
+    for (i in seq_len(nColOutput)) {
+      if (supprSumRow[i] > supprSumRow_old[i]) {
+        
+        cat("col", i, ",", supprSumRow[i] - supprSumRow_old[i], "extra : ")
+        secondary <- GaussSuppression(x = xRow, candidates = candidatesROW, 
+                                      primary = supprMatrix[, i], 
+                                      forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
+                                      printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
+        
+        supprMatrix[secondary, i] <- TRUE
+      }
+    }
+    
+    supprSumRow_old <- supprSumRow
+    supprSumCol <- rowSums(supprMatrix)
+    
+    # print(supprSumCol) print(supprSumCol_old)
+    
+    for (i in seq_len(nRowOutput)) {
+      if (supprSumCol[i] > supprSumCol_old[i]) {
+        
+        cat("row", i, ",", supprSumCol[i] - supprSumCol_old[i], "extra : ")
+        secondary <- GaussSuppression(x = xCol, candidates = candidatesCol, 
+                                      primary = supprMatrix[i, ], 
+                                      forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
+                                      printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
+        
+        supprMatrix[i, secondary] <- TRUE
+      }
+    }
+    
+    supprSumCol_old <- rowSums(supprMatrix)
+    supprSumRow <- colSums(supprMatrix)
+    
+  }
+  
+  
   
   #singleton = NULL og/eller singletonMethod = "none" 
   #whenEmptySuppressed = NULL og whenEmptyUnsuppressed = NULL
@@ -252,7 +296,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
        numRow = numRow, numCol = numCol, 
        weightRow = weightRow, weightCol = weightCol,
        hc2[idxTotalCol, , drop = FALSE],
-       hc2[idxTotalRow, , drop = FALSE], candidatesROW =candidatesROW, candidatesCol =candidatesCol, primary=primary
+       hc2[idxTotalRow, , drop = FALSE], candidatesROW =candidatesROW, candidatesCol =candidatesCol, primary=primary,  supprMatrix= supprMatrix
        )
 
   
