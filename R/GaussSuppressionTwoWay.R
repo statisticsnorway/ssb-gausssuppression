@@ -1,8 +1,8 @@
 
 
-#' Two-way iteration algorithm 
+#' Two-way iteration algorithm utilizing \code{\link{HierarchyCompute2}}
 #' 
-#' Utilizing HierarchyCompute2
+#' Use parameter `colVar` to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
 #' 
 #' In this version: Global calculation of primary and local calculations otherwise 
 #'
@@ -31,7 +31,7 @@
 #'               "x" means dummy matrix (as input parameter x).   
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
-#' @param  colVar  Hierarchy variables for the column groups (others in row group)  
+#' @param  colVar  Hierarchy variables for the column groups (others in row group).  
 #' @param  removeEmpty	When TRUE (not implemented), empty output corresponding to empty input is removed. 
 #'                      When NULL (default), removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.
 #' @param inputInOutput Logical vector (possibly recycled) for each element of hierarchies.
@@ -171,10 +171,6 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   # New code starts from here
   
-  
-  if (is.null(colVar)) {
-    colVar <- names(hierarchies)[1]
-  }
   
   rowVar <- names(hierarchies)[!(names(hierarchies) %in% colVar)]
   

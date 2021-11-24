@@ -2,7 +2,7 @@
 % Please edit documentation in R/GaussSuppressionTwoWay.R
 \name{GaussSuppressionTwoWay}
 \alias{GaussSuppressionTwoWay}
-\title{Two-way iteration algorithm}
+\title{Two-way iteration algorithm utilizing \code{\link{HierarchyCompute2}}}
 \usage{
 GaussSuppressionTwoWay(
   data,
@@ -77,7 +77,7 @@ Here "inner" means input data (possibly pre-aggregated) and
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
 This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
 
-\item{colVar}{Hierarchy variables for the column groups (others in row group)}
+\item{colVar}{Hierarchy variables for the column groups (others in row group).}
 
 \item{removeEmpty}{When TRUE (not implemented), empty output corresponding to empty input is removed.
 When NULL (default), removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.}
@@ -91,7 +91,7 @@ TRUE means that codes from input are included in output. Values corresponding to
 Aggregated data with suppression information
 }
 \description{
-Utilizing HierarchyCompute2
+Use parameter \code{colVar} to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
 }
 \details{
 In this version: Global calculation of primary and local calculations otherwise
