@@ -35,9 +35,13 @@
 #' @param singletonMethod \code{\link{GaussSuppression}} input 
 #' @param printInc        \code{\link{GaussSuppression}} input
 #' @param output One of `"publish"` (default), `"inner"`, `"publish_inner"`, `"publish_inner_x"`, `"publish_x"`, 
-#'                      `"inner_x"`, and `"input2functions"` (input to supplied functions). 
+#'                      `"inner_x"`, `"input2functions"` (input to supplied functions),
+#'                      `"inputGaussSuppression"`, `"inputGaussSuppression_x"`, 
+#'                      `"outputGaussSuppression"` and `"outputGaussSuppression_x"`. 
 #'               Here "inner" means input data (possibly pre-aggregated) and 
 #'               "x" means dummy matrix (as input parameter x).   
+#'               All input to and output from \code{\link{GaussSuppression}}, except `...`, are returned when `"outputGaussSuppression_x"`. 
+#'               Excluding x and only input are also possible.
 #' @param x `x` (`modelMatrix`) and `crossTable` can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
@@ -121,7 +125,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            ...){ 
   
   
-  if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions" )))
+  if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
+                     "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x")))
     stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
   
   
@@ -299,11 +304,33 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   # hack
   if(is.list(primary)){
-    num = cbind(num, primary[[2]])
-    primary = primary[[1]]
+    num <- cbind(num, primary[[2]])
+    primary <- primary[[1]]
   }
   
+  if(output=="inputGaussSuppression_x"){
+    return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, x = x))
+  }
+  if(output=="inputGaussSuppression"){
+    return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc))
+  }
+  
+  if( output %in% c("outputGaussSuppression", "outputGaussSuppression_x")){
+    rm(crossTable)
+    rm(freq)
+    rm(num)
+    rm(weight)
+    rm(data)
+  } 
+  
   secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+  
+  if(output=="outputGaussSuppression_x"){
+    return(list(secondary = secondary, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, x = x))
+  }
+  if(output=="outputGaussSuppression"){
+    return(list(secondary = secondary, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc))
+  }
   
   suppressed <- rep(FALSE, m)
   suppressed[primary] <- TRUE
