@@ -29,7 +29,7 @@ SuppressDirectDisclosure2 <- function(data, dimVar = NULL, freqVar, coalition = 
 FindDisclosiveCells2 <- function(x, freq, coalition = 1, ...) {
   
   # t(x) %*% x on triplet form (via dgeMatrix needed)
-  k <- as(as(crossprod(x), "dgeMatrix"), "dgTMatrix")
+  k <- as(as(crossprod(x), "dgCMatrix"), "dgTMatrix")
   
   colSums_x <- colSums(x)
   
