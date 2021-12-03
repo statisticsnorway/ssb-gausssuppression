@@ -74,7 +74,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            output = "publish",                                                        
                            preAggregate = is.null(freqVar),
                            colVar = names(hierarchies)[1],
-                           removeEmpty = NULL,
+                           removeEmpty = TRUE,
                            inputInOutput = TRUE,
                            ...){ 
   
@@ -84,13 +84,18 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   if(is.null(removeEmpty)){
     removeEmpty_in_x <- TRUE
-    removeEmpty <- FALSE
+    removeEmpty<- FALSE
   } else {
     removeEmpty_in_x <- removeEmpty 
   }
   
   if(removeEmpty){
-    stop("removeEmpty=TRUE is not implementyed. Usen NULL and remove rows where iN_dEx is 0")
+    colSelect <- "removeEmpty"
+    rowSelect <- "removeEmpty"
+  } else {
+    stop("removeEmpty=STOP is not implementyed")
+    colSelect <- NULL
+    rowSelect <- NULL
   }
   
   
@@ -181,24 +186,43 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   # Two HierarchyCompute runs. 
   
   # matrixComponents output with "index"
-  hc1 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = "iN_dEx", colVar = colVar, output = "matrixComponents", inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
+  hc1 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = "iN_dEx", colVar = colVar,
+                          colSelect = colSelect, rowSelect = rowSelect,
+                          output = "matrixComponents", inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   
   if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
     stop("Index method failed. Duplicated combinations?")
   }
   
+  outputMatrix <- hc1$hcRow$dataDummyHierarchy %*% hc1$hcRow$valueMatrix %*% t(hc1$hcCol$dataDummyHierarchy)
   
-  # All numerical variables including "index"
-  hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c("iN_dEx", freqVar, numVar, weightVar), colVar = colVar, inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   
+  
+  value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
+  
+  dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
+  dgTframe <- AsDgTframe(dgTframe_mT, x = FALSE, frame = FALSE)
+  
+  freq_num_weight <- matrix(1, nrow(dgTframe), 0)
+  freqVar_numVar_weightVar <- c(freqVar, numVar, weightVar)
+  
+  value_i <- value_dgT
+  for (i in seq_along(c(freqVar, numVar, weightVar))) {
+    value_i@x <- data[value_dgT@x, freqVar_numVar_weightVar[i]]
+    freq_num_weight <- cbind(freq_num_weight, DgTframeNewValue(dgTframe, hc1$hcRow$dataDummyHierarchy %*% value_i %*% t(hc1$hcCol$dataDummyHierarchy)))
+  }
+  colnames(freq_num_weight) <- freqVar_numVar_weightVar
+  
+  hc2 <- cbind(hc1$hcCol$codeFrame[dgTframe[, "col"], , drop = FALSE], 
+               hc1$hcRow$toCrossCode[dgTframe[, "row"], , drop = FALSE], as.data.frame(freq_num_weight))
   
   if (is.function(primary) | is.list(primary))  
     primary <-     Primary(primary = primary, 
-                           crossTable = hc2[names(hierarchies)], # x = x,    ## x not possible here
-                           freq = hc2[[freqVar]], 
-                           num = hc2[numVar], 
-                           weight = hc2[[weightVar]], 
-                           maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+                             crossTable = hc2[names(hierarchies)], # x = x,    ## x not possible here
+                             freq = hc2[[freqVar]], 
+                             num = hc2[numVar], 
+                             weight = hc2[[weightVar]], 
+                             maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
   
   totalRow <- which.max(rowSums(hc1$hcRow$dataDummyHierarchy))
@@ -208,28 +232,14 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   nRowOutput <- nrow(hc1$hcRow$dataDummyHierarchy)
   nColOutput <- nrow(hc1$hcCol$dataDummyHierarchy)
   
-  idxTotalCol <- seq_len(nRowOutput) + (nRowOutput * (totalCol - 1))
-  idxTotalRow <- totalRow + (seq_len(nColOutput) - 1) * nRowOutput
-  
-  value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
-  
-  #data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], unique(colVar), drop = FALSE]
+
+  idxTotalRow <- which(dgTframe[,"row"]==totalRow)
+  idxTotalCol <- which(dgTframe[,"col"]==totalCol)
   
   
   dataRow <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[rowVar], sum)
-  ma <- Match(dataRow[rowVar], hc1$hcRow$fromCrossCode)
-  if( any(range(diff(sort(ma))) != c(1L, 1L)) ){
-    stop("Matching failed")
-  }
-  dataRow <- dataRow[ ma, , drop = FALSE]
   
   dataCol <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[colVar], sum)
-  ma <- Match(dataCol[colVar], data[value_dgT@x[match(unique(value_dgT@j), value_dgT@j)], colVar, drop = FALSE])
-  if( any(range(diff(sort(ma))) != c(1L, 1L)) ){
-    stop("Matching failed")
-  }
-  dataCol <- dataCol[ ma, , drop = FALSE]
-  
   
   
   xRow <- t(hc1$hcRow$dataDummyHierarchy)
@@ -240,27 +250,26 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     freqRow <- NULL
     freqCol <- NULL
   } else {
-    freqRow <- hc2[idxTotalCol, freqVar, drop = TRUE]
-    freqCol <- hc2[idxTotalRow, freqVar, drop = TRUE]
+    freqRow <- hc2[idxTotalCol, freqVar , drop = TRUE]
+    freqCol <- hc2[idxTotalRow, freqVar , drop = TRUE]
   }
   
   if (!length(numVar)) {
     numRow <- NULL
     numCol <- NULL
   } else {
-    numRow <- hc2[idxTotalCol, numVar, drop = FALSE]
-    numCol <- hc2[idxTotalRow, numVar, drop = FALSE]
+    numRow <- hc2[idxTotalCol, numVar , drop = FALSE]
+    numCol <- hc2[idxTotalRow, numVar , drop = FALSE]
   }
   
-  
+
   if (!length(weightVar)) {
     weightRow <- NULL
     weightCol <- NULL
   } else {
-    weightRow <- hc2[idxTotalCol, weightVar, drop = TRUE]
-    weightCol <- hc2[idxTotalRow, weightVar, drop = TRUE]
+    weightRow <- hc2[idxTotalCol, weightVar , drop = TRUE]
+    weightCol <- hc2[idxTotalRow, weightVar , drop = TRUE]
   }
-  
   
   
   if (is.function(candidates)){ # An alternative is two functions as input
@@ -281,15 +290,15 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     numExtra <- matrix(0, nrow(hc2), 0)
   }
   
-  supprMatrix <- matrix(primary, ncol = nColOutput)
+  
+  supprMatrix <- dgTframe_mT 
+  supprMatrix@x <- as.numeric(primary)
+  
   
   supprSumCol_old <- rowSums(supprMatrix)
   supprSumRow <- colSums(supprMatrix)
   supprSumRow_old <- 0L * supprSumRow
   
-  # t(xRow) %*% hc1$hcRow$valueMatrix %*%  xCol
-  
-  # When TRUE: Output corresponding to zero data rows in input will never be secondary suppressed  
   
   xRow_i <- xRow
   xCol_i <- xCol
@@ -310,11 +319,12 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
         }
         
         secondary <- GaussSuppression(x = xRow_i, candidates = candidatesROW, 
-                                      primary = supprMatrix[, i], 
+                                      primary = as.logical(supprMatrix[, i]), 
                                       forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
         
-        supprMatrix[secondary, i] <- TRUE
+        if(length(secondary))
+          supprMatrix[secondary, i] <- 1
       }
     }
     
@@ -334,38 +344,61 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
           }
           xCol_i <- xCol[rr, ,drop=FALSE] 
         }
-        
         secondary <- GaussSuppression(x = xCol_i, candidates = candidatesCol, 
-                                      primary = supprMatrix[i, ], 
+                                      primary = as.logical(supprMatrix[i, ]), 
                                       forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
-        
-        supprMatrix[i, secondary] <- TRUE
+        if(length(secondary))
+          supprMatrix[i, secondary] <- 1
       }
     }
     
     supprSumCol_old <- rowSums(supprMatrix)
     supprSumRow <- colSums(supprMatrix)
     
-  }
+  }  
   
-  
-  #list(hc1 = hc1, hc2 = hc2, dataRow = dataRow, dataCol = dataCol, 
-  #     freqRow = freqRow, freqCol = freqCol, 
-  #     numRow = numRow, numCol = numCol, 
-  #     weightRow = weightRow, weightCol = weightCol,
-  #     hc2[idxTotalCol, , drop = FALSE],
-  #     hc2[idxTotalRow, , drop = FALSE], candidatesROW =candidatesROW, candidatesCol =candidatesCol, primary=primary,  supprMatrix= supprMatrix
-  #     )
-
-  if(removeEmpty){
-    cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix))
-  }
-  
-  
-  cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix))
-  
+  cbind(hc2, primary = primary, numExtra, suppressed = as.logical(DgTframeNewValue(dgTframe,supprMatrix)))
   
 }
 
+AsDgTframe <- function(m = NULL, mT = NULL, x = TRUE, frame = TRUE) {
+  if (is.null(mT)) {
+    mT <- as(drop0(m), "dgTMatrix")
+  }
+  if (frame) {
+    Cbind <- data.frame
+  } else {
+    Cbind <- cbind
+  }
+  if (x) {
+    mF <- Cbind(row = mT@i + 1L, col = mT@j + 1L, x = mT@x)
+  } else {
+    mF <- Cbind(row = mT@i + 1L, col = mT@j + 1L)
+  }
+  doSort <- FALSE
+  diffmF1 <- diff(mF[, 2])
+  if (any(diffmF1 < 0)) {
+    doSort <- TRUE
+  } else {
+    if (any(diff(mF[, 1])[diffmF1 == 0] < 0)) {
+      doSort <- TRUE
+    }
+  }
+  # doSort=TRUE
+  if (doSort) {
+    # mF <- SortRows(mF)
+    mF <- mF[order(mF[, 2], mF[, 1]), ]
+    warning("sorting needed")
+  }
+  mF
+}
 
+DgTframeNewValue <- function(obj, newM) {
+  if (class(obj)[1] == "data.frame") {
+    value <- newM[cbind(obj$row, obj$col)]
+  } else {
+    value <- newM[obj[, c("row", "col")]]
+  }
+  value
+}

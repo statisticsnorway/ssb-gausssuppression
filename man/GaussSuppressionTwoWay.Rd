@@ -26,7 +26,7 @@ GaussSuppressionTwoWay(
   output = "publish",
   preAggregate = is.null(freqVar),
   colVar = names(hierarchies)[1],
-  removeEmpty = NULL,
+  removeEmpty = TRUE,
   inputInOutput = TRUE,
   ...
 )
