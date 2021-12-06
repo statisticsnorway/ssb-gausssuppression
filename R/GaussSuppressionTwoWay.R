@@ -77,29 +77,52 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            removeEmpty = TRUE,
                            inputInOutput = TRUE,
                            ...){ 
-  
   if (is.null(hierarchies)) {
     stop("Hierarchies must be specified")
   }
   
-  if(is.null(removeEmpty)){
-    removeEmpty_in_x <- TRUE
-    removeEmpty<- FALSE
-  } else {
-    removeEmpty_in_x <- removeEmpty 
+  removeEmptyTest <- identical(removeEmpty, "test")
+  
+  if (removeEmptyTest) {
+    removeEmpty <- FALSE
   }
   
-  if(removeEmpty){
+  if (is.null(removeEmpty)) {
+    removeEmpty_in_x <- TRUE
+    removeEmpty <- FALSE
+  } else {
+    removeEmpty_in_x <- removeEmpty
+  }
+  
+  if (removeEmpty) {
     colSelect <- "removeEmpty"
     rowSelect <- "removeEmpty"
   } else {
-    stop("removeEmpty=STOP is not implementyed")
     colSelect <- NULL
     rowSelect <- NULL
+    sysCall <- sys.call()
+    parentFrame <- parent.frame()
+    if (!removeEmptyTest) {   # run old code in this case
+      sysCall[[1]] <- as.name("OldGaussSuppressionTwoWay")
+      if (removeEmpty_in_x) {
+        sysCall["removeEmpty"] <- NULL
+      }
+      return(eval(sysCall, envir = parentFrame))
+    } else {
+      sysCall["removeEmpty"] <- TRUE
+      outTRUE <- eval(sysCall, envir = parentFrame)
+      sysCall[[1]] <- as.name("OldGaussSuppressionTwoWay")
+      sysCall["removeEmpty"] <- NULL
+      outNULL <- eval(sysCall, envir = parentFrame)
+      if (!all(range(diff(sort(Match(outNULL[outNULL$iN_dEx > 0, names(outTRUE)], outTRUE)))) == c(1, 1))) {
+        warning("Test failed")
+        return(list(outTRUE = outTRUE, outFALSE = outNULL))
+      }
+      return(outFALSE)
+    }
   }
   
-  
-  total = "Total"
+  total <- "Total"
   hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, total = total, 
                                      hierarchyVarNames = c(mapsFrom = "mapsFrom", mapsTo = "mapsTo", sign = "sign", level = "level"))
   
