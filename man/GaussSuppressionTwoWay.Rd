@@ -108,8 +108,8 @@ This is defined by the dimensional variables according to \code{dimVar}, \code{h
 
 \item{colVar}{Hierarchy variables for the column groups (others in row group).}
 
-\item{removeEmpty}{When TRUE (not implemented), empty output corresponding to empty input is removed.
-When NULL (default), removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.}
+\item{removeEmpty}{When TRUE (default) empty output corresponding to empty input is removed.
+When NULL, removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.}
 
 \item{inputInOutput}{Logical vector (possibly recycled) for each element of hierarchies.
 TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.}

@@ -32,8 +32,8 @@
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param  colVar  Hierarchy variables for the column groups (others in row group).  
-#' @param  removeEmpty	When TRUE (not implemented), empty output corresponding to empty input is removed. 
-#'                      When NULL (default), removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.
+#' @param  removeEmpty	When TRUE (default) empty output corresponding to empty input is removed. 
+#'                      When NULL, removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.
 #' @param inputInOutput Logical vector (possibly recycled) for each element of hierarchies.
 #'         TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.
 #' @param ... Further arguments to be passed to the supplied functions.
