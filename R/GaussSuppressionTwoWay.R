@@ -233,7 +233,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
     value_i <- value_dgT
     for (i in seq_along(c(freqVar, numVar, weightVar))) {
-      value_i@x <- data[value_dgT@x, freqVar_numVar_weightVar[i]]
+      value_i@x <- as.numeric(data[value_dgT@x, freqVar_numVar_weightVar[i]])
       freq_num_weight <- cbind(freq_num_weight, DgTframeNewValue(dgTframe, hc1$hcRow$dataDummyHierarchy %*% value_i %*% t(hc1$hcCol$dataDummyHierarchy)))
     }
     colnames(freq_num_weight) <- freqVar_numVar_weightVar
