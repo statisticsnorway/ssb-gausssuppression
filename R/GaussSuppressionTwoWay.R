@@ -81,11 +81,31 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     stop("Hierarchies must be specified")
   }
   
-  removeEmptyTest <- identical(removeEmpty, "test")
-  
-  if (removeEmptyTest) {
-    removeEmpty <- FALSE
-  }
+  if (identical(removeEmpty, "test")) {
+    sysCall <- sys.call()
+    parentFrame <- parent.frame()
+    sysCall["removeEmpty"] <- TRUE
+    outTRUE <- eval(sysCall, envir = parentFrame)
+    sysCall["removeEmpty"] <- FALSE
+    outFALSEnew <- eval(sysCall, envir = parentFrame)
+    sysCall["removeEmpty"] <- vector("list", 1)  # Assigning NULL directly removes element 
+    outNULLnew <- eval(sysCall, envir = parentFrame)
+    sysCall[[1]] <- as.name("OldGaussSuppressionTwoWay")
+    outNULL <- eval(sysCall, envir = parentFrame)
+    sysCall["removeEmpty"] <- FALSE
+    outFALSE <- eval(sysCall, envir = parentFrame)
+    if (!isTRUE(all.equal(outNULL, outNULLnew))) {
+      warning("NULL not equal")
+    }
+    if (!isTRUE(all.equal(outFALSE, outFALSEnew))) {
+      warning("FALSE not equal")
+    }
+    if (!all(range(diff(sort(Match(outNULL[outNULL$iN_dEx > 0, names(outTRUE)], outTRUE)))) == c(1, 1))) {
+      warning("Test failed")
+      return(list(outTRUE = outTRUE, outNULL = outNULL))
+    }
+    return(outNULL)
+  }   
   
   if (is.null(removeEmpty)) {
     removeEmpty_in_x <- TRUE
@@ -100,27 +120,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   } else {
     colSelect <- NULL
     rowSelect <- NULL
-    sysCall <- sys.call()
-    parentFrame <- parent.frame()
-    if (!removeEmptyTest) {   # run old code in this case
-      sysCall[[1]] <- as.name("OldGaussSuppressionTwoWay")
-      if (removeEmpty_in_x) {
-        sysCall["removeEmpty"] <- NULL
-      }
-      return(eval(sysCall, envir = parentFrame))
-    } else {
-      sysCall["removeEmpty"] <- TRUE
-      outTRUE <- eval(sysCall, envir = parentFrame)
-      sysCall[[1]] <- as.name("OldGaussSuppressionTwoWay")
-      sysCall["removeEmpty"] <- NULL
-      outNULL <- eval(sysCall, envir = parentFrame)
-      if (!all(range(diff(sort(Match(outNULL[outNULL$iN_dEx > 0, names(outTRUE)], outTRUE)))) == c(1, 1))) {
-        warning("Test failed")
-        return(list(outTRUE = outTRUE, outFALSE = outNULL))
-      }
-      return(outFALSE)
     }
-  }
+  
   
   total <- "Total"
   hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, total = total, 
@@ -220,6 +221,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   outputMatrix <- hc1$hcRow$dataDummyHierarchy %*% hc1$hcRow$valueMatrix %*% t(hc1$hcCol$dataDummyHierarchy)
   
   
+  if(removeEmpty){
   
   value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
   
@@ -239,6 +241,14 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   hc2 <- cbind(hc1$hcCol$codeFrame[dgTframe[, "col"], , drop = FALSE], 
                hc1$hcRow$toCrossCode[dgTframe[, "row"], , drop = FALSE], as.data.frame(freq_num_weight))
   
+  
+  } else {
+    # All numerical variables including "index"
+    hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c("iN_dEx", freqVar, numVar, weightVar), colVar = colVar, 
+                            colSelect = colSelect, rowSelect = rowSelect,
+                            inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
+  }
+  
   if (is.function(primary) | is.list(primary))  
     primary <-     Primary(primary = primary, 
                              crossTable = hc2[names(hierarchies)], # x = x,    ## x not possible here
@@ -256,9 +266,13 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   nColOutput <- nrow(hc1$hcCol$dataDummyHierarchy)
   
 
+  if(removeEmpty){
   idxTotalRow <- which(dgTframe[,"row"]==totalRow)
   idxTotalCol <- which(dgTframe[,"col"]==totalCol)
-  
+  } else {
+    idxTotalCol <- seq_len(nRowOutput) + (nRowOutput * (totalCol - 1))
+    idxTotalRow <- totalRow + (seq_len(nColOutput) - 1) * nRowOutput
+  }
   
   dataRow <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[rowVar], sum)
   
@@ -313,10 +327,12 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     numExtra <- matrix(0, nrow(hc2), 0)
   }
   
-  
+  if(removeEmpty){
   supprMatrix <- dgTframe_mT 
   supprMatrix@x <- as.numeric(primary)
-  
+  } else {
+    supprMatrix <- matrix(primary, ncol = nColOutput)
+  }
   
   supprSumCol_old <- rowSums(supprMatrix)
   supprSumRow <- colSums(supprMatrix)
@@ -325,6 +341,13 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   xRow_i <- xRow
   xCol_i <- xCol
+  
+  
+  if(removeEmpty){
+    true <- 1
+  } else {
+    true <- TRUE
+  }
   
   while (sum(supprSumRow) > sum(supprSumRow_old)) {
     
@@ -347,7 +370,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
         
         if(length(secondary))
-          supprMatrix[secondary, i] <- 1
+          supprMatrix[secondary, i] <- true
       }
     }
     
@@ -372,7 +395,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                                       forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
         if(length(secondary))
-          supprMatrix[i, secondary] <- 1
+          supprMatrix[i, secondary] <- true
       }
     }
     
@@ -380,6 +403,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     supprSumRow <- colSums(supprMatrix)
     
   }  
+  
+  if(!removeEmpty){
+    return(cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix)))
+  }
   
   cbind(hc2, primary = primary, numExtra, suppressed = as.logical(DgTframeNewValue(dgTframe,supprMatrix)))
   
