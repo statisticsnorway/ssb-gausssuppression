@@ -222,26 +222,25 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   
   if(removeEmpty){
-  
-  value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
-  
-  dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
-  dgTframe <- AsDgTframe(dgTframe_mT, x = FALSE, frame = FALSE)
-  
-  freq_num_weight <- matrix(1, nrow(dgTframe), 0)
-  freqVar_numVar_weightVar <- c(freqVar, numVar, weightVar)
-  
-  value_i <- value_dgT
-  for (i in seq_along(c(freqVar, numVar, weightVar))) {
-    value_i@x <- data[value_dgT@x, freqVar_numVar_weightVar[i]]
-    freq_num_weight <- cbind(freq_num_weight, DgTframeNewValue(dgTframe, hc1$hcRow$dataDummyHierarchy %*% value_i %*% t(hc1$hcCol$dataDummyHierarchy)))
-  }
-  colnames(freq_num_weight) <- freqVar_numVar_weightVar
-  
-  hc2 <- cbind(hc1$hcCol$codeFrame[dgTframe[, "col"], , drop = FALSE], 
-               hc1$hcRow$toCrossCode[dgTframe[, "row"], , drop = FALSE], as.data.frame(freq_num_weight))
-  
-  
+    
+    value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
+    
+    dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
+    dgTframe <- AsDgTframe(dgTframe_mT, x = FALSE, frame = FALSE)
+    
+    freq_num_weight <- matrix(1, nrow(dgTframe), 0)
+    freqVar_numVar_weightVar <- c(freqVar, numVar, weightVar)
+    
+    value_i <- value_dgT
+    for (i in seq_along(c(freqVar, numVar, weightVar))) {
+      value_i@x <- data[value_dgT@x, freqVar_numVar_weightVar[i]]
+      freq_num_weight <- cbind(freq_num_weight, DgTframeNewValue(dgTframe, hc1$hcRow$dataDummyHierarchy %*% value_i %*% t(hc1$hcCol$dataDummyHierarchy)))
+    }
+    colnames(freq_num_weight) <- freqVar_numVar_weightVar
+    
+    hc2 <- cbind(hc1$hcCol$codeFrame[dgTframe[, "col"], , drop = FALSE], 
+                 hc1$hcRow$toCrossCode[dgTframe[, "row"], , drop = FALSE], as.data.frame(freq_num_weight))
+    
   } else {
     # All numerical variables including "index"
     hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c("iN_dEx", freqVar, numVar, weightVar), colVar = colVar, 
@@ -267,8 +266,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
 
   if(removeEmpty){
-  idxTotalRow <- which(dgTframe[,"row"]==totalRow)
-  idxTotalCol <- which(dgTframe[,"col"]==totalCol)
+    idxTotalRow <- which(dgTframe[,"row"]==totalRow)
+    idxTotalCol <- which(dgTframe[,"col"]==totalCol)
   } else {
     idxTotalCol <- seq_len(nRowOutput) + (nRowOutput * (totalCol - 1))
     idxTotalRow <- totalRow + (seq_len(nColOutput) - 1) * nRowOutput
@@ -328,8 +327,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   }
   
   if(removeEmpty){
-  supprMatrix <- dgTframe_mT 
-  supprMatrix@x <- as.numeric(primary)
+    supprMatrix <- dgTframe_mT 
+    supprMatrix@x <- as.numeric(primary)
   } else {
     supprMatrix <- matrix(primary, ncol = nColOutput)
   }
