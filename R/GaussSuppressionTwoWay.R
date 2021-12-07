@@ -94,10 +94,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     outNULL <- eval(sysCall, envir = parentFrame)
     sysCall["removeEmpty"] <- FALSE
     outFALSE <- eval(sysCall, envir = parentFrame)
-    if (!isTRUE(all.equal(outNULL, outNULLnew))) {
+    if (!isTRUE(all.equal(outNULL[names(outNULLnew)], outNULLnew))) {
       warning("NULL not equal")
     }
-    if (!isTRUE(all.equal(outFALSE, outFALSEnew))) {
+    if (!isTRUE(all.equal(outFALSE[names(outNULLnew)], outFALSEnew))) {
       warning("FALSE not equal")
     }
     if (!all(range(diff(sort(Match(outNULL[outNULL$iN_dEx > 0, names(outTRUE)], outTRUE)))) == c(1, 1))) {
@@ -240,10 +240,11 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
     hc2 <- cbind(hc1$hcCol$codeFrame[dgTframe[, "col"], , drop = FALSE], 
                  hc1$hcRow$toCrossCode[dgTframe[, "row"], , drop = FALSE], as.data.frame(freq_num_weight))
+    rownames(hc2) <- NULL
     
   } else {
     # All numerical variables including "index"
-    hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c("iN_dEx", freqVar, numVar, weightVar), colVar = colVar, 
+    hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c(freqVar, numVar, weightVar), colVar = colVar, 
                             colSelect = colSelect, rowSelect = rowSelect,
                             inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   }
