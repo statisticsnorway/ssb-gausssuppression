@@ -349,7 +349,13 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     true <- TRUE
   }
   
+  iter <- 0
+  iterInfo = paste0(sum(supprSumRow), "-primary-suppressed\n")
+  cat(iterInfo, "\n")
+  
   while (sum(supprSumRow) > sum(supprSumRow_old)) {
+    
+    iter <- iter + 1 
     
     for (i in seq_len(nColOutput)) {
       if (supprSumRow[i] > supprSumRow_old[i]) {
@@ -378,6 +384,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     supprSumCol <- rowSums(supprMatrix)
     
     
+    iterInfo <- paste0(iterInfo, "iter-",iter,"-col-",sum(supprSumCol), "-suppressed\n")
+    cat(iterInfo, "\n")
+    
     for (i in seq_len(nRowOutput)) {
       if (supprSumCol[i] > supprSumCol_old[i]) {
         
@@ -401,6 +410,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
     supprSumCol_old <- rowSums(supprMatrix)
     supprSumRow <- colSums(supprMatrix)
+    
+    iterInfo <- paste0(iterInfo, "iter-",iter,"-row-",sum(supprSumRow), "-suppressed\n")
+    cat(iterInfo, "\n")
     
   }  
   
