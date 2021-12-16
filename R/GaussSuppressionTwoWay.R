@@ -334,10 +334,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     supprMatrix <- matrix(primary, ncol = nColOutput)
   }
   
-  supprSumCol_old <- rowSums(supprMatrix)
   supprSumRow <- colSums(supprMatrix)
   supprSumRow_old <- 0L * supprSumRow
-  
+  supprSumCol_old <- rep(0L, nrow(supprMatrix))
   
   xRow_i <- xRow
   xCol_i <- xCol
