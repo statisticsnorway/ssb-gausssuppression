@@ -36,6 +36,7 @@
 #'                      When NULL, removal only within the algorithm (x  matrices) so that such empty outputs are never secondary suppressed.
 #' @param inputInOutput Logical vector (possibly recycled) for each element of hierarchies.
 #'         TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.
+#' @param candidatesFromTotal When TRUE (default), same candidates for all rows and for all columns, computed from row/column totals.          
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -76,6 +77,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            colVar = names(hierarchies)[1],
                            removeEmpty = TRUE,
                            inputInOutput = TRUE,
+                           candidatesFromTotal = TRUE, 
                            ...){ 
   if (is.null(hierarchies)) {
     stop("Hierarchies must be specified")
@@ -220,10 +222,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   outputMatrix <- hc1$hcRow$dataDummyHierarchy %*% hc1$hcRow$valueMatrix %*% t(hc1$hcCol$dataDummyHierarchy)
   
+  value_dgT <- as(drop0(hc1$hcRow$valueMatrix), "dgTMatrix")
   
   if(removeEmpty){
-    
-    value_dgT <- as(hc1$hcRow$valueMatrix, "dgTMatrix")
     
     dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
     dgTframe <- AsDgTframe(dgTframe_mT, x = FALSE, frame = FALSE)
@@ -248,19 +249,14 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                             colSelect = colSelect, rowSelect = rowSelect,
                             inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   }
-  
-  if (is.function(primary) | is.list(primary))  
-    primary <-     Primary(primary = primary, 
-                             crossTable = hc2[names(hierarchies)], # x = x,    ## x not possible here
-                             freq = hc2[[freqVar]], 
-                             num = hc2[numVar], 
-                             weight = hc2[[weightVar]], 
-                             maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+   
+  if (is.function(singleton)){ # freqVar must exist when singleton-function  
+    value_i@x <- as.numeric(data[value_dgT@x, freqVar])
+  }
   
   
   totalRow <- which.max(rowSums(hc1$hcRow$dataDummyHierarchy))
   totalCol <- which.max(rowSums(hc1$hcCol$dataDummyHierarchy))
-  
   
   nRowOutput <- nrow(hc1$hcRow$dataDummyHierarchy)
   nColOutput <- nrow(hc1$hcCol$dataDummyHierarchy)
@@ -286,27 +282,70 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   if (!length(freqVar)) {
     freqRow <- NULL
     freqCol <- NULL
+    freq <- NULL
   } else {
     freqRow <- hc2[idxTotalCol, freqVar , drop = TRUE]
     freqCol <- hc2[idxTotalRow, freqVar , drop = TRUE]
+    freq = hc2[[freqVar]]
   }
   
   if (!length(numVar)) {
     numRow <- NULL
     numCol <- NULL
+    num <- NULL
   } else {
     numRow <- hc2[idxTotalCol, numVar , drop = FALSE]
     numCol <- hc2[idxTotalRow, numVar , drop = FALSE]
+    num = hc2[numVar]
   }
   
 
   if (!length(weightVar)) {
     weightRow <- NULL
     weightCol <- NULL
+    weight <- NULL
   } else {
     weightRow <- hc2[idxTotalCol, weightVar , drop = TRUE]
     weightCol <- hc2[idxTotalRow, weightVar , drop = TRUE]
+    weight = hc2[[weightVar]]
   }
+  
+  
+  arg_x <- FALSE
+  
+  arg_x <- arg_x |  Arg_x(primary)
+  if (!candidatesFromTotal)
+    arg_x <- arg_x |  Arg_x(candidates)
+  arg_x <- arg_x |  Arg_x(forced)
+  arg_x <- arg_x |  Arg_x(hidden)
+  
+  if(arg_x){
+    x <- Hierarchies2ModelMatrix(data, hierarchies = hierarchies, select = hc2[names(hierarchies)])
+  } else {
+    x <- NULL
+  }
+  
+  
+  if (is.function(primary) | is.list(primary))  
+    primary <-     Primary(primary = primary, 
+                           crossTable = hc2[names(hierarchies)], 
+                           x = x,    
+                           freq = freq , 
+                           num = num, 
+                           weight = weight, 
+                           maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
+  if (!candidatesFromTotal)
+  if (is.function(candidates))  candidates <- candidates(crossTable = hc2[names(hierarchies)], x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
+  if (is.function(forced))         forced <-      forced(crossTable = hc2[names(hierarchies)], x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
+  if (is.function(hidden))         hidden <-      hidden(crossTable = hc2[names(hierarchies)], x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
+  #if (is.function(singleton))   singleton <-   singleton(crossTable = hc2[names(hierarchies)], x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  
+  
+  rm(x)
   
   
   if (is.function(candidates)){ # An alternative is two functions as input
@@ -319,6 +358,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
   }
   
+  dgTframe <<- dgTframe
+  singleton <<- singleton
   
   if (is.list(primary)) {
     numExtra <- primary[[2]]
@@ -334,10 +375,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     supprMatrix <- matrix(primary, ncol = nColOutput)
   }
   
-  supprSumCol_old <- rowSums(supprMatrix)
+ 
   supprSumRow <- colSums(supprMatrix)
   supprSumRow_old <- 0L * supprSumRow
-  
+  supprSumCol_old <- supprSumRow_old 
   
   xRow_i <- xRow
   xCol_i <- xCol
@@ -348,6 +389,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   } else {
     true <- TRUE
   }
+  
   
   iter <- 0
   iterInfo = paste0(sum(supprSumRow), "-primary-suppressed\n")
@@ -370,9 +412,24 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
           xRow_i <- xRow[rr, ,drop=FALSE] 
         }
         
+        if (is.function(singleton)){
+          freqDF <- data.frame(x=as.vector(as.matrix(value_i %*%  xCol[, i, drop=FALSE]))[rr])
+          names(freqDF) <- freqVar
+          singleton_i <- singleton(data = freqDF, freqVar=freqVar, protectZeros=protectZeros, secondaryZeros=secondaryZeros)
+        } else {
+          singleton_i <- NULL
+        }
+        
+        
+        if (!candidatesFromTotal){
+          candidatesROW <- DgTframeSelect(dgTframe = dgTframe, selection = candidates, dim1 = "row", i = i)
+        }
         secondary <- GaussSuppression(x = xRow_i, candidates = candidatesROW, 
                                       primary = as.logical(supprMatrix[, i]), 
-                                      forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
+                                      forced = DgTframeSelect(dgTframe = dgTframe, selection = forced, dim1 = "row", i = i), 
+                                      hidden = DgTframeSelect(dgTframe = dgTframe, selection = hidden, dim1 = "row", i = i),
+                                      singleton = singleton_i, ############################################################################################################## annen metode her
+                                      singletonMethod = singletonMethod,
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
         
         if(length(secondary))
@@ -398,6 +455,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
             cat("-",sum(!rr)," ", sep="")
           }
           xCol_i <- xCol[rr, ,drop=FALSE] 
+        }
+        
+        if (!candidatesFromTotal){
+          candidatesCol <- DgTframeSelect(dgTframe = dgTframe, selection = candidates, dim1 = "col", i = i)
         }
         secondary <- GaussSuppression(x = xCol_i, candidates = candidatesCol, 
                                       primary = as.logical(supprMatrix[i, ]), 
@@ -464,3 +525,43 @@ DgTframeNewValue <- function(obj, newM) {
   }
   value
 }
+
+
+
+# TRUE when "x" is argument to function(s)
+Arg_x <- function(fun) {
+  if (is.function(fun)) {
+    return("x" %in% formalArgs(fun))
+  }
+  if (!is.list(fun)) {
+    return(FALSE) # Not a list of functions 
+  }
+  for (i in seq_along(fun)) {
+    if (!is.function(fun[[i]])) {
+      return(FALSE) # Not a list of functions 
+    }
+    if ("x" %in% formalArgs(fun[[i]])) {
+      return(TRUE)
+    }
+  }
+  FALSE
+}
+
+DgTframeSelect <- function(dgTframe, selection, dim1, i) {
+  if (!length(selection)){
+    return(NULL)
+  }
+  a <- dgTframe[selection, ]
+  
+  if (dim1 == "row")
+    dim2 <- "col" else dim2 <- "row"
+    
+    a[, dim1][a[, dim2] == i]
+}
+
+
+
+
+
+
+

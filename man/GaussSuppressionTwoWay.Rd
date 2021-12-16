@@ -30,6 +30,7 @@ GaussSuppressionTwoWay(
   colVar = names(hierarchies)[1],
   removeEmpty = TRUE,
   inputInOutput = TRUE,
+  candidatesFromTotal = TRUE,
   ...
 )
 
@@ -113,6 +114,8 @@ When NULL, removal only within the algorithm (x  matrices) so that such empty ou
 
 \item{inputInOutput}{Logical vector (possibly recycled) for each element of hierarchies.
 TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.}
+
+\item{candidatesFromTotal}{When TRUE (default), same candidates for all rows and for all columns, computed from row/column totals.}
 
 \item{...}{Further arguments to be passed to the supplied functions.}
 }
