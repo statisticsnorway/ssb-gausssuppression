@@ -42,7 +42,7 @@
 #' @return Aggregated data with suppression information
 #' 
 #' @importFrom Matrix t rowSums
-#' @importFrom SSBtools AutoHierarchies HierarchyCompute HierarchyCompute2
+#' @importFrom SSBtools AutoHierarchies HierarchyCompute HierarchyCompute2 Hierarchies2ModelMatrix
 #' @export
 #' 
 #' @examples 
@@ -67,10 +67,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            secondaryZeros = FALSE,
                            candidates = CandidatesDefault,
                            primary = PrimaryDefault,
-                           forced = NULL,                                                             # Parameter not treated yet
-                           hidden = NULL,                                                             # Parameter not treated yet
-                           singleton = SingletonDefault,                                              # Parameter not treated yet 
-                           singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),    # Parameter not treated yet
+                           forced = NULL,                                                             
+                           hidden = NULL,                                                             
+                           singleton = SingletonDefault,                                              
+                           singletonMethod = ifelse(secondaryZeros, "anySumNOTprimary", "anySum"),    
                            printInc = TRUE,
                            output = "publish",                                                        
                            preAggregate = is.null(freqVar),
@@ -378,7 +378,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
  
   supprSumRow <- colSums(supprMatrix)
   supprSumRow_old <- 0L * supprSumRow
-  supprSumCol_old <- supprSumRow_old 
+  supprSumCol_old <- rep(0L, nrow(supprMatrix))
   
   xRow_i <- xRow
   xCol_i <- xCol
@@ -428,7 +428,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                                       primary = as.logical(supprMatrix[, i]), 
                                       forced = DgTframeSelect(dgTframe = dgTframe, selection = forced, dim1 = "row", i = i), 
                                       hidden = DgTframeSelect(dgTframe = dgTframe, selection = hidden, dim1 = "row", i = i),
-                                      singleton = singleton_i, ############################################################################################################## annen metode her
+                                      singleton = singleton_i, 
                                       singletonMethod = singletonMethod,
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
         
@@ -457,12 +457,23 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
           xCol_i <- xCol[rr, ,drop=FALSE] 
         }
         
+        if (is.function(singleton)){
+          freqDF <- data.frame(x=as.vector(as.matrix(t(value_i) %*%  xRow[, i, drop=FALSE]))[rr])
+          names(freqDF) <- freqVar
+          singleton_i <- singleton(data = freqDF, freqVar=freqVar, protectZeros=protectZeros, secondaryZeros=secondaryZeros)
+        } else {
+          singleton_i <- NULL
+        }
+        
         if (!candidatesFromTotal){
           candidatesCol <- DgTframeSelect(dgTframe = dgTframe, selection = candidates, dim1 = "col", i = i)
         }
         secondary <- GaussSuppression(x = xCol_i, candidates = candidatesCol, 
                                       primary = as.logical(supprMatrix[i, ]), 
-                                      forced = NULL, hidden = NULL, singleton = NULL, singletonMethod = "none",
+                                      forced = DgTframeSelect(dgTframe = dgTframe, selection = forced, dim1 = "col", i = i), 
+                                      hidden = DgTframeSelect(dgTframe = dgTframe, selection = hidden, dim1 = "col", i = i),
+                                      singleton = singleton_i, 
+                                      singletonMethod = singletonMethod,
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
         if(length(secondary))
           supprMatrix[i, secondary] <- true
