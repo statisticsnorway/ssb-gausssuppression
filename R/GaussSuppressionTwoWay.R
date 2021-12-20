@@ -223,6 +223,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   outputMatrix <- hc1$hcRow$dataDummyHierarchy %*% hc1$hcRow$valueMatrix %*% t(hc1$hcCol$dataDummyHierarchy)
   
   value_dgT <- as(drop0(hc1$hcRow$valueMatrix), "dgTMatrix")
+  value_i <- value_dgT
   
   if(removeEmpty){
     
@@ -232,7 +233,6 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     freq_num_weight <- matrix(1, nrow(dgTframe), 0)
     freqVar_numVar_weightVar <- c(freqVar, numVar, weightVar)
     
-    value_i <- value_dgT
     for (i in seq_along(c(freqVar, numVar, weightVar))) {
       value_i@x <- as.numeric(data[value_dgT@x, freqVar_numVar_weightVar[i]])
       freq_num_weight <- cbind(freq_num_weight, DgTframeNewValue(dgTframe, hc1$hcRow$dataDummyHierarchy %*% value_i %*% t(hc1$hcCol$dataDummyHierarchy)))
@@ -248,6 +248,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     hc2 <- HierarchyCompute(data, hierarchies = hierarchies, valueVar = c(freqVar, numVar, weightVar), colVar = colVar, 
                             colSelect = colSelect, rowSelect = rowSelect,
                             inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
+    dgTframe <- NULL
   }
    
   if (is.function(singleton)){ # freqVar must exist when singleton-function  
@@ -344,9 +345,10 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   #if (is.function(singleton))   singleton <-   singleton(crossTable = hc2[names(hierarchies)], x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
   
-  
   rm(x)
   
+  
+  forced <<- forced
   
   if (is.function(candidates)){ # An alternative is two functions as input
     candidatesROW <-  candidates(crossTable = hc2[idxTotalCol, rowVar , drop = FALSE], 
@@ -357,9 +359,6 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                                  data = dataCol, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
     
   }
-  
-  dgTframe <<- dgTframe
-  singleton <<- singleton
   
   if (is.list(primary)) {
     numExtra <- primary[[2]]
@@ -410,6 +409,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
             cat("-",sum(!rr)," ", sep="")
           }
           xRow_i <- xRow[rr, ,drop=FALSE] 
+        } else {
+          rr <- rep(TRUE, nrow(xRow))
         }
         
         if (is.function(singleton)){
@@ -422,12 +423,12 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
         
         
         if (!candidatesFromTotal){
-          candidatesROW <- DgTframeSelect(dgTframe = dgTframe, selection = candidates, dim1 = "row", i = i)
+          candidatesROW <- DgTframeSelect(dgTframe = dgTframe, selection = candidates, dim1 = "row", i = i, nRowOutput = nRowOutput, nColOutput = nColOutput)
         }
         secondary <- GaussSuppression(x = xRow_i, candidates = candidatesROW, 
                                       primary = as.logical(supprMatrix[, i]), 
-                                      forced = DgTframeSelect(dgTframe = dgTframe, selection = forced, dim1 = "row", i = i), 
-                                      hidden = DgTframeSelect(dgTframe = dgTframe, selection = hidden, dim1 = "row", i = i),
+                                      forced = DgTframeSelect(dgTframe = dgTframe, selection = forced, dim1 = "row", i = i, nRowOutput = nRowOutput, nColOutput = nColOutput), 
+                                      hidden = DgTframeSelect(dgTframe = dgTframe, selection = hidden, dim1 = "row", i = i, nRowOutput = nRowOutput, nColOutput = nColOutput),
                                       singleton = singleton_i, 
                                       singletonMethod = singletonMethod,
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
@@ -455,6 +456,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
             cat("-",sum(!rr)," ", sep="")
           }
           xCol_i <- xCol[rr, ,drop=FALSE] 
+        } else {
+          rr <- rep(TRUE, nrow(xCol))
         }
         
         if (is.function(singleton)){
@@ -466,12 +469,12 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
         }
         
         if (!candidatesFromTotal){
-          candidatesCol <- DgTframeSelect(dgTframe = dgTframe, selection = candidates, dim1 = "col", i = i)
+          candidatesCol <- DgTframeSelect(dgTframe = dgTframe, selection = candidates, dim1 = "col", i = i, nRowOutput = nRowOutput, nColOutput = nColOutput)
         }
         secondary <- GaussSuppression(x = xCol_i, candidates = candidatesCol, 
                                       primary = as.logical(supprMatrix[i, ]), 
-                                      forced = DgTframeSelect(dgTframe = dgTframe, selection = forced, dim1 = "col", i = i), 
-                                      hidden = DgTframeSelect(dgTframe = dgTframe, selection = hidden, dim1 = "col", i = i),
+                                      forced = DgTframeSelect(dgTframe = dgTframe, selection = forced, dim1 = "col", i = i, nRowOutput = nRowOutput, nColOutput = nColOutput), 
+                                      hidden = DgTframeSelect(dgTframe = dgTframe, selection = hidden, dim1 = "col", i = i, nRowOutput = nRowOutput, nColOutput = nColOutput),
                                       singleton = singleton_i, 
                                       singletonMethod = singletonMethod,
                                       printInc = printInc, whenEmptySuppressed = NULL, whenEmptyUnsuppressed = NULL, ...)
@@ -489,10 +492,14 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   }  
   
   if(!removeEmpty){
-    return(cbind(hc2, primary = primary, numExtra, suppressed = as.vector(supprMatrix)))
+    suppressed = as.vector(supprMatrix)
+  } else {
+    suppressed = as.logical(DgTframeNewValue(dgTframe,supprMatrix))
   }
   
-  cbind(hc2, primary = primary, numExtra, suppressed = as.logical(DgTframeNewValue(dgTframe,supprMatrix)))
+  suppressed[hidden] <- NA
+  
+  cbind(hc2, primary = primary, numExtra, suppressed = suppressed )
   
 }
 
@@ -558,10 +565,15 @@ Arg_x <- function(fun) {
   FALSE
 }
 
-DgTframeSelect <- function(dgTframe, selection, dim1, i) {
+DgTframeSelect <- function(dgTframe, selection, dim1, i, nRowOutput, nColOutput) {
   if (!length(selection)){
     return(NULL)
   }
+  
+  if(is.null(dgTframe)){
+    return(EasySelect( selection, dim1, i, nRowOutput, nColOutput))
+  }
+  
   a <- dgTframe[selection, ]
   
   if (dim1 == "row")
@@ -571,6 +583,16 @@ DgTframeSelect <- function(dgTframe, selection, dim1, i) {
 }
 
 
+EasySelect <- function(selection, dim1, i, nRowOutput, nColOutput){
+  if (dim1 == "row"){
+    idx <- seq_len(nRowOutput) + (nRowOutput * (i - 1))
+  } else {
+    idx <- i + (seq_len(nColOutput) - 1) * nRowOutput
+  }
+  selection[idx]
+}
+  
+  
 
 
 
