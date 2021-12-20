@@ -53,7 +53,7 @@
 #'                       This extra aggregation is useful when parameter `charVar` is used.
 #'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
 #'                       Supply `"inner"` or `"input2functions"` to obtain other results. 
-#' @param ... Further arguments to be passed to the supplied functions.
+#' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
 #' @export
@@ -202,9 +202,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   if (is.null(x)) {
     if (is.null(formula) & is.null(hierarchies)) {
-      x <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE)
+      x <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE, ...)
     } else {
-      x <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE)
+      x <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, ...)
     }
     crossTable <- as.data.frame(x$crossTable)  # fix i ModelMatrix 
     x <- x$modelMatrix
@@ -263,9 +263,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     }
   
     if (is.null(formula) & is.null(hierarchies)) {
-      xExtra <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE)
+      xExtra <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE, ...)
     } else {
-      xExtra <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE)
+      xExtra <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, ...)
     }
     if (printInc) {
       cat("Checking crossTables ..")
