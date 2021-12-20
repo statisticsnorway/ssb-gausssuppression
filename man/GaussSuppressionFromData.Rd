@@ -70,9 +70,14 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
 \item{output}{One of \code{"publish"} (default), \code{"inner"}, \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"},
-\code{"inner_x"}, and \code{"input2functions"} (input to supplied functions).
+\code{"inner_x"}, \code{"input2functions"} (input to supplied functions),
+\code{"inputGaussSuppression"}, \code{"inputGaussSuppression_x"},
+\code{"outputGaussSuppression"}  \code{"outputGaussSuppression_x"},
+\code{"primary"} and \code{"secondary"}.
 Here "inner" means input data (possibly pre-aggregated) and
-"x" means dummy matrix (as input parameter x).}
+"x" means dummy matrix (as input parameter x).
+All input to and output from \code{\link{GaussSuppression}}, except \code{...}, are returned when \code{"outputGaussSuppression_x"}.
+Excluding x and only input are also possible.}
 
 \item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}}
 
@@ -88,7 +93,7 @@ This extra aggregation is useful when parameter \code{charVar} is used.
 Supply \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"} or \code{"inner_x"} as \code{output} to obtain extra aggregated results.
 Supply \code{"inner"} or \code{"input2functions"} to obtain other results.}
 
-\item{...}{Further arguments to be passed to the supplied functions.}
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }
 \value{
 Aggregated data with suppression information
