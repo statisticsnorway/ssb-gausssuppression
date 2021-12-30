@@ -347,8 +347,17 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   rm(x)
   
+  # non-logigal needed in EasySelect
+  if (is.logical(hidden)) 
+    hidden <- which(hidden) 
+  else 
+    hidden <- unique(hidden)
   
-  forced <<- forced
+  if (is.logical(forced)) 
+    forced <- which(forced) 
+  else 
+    forced <- unique(forced)
+  
   
   if (is.function(candidates)){ # An alternative is two functions as input
     candidatesROW <-  candidates(crossTable = hc2[idxTotalCol, rowVar , drop = FALSE], 
@@ -589,7 +598,7 @@ EasySelect <- function(selection, dim1, i, nRowOutput, nColOutput){
   } else {
     idx <- i + (seq_len(nColOutput) - 1) * nRowOutput
   }
-  selection[idx]
+  selection[selection %in% idx]
 }
   
   
