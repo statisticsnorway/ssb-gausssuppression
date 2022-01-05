@@ -1,10 +1,13 @@
-
-
-#' Two-way iteration algorithm utilizing \code{\link{HierarchyCompute2}}
+#' Two-way iteration variant of \code{\link{GaussSuppressionFromData}}  
 #' 
 #' Use parameter `colVar` to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
+#' The algorithm utilizes \code{\link{HierarchyCompute2}}. 
 #' 
-#' In this version: Global calculation of primary and local calculations otherwise 
+#' The supplied functions for generating \code{\link{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
+#' When `candidatesFromTotal` is `TRUE` (default) the candidate function will be run locally once for rows and once for columns. Each time based on column or row totals.
+#' The global x-matrix will only be generated if one of the functions supplied needs it.
+#' Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link{GaussSuppression}}.  
+#' 
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -22,11 +25,11 @@
 #' @param primary    GaussSuppression input or a function generating it (see details) Default: \code{\link{PrimaryDefault}}
 #' @param forced     GaussSuppression input or a function generating it (see details)
 #' @param hidden     GaussSuppression input or a function generating it (see details)
-#' @param singleton  GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}
-#' @param singletonMethod \code{\link{GaussSuppression}} input 
+#' @param singleton  NULL or a function generating GaussSuppression input (logical vector not possible) Default: \code{\link{SingletonDefault}}
+#' @param singletonMethod \code{\link{GaussSuppression}} input
 #' @param printInc        \code{\link{GaussSuppression}} input
 #' @param output One of `"publish"` (default), `"inner"`.
-#'               Here "inner" means input data (possibly pre-aggregated) 
+#'               Here "inner" means input data (possibly pre-aggregated). 
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param  colVar  Hierarchy variables for the column groups (others in row group).  
@@ -41,6 +44,7 @@
 #' 
 #' @importFrom Matrix t rowSums
 #' @importFrom SSBtools AutoHierarchies HierarchyCompute HierarchyCompute2 Hierarchies2ModelMatrix
+#' @importFrom methods formalArgs
 #' @export
 #' 
 #' @examples 

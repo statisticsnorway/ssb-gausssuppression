@@ -2,7 +2,7 @@
 % Please edit documentation in R/GaussSuppressionTwoWay.R
 \name{GaussSuppressionTwoWay}
 \alias{GaussSuppressionTwoWay}
-\title{Two-way iteration algorithm utilizing \code{\link{HierarchyCompute2}}}
+\title{Two-way iteration variant of \code{\link{GaussSuppressionFromData}}}
 \usage{
 GaussSuppressionTwoWay(
   data,
@@ -64,14 +64,14 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{hidden}{GaussSuppression input or a function generating it (see details)}
 
-\item{singleton}{GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}}
+\item{singleton}{NULL or a function generating GaussSuppression input (logical vector not possible) Default: \code{\link{SingletonDefault}}}
 
 \item{singletonMethod}{\code{\link{GaussSuppression}} input}
 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
 \item{output}{One of \code{"publish"} (default), \code{"inner"}.
-Here "inner" means input data (possibly pre-aggregated)}
+Here "inner" means input data (possibly pre-aggregated).}
 
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
 This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
@@ -93,9 +93,13 @@ Aggregated data with suppression information
 }
 \description{
 Use parameter \code{colVar} to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
+The algorithm utilizes \code{\link{HierarchyCompute2}}.
 }
 \details{
-In this version: Global calculation of primary and local calculations otherwise
+The supplied functions for generating \code{\link{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
+When \code{candidatesFromTotal} is \code{TRUE} (default) the candidate function will be run locally once for rows and once for columns. Each time based on column or row totals.
+The global x-matrix will only be generated if one of the functions supplied needs it.
+Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link{GaussSuppression}}.
 }
 \examples{
 z3 <- SSBtoolsData("z3")
