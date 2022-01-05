@@ -83,32 +83,6 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     stop("Hierarchies must be specified")
   }
   
-  if (identical(removeEmpty, "test")) {
-    sysCall <- sys.call()
-    parentFrame <- parent.frame()
-    sysCall["removeEmpty"] <- TRUE
-    outTRUE <- eval(sysCall, envir = parentFrame)
-    sysCall["removeEmpty"] <- FALSE
-    outFALSEnew <- eval(sysCall, envir = parentFrame)
-    sysCall["removeEmpty"] <- vector("list", 1)  # Assigning NULL directly removes element 
-    outNULLnew <- eval(sysCall, envir = parentFrame)
-    sysCall[[1]] <- as.name("OldGaussSuppressionTwoWay")
-    outNULL <- eval(sysCall, envir = parentFrame)
-    sysCall["removeEmpty"] <- FALSE
-    outFALSE <- eval(sysCall, envir = parentFrame)
-    if (!isTRUE(all.equal(outNULL[names(outNULLnew)], outNULLnew))) {
-      warning("NULL not equal")
-    }
-    if (!isTRUE(all.equal(outFALSE[names(outNULLnew)], outFALSEnew))) {
-      warning("FALSE not equal")
-    }
-    if (!all(range(diff(sort(Match(outNULL[outNULL$iN_dEx > 0, names(outTRUE)], outTRUE)))) == c(1, 1))) {
-      warning("Test failed")
-      return(list(outTRUE = outTRUE, outNULL = outNULL))
-    }
-    return(outNULL)
-  }   
-  
   if (is.null(removeEmpty)) {
     removeEmpty_in_x <- TRUE
     removeEmpty <- FALSE
