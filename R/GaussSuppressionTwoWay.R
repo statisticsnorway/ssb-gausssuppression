@@ -25,10 +25,8 @@
 #' @param singleton  GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}
 #' @param singletonMethod \code{\link{GaussSuppression}} input 
 #' @param printInc        \code{\link{GaussSuppression}} input
-#' @param output One of `"publish"` (default), `"inner"`, `"publish_inner"`, `"publish_inner_x"`, `"publish_x"`, 
-#'                      `"inner_x"`, and `"input2functions"` (input to supplied functions). 
-#'               Here "inner" means input data (possibly pre-aggregated) and 
-#'               "x" means dummy matrix (as input parameter x).   
+#' @param output One of `"publish"` (default), `"inner"`.
+#'               Here "inner" means input data (possibly pre-aggregated) 
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param  colVar  Hierarchy variables for the column groups (others in row group).  
@@ -103,8 +101,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, total = total, 
                                      hierarchyVarNames = c(mapsFrom = "mapsFrom", mapsTo = "mapsTo", sign = "sign", level = "level"))
   
-  if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions" )))
-    stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
+  if(!(output %in% c("publish", "inner")))
+    stop('Allowed values of parameter output are "publish" and "inner"')
   
   
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")

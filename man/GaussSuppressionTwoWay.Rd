@@ -70,10 +70,8 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
-\item{output}{One of \code{"publish"} (default), \code{"inner"}, \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"},
-\code{"inner_x"}, and \code{"input2functions"} (input to supplied functions).
-Here "inner" means input data (possibly pre-aggregated) and
-"x" means dummy matrix (as input parameter x).}
+\item{output}{One of \code{"publish"} (default), \code{"inner"}.
+Here "inner" means input data (possibly pre-aggregated)}
 
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
 This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
