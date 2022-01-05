@@ -388,9 +388,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
         
         if(removeEmpty_in_x){
           rr <- as.vector(as.matrix(hc1$hcRow$valueMatrix %*%  xCol[, i, drop=FALSE])) > 0
-          if(any(!rr)){
-            if (printInc) cat("-",sum(!rr)," ", sep="")
-          }
+          # if(any(!rr)){
+          #   if (printInc) cat("-",sum(!rr)," ", sep="")
+          # }
           xRow_i <- xRow[rr, ,drop=FALSE] 
         } else {
           rr <- rep(TRUE, nrow(xRow))
@@ -435,9 +435,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
         
         if(removeEmpty_in_x){
           rr <- as.vector(as.matrix(t(hc1$hcRow$valueMatrix) %*%  xRow[, i, drop=FALSE])) > 0
-          if(any(!rr)){
-            if (printInc) cat("-",sum(!rr)," ", sep="")
-          }
+          #if(any(!rr)){
+          #  if (printInc) cat("-",sum(!rr)," ", sep="")
+          #}
           xCol_i <- xCol[rr, ,drop=FALSE] 
         } else {
           rr <- rep(TRUE, nrow(xCol))
