@@ -482,6 +482,9 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   suppressed[hidden] <- NA
   
+  if (length(freqVar)) names(hc2)[names(hc2) == freqVar] <- "freq"
+  if (length(weightVar)) names(hc2)[names(hc2) == weightVar] <- "weight"
+  
   cbind(hc2, primary = primary, numExtra, suppressed = suppressed )
   
 }
