@@ -375,7 +375,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   iter <- 0
   iterInfo = paste0(sum(supprSumRow), "-primary-suppressed\n")
-  cat(iterInfo, "\n")
+  if (printInc) cat(iterInfo, "\n")
   
   while (sum(supprSumRow) > sum(supprSumRow_old)) {
     
@@ -384,12 +384,12 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     for (i in seq_len(nColOutput)) {
       if (supprSumRow[i] > supprSumRow_old[i]) {
         
-        cat("col", i, ",", supprSumRow[i] - supprSumRow_old[i], "extra : ")
+        if (printInc) cat("col", i, ",", supprSumRow[i] - supprSumRow_old[i], "extra : ")
         
         if(removeEmpty_in_x){
           rr <- as.vector(as.matrix(hc1$hcRow$valueMatrix %*%  xCol[, i, drop=FALSE])) > 0
           if(any(!rr)){
-            cat("-",sum(!rr)," ", sep="")
+            if (printInc) cat("-",sum(!rr)," ", sep="")
           }
           xRow_i <- xRow[rr, ,drop=FALSE] 
         } else {
@@ -426,17 +426,17 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
     
     iterInfo <- paste0(iterInfo, "iter-",iter,"-col-",sum(supprSumCol), "-suppressed\n")
-    cat(iterInfo, "\n")
+    if (printInc) cat(iterInfo, "\n")
     
     for (i in seq_len(nRowOutput)) {
       if (supprSumCol[i] > supprSumCol_old[i]) {
         
-        cat("row", i, ",", supprSumCol[i] - supprSumCol_old[i], "extra : ")
+        if (printInc) cat("row", i, ",", supprSumCol[i] - supprSumCol_old[i], "extra : ")
         
         if(removeEmpty_in_x){
           rr <- as.vector(as.matrix(t(hc1$hcRow$valueMatrix) %*%  xRow[, i, drop=FALSE])) > 0
           if(any(!rr)){
-            cat("-",sum(!rr)," ", sep="")
+            if (printInc) cat("-",sum(!rr)," ", sep="")
           }
           xCol_i <- xCol[rr, ,drop=FALSE] 
         } else {
@@ -470,7 +470,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     supprSumRow <- colSums(supprMatrix)
     
     iterInfo <- paste0(iterInfo, "iter-",iter,"-row-",sum(supprSumRow), "-suppressed\n")
-    cat(iterInfo, "\n")
+    if (printInc) cat(iterInfo, "\n")
     
   }  
   
