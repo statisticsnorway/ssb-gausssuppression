@@ -92,14 +92,25 @@ TRUE means that codes from input are included in output. Values corresponding to
 Aggregated data with suppression information
 }
 \description{
+Internally, data is organized in a two-way table.
+
 Use parameter \code{colVar} to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
 The algorithm utilizes \code{\link{HierarchyCompute2}}.
+
+With two-way iterations, larger data can be handled, but there is a residual risk.
+The method is a special form of linked-table iteration.
+Separately, the rows and columns are protected by \code{\link{GaussSuppression}} and they have common suppressed cells.
 }
 \details{
 The supplied functions for generating \code{\link{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
 When \code{candidatesFromTotal} is \code{TRUE} (default) the candidate function will be run locally once for rows and once for columns. Each time based on column or row totals.
 The global x-matrix will only be generated if one of the functions supplied needs it.
 Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link{GaussSuppression}}.
+
+Note that a difference from \code{GaussSuppressionFromData} is that parameter \code{removeEmpty} is set to \code{TRUE} by default.
+
+Another difference is that duplicated combinations is not allowed. Normally duplicates are avoided by setting \code{preAggregate} to \code{TRUE}.
+When the \code{charVar} parameter is used, this can still be a problem. See the examples for a possible workaround.
 }
 \examples{
 z3 <- SSBtoolsData("z3")
@@ -107,13 +118,31 @@ z3 <- SSBtoolsData("z3")
 dimListsA <- SSBtools::FindDimLists(z3[, 1:6])
 dimListsB <- SSBtools::FindDimLists(z3[, c(1, 4, 5)])
 
+set.seed(123)
+z <- z3[sample(nrow(z3),250),]
 
-out1 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+out1 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
                                colVar = c("hovedint"))
-out2 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+out2 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
                                colVar = c("hovedint", "mnd"))
-out3 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+out3 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsB, 
                                colVar = c("region"))
-out4 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+out4 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsB, 
                                colVar = c("hovedint", "region"))
+                               
+# "mnd" not in  hierarchies -> duplicated combinations in input 
+# Error when  preAggregate is FALSE: Index method failed. Duplicated combinations?
+out5 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA[1:3], 
+                               protectZeros = FALSE, colVar = c("hovedint"), preAggregate = TRUE)
+
+
+# charVar needed -> Still problem when preAggregate is TRUE
+# Possible workaround by extra hierarchy 
+out6 <- GaussSuppressionTwoWay(z, freqVar = "ant", charVar = "mnd2",
+                               hierarchies = c(dimListsA[1:3], mnd2 = "Total"), # include charVar 
+                               inputInOutput = c(TRUE, TRUE, FALSE),  # FALSE -> only Total 
+                               protectZeros = FALSE, colVar = c("hovedint"),
+                               preAggregate = TRUE,  
+                               hidden = function(x, data, charVar, ...) 
+                                 as.vector((t(x) \%*\% as.numeric(data[[charVar]] == "M06M12")) == 0))                                
 }

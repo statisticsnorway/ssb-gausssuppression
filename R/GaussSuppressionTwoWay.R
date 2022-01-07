@@ -1,13 +1,25 @@
 #' Two-way iteration variant of \code{\link{GaussSuppressionFromData}}  
 #' 
+#' @description
+#' Internally, data is organized in a two-way table. 
+#' 
 #' Use parameter `colVar` to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
 #' The algorithm utilizes \code{\link{HierarchyCompute2}}. 
 #' 
+#' With two-way iterations, larger data can be handled, but there is a residual risk.
+#' The method is a special form of linked-table iteration. 
+#' Separately, the rows and columns are protected by \code{\link{GaussSuppression}} and they have common suppressed cells.
+#' 
+#' @details
 #' The supplied functions for generating \code{\link{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
 #' When `candidatesFromTotal` is `TRUE` (default) the candidate function will be run locally once for rows and once for columns. Each time based on column or row totals.
 #' The global x-matrix will only be generated if one of the functions supplied needs it.
 #' Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link{GaussSuppression}}.  
 #' 
+#' Note that a difference from `GaussSuppressionFromData` is that parameter `removeEmpty` is set to `TRUE` by default.
+#' 
+#' Another difference is that duplicated combinations is not allowed. Normally duplicates are avoided by setting `preAggregate` to `TRUE`.
+#' When the `charVar` parameter is used, this can still be a problem. See the examples for a possible workaround.
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -53,15 +65,33 @@
 #' dimListsA <- SSBtools::FindDimLists(z3[, 1:6])
 #' dimListsB <- SSBtools::FindDimLists(z3[, c(1, 4, 5)])
 #' 
+#' set.seed(123)
+#' z <- z3[sample(nrow(z3),250),]
 #' 
-#' out1 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+#' out1 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
 #'                                colVar = c("hovedint"))
-#' out2 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsA, 
+#' out2 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
 #'                                colVar = c("hovedint", "mnd"))
-#' out3 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+#' out3 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsB, 
 #'                                colVar = c("region"))
-#' out4 <- GaussSuppressionTwoWay(z3, freqVar = "ant", hierarchies = dimListsB, 
+#' out4 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsB, 
 #'                                colVar = c("hovedint", "region"))
+#'                                
+#' # "mnd" not in  hierarchies -> duplicated combinations in input 
+#' # Error when  preAggregate is FALSE: Index method failed. Duplicated combinations?
+#' out5 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA[1:3], 
+#'                                protectZeros = FALSE, colVar = c("hovedint"), preAggregate = TRUE)
+#' 
+#' 
+#' # charVar needed -> Still problem when preAggregate is TRUE
+#' # Possible workaround by extra hierarchy 
+#' out6 <- GaussSuppressionTwoWay(z, freqVar = "ant", charVar = "mnd2",
+#'                                hierarchies = c(dimListsA[1:3], mnd2 = "Total"), # include charVar 
+#'                                inputInOutput = c(TRUE, TRUE, FALSE),  # FALSE -> only Total 
+#'                                protectZeros = FALSE, colVar = c("hovedint"),
+#'                                preAggregate = TRUE,  
+#'                                hidden = function(x, data, charVar, ...) 
+#'                                  as.vector((t(x) %*% as.numeric(data[[charVar]] == "M06M12")) == 0))                                
 GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies, formula = NULL,
                            maxN = 3, 
@@ -193,7 +223,15 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                           output = "matrixComponents", inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   
   if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
-    stop("Index method failed. Duplicated combinations?")
+    extratext <- ""
+    if (!preAggregate) {
+      extratext <- "  Try preAggregate=TRUE?"
+    } else {
+      if (!is.null(charVar)){
+        extratext <- "  Try workaround (see examples)?"
+      }
+    }
+    stop(paste0("Index method failed. Duplicated combinations?", extratext))
   }
   
   outputMatrix <- hc1$hcRow$dataDummyHierarchy %*% hc1$hcRow$valueMatrix %*% t(hc1$hcCol$dataDummyHierarchy)
