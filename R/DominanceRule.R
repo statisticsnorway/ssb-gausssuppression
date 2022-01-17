@@ -11,13 +11,14 @@
 #' @param numVar vector containing numeric values in the data set
 #' @param n parameter `n` in dominance rule. 
 #' @param k parameter `k` in dominance rule.
+#' @param protectZeros parameter determining whether cells with value 0 should be suppressed.
 #' @param ... unused parameters
 #' @return logical vector that is `TRUE` in positions corresponding to cells breaching the dominance rules.
 #' @export
 #'
 #' @author Daniel Lupp 
 #' 
-DominanceRule <- function(data, x, crossTable, numVar, n, k, ...) {
+DominanceRule <- function(data, x, crossTable, numVar, n, k, protectZeros = FALSE, ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
   if (length(numVar) != 1)
@@ -29,7 +30,10 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k, ...) {
   primary <- mapply(function (a,b) single_dominance_rule(x, abs_cellvals, abs_num, a,b),
                     n,k)
 
-  apply(primary, 1, function (x) Reduce(`|`, x))
+  dominant <- apply(primary, 1, function (x) Reduce(`|`, x))
+  if (!protectZeros) 
+    return(dominant)
+  dominant | (abs_num == 0)
 }
 
 single_dominance_rule <- function(x, cellvals, num, n, k) {
