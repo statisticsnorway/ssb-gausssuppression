@@ -29,7 +29,7 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
   abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs(data[, numVar, drop = FALSE])))))
   abs_cellvals <- abs(data[[numVar]])
   
-  primary <- mapply(function (a,b) single_dominance_rule(x, abs_cellvals, abs_num, a,b),
+  primary <- mapply(function (a,b) FindDominantCells(x, abs_cellvals, abs_num, a,b),
                     n,k)
 
   dominant <- apply(primary, 1, function (x) Reduce(`|`, x))
@@ -38,7 +38,7 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
   dominant | (abs_num == 0)
 }
 
-single_dominance_rule <- function(x, cellvals, num, n, k) {
+FindDominantCells <- function(x, cellvals, num, n, k) {
   max_cont <- MaxContribution(x, cellvals, n = n)
   max_cont[is.na(max_cont)] <- 0
   as.vector(num > 0 & rowSums(max_cont) > num*k/100)
