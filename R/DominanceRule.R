@@ -22,6 +22,8 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
                           protectZeros = FALSE, ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
+  if (is.null(numVar))
+    stop("You must provide a numeric variable numVar to use the dominance rule.")
   if (length(numVar) > 1){
     warning("Multiple numVar were supplied, only the first is suppressed.")
     numVar <- numVar[1]
