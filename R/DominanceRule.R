@@ -27,7 +27,11 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
   if (length(numVar) > 1){
     warning("Multiple numVar were supplied, only the first is suppressed.")
     numVar <- numVar[1]
-  }  
+  }
+  if (!protectZeros)
+    cat("Zeroes are not primary suppressed.\n")
+  else
+    cat("Zeroes are primary suppressed.\n")
   abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs(data[, numVar, drop = FALSE])))))
   abs_cellvals <- abs(data[[numVar]])
   
