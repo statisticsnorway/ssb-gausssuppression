@@ -7,11 +7,15 @@
 CandidatesDefault(freq, x, secondaryZeros = FALSE, weight, ...)
 }
 \arguments{
-\item{freq}{freq}
+\item{freq}{Vector of output frequencies}
 
-\item{x}{x}
+\item{x}{The model matrix}
 
-\item{secondaryZeros}{secondaryZeros}
+\item{secondaryZeros}{When \code{TRUE}, cells with zero frequency or value are prioritized to
+be published so that they are not secondary suppressed.
+This is achieved by this function by having the zero frequency indices first in the retuned order.}
+
+\item{weight}{Vector of output weights}
 
 \item{...}{Unused parameters}
 }
@@ -20,5 +24,10 @@ candidates, \code{\link{GaussSuppression}} input
 }
 \description{
 Function for \code{\link{GaussSuppressionFromData}}
+}
+\details{
+This main part of this function orders the indices decreasingly according to \code{freq} or,
+when \code{weight} is non-NULL,  \code{(freq+1)*weight}. Ties are handled by prioritizing output cells
+that are calculated from many input cells. In addition, zeros are handled according to parameter \code{secondaryZeros}.
 }
 \keyword{internal}

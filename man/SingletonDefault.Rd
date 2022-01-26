@@ -7,13 +7,13 @@
 SingletonDefault(data, freqVar, protectZeros, secondaryZeros, ...)
 }
 \arguments{
-\item{data}{data}
+\item{data}{Input data, possibly pre-aggregated within \code{GaussSuppressionFromData}}
 
-\item{freqVar}{freqVar}
+\item{freqVar}{A single variable holding counts (input to \code{GaussSuppressionFromData})}
 
-\item{protectZeros}{protectZeros}
+\item{protectZeros}{Suppression parameter (see \code{GaussSuppressionFromData})}
 
-\item{secondaryZeros}{secondaryZeros}
+\item{secondaryZeros}{Suppression parameter (see \code{GaussSuppressionFromData})}
 
 \item{...}{Unused parameters}
 }
@@ -22,5 +22,10 @@ singleton, \code{\link{GaussSuppression}} input
 }
 \description{
 Function for \code{\link{GaussSuppressionFromData}}
+}
+\details{
+This function marks input cells as singletons according to the input frequencies.
+Zeros are set to singletons when \code{protectZeros} or \code{secondaryZeros} is \code{TRUE}.
+Otherwise, ones are set to singletons.
 }
 \keyword{internal}

@@ -33,7 +33,8 @@
 #' @param formula A model formula
 #' @param maxN Suppression parameter. Cells with frequency `<= maxN` are set as primary suppressed.   
 #'        Using the default `primary` function, `maxN` is by default set to `3`. See details.
-#' @param protectZeros Suppression parameter. Cells with zero frequency or value are set as primary suppressed. 
+#' @param protectZeros Suppression parameter. 
+#'        When `TRUE`, cells with zero frequency or value are set as primary suppressed. 
 #'        Using the default `primary` function, `protectZeros` is by default set to `TRUE`. See details.
 #' @param secondaryZeros Suppression parameter. 
 #'        When `TRUE`, cells with zero frequency or value are prioritized to be published so that they are not secondary suppressed.
@@ -425,21 +426,19 @@ Primary <- function(primary, crossTable, ...) {
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
 #'
-#' @param freq freq 
-#' @param x x
-#' @param maxN maxN
-#' @param protectZeros protectZeros 
+#' @param freq Vector of output frequencies 
+#' @param maxN Cells with frequency `<= maxN` are set as primary suppressed. 
+#' @param protectZeros When `TRUE`, cells with zero frequency are set as primary suppressed. 
 #' @param ... Unused parameters 
 #'
 #' @return primary, \code{\link{GaussSuppression}} input 
 #' @export
 #' @keywords internal
-PrimaryDefault <- function(freq, x, maxN = 3, protectZeros = TRUE, ...) {
+PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
   primary <- freq <= maxN
   if (!protectZeros) 
     primary[freq == 0] <- FALSE
   
-  #which(primary)
   primary
 }
 
@@ -447,10 +446,17 @@ PrimaryDefault <- function(freq, x, maxN = 3, protectZeros = TRUE, ...) {
 #' CandidatesDefault
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
+#' 
+#' This main part of this function orders the indices decreasingly according to `freq` or, 
+#' when `weight` is non-NULL,  `(freq+1)*weight`. Ties are handled by prioritizing output cells 
+#' that are calculated from many input cells. In addition, zeros are handled according to parameter `secondaryZeros`. 
 #'
-#' @param freq freq 
-#' @param x x
-#' @param secondaryZeros secondaryZeros
+#' @param freq Vector of output frequencies 
+#' @param x The model matrix
+#' @param secondaryZeros When `TRUE`, cells with zero frequency or value are prioritized to 
+#'        be published so that they are not secondary suppressed.
+#'        This is achieved by this function by having the zero frequency indices first in the retuned order.
+#' @param weight Vector of output weights
 #' @param ... Unused parameters 
 #'
 #' @return candidates, \code{\link{GaussSuppression}} input 
@@ -482,11 +488,15 @@ CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
 #' SingletonDefault
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
+#' 
+#' This function marks input cells as singletons according to the input frequencies. 
+#' Zeros are set to singletons when `protectZeros` or `secondaryZeros` is `TRUE`. 
+#' Otherwise, ones are set to singletons.
 #'
-#' @param data data  
-#' @param freqVar freqVar
-#' @param protectZeros protectZeros 
-#' @param secondaryZeros secondaryZeros
+#' @param data  Input data, possibly pre-aggregated within `GaussSuppressionFromData`  
+#' @param freqVar A single variable holding counts (input to `GaussSuppressionFromData`)
+#' @param protectZeros Suppression parameter (see `GaussSuppressionFromData`)
+#' @param secondaryZeros Suppression parameter (see `GaussSuppressionFromData`)
 #' @param ... Unused parameters 
 #'
 #' @return singleton, \code{\link{GaussSuppression}} input 

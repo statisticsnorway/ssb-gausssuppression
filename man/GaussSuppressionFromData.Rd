@@ -52,7 +52,8 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 \item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
 Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
 
-\item{protectZeros}{Suppression parameter. Cells with zero frequency or value are set as primary suppressed.
+\item{protectZeros}{Suppression parameter.
+When \code{TRUE}, cells with zero frequency or value are set as primary suppressed.
 Using the default \code{primary} function, \code{protectZeros} is by default set to \code{TRUE}. See details.}
 
 \item{secondaryZeros}{Suppression parameter.
