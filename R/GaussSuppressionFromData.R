@@ -14,6 +14,13 @@
 #' Similarly, `num`, is a data frame of aggregated numerical variables.   
 #' It is possible to supply several primary functions joined by `c`, e.g. (`c(FunPrim1, FunPrim2)`). 
 #' All `NA`s returned from any of the functions force the corresponding cells not to be primary suppressed.
+#' 
+#' The effect of `maxN` , `protectZeros` and `secondaryZeros` depends on the supplied functions where these parameters are used. 
+#' Their default values are inherited from the default values of the first `primary` function (several possible) or, 
+#' in the case of `secondaryZeros`, the `candidates` function.   
+#' When defaults cannot be inherited, they are set to `NULL`.   
+#' In practice the function `formals` are still used to generate the defaults when `primary` and/or `candidates` are not functions. 
+#' Then `NULL` is correctly returned, but `suppressWarnings` are needed.
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -24,9 +31,14 @@
 #' @param hierarchies List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
 #'        Thus, the variables can also be coded by `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param formula A model formula
-#' @param maxN  Suppression parameter. Default: Cells having counts `<= maxN` are set as primary suppressed. 
-#' @param protectZeros Suppression parameter. Default when TRUE: Empty cells (count=0) are set as primary suppressed.  
-#' @param secondaryZeros Suppression parameter.
+#' @param maxN Suppression parameter. Cells with frequency `<= maxN` are set as primary suppressed.   
+#'        Using the default `primary` function, `maxN` is by default set to `3`. See details.
+#' @param protectZeros Suppression parameter. Cells with zero frequency or value are set as primary suppressed. 
+#'        Using the default `primary` function, `protectZeros` is by default set to `TRUE`. See details.
+#' @param secondaryZeros Suppression parameter. 
+#'        When `TRUE`, cells with zero frequency or value are prioritized to be published so that they are not secondary suppressed.
+#'        Using the default `candidates` function, `secondaryZeros` is by default set to `FALSE`. 
+#'        See details.
 #' @param candidates GaussSuppression input or a function generating it (see details) Default: \code{\link{CandidatesDefault}}
 #' @param primary    GaussSuppression input or a function generating it (see details) Default: \code{\link{PrimaryDefault}}
 #' @param forced     GaussSuppression input or a function generating it (see details)
@@ -79,14 +91,15 @@
 #' 
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values")
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10)
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
+#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10,
+#'       protectZeros = TRUE, # Parameter needed by SingletonDefault and default not in primary  
 #'       primary = function(freq, crossTable, maxN, ...) 
 #'                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
 #'                    
 #' # Combining several primary functions 
 #' # Note that NA & c(TRUE, FALSE) equals c(NA, FALSE)                      
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
-#'        primary = c(function(freq, maxN, ...) freq >= 45,
+#'        primary = c(function(freq, maxN, protectZeros = TRUE, ...) freq >= 45,
 #'                    function(freq, maxN, ...) freq <= maxN,
 #'                    function(crossTable, ...) NA & crossTable[[2]] == "C",  
 #'                    function(crossTable, ...) NA & crossTable[[1]]== "Total" 
@@ -110,9 +123,9 @@
 #' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE)      
 GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies = NULL, formula = NULL,
-                           maxN = 3, 
-                           protectZeros = TRUE, 
-                           secondaryZeros = FALSE,
+                           maxN = suppressWarnings(formals(c(primary)[[1]])$maxN), 
+                           protectZeros = suppressWarnings(formals(c(primary)[[1]])$protectZeros), 
+                           secondaryZeros = suppressWarnings(formals(candidates)$secondaryZeros),
                            candidates = CandidatesDefault,
                            primary = PrimaryDefault,
                            forced = NULL,
@@ -136,6 +149,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
 
   force(preAggregate)
   force(extraAggregate)
+  
+  # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
+  if (is.name(maxN)) maxN <- NULL
+  if (is.name(protectZeros)) protectZeros <- NULL
+  if (is.name(secondaryZeros)) secondaryZeros <- NULL
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
@@ -416,7 +434,7 @@ Primary <- function(primary, crossTable, ...) {
 #' @return primary, \code{\link{GaussSuppression}} input 
 #' @export
 #' @keywords internal
-PrimaryDefault <- function(freq, x, maxN, protectZeros, ...) {
+PrimaryDefault <- function(freq, x, maxN = 3, protectZeros = TRUE, ...) {
   primary <- freq <= maxN
   if (!protectZeros) 
     primary[freq == 0] <- FALSE
@@ -438,7 +456,7 @@ PrimaryDefault <- function(freq, x, maxN, protectZeros, ...) {
 #' @return candidates, \code{\link{GaussSuppression}} input 
 #' @export
 #' @keywords internal
-CandidatesDefault <- function(freq, x, secondaryZeros, weight, ...) {
+CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
   if(is.null(weight))
     weight <- 1
   else{

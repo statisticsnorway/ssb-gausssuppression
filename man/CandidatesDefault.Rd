@@ -4,7 +4,7 @@
 \alias{CandidatesDefault}
 \title{CandidatesDefault}
 \usage{
-CandidatesDefault(freq, x, secondaryZeros, weight, ...)
+CandidatesDefault(freq, x, secondaryZeros = FALSE, weight, ...)
 }
 \arguments{
 \item{freq}{freq}

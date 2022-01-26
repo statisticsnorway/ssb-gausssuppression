@@ -4,7 +4,7 @@
 \alias{PrimaryDefault}
 \title{PrimaryDefault}
 \usage{
-PrimaryDefault(freq, x, maxN, protectZeros, ...)
+PrimaryDefault(freq, x, maxN = 3, protectZeros = TRUE, ...)
 }
 \arguments{
 \item{freq}{freq}
