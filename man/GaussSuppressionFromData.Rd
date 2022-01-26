@@ -28,6 +28,7 @@ GaussSuppressionFromData(
   crossTable = NULL,
   preAggregate = is.null(freqVar),
   extraAggregate = preAggregate & !is.null(charVar),
+  structuralEmpty = FALSE,
   ...
 )
 }
@@ -98,6 +99,14 @@ function and \code{\link{GaussSuppression}}.
 This extra aggregation is useful when parameter \code{charVar} is used.
 Supply \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"} or \code{"inner_x"} as \code{output} to obtain extra aggregated results.
 Supply \code{"inner"} or \code{"input2functions"} to obtain other results.}
+
+\item{structuralEmpty}{When \code{TRUE}, output cells with no contributing inner cells (only zeros in column of \code{x})
+are forced to be not primary suppressed.
+Thus, these cells are considered as structural zeros.
+When \code{structuralEmpty} is \code{TRUE}, the following error message is avoided:
+\code{Suppressed} \code{cells} \code{with} \code{empty} \code{input} \code{will} \code{not} \code{be} \code{protected.}
+\code{Extend} \code{input} \code{data} \code{with} \verb{zeros?}.
+When \code{removeEmpty} is \code{TRUE} (see "\code{...}" below), \code{structuralEmpty} is superfluous}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }

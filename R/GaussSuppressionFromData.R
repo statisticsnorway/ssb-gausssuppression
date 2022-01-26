@@ -66,6 +66,13 @@
 #'                       This extra aggregation is useful when parameter `charVar` is used.
 #'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
 #'                       Supply `"inner"` or `"input2functions"` to obtain other results. 
+#' @param structuralEmpty  When `TRUE`, output cells with no contributing inner cells (only zeros in column of `x`) 
+#'                         are forced to be not primary suppressed. 
+#'                         Thus, these cells are considered as structural zeros. 
+#'                         When `structuralEmpty` is `TRUE`, the following error message is avoided: 
+#'                         `Suppressed` `cells` `with` `empty` `input` `will` `not` `be` `protected.` 
+#'                         `Extend` `input` `data` `with` `zeros?`.    
+#'                         When `removeEmpty` is `TRUE` (see "`...`" below), `structuralEmpty` is superfluous             
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -137,6 +144,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            output = "publish", x = NULL, crossTable = NULL,
                            preAggregate = is.null(freqVar),
                            extraAggregate = preAggregate & !is.null(charVar), 
+                           structuralEmpty = FALSE, 
                            ...){ 
   
   
@@ -155,6 +163,14 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   if (is.name(maxN)) maxN <- NULL
   if (is.name(protectZeros)) protectZeros <- NULL
   if (is.name(secondaryZeros)) secondaryZeros <- NULL
+  
+  if (structuralEmpty) {
+    if (!is.function(c(primary)[[1]])) {  # Also handle non-function input 
+      primary_values <- primary
+      primary <- function(...) primary_values
+    }
+    primary <- c(primary, function(x, ...) NA & colSums(x) == 0)
+  }
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
