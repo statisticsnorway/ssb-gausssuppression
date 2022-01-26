@@ -435,6 +435,10 @@ Primary <- function(primary, crossTable, ...) {
 #' @export
 #' @keywords internal
 PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
+  
+  if(is.null(maxN))         stop("A non-NULL value of maxN is required.")
+  if(is.null(protectZeros)) stop("A non-NULL value of protectZeros is required.")
+  
   primary <- freq <= maxN
   if (!protectZeros) 
     primary[freq == 0] <- FALSE
@@ -463,6 +467,9 @@ PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
 #' @export
 #' @keywords internal
 CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
+  
+  if(is.null(secondaryZeros)) stop("A non-NULL value of secondaryZeros is required.")
+  
   if(is.null(weight))
     weight <- 1
   else{
@@ -503,6 +510,10 @@ CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
 #' @export
 #' @keywords internal
 SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
+  
+  if(is.null(protectZeros))   stop("A non-NULL value of protectZeros is required.")
+  if(is.null(secondaryZeros)) stop("A non-NULL value of secondaryZeros is required.")
+  
   if (protectZeros | secondaryZeros){ 
     return(data[[freqVar]] == 0)
   }
