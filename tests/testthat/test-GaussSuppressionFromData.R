@@ -43,3 +43,16 @@ test_that("Advanced with integer overflow", {
   expect_identical(sum(which(a$suppressed)), 576555L)
   
 })
+
+
+test_that("structuralEmpty and removeEmpty", {
+  expect_warning(a1 <- GaussSuppressionFromData(z3[100:300, ], 1:6, 7, printInc = printInc))
+  a2 <- GaussSuppressionFromData(z3[100:300, ], 1:6, 7, printInc = printInc, structuralEmpty = TRUE)
+  a3 <- GaussSuppressionFromData(z3[100:300, ], 1:6, 7, printInc = printInc, removeEmpty = TRUE)
+  k <- a1$suppressed != a2$suppressed
+  expect_equal(a1[!k, ], a3)
+  expect_equal(a2[!k, ], a3)
+  expect_equal(unique(a1[k, "freq"]), 0)
+})
+
+
