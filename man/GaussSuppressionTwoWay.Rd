@@ -13,9 +13,9 @@ GaussSuppressionTwoWay(
   charVar = NULL,
   hierarchies,
   formula = NULL,
-  maxN = 3,
-  protectZeros = TRUE,
-  secondaryZeros = FALSE,
+  maxN = suppressWarnings(formals(c(primary)[[1]])$maxN),
+  protectZeros = suppressWarnings(formals(c(primary)[[1]])$protectZeros),
+  secondaryZeros = suppressWarnings(formals(candidates)$secondaryZeros),
   candidates = CandidatesDefault,
   primary = PrimaryDefault,
   forced = NULL,
@@ -29,6 +29,7 @@ GaussSuppressionTwoWay(
   removeEmpty = TRUE,
   inputInOutput = TRUE,
   candidatesFromTotal = TRUE,
+  structuralEmpty = FALSE,
   ...
 )
 }
@@ -50,11 +51,11 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{formula}{A model formula}
 
-\item{maxN}{Suppression parameter. Default: Cells having counts \verb{<= maxN} are set as primary suppressed.}
+\item{maxN}{Suppression parameter. See \code{GaussSuppressionFromData}.}
 
-\item{protectZeros}{Suppression parameter. Default when TRUE: Empty cells (count=0) are set as primary suppressed.}
+\item{protectZeros}{Suppression parameter. See \code{GaussSuppressionFromData}.}
 
-\item{secondaryZeros}{Suppression parameter.}
+\item{secondaryZeros}{Suppression parameter. See \code{GaussSuppressionFromData}.}
 
 \item{candidates}{GaussSuppression input or a function generating it (see details) Default: \code{\link{CandidatesDefault}}}
 
@@ -85,6 +86,8 @@ When NULL, removal only within the algorithm (x  matrices) so that such empty ou
 TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.}
 
 \item{candidatesFromTotal}{When TRUE (default), same candidates for all rows and for all columns, computed from row/column totals.}
+
+\item{structuralEmpty}{See \code{GaussSuppressionFromData}.}
 
 \item{...}{Further arguments to be passed to the supplied functions.}
 }
