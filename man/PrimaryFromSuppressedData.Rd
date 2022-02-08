@@ -45,7 +45,7 @@ Function for \code{\link{GaussSuppressionFromData}}
 Hence the result can be used as an extra primary vector to ensure that code combinations
 not suppressed according to \code{suppressedData} are forced not to be primary suppressed.
 
-The variables in \code{suppressedData} in addition to suppressed are those with matching names in \code{crossTable}. Others are ignored.
+The variables used in \code{suppressedData} in addition to \code{"suppressed"} are those with matching names in \code{crossTable}. Others are ignored.
 For variables in \code{crossTable} not in \code{suppressedData}, only totals are considered.
 Others rows are ignored when mathing with \code{suppressedData}.
 

@@ -11,7 +11,7 @@
 #' Hence the result can be used as an extra primary vector to ensure that code combinations 
 #' not suppressed according to `suppressedData` are forced not to be primary suppressed.
 #' 
-#' The variables in `suppressedData` in addition to suppressed are those with matching names in `crossTable`. Others are ignored. 
+#' The variables used in `suppressedData` in addition to `"suppressed"` are those with matching names in `crossTable`. Others are ignored. 
 #' For variables in `crossTable` not in `suppressedData`, only totals are considered.   
 #' Others rows are ignored when mathing with `suppressedData`.
 #' 
