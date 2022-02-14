@@ -73,7 +73,7 @@ PrimaryFromSuppressedData <- function(x, crossTable, suppressedData, forcedData 
   if (is.null(dim(suppressedData))) {  # list of several suppressedData
     primary <- rep(FALSE, nrow(crossTable))
     for (i in seq_along(suppressedData)) {
-      primary <- primary | PrimaryFromSuppressedData(x = x, crossTable = crossTable, suppressedData = suppressedData[[i]], totCode = totCode)
+      primary <- primary | PrimaryFromSuppressedData(x = x, crossTable = crossTable, suppressedData = suppressedData[[i]], forcedData = forcedData, totCode = totCode)
     }
     return(primary)
   }
@@ -97,7 +97,7 @@ PrimaryFromSuppressedData <- function(x, crossTable, suppressedData, forcedData 
     }
   }
   
-  ma <- Match(crossTable[rows, namesIn], suppressedData)
+  ma <- Match(crossTable[rows, namesIn, drop = FALSE], suppressedData)
   
   rows[rows][is.na(ma)] <- FALSE
   rows
