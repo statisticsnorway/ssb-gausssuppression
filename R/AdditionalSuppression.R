@@ -81,6 +81,15 @@
 #' 
 AdditionalSuppression = function(data,  ..., primary = PrimaryDefault, suppressedData = NULL, makePrimary = TRUE, makeForced = TRUE, forceNotPrimary = TRUE){
 
+  
+  if (!is.data.frame(suppressedData)) {  # empty list as NULL
+    if (is.list(suppressedData))
+      if (!length(suppressedData)) {
+        suppressedData <- NULL
+      }
+  }
+  
+  
   if(is.null(suppressedData)){
     return(GaussSuppressionFromData(data = data, ..., primary = primary))
   }
