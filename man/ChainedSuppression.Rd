@@ -2,20 +2,21 @@
 % Please edit documentation in R/ChainedSuppression.R
 \name{ChainedSuppression}
 \alias{ChainedSuppression}
-\title{ChainedSuppression}
+\title{Repeated GaussSuppression  with forwarding of previous results}
 \usage{
 ChainedSuppression(..., withinArg = NULL)
 }
 \arguments{
-\item{...}{dots}
+\item{...}{Arguments to \code{AdditionalSuppression}/\code{GaussSuppressionFromData} that are kept constant.}
 
-\item{withinArg}{withinArg}
+\item{withinArg}{A list of named lists. Arguments to \code{AdditionalSuppression}/\code{GaussSuppressionFromData} that are not kept constant.
+List elements with suppressed data are also allowed.}
 }
 \value{
-list
+List of data frames
 }
 \description{
-ChainedSuppression
+\code{\link{AdditionalSuppression}} is called several times. Each time with all previous  results as \code{suppressedData}.
 }
 \examples{
 
@@ -29,25 +30,34 @@ a1 <- ChainedSuppression(z1, 1:2, 3, maxN = 5)
 a2 <- ChainedSuppression(z1, withinArg = list(list(dimVar = 1:2, freqVar = 3, maxN = 5)))
 identical(a1, a2[[1]])
 
-
+# b[[3]] include results from b[[1]] and b[[2]]
 b <- ChainedSuppression(z1, freqVar = 3, withinArg = list(
        list(dimVar = 1,   maxN = 55), 
        list(dimVar = 2,   maxN = 55), 
        list(dimVar = 1:2, maxN = 5)))
 
+# d[[2]] is same as b1 in AdditionalSuppression examples
 d <- ChainedSuppression(withinArg = list(
        list(data = z1,  dimVar = 1:2, freqVar = 3, maxN = 5), 
        list(data = z2,  dimVar = 1:4, freqVar = 5, maxN = 1)))
 
+# Common variable names important. 
+# Therefore kostragr renamed to region in z2b. 
 f <- ChainedSuppression(withinArg = list(
        list(data = z1,  dimVar = 1:2, freqVar = 3, maxN = 5), 
        list(data = z2b, dimVar = 1:2, freqVar = 3, maxN = 5), 
        list(data = z2,  dimVar = 1:4, freqVar = 5, maxN = 1)))
 
+# Parameters so that only suppressions are forwarded. 
+# This is first iteration in linked tables by iterations. 
 e <- ChainedSuppression(withinArg = list(
        list(data = z1,  dimVar = 1:2, freqVar = 3, maxN = 5), 
        list(data = z2b, dimVar = 1:2, freqVar = 3, maxN = 5), 
        list(data = z2,  dimVar = 1:4, freqVar = 5, maxN = 1)), 
        makeForced = FALSE, forceNotPrimary = FALSE)
+       
+# "A" "annet"/"arbeid" could be suppressed here, but not in f since f[[1]]      
+e[[3]][which(e[[3]]$suppressed != f[[3]]$suppressed), ]        
+       
        
 }
