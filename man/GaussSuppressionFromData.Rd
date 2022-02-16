@@ -93,7 +93,7 @@ This extra aggregation is useful when parameter \code{charVar} is used.
 Supply \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"} or \code{"inner_x"} as \code{output} to obtain extra aggregated results.
 Supply \code{"inner"} or \code{"input2functions"} to obtain other results.}
 
-\item{...}{Further arguments to be passed to the supplied functions.}
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }
 \value{
 Aggregated data with suppression information
