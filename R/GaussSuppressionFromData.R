@@ -348,6 +348,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   publish <- cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
   
+  startCol <- attr(x, "startCol", exact = TRUE)
+  if (!is.null(startCol)) {
+    attr(publish, "startRow") <- startCol
+  }
+  
   if (output == "publish_inner_x") {
     return(list(publish = publish, inner = data, x = x))
   }
