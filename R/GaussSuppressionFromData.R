@@ -151,7 +151,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
                      "primary", "secondary")))
-    stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
+    stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions",
+         "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
+                     "primary", "secondary")')
   
   
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
