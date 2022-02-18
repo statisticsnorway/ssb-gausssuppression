@@ -333,7 +333,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     }
     if(!isTRUE(all.equal(
       as.matrix(crossprod(x, as.matrix(data[, c(freqVar, numVar, weightVar), drop = FALSE]))), 
-      cbind(freq, num, weight),
+      as.matrix(cbind(freq, num, weight)),
       check.attributes = FALSE, check.names = FALSE)))
       warning("(freq, num, weight) all not equal when checked by all.equal")
     if (printInc) {
