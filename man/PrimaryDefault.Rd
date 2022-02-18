@@ -4,16 +4,14 @@
 \alias{PrimaryDefault}
 \title{PrimaryDefault}
 \usage{
-PrimaryDefault(freq, x, maxN, protectZeros, ...)
+PrimaryDefault(freq, maxN = 3, protectZeros = TRUE, ...)
 }
 \arguments{
-\item{freq}{freq}
+\item{freq}{Vector of output frequencies}
 
-\item{x}{x}
+\item{maxN}{Cells with frequency \verb{<= maxN} are set as primary suppressed.}
 
-\item{maxN}{maxN}
-
-\item{protectZeros}{protectZeros}
+\item{protectZeros}{When \code{TRUE}, cells with zero frequency are set as primary suppressed.}
 
 \item{...}{Unused parameters}
 }

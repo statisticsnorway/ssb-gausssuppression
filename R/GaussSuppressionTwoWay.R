@@ -30,9 +30,9 @@
 #' @param hierarchies List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
 #'        Thus, the variables can also be coded by `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param formula A model formula
-#' @param maxN  Suppression parameter. Default: Cells having counts `<= maxN` are set as primary suppressed. 
-#' @param protectZeros Suppression parameter. Default when TRUE: Empty cells (count=0) are set as primary suppressed.  
-#' @param secondaryZeros Suppression parameter.
+#' @param maxN           Suppression parameter. See `GaussSuppressionFromData`.  
+#' @param protectZeros   Suppression parameter. See `GaussSuppressionFromData`.  
+#' @param secondaryZeros Suppression parameter. See `GaussSuppressionFromData`.
 #' @param candidates GaussSuppression input or a function generating it (see details) Default: \code{\link{CandidatesDefault}}
 #' @param primary    GaussSuppression input or a function generating it (see details) Default: \code{\link{PrimaryDefault}}
 #' @param forced     GaussSuppression input or a function generating it (see details)
@@ -50,6 +50,7 @@
 #' @param inputInOutput Logical vector (possibly recycled) for each element of hierarchies.
 #'         TRUE means that codes from input are included in output. Values corresponding to \code{"rowFactor"} or \code{""} are ignored.
 #' @param candidatesFromTotal When TRUE (default), same candidates for all rows and for all columns, computed from row/column totals.          
+#' @param structuralEmpty See `GaussSuppressionFromData`.
 #' @param ... Further arguments to be passed to the supplied functions.
 #'
 #' @return Aggregated data with suppression information
@@ -94,9 +95,9 @@
 #'                                  as.vector((t(x) %*% as.numeric(data[[charVar]] == "M06M12")) == 0))                                
 GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies, formula = NULL,
-                           maxN = 3, 
-                           protectZeros = TRUE, 
-                           secondaryZeros = FALSE,
+                           maxN = suppressWarnings(formals(c(primary)[[1]])$maxN), 
+                           protectZeros = suppressWarnings(formals(c(primary)[[1]])$protectZeros), 
+                           secondaryZeros = suppressWarnings(formals(candidates)$secondaryZeros),
                            candidates = CandidatesDefault,
                            primary = PrimaryDefault,
                            forced = NULL,                                                             
@@ -110,6 +111,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            removeEmpty = TRUE,
                            inputInOutput = TRUE,
                            candidatesFromTotal = TRUE, 
+                           structuralEmpty = FALSE, 
                            ...){ 
   if (is.null(hierarchies)) {
     stop("Hierarchies must be specified")
@@ -142,6 +144,20 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
 
   force(preAggregate)
+  
+  # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
+  if (is.name(maxN)) maxN <- NULL
+  if (is.name(protectZeros)) protectZeros <- NULL
+  if (is.name(secondaryZeros)) secondaryZeros <- NULL
+  
+  if (structuralEmpty) {
+    if (!is.function(c(primary)[[1]])) {  # Also handle non-function input 
+      primary_values <- primary
+      primary <- function(...) primary_values
+    }
+    primary <- c(primary, function(x, ...) NA & colSums(x) == 0)
+  }
+  
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])

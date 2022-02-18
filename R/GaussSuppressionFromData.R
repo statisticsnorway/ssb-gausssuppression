@@ -14,6 +14,13 @@
 #' Similarly, `num`, is a data frame of aggregated numerical variables.   
 #' It is possible to supply several primary functions joined by `c`, e.g. (`c(FunPrim1, FunPrim2)`). 
 #' All `NA`s returned from any of the functions force the corresponding cells not to be primary suppressed.
+#' 
+#' The effect of `maxN` , `protectZeros` and `secondaryZeros` depends on the supplied functions where these parameters are used. 
+#' Their default values are inherited from the default values of the first `primary` function (several possible) or, 
+#' in the case of `secondaryZeros`, the `candidates` function.   
+#' When defaults cannot be inherited, they are set to `NULL`.   
+#' In practice the function `formals` are still used to generate the defaults when `primary` and/or `candidates` are not functions. 
+#' Then `NULL` is correctly returned, but `suppressWarnings` are needed.
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -24,9 +31,15 @@
 #' @param hierarchies List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
 #'        Thus, the variables can also be coded by `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param formula A model formula
-#' @param maxN  Suppression parameter. Default: Cells having counts `<= maxN` are set as primary suppressed. 
-#' @param protectZeros Suppression parameter. Default when TRUE: Empty cells (count=0) are set as primary suppressed.  
-#' @param secondaryZeros Suppression parameter.
+#' @param maxN Suppression parameter. Cells with frequency `<= maxN` are set as primary suppressed.   
+#'        Using the default `primary` function, `maxN` is by default set to `3`. See details.
+#' @param protectZeros Suppression parameter. 
+#'        When `TRUE`, cells with zero frequency or value are set as primary suppressed. 
+#'        Using the default `primary` function, `protectZeros` is by default set to `TRUE`. See details.
+#' @param secondaryZeros Suppression parameter. 
+#'        When `TRUE`, cells with zero frequency or value are prioritized to be published so that they are not secondary suppressed.
+#'        Using the default `candidates` function, `secondaryZeros` is by default set to `FALSE`. 
+#'        See details.
 #' @param candidates GaussSuppression input or a function generating it (see details) Default: \code{\link{CandidatesDefault}}
 #' @param primary    GaussSuppression input or a function generating it (see details) Default: \code{\link{PrimaryDefault}}
 #' @param forced     GaussSuppression input or a function generating it (see details)
@@ -53,6 +66,13 @@
 #'                       This extra aggregation is useful when parameter `charVar` is used.
 #'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
 #'                       Supply `"inner"` or `"input2functions"` to obtain other results. 
+#' @param structuralEmpty  When `TRUE`, output cells with no contributing inner cells (only zeros in column of `x`) 
+#'                         are forced to be not primary suppressed. 
+#'                         Thus, these cells are considered as structural zeros. 
+#'                         When `structuralEmpty` is `TRUE`, the following error message is avoided: 
+#'                         `Suppressed` `cells` `with` `empty` `input` `will` `not` `be` `protected.` 
+#'                         `Extend` `input` `data` `with` `zeros?`.    
+#'                         When `removeEmpty` is `TRUE` (see "`...`" below), `structuralEmpty` is superfluous             
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -79,14 +99,15 @@
 #' 
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values")
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10)
-#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
+#' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10,
+#'       protectZeros = TRUE, # Parameter needed by SingletonDefault and default not in primary  
 #'       primary = function(freq, crossTable, maxN, ...) 
 #'                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
 #'                    
 #' # Combining several primary functions 
 #' # Note that NA & c(TRUE, FALSE) equals c(NA, FALSE)                      
 #' GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
-#'        primary = c(function(freq, maxN, ...) freq >= 45,
+#'        primary = c(function(freq, maxN, protectZeros = TRUE, ...) freq >= 45,
 #'                    function(freq, maxN, ...) freq <= maxN,
 #'                    function(crossTable, ...) NA & crossTable[[2]] == "C",  
 #'                    function(crossTable, ...) NA & crossTable[[1]]== "Total" 
@@ -110,9 +131,9 @@
 #' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE)      
 GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies = NULL, formula = NULL,
-                           maxN = 3, 
-                           protectZeros = TRUE, 
-                           secondaryZeros = FALSE,
+                           maxN = suppressWarnings(formals(c(primary)[[1]])$maxN), 
+                           protectZeros = suppressWarnings(formals(c(primary)[[1]])$protectZeros), 
+                           secondaryZeros = suppressWarnings(formals(candidates)$secondaryZeros),
                            candidates = CandidatesDefault,
                            primary = PrimaryDefault,
                            forced = NULL,
@@ -123,19 +144,35 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            output = "publish", x = NULL, crossTable = NULL,
                            preAggregate = is.null(freqVar),
                            extraAggregate = preAggregate & !is.null(charVar), 
+                           structuralEmpty = FALSE, 
                            ...){ 
   
   
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
                      "primary", "secondary")))
-    stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", and "input2functions".')
+    stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions",
+         "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
+                     "primary", "secondary")')
   
   
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
 
   force(preAggregate)
   force(extraAggregate)
+  
+  # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
+  if (is.name(maxN)) maxN <- NULL
+  if (is.name(protectZeros)) protectZeros <- NULL
+  if (is.name(secondaryZeros)) secondaryZeros <- NULL
+  
+  if (structuralEmpty) {
+    if (!is.function(c(primary)[[1]])) {  # Also handle non-function input 
+      primary_values <- primary
+      primary <- function(...) primary_values
+    }
+    primary <- c(primary, function(x, ...) NA & colSums(x) == 0)
+  }
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
@@ -412,21 +449,23 @@ Primary <- function(primary, crossTable, ...) {
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
 #'
-#' @param freq freq 
-#' @param x x
-#' @param maxN maxN
-#' @param protectZeros protectZeros 
+#' @param freq Vector of output frequencies 
+#' @param maxN Cells with frequency `<= maxN` are set as primary suppressed. 
+#' @param protectZeros When `TRUE`, cells with zero frequency are set as primary suppressed. 
 #' @param ... Unused parameters 
 #'
 #' @return primary, \code{\link{GaussSuppression}} input 
 #' @export
 #' @keywords internal
-PrimaryDefault <- function(freq, x, maxN, protectZeros, ...) {
+PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
+  
+  if(is.null(maxN))         stop("A non-NULL value of maxN is required.")
+  if(is.null(protectZeros)) stop("A non-NULL value of protectZeros is required.")
+  
   primary <- freq <= maxN
   if (!protectZeros) 
     primary[freq == 0] <- FALSE
   
-  #which(primary)
   primary
 }
 
@@ -434,16 +473,26 @@ PrimaryDefault <- function(freq, x, maxN, protectZeros, ...) {
 #' CandidatesDefault
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
+#' 
+#' This main part of this function orders the indices decreasingly according to `freq` or, 
+#' when `weight` is non-NULL,  `(freq+1)*weight`. Ties are handled by prioritizing output cells 
+#' that are calculated from many input cells. In addition, zeros are handled according to parameter `secondaryZeros`. 
 #'
-#' @param freq freq 
-#' @param x x
-#' @param secondaryZeros secondaryZeros
+#' @param freq Vector of output frequencies 
+#' @param x The model matrix
+#' @param secondaryZeros When `TRUE`, cells with zero frequency or value are prioritized to 
+#'        be published so that they are not secondary suppressed.
+#'        This is achieved by this function by having the zero frequency indices first in the retuned order.
+#' @param weight Vector of output weights
 #' @param ... Unused parameters 
 #'
 #' @return candidates, \code{\link{GaussSuppression}} input 
 #' @export
 #' @keywords internal
-CandidatesDefault <- function(freq, x, secondaryZeros, weight, ...) {
+CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
+  
+  if(is.null(secondaryZeros)) stop("A non-NULL value of secondaryZeros is required.")
+  
   if(is.null(weight))
     weight <- 1
   else{
@@ -469,17 +518,25 @@ CandidatesDefault <- function(freq, x, secondaryZeros, weight, ...) {
 #' SingletonDefault
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
+#' 
+#' This function marks input cells as singletons according to the input frequencies. 
+#' Zeros are set to singletons when `protectZeros` or `secondaryZeros` is `TRUE`. 
+#' Otherwise, ones are set to singletons.
 #'
-#' @param data data  
-#' @param freqVar freqVar
-#' @param protectZeros protectZeros 
-#' @param secondaryZeros secondaryZeros
+#' @param data  Input data, possibly pre-aggregated within `GaussSuppressionFromData`  
+#' @param freqVar A single variable holding counts (input to `GaussSuppressionFromData`)
+#' @param protectZeros Suppression parameter (see `GaussSuppressionFromData`)
+#' @param secondaryZeros Suppression parameter (see `GaussSuppressionFromData`)
 #' @param ... Unused parameters 
 #'
 #' @return singleton, \code{\link{GaussSuppression}} input 
 #' @export
 #' @keywords internal
 SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
+  
+  if(is.null(protectZeros))   stop("A non-NULL value of protectZeros is required.")
+  if(is.null(secondaryZeros)) stop("A non-NULL value of secondaryZeros is required.")
+  
   if (protectZeros | secondaryZeros){ 
     return(data[[freqVar]] == 0)
   }
