@@ -72,12 +72,13 @@
 #'                         When `structuralEmpty` is `TRUE`, the following error message is avoided: 
 #'                         `Suppressed` `cells` `with` `empty` `input` `will` `not` `be` `protected.` 
 #'                         `Extend` `input` `data` `with` `zeros?`.    
-#'                         When `removeEmpty` is `TRUE` (see "`...`" below), `structuralEmpty` is superfluous             
+#'                         When `removeEmpty` is `TRUE` (see "`...`" below), `structuralEmpty` is superfluous    
+#' @param extend0  Data is automatically extended by `Extend0` when `TRUE`. Can also be specified as a list meaning parameter `varGroups` to `Extend0`.                                  
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -145,6 +146,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            preAggregate = is.null(freqVar),
                            extraAggregate = preAggregate & !is.null(charVar), 
                            structuralEmpty = FALSE, 
+                           extend0 = FALSE,
                            ...){ 
   
   
@@ -174,13 +176,22 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     primary <- c(primary, function(x, ...) NA & colSums(x) == 0)
   }
   
+  
+  if (is.list(extend0)) {
+    varGroups <- extend0
+    extend0 <- TRUE
+  } else {
+    varGroups <- NULL
+  }
+  
+  
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
   numVar <- names(data[1, numVar, drop = FALSE])
   weightVar <- names(data[1, weightVar, drop = FALSE])
   charVar <- names(data[1, charVar, drop = FALSE])
   
-  if (preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
+  if (extend0 | preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
     if (printInc & preAggregate) {
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
@@ -227,6 +238,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
   }
+  
+  if (extend0) {
+    data <- Extend0(data, freqName = freqVar, dimVar = dVar,  varGroups = varGroups, extraVar = TRUE, 
+                    hierarchical = is.null(hierarchies))
+  }
+  
   
   if(innerReturn){
     attr(data, "freqVar") <- freqVar

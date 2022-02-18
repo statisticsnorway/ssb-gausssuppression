@@ -29,6 +29,7 @@ GaussSuppressionFromData(
   preAggregate = is.null(freqVar),
   extraAggregate = preAggregate & !is.null(charVar),
   structuralEmpty = FALSE,
+  extend0 = FALSE,
   ...
 )
 }
@@ -107,6 +108,8 @@ When \code{structuralEmpty} is \code{TRUE}, the following error message is avoid
 \code{Suppressed} \code{cells} \code{with} \code{empty} \code{input} \code{will} \code{not} \code{be} \code{protected.}
 \code{Extend} \code{input} \code{data} \code{with} \verb{zeros?}.
 When \code{removeEmpty} is \code{TRUE} (see "\code{...}" below), \code{structuralEmpty} is superfluous}
+
+\item{extend0}{Data is automatically extended by \code{Extend0} when \code{TRUE}. Can also be specified as a list meaning parameter \code{varGroups} to \code{Extend0}.}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }
