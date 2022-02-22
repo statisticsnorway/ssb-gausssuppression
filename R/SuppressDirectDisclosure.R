@@ -36,7 +36,7 @@ SuppressDirectDisclosure <- function(data, dimVar, freqVar,
                                      candidates = DirectDisclosureCandidates,
                                      ...) {
   
-  mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE)
+  mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE, ...)
   
   if (ncol(mm$crossTable) < length(dimVar))
     stop("Hierarchies have been detected. This method does not currently support hierarchical data.")
