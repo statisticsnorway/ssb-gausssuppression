@@ -78,7 +78,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -196,22 +196,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
     }
-    if (!is.null(hierarchies)) {
-      dVar <- names(hierarchies)
-    } else {
-      if (!is.null(formula)) {
-        dVar <- row.names(attr(delete.response(terms(as.formula(formula))), "factors"))
+    
+    dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
+    
+    if (!length(dVar)) {
+      freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
+      if (!length(freqPlusVarName)) {
+        dVar <- names(data)
       } else {
-        if (length(dimVar)){
-          dVar <- dimVar
-        } else {
-          freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
-          if (!length(freqPlusVarName)){
-            dVar <- names(data)
-          } else {
-            dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
-          }
-        }
+        dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
       }
     }
     dVar <- unique(dVar)
