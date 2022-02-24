@@ -240,9 +240,25 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       avoidHierarchical <- AH(...)
     } else {
       avoidHierarchical <- FALSE
-    } 
+    }
     
-    data <- Extend0(data, freqName = freqVar, dimVar = dVar,  varGroups = varGroups, extraVar = TRUE, 
+    dVar_ <- dVar
+    
+    # To keep hierarchical = FALSE in Extend0 when !is.null(hierarchies):  AutoHierarchies needed first  when unnamed elements in hierarchies  
+    if (!is.null(hierarchies)) {
+      toFindDimLists <- (names(hierarchies) %in% c(NA, "")) & (sapply(hierarchies, is.character))  # toFindDimLists created exactly as in AutoHierarchies
+      if (sum(toFindDimLists)) {
+        AutoHierarchiesWithDots <- function(hierarchies, data,  # New function needed since AutoHierarchies not defined with dots
+                                            total = "Total",    # Including dot-parameters called by ModelMatrix 
+                                            hierarchyVarNames = c(mapsFrom = "mapsFrom", mapsTo = "mapsTo", sign = "sign", level = "level"), ...) {
+          AutoHierarchies(hierarchies = hierarchies, data = data, total = total, hierarchyVarNames = hierarchyVarNames)
+        }
+        hierarchies <- AutoHierarchiesWithDots(hierarchies = hierarchies, data = data, ...)
+        dVar_ <- names(hierarchies)
+      }
+    }
+    
+    data <- Extend0(data, freqName = freqVar, dimVar = dVar_,  varGroups = varGroups, extraVar = TRUE, 
                     hierarchical = !avoidHierarchical & is.null(hierarchies))
   }
   
