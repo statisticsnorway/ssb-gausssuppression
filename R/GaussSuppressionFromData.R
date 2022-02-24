@@ -246,6 +246,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     
     # To keep hierarchical = FALSE in Extend0 when !is.null(hierarchies):  AutoHierarchies needed first  when unnamed elements in hierarchies  
     if (!is.null(hierarchies)) {
+      if (is.null(names(hierarchies))) names(hierarchies) <- rep(NA, length(hierarchies))
       toFindDimLists <- (names(hierarchies) %in% c(NA, "")) & (sapply(hierarchies, is.character))  # toFindDimLists created exactly as in AutoHierarchies
       if (sum(toFindDimLists)) {
         AutoHierarchiesWithDots <- function(hierarchies, data,  # New function needed since AutoHierarchies not defined with dots
