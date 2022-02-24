@@ -43,6 +43,7 @@ By default, the suppression pattern in \code{suppressedData} is preserved. The b
 
 Note that the variables used in \code{suppressedData} in addition to \code{"suppressed"} are those with matching names in \code{crossTable}.
 Others are ignored. See examples (d3, d4, d5).
+NOW A FIX IS INCLUDED by attribute totCode. EXAMPLES NOT YET CHANGED.
 }
 \examples{
 

@@ -426,6 +426,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     attr(publish, "startRow") <- startCol
   }
   
+  attr(publish, "totCode") <- FindTotCode2(x, crossTable)
+  
+  
   if (output == "publish_inner_x") {
     return(list(publish = publish, inner = data, x = x))
   }

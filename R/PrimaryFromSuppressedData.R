@@ -83,6 +83,17 @@ PrimaryFromSuppressedData <- function(x, crossTable, suppressedData, forcedData 
   namesIn <- names(crossTable)[crossTable_in_suppressedData]
   namesNotIn <- names(crossTable)[!crossTable_in_suppressedData]
   
+  totCodeExtern <- attr(suppressedData, "totCode")
+  namesExtern <- names(totCodeExtern)
+  namesExtern <- namesExtern[!(namesExtern %in% names(crossTable))]
+  if (length(namesExtern)) {
+    rows <- rep(TRUE, nrow(suppressedData))
+    for (i in seq_along(namesExtern)) {
+      rows <- rows & (suppressedData[[namesExtern[i]]] %in% totCodeExtern[[namesExtern[i]]])
+    }
+    suppressedData <- suppressedData[rows, ,drop=FALSE] 
+  }
+  
   rows <- rep(TRUE, nrow(crossTable))
   
   for (i in seq_along(namesNotIn)) {

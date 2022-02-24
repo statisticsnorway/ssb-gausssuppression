@@ -10,6 +10,8 @@
 #' 
 #' Note that the variables used in `suppressedData` in addition to `"suppressed"` are those with matching names in `crossTable`. 
 #' Others are ignored. See examples (d3, d4, d5).
+#' NOW A FIX IS INCLUDED by attribute totCode. EXAMPLES NOT YET CHANGED.
+#' 
 #'
 #' @param data Input data as a data frame
 #' @param ... Further parameters to \code{\link{GaussSuppressionFromData}}
