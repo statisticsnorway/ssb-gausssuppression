@@ -90,10 +90,14 @@ PrimaryFromSuppressedData <- function(x, crossTable, suppressedData, forcedData 
   }
   
   if ("suppressed" %in% names(suppressedData)) {
+    suppressedDataFALSE <- suppressedData[!suppressedData$suppressed, namesIn, drop = FALSE]
+    suppressedData <- suppressedData[suppressedData$suppressed, namesIn, drop = FALSE]
+    ma <- Match(suppressedData, suppressedDataFALSE)
+    if (any(!is.na(ma))) {
+      stop("Suppression pattern in suppressedData is not unique") 
+    }
     if (forcedData) {
-      suppressedData <- suppressedData[!suppressedData$suppressed, namesIn, drop = FALSE]
-    } else {
-      suppressedData <- suppressedData[suppressedData$suppressed, namesIn, drop = FALSE]
+      suppressedData <- suppressedDataFALSE 
     }
   }
   
