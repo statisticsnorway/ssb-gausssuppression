@@ -399,7 +399,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     rm(data)
   } 
   
-  secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+  # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
+  if(hasArg(whenEmptyUnsuppressed) | !structuralEmpty){
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+  } else {
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, ...)
+  }
   
   if (output == "secondary"){
     return(secondary)
