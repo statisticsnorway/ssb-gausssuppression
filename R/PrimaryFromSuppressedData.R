@@ -80,6 +80,10 @@ PrimaryFromSuppressedData <- function(x, crossTable, suppressedData, forcedData 
   
   crossTable_in_suppressedData <- names(crossTable) %in% names(suppressedData)
   
+  if (!sum(crossTable_in_suppressedData)) {
+    return(rep(FALSE, nrow(crossTable)))
+  }
+  
   namesIn <- names(crossTable)[crossTable_in_suppressedData]
   namesNotIn <- names(crossTable)[!crossTable_in_suppressedData]
   
