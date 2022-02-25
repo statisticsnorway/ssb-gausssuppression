@@ -3,11 +3,14 @@
 \name{ChainedSuppression}
 \alias{ChainedSuppression}
 \alias{ChainedSuppressionHi}
+\alias{ChainedSuppressionHi1}
 \title{Repeated GaussSuppression  with forwarding of previous results}
 \usage{
 ChainedSuppression(..., withinArg = NULL)
 
 ChainedSuppressionHi(..., hierarchies)
+
+ChainedSuppressionHi1(..., hierarchies)
 }
 \arguments{
 \item{...}{Arguments to \code{AdditionalSuppression}/\code{GaussSuppressionFromData} that are kept constant.}
@@ -17,10 +20,14 @@ List elements with suppressed data are also allowed.}
 
 \item{hierarchies}{In the wrapper \code{ChainedSuppressionHi}, this argument will be used to generate the
 \code{withinArg} to \code{ChainedSuppression} with the same length (see examples).
-Then, element number \code{i} of \code{withinArg} is \code{list(hierarchies = hierarchies[1:i])}.}
+Then, element number \code{i} of \code{withinArg} is \code{list(hierarchies = hierarchies[1:i])}.
+In the similar wrapper, \code{ChainedSuppressionHi1}, \code{withinArg} has always two elements:
+\code{list(hierarchies = hierarchies[1])} and
+\code{list(hierarchies = hierarchies)}.}
 }
 \value{
-List of data frames
+List of data frames. The wrappers, \code{ChainedSuppressionHi} and \code{ChainedSuppressionHi1},
+return a single data frame, which is the last list item.
 }
 \description{
 \code{\link{AdditionalSuppression}} is called several times. Each time with all previous  results as \code{suppressedData}.
@@ -82,5 +89,8 @@ g1b <-  ChainedSuppression(z2, c(1, 3), 5, maxN = 1, withinArg = list(
 # Results different after combining hierarchies      
 g2 <- ChainedSuppressionHi(z2, c(1, 3), 5, maxN = 1, 
          hierarchies = SSBtools::AutoHierarchies(dimLists))        
+       
+# In this case, the same results can be obtained by:         
+g3 <- ChainedSuppressionHi1(z2, c(1, 3), 5, maxN = 1, hierarchies = dimLists)        
        
 }

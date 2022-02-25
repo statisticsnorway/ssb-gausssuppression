@@ -8,7 +8,8 @@
 #' @param withinArg A list of named lists. Arguments to `AdditionalSuppression`/`GaussSuppressionFromData` that are not kept constant. 
 #'                  List elements with suppressed data are also allowed. 
 #'
-#' @return List of data frames
+#' @return List of data frames. The wrappers, `ChainedSuppressionHi` and `ChainedSuppressionHi1`,
+#'         return a single data frame, which is the last list item.
 #' @export
 #'
 #' @examples
@@ -69,6 +70,9 @@
 #' g2 <- ChainedSuppressionHi(z2, c(1, 3), 5, maxN = 1, 
 #'          hierarchies = SSBtools::AutoHierarchies(dimLists))        
 #'        
+#' # In this case, the same results can be obtained by:         
+#' g3 <- ChainedSuppressionHi1(z2, c(1, 3), 5, maxN = 1, hierarchies = dimLists)        
+#'        
 ChainedSuppression <- function(..., withinArg = NULL) {
   if (is.null(withinArg)) {
     return(GaussSuppressionFromData(...))
@@ -102,6 +106,9 @@ ChainedSuppression <- function(..., withinArg = NULL) {
 #' @param hierarchies In the wrapper `ChainedSuppressionHi`, this argument will be used to generate the 
 #'                    `withinArg` to `ChainedSuppression` with the same length (see examples).
 #'                    Then, element number `i` of `withinArg` is `list(hierarchies = hierarchies[1:i])`. 
+#'                    In the similar wrapper, `ChainedSuppressionHi1`, `withinArg` has always two elements: 
+#'                    `list(hierarchies = hierarchies[1])` and 
+#'                    `list(hierarchies = hierarchies)`. 
 #'   
 #' @export
 ChainedSuppressionHi <- function(..., hierarchies) {
@@ -111,6 +118,15 @@ ChainedSuppressionHi <- function(..., hierarchies) {
     withinArg[[i]] <- list(hierarchies = hierarchies[seq_len(i)])
   }
   ChainedSuppression(..., withinArg = withinArg)[[n]]
+}
+
+#' @rdname ChainedSuppression
+#' @export
+ChainedSuppressionHi1 <- function(..., hierarchies) {
+  withinArg <- vector("list", 2)
+  withinArg[[1]] <- list(hierarchies = hierarchies[1])
+  withinArg[[2]] <- list(hierarchies = hierarchies)
+  ChainedSuppression(..., withinArg = withinArg)[[2]]
 }
 
 
