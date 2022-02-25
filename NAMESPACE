@@ -3,6 +3,7 @@
 export(AdditionalSuppression)
 export(CandidatesDefault)
 export(ChainedSuppression)
+export(ChainedSuppressionHi)
 export(DominanceRule)
 export(ForcedFromSuppressedData)
 export(GaussSuppressDec)
