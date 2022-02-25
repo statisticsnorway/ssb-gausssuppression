@@ -82,6 +82,7 @@
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
+#' @importFrom methods hasArg
 #' 
 #' @author Øyvind Langsrud and Daniel Lupp
 #'
@@ -400,7 +401,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   } 
   
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
-  if(hasArg(whenEmptyUnsuppressed) | !structuralEmpty){
+  if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, ...)
