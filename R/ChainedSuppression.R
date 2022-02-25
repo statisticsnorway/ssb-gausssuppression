@@ -50,8 +50,24 @@
 #'        makeForced = FALSE, forceNotPrimary = FALSE)
 #'        
 #' # "A" "annet"/"arbeid" could be suppressed here, but not in f since f[[1]]      
-#' e[[3]][which(e[[3]]$suppressed != f[[3]]$suppressed), ]        
+#' e[[3]][which(e[[3]]$suppressed != f[[3]]$suppressed), ]  
+#' 
+#' 
+#' #### Demonstrate SuppressionByChainedHierarchies
+#' 
+#' dimLists <- SSBtools::FindDimLists(z2[, 4:1])
+#' 
+#' 
+#' # Two ways of doing the same calculations
+#' g1 <- ChainedSuppressionHi(z2, c(1, 3), 5, maxN = 1, hierarchies = dimLists)
+#' g1b <-  ChainedSuppression(z2, c(1, 3), 5, maxN = 1, withinArg = list(
+#'          list(hierarchies = dimLists[1]),
+#'          list(hierarchies = dimLists[1:2]),
+#'          list(hierarchies = dimLists[1:3])))[[3]]      
 #'        
+#' # Results different after combining hierarchies      
+#' g2 <- ChainedSuppressionHi(z2, c(1, 3), 5, maxN = 1, 
+#'          hierarchies = SSBtools::AutoHierarchies(dimLists))        
 #'        
 ChainedSuppression <- function(..., withinArg = NULL) {
   if (is.null(withinArg)) {
@@ -80,6 +96,34 @@ ChainedSuppression <- function(..., withinArg = NULL) {
   }
   withinArg
 }
+
+
+#' @rdname ChainedSuppression
+#' @param hierarchies In the wrapper `ChainedSuppressionHi`, this argument will be used to generate the 
+#'                    `withinArg` to `ChainedSuppression` with the same length (see examples).
+#'                    Then, element number `i` of `withinArg` is `list(hierarchies = hierarchies[1:i])`. 
+#'   
+#' @export
+ChainedSuppressionHi <- function(..., hierarchies) {
+  n <- length(hierarchies)
+  withinArg <- vector("list", n)
+  for (i in seq_len(n)) {
+    withinArg[[i]] <- list(hierarchies = hierarchies[seq_len(i)])
+  }
+  ChainedSuppression(..., withinArg = withinArg)[[n]]
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
    

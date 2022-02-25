@@ -2,15 +2,22 @@
 % Please edit documentation in R/ChainedSuppression.R
 \name{ChainedSuppression}
 \alias{ChainedSuppression}
+\alias{ChainedSuppressionHi}
 \title{Repeated GaussSuppression  with forwarding of previous results}
 \usage{
 ChainedSuppression(..., withinArg = NULL)
+
+ChainedSuppressionHi(..., hierarchies)
 }
 \arguments{
 \item{...}{Arguments to \code{AdditionalSuppression}/\code{GaussSuppressionFromData} that are kept constant.}
 
 \item{withinArg}{A list of named lists. Arguments to \code{AdditionalSuppression}/\code{GaussSuppressionFromData} that are not kept constant.
 List elements with suppressed data are also allowed.}
+
+\item{hierarchies}{In the wrapper \code{ChainedSuppressionHi}, this argument will be used to generate the
+\code{withinArg} to \code{ChainedSuppression} with the same length (see examples).
+Then, element number \code{i} of \code{withinArg} is \code{list(hierarchies = hierarchies[1:i])}.}
 }
 \value{
 List of data frames
@@ -57,7 +64,23 @@ e <- ChainedSuppression(withinArg = list(
        makeForced = FALSE, forceNotPrimary = FALSE)
        
 # "A" "annet"/"arbeid" could be suppressed here, but not in f since f[[1]]      
-e[[3]][which(e[[3]]$suppressed != f[[3]]$suppressed), ]        
+e[[3]][which(e[[3]]$suppressed != f[[3]]$suppressed), ]  
+
+
+#### Demonstrate SuppressionByChainedHierarchies
+
+dimLists <- SSBtools::FindDimLists(z2[, 4:1])
+
+
+# Two ways of doing the same calculations
+g1 <- ChainedSuppressionHi(z2, c(1, 3), 5, maxN = 1, hierarchies = dimLists)
+g1b <-  ChainedSuppression(z2, c(1, 3), 5, maxN = 1, withinArg = list(
+         list(hierarchies = dimLists[1]),
+         list(hierarchies = dimLists[1:2]),
+         list(hierarchies = dimLists[1:3])))[[3]]      
        
+# Results different after combining hierarchies      
+g2 <- ChainedSuppressionHi(z2, c(1, 3), 5, maxN = 1, 
+         hierarchies = SSBtools::AutoHierarchies(dimLists))        
        
 }
