@@ -4,7 +4,7 @@
 \alias{MaxContribution}
 \title{Find major contributors to aggregates}
 \usage{
-MaxContribution(x, y, n = 1, decreasing = TRUE, index = FALSE)
+MaxContribution(x, y, n = 1, decreasing = TRUE, index = FALSE, groups = NULL)
 }
 \arguments{
 \item{x}{A (sparse) dummy matrix}
@@ -16,6 +16,10 @@ MaxContribution(x, y, n = 1, decreasing = TRUE, index = FALSE)
 \item{decreasing}{Ordering parameter. Smallest contributors found when \code{FALSE}.}
 
 \item{index}{Indices to \code{y} returned when TRUE}
+
+\item{groups}{When non-NULL, major contributions after aggregation within groups.
+Cannot be combined with \code{index = TRUE}.
+The missing group category is excluded.}
 }
 \value{
 Matrix with lagest contributors in first column, second largest in second column and so on.
@@ -40,7 +44,17 @@ cbind(a$crossTable, MaxContribution(a$modelMatrix, z$ths_per, 10, index = TRUE))
 
 b <- ModelMatrix(z[, -4], crossTable = TRUE, inputInOutput = c(TRUE, FALSE, TRUE))
 
-cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10))
+k <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10))
+
+gr18 <- paste0("g", 1:18)                          # Each row is a group
+k18 <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10, groups = gr18))
+identical(k, k18) # TRUE
+
+gr9 <- paste0("g", as.integer(10 * z$ths_per)\%\%10) # 9 groups from decimal
+k9 <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10, groups = gr9))
+
+k18[c(4, 13, 17, 33), ]
+k9[c(4, 13, 17, 33), ]
 
 }
 \seealso{
