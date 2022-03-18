@@ -4,7 +4,17 @@
 \alias{DominanceRule}
 \title{Dominance \verb{(n,k)} rule for magnitude tables}
 \usage{
-DominanceRule(data, x, crossTable, numVar, n, k, protectZeros = FALSE, ...)
+DominanceRule(
+  data,
+  x,
+  crossTable,
+  numVar,
+  n,
+  k,
+  protectZeros = FALSE,
+  charVar,
+  ...
+)
 }
 \arguments{
 \item{data}{the dataset}
@@ -20,6 +30,8 @@ DominanceRule(data, x, crossTable, numVar, n, k, protectZeros = FALSE, ...)
 \item{k}{parameter \code{k} in dominance rule.}
 
 \item{protectZeros}{parameter determining whether cells with value 0 should be suppressed.}
+
+\item{charVar}{Variable in data holding grouping information. Dominance will be calculated after aggregation within these groups.}
 
 \item{...}{unused parameters}
 }
