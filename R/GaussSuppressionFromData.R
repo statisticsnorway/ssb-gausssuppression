@@ -78,7 +78,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -260,8 +260,22 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       }
     }
     
+    nrowPreExtend0 <- nrow(data) 
+    
     data <- Extend0(data, freqName = freqVar, dimVar = dVar_,  varGroups = varGroups, extraVar = TRUE, 
                     hierarchical = !avoidHierarchical & is.null(hierarchies))
+    
+    # Set to NA instead of 0 for possible numeric dimVar not in hierarchy after AutoHierarchies (above)   
+    if (length(dVar_) < length(dVar)) {
+      extra_dVar <- dVar[!(dVar %in% dVar_)]
+      extra_dVar <- extra_dVar[sapply(data[1, extra_dVar], is.numeric)]
+      if (length(extra_dVar)) {
+        newrows <- SeqInc(nrowPreExtend0 + 1L, nrow(data))
+        if (length(newrows)) {
+          data[newrows, extra_dVar] <- NA
+        }
+      }
+    }
     
     if (printInc) {
       cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
