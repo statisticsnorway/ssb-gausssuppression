@@ -56,3 +56,60 @@ test_that("structuralEmpty and removeEmpty", {
 })
 
 
+
+test_that("extend0 and various hierarchy input", {
+  z2 <- SSBtoolsData("z2")
+  dimLists <- SSBtools::FindDimLists(z2[, -5])
+  hi <- list(c("region", "fylke", "kostragr"), hovedint = dimLists$hovedint)
+  
+  a1 <- GaussSuppressionFromData(z2, 1:4, 5, printInc = printInc)
+  a2 <- GaussSuppressionFromData(z2, freqVar = "ant", hierarchies = dimLists, printInc = printInc)
+  a3 <- GaussSuppressionFromData(z2, freqVar = "ant", hierarchies = hi, printInc = printInc)
+  
+  expect_identical(a1, a2)
+  expect_identical(a3, a2)
+  
+  z2_ <- z2[z2$ant != 0, ]
+  
+  a1 <- GaussSuppressionFromData(z2_, 1:4, 5, extend0 = TRUE, output = "publish_inner", printInc = printInc)
+  
+  expect_identical(a1$publish, a2)
+  
+  a2 <- GaussSuppressionFromData(z2_, freqVar = "ant", hierarchies = dimLists, extend0 = TRUE, output = "publish_inner", printInc = printInc)
+  a3 <- GaussSuppressionFromData(z2_, freqVar = "ant", hierarchies = hi, extend0 = TRUE, output = "publish_inner", printInc = printInc)
+  
+  expect_identical(a1$publish, a2$publish)
+  expect_identical(a3$publish, a2$publish)
+  
+  expect_equal(a1$inner[names(a2$inner)], a2$inner, ignore_attr = TRUE)
+  expect_equal(a3$inner[names(a2$inner)], a2$inner, ignore_attr = TRUE)
+  
+  a1_ <- GaussSuppressionFromData(z2_, 1:4, 5, extend0 = "all", output = "publish_inner", printInc = printInc)
+  a2_ <- GaussSuppressionFromData(z2_, freqVar = "ant", hierarchies = dimLists, extend0 = "all", output = "publish_inner", printInc = printInc)
+  a3_ <- GaussSuppressionFromData(z2_, freqVar = "ant", hierarchies = hi, extend0 = "all", output = "publish_inner", printInc = printInc)
+  
+  expect_identical(a1, a1_)
+  expect_identical(a2, a2_)
+  expect_identical(a3, a3_)
+  
+  z2__ <- z2_[z2_$hovedint != "trygd", ]
+  
+  a2 <- GaussSuppressionFromData(z2__, freqVar = "ant", hierarchies = dimLists, extend0 = "all", output = "publish_inner", printInc = printInc)
+  a3 <- GaussSuppressionFromData(z2__, freqVar = "ant", hierarchies = hi, extend0 = "all", output = "publish_inner", printInc = printInc)
+  
+  expect_identical(a3$publish, a2$publish)
+  expect_equal(a3$inner[names(a2$inner)], a2$inner, ignore_attr = TRUE)
+  
+  expect_identical(lapply(c(a2, a3), dim), lapply(c(a2_, a3_), dim))
+  
+  z2___ <- z2__[z2__$fylke != 10, ]
+  
+  a2_ <- GaussSuppressionFromData(z2___, freqVar = "ant", hierarchies = dimLists, extend0 = "all", output = "publish_inner", printInc = printInc)
+  a3_ <- GaussSuppressionFromData(z2___, freqVar = "ant", hierarchies = hi, extend0 = "all", output = "publish_inner", printInc = printInc)
+  
+  expect_identical(lapply(a2, dim), lapply(a2_, dim))
+  
+  expect_true(nrow(a3_$inner) < nrow(a3$inner))
+  expect_true(nrow(a3_$publish) < nrow(a3$publish))
+})
+
