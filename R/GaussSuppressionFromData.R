@@ -235,6 +235,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   if (extend0) {
     
+    if (printInc) {
+      cat("[extend0 ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
+      flush.console()
+    }
+    
     # Capture possible avoidHierarchical argument to Formula2ModelMatrix
     if (!is.null(formula) & is.null(hierarchies)) {
       AH <- function(avoidHierarchical = FALSE, ...){avoidHierarchical}
@@ -262,6 +267,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     
     data <- Extend0(data, freqName = freqVar, dimVar = dVar_,  varGroups = varGroups, extraVar = TRUE, 
                     hierarchical = !avoidHierarchical & is.null(hierarchies))
+    
+    if (printInc) {
+      cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
+      flush.console()
+    }
   }
   
   
