@@ -78,6 +78,12 @@ test_that("extend0 and various hierarchy input", {
   a2 <- GaussSuppressionFromData(z2_, freqVar = "ant", hierarchies = dimLists, extend0 = TRUE, output = "publish_inner", printInc = printInc)
   a3 <- GaussSuppressionFromData(z2_, freqVar = "ant", hierarchies = hi, extend0 = TRUE, output = "publish_inner", printInc = printInc)
   
+  if (FALSE) { # Include code that shows differences 
+    tail(a1$inner)
+    tail(a2$inner)
+    tail(a3$inner)
+  }
+  
   expect_identical(a1$publish, a2$publish)
   expect_identical(a3$publish, a2$publish)
   
