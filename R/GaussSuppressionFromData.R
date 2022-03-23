@@ -73,7 +73,9 @@
 #'                         `Suppressed` `cells` `with` `empty` `input` `will` `not` `be` `protected.` 
 #'                         `Extend` `input` `data` `with` `zeros?`.    
 #'                         When `removeEmpty` is `TRUE` (see "`...`" below), `structuralEmpty` is superfluous    
-#' @param extend0  Data is automatically extended by `Extend0` when `TRUE`. Can also be specified as a list meaning parameter `varGroups` to `Extend0`.                                  
+#' @param extend0  Data is automatically extended by `Extend0` when `TRUE`.
+#'                 Can also be set to `"all"` which means that input codes in hierarchies are considered in addition to those in data.   
+#'                 Parameter `extend0` can also be specified as a list meaning parameter `varGroups` to `Extend0`.                                   
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -177,14 +179,21 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     primary <- c(primary, function(x, ...) NA & colSums(x) == 0)
   }
   
-  
+  extend0all <- FALSE
   if (is.list(extend0)) {
     varGroups <- extend0
     extend0 <- TRUE
   } else {
     varGroups <- NULL
+    if (is.character(extend0)) {
+      if (extend0 == "all") {
+        extend0all <- TRUE
+        extend0 <- TRUE
+      } else {
+        stop('extend0 must be "all" when supplied as character') 
+      }
+    }
   }
-  
   
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
@@ -251,12 +260,28 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     dVar_ <- dVar
     
     # To keep hierarchical = FALSE in Extend0 when !is.null(hierarchies):  AutoHierarchies needed first  when unnamed elements in hierarchies  
+    # AutoHierarchies needed also when extend0all
     if (!is.null(hierarchies)) {
       if (is.null(names(hierarchies))) names(hierarchies) <- rep(NA, length(hierarchies))
       toFindDimLists <- (names(hierarchies) %in% c(NA, "")) & (sapply(hierarchies, is.character))  # toFindDimLists created exactly as in AutoHierarchies
-      if (sum(toFindDimLists)) {
+      if (sum(toFindDimLists) | extend0all) {
         hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, ...)
         dVar_ <- names(hierarchies)
+      }
+      if (extend0all) {
+        varGroups <- as.list(dVar_)  # This is standard in Extend0 when !hierarchical
+        for (i in seq_along(varGroups)) {
+          varGroups[[i]] <- unique(data[varGroups[[i]]])  # This is standard in Extend0
+          mapsFrom <- unique(hierarchies[[dVar_[i]]]$mapsFrom)
+          mapsTo <- unique(hierarchies[[dVar_[i]]]$mapsTo)
+          mapsExtra <- mapsFrom[!(mapsFrom %in% mapsTo)]
+          mapsExtra <- mapsExtra[!(mapsExtra %in% varGroups[[i]][[1]])]
+          if (length(mapsExtra)) {
+            extra_varGroups_i <- varGroups[[i]][rep(1, length(mapsExtra)), , drop = FALSE]
+            extra_varGroups_i[[1]] <- mapsExtra
+            varGroups[[i]] <- rbind(varGroups[[i]], extra_varGroups_i)
+          }
+        }
       }
     }
     
