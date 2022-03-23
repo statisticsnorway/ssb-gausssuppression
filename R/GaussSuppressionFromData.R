@@ -255,12 +255,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       if (is.null(names(hierarchies))) names(hierarchies) <- rep(NA, length(hierarchies))
       toFindDimLists <- (names(hierarchies) %in% c(NA, "")) & (sapply(hierarchies, is.character))  # toFindDimLists created exactly as in AutoHierarchies
       if (sum(toFindDimLists)) {
-        AutoHierarchiesWithDots <- function(hierarchies, data,  # New function needed since AutoHierarchies not defined with dots
-                                            total = "Total",    # Including dot-parameters called by ModelMatrix 
-                                            hierarchyVarNames = c(mapsFrom = "mapsFrom", mapsTo = "mapsTo", sign = "sign", level = "level"), ...) {
-          AutoHierarchies(hierarchies = hierarchies, data = data, total = total, hierarchyVarNames = hierarchyVarNames)
-        }
-        hierarchies <- AutoHierarchiesWithDots(hierarchies = hierarchies, data = data, ...)
+        hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, ...)
         dVar_ <- names(hierarchies)
       }
     }
