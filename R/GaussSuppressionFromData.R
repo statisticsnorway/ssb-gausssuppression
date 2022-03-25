@@ -257,49 +257,23 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       avoidHierarchical <- FALSE
     }
     
-    dVar_ <- dVar
     
     # To keep hierarchical = FALSE in Extend0 when !is.null(hierarchies):  AutoHierarchies needed first  when unnamed elements in hierarchies  
     # AutoHierarchies needed also when extend0all
     if (!is.null(hierarchies)) {
       if (is.null(names(hierarchies))) names(hierarchies) <- rep(NA, length(hierarchies))
       toFindDimLists <- (names(hierarchies) %in% c(NA, "")) & (sapply(hierarchies, is.character))  # toFindDimLists created exactly as in AutoHierarchies
-      if (sum(toFindDimLists) | extend0all) {
-        hierarchies <- AutoHierarchies(hierarchies = hierarchies, data = data, ...)
-        dVar_ <- names(hierarchies)
-      }
-      if (extend0all) {
-        varGroups <- as.list(dVar_)  # This is standard in Extend0 when !hierarchical
-        for (i in seq_along(varGroups)) {
-          varGroups[[i]] <- unique(data[varGroups[[i]]])  # This is standard in Extend0
-          mapsFrom <- unique(hierarchies[[dVar_[i]]]$mapsFrom)
-          mapsTo <- unique(hierarchies[[dVar_[i]]]$mapsTo)
-          mapsExtra <- mapsFrom[!(mapsFrom %in% mapsTo)]
-          mapsExtra <- mapsExtra[!(mapsExtra %in% varGroups[[i]][[1]])]
-          if (length(mapsExtra)) {
-            extra_varGroups_i <- varGroups[[i]][rep(1, length(mapsExtra)), , drop = FALSE]
-            extra_varGroups_i[[1]] <- mapsExtra
-            varGroups[[i]] <- rbind(varGroups[[i]], extra_varGroups_i)
-          }
-        }
-      }
-    }
-    
-    nrowPreExtend0 <- nrow(data) 
-    
-    data <- Extend0(data, freqName = freqVar, dimVar = dVar_,  varGroups = varGroups, extraVar = TRUE, 
-                    hierarchical = !avoidHierarchical & is.null(hierarchies))
-    
-    # Set to NA instead of 0 for possible numeric dimVar not in hierarchy after AutoHierarchies (above)   
-    if (length(dVar_) < length(dVar)) {
-      extra_dVar <- dVar[!(dVar %in% dVar_)]
-      extra_dVar <- extra_dVar[sapply(data[1, extra_dVar], is.numeric)]
-      if (length(extra_dVar)) {
-        newrows <- SeqInc(nrowPreExtend0 + 1L, nrow(data))
-        if (length(newrows)) {
-          data[newrows, extra_dVar] <- NA
-        }
-      }
+    } else {
+      toFindDimLists <- FALSE # sum is 0 below
+    }  
+    if (!is.null(hierarchies) & is.null(varGroups) & (sum(toFindDimLists) | extend0all)) {
+      data = Extend0fromHierarchies(data, freqName = freqVar, hierarchies = hierarchies, 
+                                    dimVar = dVar, extend0all = extend0all, ...)
+      hierarchies <- data$hierarchies
+      data <- data$data 
+    } else {
+      data <- Extend0(data, freqName = freqVar, dimVar = dVar,  varGroups = varGroups, extraVar = TRUE, 
+                      hierarchical = !avoidHierarchical & is.null(hierarchies))
     }
     
     if (printInc) {
