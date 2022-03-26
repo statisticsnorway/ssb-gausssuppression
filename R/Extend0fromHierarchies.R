@@ -1,3 +1,11 @@
+
+# This function is made to handle cases with extend0all and cases with special hierarchies (unnamed list) so that SSBtools:::NamesFromHierarchies before and after AutoHierarchies differ. 
+# A straightforward handling of the latter means that some  dimVar become extraVar. Then if they are numeric, they will be set to 0. This function change this to NA (maybe NA can be solved by future parameter to Extend0 ).
+# Hopefully this function also avoids that dimVar become extraVar.  I general hierarchical relationships are described by hierarchies and not data. But when data are used to generate (parts of) the hierarchies, data may be used.
+# All the code made to avoid dimVar become extraVar have no practical consequences for standard use of GaussSuppressionFromData. The code is relevant  when "inner" is included in output.
+# This function may be a future function in SSBtools. Then dimVar is not needed in input. Instead found by  SSBtools:::NamesFromHierarchies
+
+
 #' @importFrom SSBtools HierarchicalGroups2
 Extend0fromHierarchies <- function(data, freqName, hierarchies, dimVar, extend0all, ...) {
   
