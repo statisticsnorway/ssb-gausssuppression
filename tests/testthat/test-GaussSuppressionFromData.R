@@ -88,7 +88,7 @@ test_that("extend0 and various hierarchy input", {
   expect_identical(a3$publish, a2$publish)
   
   expect_equal(a1$inner[names(a2$inner)], a2$inner, ignore_attr = TRUE)
-  expect_equal(a3$inner[names(a2$inner)], a2$inner, ignore_attr = TRUE)
+  expect_equal(a3$inner[names(a1$inner)], a1$inner, ignore_attr = TRUE)
   
   a1_ <- GaussSuppressionFromData(z2_, 1:4, 5, extend0 = "all", output = "publish_inner", printInc = printInc)
   a2_ <- GaussSuppressionFromData(z2_, freqVar = "ant", hierarchies = dimLists, extend0 = "all", output = "publish_inner", printInc = printInc)
