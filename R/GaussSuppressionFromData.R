@@ -72,15 +72,19 @@
 #'                         When `structuralEmpty` is `TRUE`, the following error message is avoided: 
 #'                         `Suppressed` `cells` `with` `empty` `input` `will` `not` `be` `protected.` 
 #'                         `Extend` `input` `data` `with` `zeros?`.    
-#'                         When `removeEmpty` is `TRUE` (see "`...`" below), `structuralEmpty` is superfluous             
+#'                         When `removeEmpty` is `TRUE` (see "`...`" below), `structuralEmpty` is superfluous    
+#' @param extend0  Data is automatically extended by `Extend0` when `TRUE`.
+#'                 Can also be set to `"all"` which means that input codes in hierarchies are considered in addition to those in data.   
+#'                 Parameter `extend0` can also be specified as a list meaning parameter `varGroups` to `Extend0`.                                   
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
+#' @importFrom methods hasArg
 #' 
 #' @author Øyvind Langsrud and Daniel Lupp
 #'
@@ -145,6 +149,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            preAggregate = is.null(freqVar),
                            extraAggregate = preAggregate & !is.null(charVar), 
                            structuralEmpty = FALSE, 
+                           extend0 = FALSE,
                            ...){ 
   
   
@@ -174,33 +179,42 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     primary <- c(primary, function(x, ...) NA & colSums(x) == 0)
   }
   
+  extend0all <- FALSE
+  if (is.list(extend0)) {
+    varGroups <- extend0
+    extend0 <- TRUE
+  } else {
+    varGroups <- NULL
+    if (is.character(extend0)) {
+      if (extend0 == "all") {
+        extend0all <- TRUE
+        extend0 <- TRUE
+      } else {
+        stop('extend0 must be "all" when supplied as character') 
+      }
+    }
+  }
+  
   dimVar <- names(data[1, dimVar, drop = FALSE])
   freqVar <- names(data[1, freqVar, drop = FALSE])
   numVar <- names(data[1, numVar, drop = FALSE])
   weightVar <- names(data[1, weightVar, drop = FALSE])
   charVar <- names(data[1, charVar, drop = FALSE])
   
-  if (preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
+  if (extend0 | preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
     if (printInc & preAggregate) {
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
     }
-    if (!is.null(hierarchies)) {
-      dVar <- names(hierarchies)
-    } else {
-      if (!is.null(formula)) {
-        dVar <- row.names(attr(delete.response(terms(as.formula(formula))), "factors"))
+    
+    dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
+    
+    if (!length(dVar)) {
+      freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
+      if (!length(freqPlusVarName)) {
+        dVar <- names(data)
       } else {
-        if (length(dimVar)){
-          dVar <- dimVar
-        } else {
-          freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
-          if (!length(freqPlusVarName)){
-            dVar <- names(data)
-          } else {
-            dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
-          }
-        }
+        dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
       }
     }
     dVar <- unique(dVar)
@@ -227,6 +241,47 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
   }
+  
+  if (extend0) {
+    
+    if (printInc) {
+      cat("[extend0 ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
+      flush.console()
+    }
+    
+    # Capture possible avoidHierarchical argument to Formula2ModelMatrix
+    if (!is.null(formula) & is.null(hierarchies)) {
+      AH <- function(avoidHierarchical = FALSE, ...){avoidHierarchical}
+      avoidHierarchical <- AH(...)
+    } else {
+      avoidHierarchical <- FALSE
+    }
+    
+    
+    # To keep hierarchical = FALSE in Extend0 when !is.null(hierarchies):  AutoHierarchies needed first  when unnamed elements in hierarchies  
+    # AutoHierarchies needed also when extend0all
+    if (!is.null(hierarchies)) {
+      if (is.null(names(hierarchies))) names(hierarchies) <- rep(NA, length(hierarchies))
+      toFindDimLists <- (names(hierarchies) %in% c(NA, "")) & (sapply(hierarchies, is.character))  # toFindDimLists created exactly as in AutoHierarchies
+    } else {
+      toFindDimLists <- FALSE # sum is 0 below
+    }  
+    if (!is.null(hierarchies) & is.null(varGroups) & (sum(toFindDimLists) | extend0all)) {
+      data = Extend0fromHierarchies(data, freqName = freqVar, hierarchies = hierarchies, 
+                                    dimVar = dVar, extend0all = extend0all, ...)
+      hierarchies <- data$hierarchies
+      data <- data$data 
+    } else {
+      data <- Extend0(data, freqName = freqVar, dimVar = dVar,  varGroups = varGroups, extraVar = TRUE, 
+                      hierarchical = !avoidHierarchical & is.null(hierarchies))
+    }
+    
+    if (printInc) {
+      cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
+      flush.console()
+    }
+  }
+  
   
   if(innerReturn){
     attr(data, "freqVar") <- freqVar
@@ -363,7 +418,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     rm(data)
   } 
   
-  secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+  # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
+  if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+  } else {
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, ...)
+  }
   
   if (output == "secondary"){
     return(secondary)
@@ -390,6 +450,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     attr(publish, "startRow") <- startCol
   }
   
+  attr(publish, "totCode") <- FindTotCode2(x, crossTable)
+  
+  
   if (output == "publish_inner_x") {
     return(list(publish = publish, inner = data, x = x))
   }
@@ -403,44 +466,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   }
   
   publish
-}
-
-
-
-# combination of primary functions 
-Primary <- function(primary, crossTable, ...) {
-  num <- NULL
-  pri <- 1L
-  n <- nrow(crossTable)    # This line is why crossTable is parameter
-  if (is.function(primary)) {
-    primary <- c(primary)  # This is a list
-  }
-  for (i in seq_along(primary)) {
-    a <- primary[[i]](crossTable = crossTable, ...)
-    if (is.list(a)) {
-      if (is.null(num)) {
-        num <- a[[2]]
-      } else {
-        num <- cbind(num, a[[2]])
-      }
-      a <- a[[1]]
-    }
-    if (!is.logical(a)) { # Indices instead are allowed/possible  
-      aInd <- a
-      a <- rep(FALSE, n)
-      a[aInd] <- TRUE
-    }
-    if (length(a) != n)
-      stop("wrong length of primary function output")
-    pri <- pri * as.integer(!a)    # zeros (=TRUE since !) and NA’s are preserved
-  }
-  pri <- !as.logical(pri)
-  pri[is.na(pri)] <- FALSE    # No suppression when any NA
-  
-  if (is.null(num)) {
-    return(pri)
-  }
-  list(primary = pri, numExtra = num)
 }
 
 
