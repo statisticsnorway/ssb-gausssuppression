@@ -20,7 +20,7 @@
 #' @author Daniel Lupp 
 #' 
 DominanceRule <- function(data, x, crossTable, numVar, n, k,
-                          protectZeros = FALSE, charVar, ...) {
+                          protectZeros = FALSE, charVar, sWeightVar = NULL, dom.index = FALSE, ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
   if (is.null(numVar))
@@ -33,20 +33,32 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
     cat("Zeroes are not primary suppressed.\n")
   else
     cat("Zeroes are primary suppressed.\n")
+
+  
   abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs(data[, numVar, drop = FALSE])))))
   abs_cellvals <- abs(data[[numVar]])
   
   if (length(charVar)) {
     if (length(charVar) == 1) {
       charVar_groups <- data[[charVar]]
+      sweight <- NULL
+      if (dom.index) {
+        warning("Setting dom.index to FALSE, since charVar and index do not work simultaneously.")
+        dom.index <- FALSE
+      }
     } else {
       stop("Only single charVar implemented")
     }
   } else {
     charVar_groups <- NULL
+    if (is.null(sWeightVar)) 
+      sweight <- as.matrix(rep(1, nrow(data)))
+    else 
+      sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
+    # sweight <- as.vector(as.matrix(crossprod(x, sweight)))
   }
   
-  primary <- mapply(function (a,b) FindDominantCells(x, abs_cellvals, abs_num, a,b, charVar_groups = charVar_groups),
+  primary <- mapply(function (a,b) FindDominantCells(x, abs_cellvals, abs_num, a,b, charVar_groups = charVar_groups, samplingWeight = sweight, dom.index),
                     n,k)
 
   dominant <- apply(primary, 1, function (x) Reduce(`|`, x))
@@ -55,8 +67,34 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
   dominant | (abs_num == 0)
 }
 
-FindDominantCells <- function(x, cellvals, num, n, k, charVar_groups) {
-  max_cont <- MaxContribution(x, cellvals, n = n, groups = charVar_groups)
-  max_cont[is.na(max_cont)] <- 0
-  as.vector(num > 0 & rowSums(max_cont) > num*k/100)
+FindDominantCells <- function(x, cellvals, num, n, k, charVar_groups, samplingWeight, dom.index) {
+  if (!dom.index) {
+    max_cont <- MaxContribution(x, cellvals, n = n, groups = charVar_groups)
+    max_cont[is.na(max_cont)] <- 0
+    return(as.vector(num > 0 & rowSums(max_cont) > num*k/100))
+  } else {
+    max_cont_index <- MaxContribution(x, cellvals, n = n, groups = charVar_groups, index = TRUE)
+    cont_weights <- apply(max_cont_index, 2, function(t) samplingWeight[t])
+    if (n == 1)
+      last_index_t <- cont_weights
+    else
+      last_index_t <- t(apply(cont_weights, 1, function(t) cumsum(t)))
+    last_index <- apply(last_index_t, 1,
+                        function(t) {
+                          ind <- which(t >= n)[1]
+                          ifelse(!length(ind), sum(!is.na(t)), ind)
+                        })
+    for (ind in seq(length(last_index))) {
+      cont_weights[ind, last_index[ind]] <- ifelse(last_index[ind] == 1,
+                                                   n,
+                                                   n - last_index_t[ind, last_index[ind] - 1])
+      cont_weights[ind, 1:ncol(cont_weights) > last_index[ind]] <- 0
+    }
+    max_cont <- apply(max_cont_index, 2, function(t) ifelse(is.na(t), 0, cellvals[t]))
+    ncontributions <- rowSums(max_cont * cont_weights)
+    # print(max_cont)
+    # print(cont_weights)
+    # print(ncontributions)
+    return(as.vector(num > 0 & ncontributions > num*k/100))
+  }
 }
