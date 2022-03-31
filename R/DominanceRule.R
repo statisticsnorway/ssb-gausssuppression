@@ -20,7 +20,7 @@
 #' @author Daniel Lupp 
 #' 
 DominanceRule <- function(data, x, crossTable, numVar, n, k,
-                          protectZeros = FALSE, charVar, sWeightVar = NULL, dom.index = FALSE, ...) {
+                          protectZeros = FALSE, charVar, sWeightVar = NULL, ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
   if (is.null(numVar))
@@ -36,16 +36,12 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
 
   
   abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs(data[, numVar, drop = FALSE])))))
-  abs_cellvals <- abs(data[[numVar]])
+  abs_inputnum <- abs(data[[numVar]])
   
   if (length(charVar)) {
     if (length(charVar) == 1) {
       charVar_groups <- data[[charVar]]
       sweight <- NULL
-      if (dom.index) {
-        warning("Setting dom.index to FALSE, since charVar and index do not work simultaneously.")
-        dom.index <- FALSE
-      }
     } else {
       stop("Only single charVar implemented")
     }
@@ -55,10 +51,9 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
       sweight <- as.matrix(rep(1, nrow(data)))
     else 
       sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
-    # sweight <- as.vector(as.matrix(crossprod(x, sweight)))
   }
   
-  primary <- mapply(function (a,b) FindDominantCells(x, abs_cellvals, abs_num, a,b, charVar_groups = charVar_groups, samplingWeight = sweight, dom.index),
+  primary <- mapply(function (a,b) FindDominantCells(x, abs_inputnum, abs_num, a,b, charVar_groups = charVar_groups, samplingWeight = sweight),
                     n,k)
 
   dominant <- apply(primary, 1, function (x) Reduce(`|`, x))
@@ -67,34 +62,64 @@ DominanceRule <- function(data, x, crossTable, numVar, n, k,
   dominant | (abs_num == 0)
 }
 
-FindDominantCells <- function(x, cellvals, num, n, k, charVar_groups, samplingWeight, dom.index) {
-  if (!dom.index) {
-    max_cont <- MaxContribution(x, cellvals, n = n, groups = charVar_groups)
+#' Method for finding dominant cells according to (possibly multiple) n,k 
+#' dominance rules.
+#' 
+#' Supports functionality for grouping contributions according to holding
+#' variables, as well as calculating dominance in surveys with a given sampling
+#' weight. The method implemented for calculating upsampled contributions is the
+#' same as in tauArgus, and is described in the book "Statistical Disclosure 
+#' Control" (Hundepool et al 2012), p. 151.
+#'
+#' @param x model matrix describing relationship between input and published
+#' cells
+#' @param inputnum vector of numeric contributions for each of the input records
+#' @param num vector of numeric values for each of the published cells
+#' @param n vector of integers describing n parameters in n,k rules. Must be
+#' same length as `k` parameter.
+#' @param k vector of numeric values describing k parameters in n,k rules, where
+#' percentages are described as numbers less than 100. Must be same length as
+#' `n` parameter.
+#' @param charVar_groups vector describing which input records should be grouped
+#' @param samplingWeight vector of sampling weights associated to input records
+#'
+#' @return logical vector describing which publish-cells need to be suppressed.
+#' @export
+#'
+#' @examples
+FindDominantCells <- function(x, inputnum, num, n, k, charVar_groups, samplingWeight) {
+  if (is.null(samplingWeight)) {
+  # without sampling weight, calculate dominance directly from numerical values
+    max_cont <- MaxContribution(x, inputnum, n = n, groups = charVar_groups)
     max_cont[is.na(max_cont)] <- 0
     return(as.vector(num > 0 & rowSums(max_cont) > num*k/100))
   } else {
-    max_cont_index <- MaxContribution(x, cellvals, n = n, groups = charVar_groups, index = TRUE)
+  # with sampling weights, need to weight the numerical contributions
+    max_cont_index <- MaxContribution(x, inputnum, n = n, groups = charVar_groups, index = TRUE)
     cont_weights <- apply(max_cont_index, 2, function(t) samplingWeight[t])
+    # last_index_t describes cumulative sum of contributing weights, used to
+    # calculate which of the contributions need to be considered
     if (n == 1)
       last_index_t <- cont_weights
     else
       last_index_t <- t(apply(cont_weights, 1, function(t) cumsum(t)))
+    # index of last contribution to be added to upsampled contribution
     last_index <- apply(last_index_t, 1,
                         function(t) {
                           ind <- which(t >= n)[1]
                           ifelse(!length(ind), sum(!is.na(t)), ind)
                         })
+    # only keep the first n contributors (counting weights) and ensure 
+    # rowSums(cont_weights) == n
     for (ind in seq(length(last_index))) {
       cont_weights[ind, last_index[ind]] <- ifelse(last_index[ind] == 1,
                                                    n,
                                                    n - last_index_t[ind, last_index[ind] - 1])
       cont_weights[ind, 1:ncol(cont_weights) > last_index[ind]] <- 0
     }
-    max_cont <- apply(max_cont_index, 2, function(t) ifelse(is.na(t), 0, cellvals[t]))
+    # sampling weights multiplied with weights and added up
+    max_cont <- apply(max_cont_index, 2, function(t) ifelse(is.na(t), 0, inputnum[t]))
     ncontributions <- rowSums(max_cont * cont_weights)
-    # print(max_cont)
-    # print(cont_weights)
-    # print(ncontributions)
     return(as.vector(num > 0 & ncontributions > num*k/100))
   }
 }
