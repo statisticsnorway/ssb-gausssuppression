@@ -117,7 +117,7 @@ FindDominantCells <- function(x, inputnum, num, n, k, charVar_groups, samplingWe
                                                    n - last_index_t[ind, last_index[ind] - 1])
       cont_weights[ind, 1:ncol(cont_weights) > last_index[ind]] <- 0
     }
-    # sampling weights multiplied with weights and added up
+    # sampling weights multiplied with contributions and added up
     max_cont <- apply(max_cont_index, 2, function(t) ifelse(is.na(t), 0, inputnum[t]))
     ncontributions <- rowSums(max_cont * cont_weights)
     return(as.vector(num > 0 & ncontributions > num*k/100))
