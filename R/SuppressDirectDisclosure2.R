@@ -113,7 +113,7 @@ FindDisclosiveCells3 <- function(x,
           next
         else if (any(sums %in% unks[[name]])) {
           # remove child parent relationship for sums that contain populated
-          # unknown child
+          # unknown child, since otherwise we suppress disclosure of unknown
           child_parent <- child_parent[!(child_parent[, 1] %in% sums &
                                            child_parent[, 2]  == parent),]
         }
@@ -128,7 +128,32 @@ FindDisclosiveCells3 <- function(x,
       }
     }
     primary
+}
+
+# computes transitive reduction of a graph represented by a dgTMatrix
+TransitiveReduction <- function(matrix) {
+  vorder <- order(colSums(matrix), decreasing = TRUE)-1
+  for (node in vorder) {
+    for (neigh1 in matrix@i[matrix@j == node & matrix@x != 0]) {
+      reductive <- ModelMatrixDFS(neigh1, matrix)
+      matrix@x[matrix@i %in% reductive & matrix@j == node] <- 0
+    }
   }
+  ind <- matrix@x != 0
+  matrix@x <- matrix@x[ind]
+  matrix@j <- matrix@j[ind]
+  matrix@i <- matrix@i[ind]
+  matrix
+}
+
+# breadth first search from node in graph represented by dgTMatrix
+ModelMatrixDFS <- function(node, matrix) {
+  reachable <- NULL
+  for (neighbor in matrix@i[matrix@j == node]) {
+    reachable <- unique(c(reachable, neighbor, ModelMatrixDFS(neighbor, matrix)))
+  }
+  reachable
+}
 
 # given a published parent cell, return all combinations of child cells that sum
 # to parent
