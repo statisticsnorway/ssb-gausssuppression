@@ -63,9 +63,9 @@ FindDisclosiveCells2 <- function(x, freq, coalition = 1, ...) {
 
 # function for hierarchies and unknowns. Largely untested. Current shortcomings:
 # User MUST provide primaryDimList containing hierarchical breakdown of all
-# categorical variables. Can provide multiple dimlists per variable. This is
-# necessary, since automatic extraction of a hierarchy from an arbitrary
-# ModelMatrix is NP-hard, so infeasible in practice.
+# categorical variables. Can provide multiple dimlists per variable (IN THEORY,
+# DOES NOT CURRENTLY WORK). This is necessary, since automatic extraction of a
+# hierarchy from an arbitrary ModelMatrix is NP-hard, so infeasible in practice.
 FindDisclosiveCells3 <- function(x,
                                  ct,
                                  primaryDimList,
