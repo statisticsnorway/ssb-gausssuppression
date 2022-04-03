@@ -146,7 +146,7 @@ TransitiveReduction <- function(matrix) {
   matrix
 }
 
-# breadth first search from node in graph represented by dgTMatrix
+# depth first search from node in graph represented by dgTMatrix
 ModelMatrixDFS <- function(node, matrix) {
   reachable <- NULL
   for (neighbor in matrix@i[matrix@j == node]) {
