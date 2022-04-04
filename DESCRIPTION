@@ -5,7 +5,8 @@ Version: 0.1.2
 Date: 2022-03-28
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
                     email = "oyl@ssb.no"),
-             person("Daniel", "Lupp", role = c("aut")))
+             person("Daniel", "Lupp", role = c("aut")),        
+             person("Hege", "Bøvelstad", role = c("ctb")))
 Maintainer: Øyvind Langsrud <oyl@ssb.no>
 Depends: Matrix
 Imports: SSBtools, RegSDC, stats, methods
