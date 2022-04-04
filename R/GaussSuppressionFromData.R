@@ -21,6 +21,9 @@
 #' When defaults cannot be inherited, they are set to `NULL`.   
 #' In practice the function `formals` are still used to generate the defaults when `primary` and/or `candidates` are not functions. 
 #' Then `NULL` is correctly returned, but `suppressWarnings` are needed.
+#' 
+#' Singleton handling can be turned off by `singleton = NULL` or `singletonMethod = "none"`. 
+#' Both of these choices are identical in the sense that `singletonMethod` is set to `"none"` whenever `singleton` is `NULL` and vice versa.
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -45,7 +48,7 @@
 #' @param forced     GaussSuppression input or a function generating it (see details)
 #' @param hidden     GaussSuppression input or a function generating it (see details)
 #' @param singleton  GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}
-#' @param singletonMethod \code{\link{GaussSuppression}} input 
+#' @param singletonMethod \code{\link{GaussSuppression}} input. The default value depends on parameter `secondaryZeros` which depends on `candidates` (see details).   
 #' @param printInc        \code{\link{GaussSuppression}} input
 #' @param output One of `"publish"` (default), `"inner"`, `"publish_inner"`, `"publish_inner_x"`, `"publish_x"`, 
 #'                      `"inner_x"`, `"input2functions"` (input to supplied functions),
@@ -165,6 +168,18 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
 
   force(preAggregate)
   force(extraAggregate)
+  
+  if (length(singletonMethod)) { # Default is logical(0) when secondaryZeros is NULL
+    if (singletonMethod == "none") {
+      singleton <- NULL
+    }
+  }
+  if (is.null(singleton)) {
+    singletonMethod <- "none"
+  }
+  if (!length(singletonMethod)) {
+    stop("A value of singletonMethod is required.")
+  }
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
