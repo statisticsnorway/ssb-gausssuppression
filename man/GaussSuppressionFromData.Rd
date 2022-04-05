@@ -73,7 +73,7 @@ See details.}
 
 \item{singleton}{GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}}
 
-\item{singletonMethod}{\code{\link{GaussSuppression}} input}
+\item{singletonMethod}{\code{\link{GaussSuppression}} input. The default value depends on parameter \code{secondaryZeros} which depends on \code{candidates} (see details).}
 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
@@ -138,6 +138,9 @@ in the case of \code{secondaryZeros}, the \code{candidates} function.
 When defaults cannot be inherited, they are set to \code{NULL}.
 In practice the function \code{formals} are still used to generate the defaults when \code{primary} and/or \code{candidates} are not functions.
 Then \code{NULL} is correctly returned, but \code{suppressWarnings} are needed.
+
+Singleton handling can be turned off by \code{singleton = NULL} or \code{singletonMethod = "none"}.
+Both of these choices are identical in the sense that \code{singletonMethod} is set to \code{"none"} whenever \code{singleton} is \code{NULL} and vice versa.
 }
 \examples{
 
