@@ -159,15 +159,17 @@ IpsoExtra <- function(y, x = NULL, ensureIntercept = TRUE, returnParts = FALSE, 
   ncoly <- NCOL(y)
   
   eQRR <- NULL
-  if (!is.null(digits) & !is.null(resScale)) {
+  if (!is.null(digits)) {   # if (!is.null(digits) & !is.null(resScale)) {  
     if (!is.null(rmse)) 
       if (max(abs(round(y - yHat, digits = digits))) == 0) {
+       if (!is.null(resScale)){  
         if (ncoly > 1){
           warning("rmse with identical residual vectors used instead of resScal since perfect fit.")
         } else {
           warning("rmse used instead of resScal since perfect fit.")
         }
         resScale <- NULL
+       }  
         eQRR <- matrix(1, 1, ncoly)  # Changed below
         m <- 1L
       }
