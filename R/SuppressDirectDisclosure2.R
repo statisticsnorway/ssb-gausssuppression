@@ -67,11 +67,11 @@ FindDisclosiveCells2 <- function(x, freq, coalition = 1, ...) {
 # DOES NOT CURRENTLY WORK). This is necessary, since automatic extraction of a
 # hierarchy from an arbitrary ModelMatrix is NP-hard, so infeasible in practice.
 FindDisclosiveCells3 <- function(x,
-                                 ct,
+                                 crossTable,
                                  primaryDimList,
                                  freq,
                                  unknowns,
-                                 coalition = 1) {
+                                 coalition = 1, ...) {
     k <- crossprod(x)
     k <- as(k, "dgTMatrix")
     colSums_x <- colSums(x)
@@ -84,8 +84,8 @@ FindDisclosiveCells3 <- function(x,
     
     # named list (by variable/hierarchy) containing populated unknown cells
     unks <-
-      sapply(names(ct), function(y)
-        which(ct[, y] %in% unknowns[[y]]))
+      sapply(names(crossTable), function(y)
+        which(crossTable[, y] %in% unknowns[[y]]))
     unks <-
       sapply(names(unks), function(y)
         unks[[y]][freq[unks[[y]]] > 0])
@@ -98,14 +98,14 @@ FindDisclosiveCells3 <- function(x,
       child_parent[!(child_parent[, 2] %in% unlist(unks)),]
     
     parents <- unique(child_parent[, 2])
-    child_sums <- vector(mode = "list", length = nrow(ct))
+    child_sums <- vector(mode = "list", length = nrow(crossTable))
     # for each parent, a named list (for each variable/hierarchy) of child sums
     # that equals parent
     child_sums[parents] <- lapply(parents,
                                   function(y)
-                                    find_sub_sums(y, ct, x, primaryDimList))
+                                    find_sub_sums(y, crossTable, x, primaryDimList))
     
-    primary <- rep(FALSE, nrow(ct))
+    primary <- rep(FALSE, nrow(crossTable))
     for (parent in parents) {
       for (name in names(child_sums[[parent]])) {
         sums <- child_sums[[parent]][[name]]
