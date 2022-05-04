@@ -84,10 +84,10 @@ GaussSuppressDec = function(data,
   dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed"))]
   dimVarPub <- dimVarPub[(dimVarPub %in% colnames(a$inner))]
   
-  innerFreqName <- attr(a$inner, "freqVar")
+  freqVar <- attr(a$inner, "freqVar")
   
   z <- as.matrix(a$publish["freq"])
-  y <- as.matrix(a$inner[innerFreqName])
+  y <- as.matrix(a$inner[freqVar])
   
   if (nRep) {
     yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
@@ -160,8 +160,10 @@ GaussSuppressDec = function(data,
     whenMixedDuplicatedInner("Duplicated inner rows, some aggregated.")
   }
   
-  a$inner <- a$inner[is.na(ma), c(dimVarPub, innerFreqName, freqDecNames), drop = FALSE]
-  names(a$inner)[names(a$inner) == innerFreqName] <- "freq"
+  print(c(dimVarPub, freqVar, freqDecNames))
+  
+  a$inner <- a$inner[is.na(ma), c(dimVarPub, freqVar, freqDecNames), drop = FALSE]
+  names(a$inner)[names(a$inner) == freqVar] <- "freq"
   
   a$inner$isPublish <- FALSE
   a$inner$isInner <- TRUE
