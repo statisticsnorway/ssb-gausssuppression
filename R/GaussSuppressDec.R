@@ -80,11 +80,13 @@ GaussSuppressDec = function(data,
   
   a <- GaussSuppressionFromData(data, ..., output = "publish_inner_x")
   
-  dimVarPub <- colnames(a$publish)
-  dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed"))]
-  dimVarPub <- dimVarPub[(dimVarPub %in% colnames(a$inner))]
-  
   freqVar <- attr(a$inner, "freqVar")
+  weightVar <- attr(a$inner, "weightVar")
+  numVar <- attr(a$inner, "numVar")
+  
+  dimVarPub <- colnames(a$publish)
+  dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed", "weight", numVar))]
+  dimVarPub <- dimVarPub[(dimVarPub %in% colnames(a$inner))]
   
   z <- as.matrix(a$publish["freq"])
   y <- as.matrix(a$inner[freqVar])
@@ -160,11 +162,18 @@ GaussSuppressDec = function(data,
     whenMixedDuplicatedInner("Duplicated inner rows, some aggregated.")
   }
   
-  print(c(dimVarPub, freqVar, freqDecNames))
+  a$inner <- a$inner[is.na(ma), c(dimVarPub, numVar, freqDecNames, freqVar, weightVar), drop = FALSE]
   
-  a$inner <- a$inner[is.na(ma), c(dimVarPub, freqVar, freqDecNames), drop = FALSE]
-  names(a$inner)[names(a$inner) == freqVar] <- "freq"
-  
+  # rename in a way that takes into account possible overlap between freqVar, weightVar, numVar
+  renameIndex <- ncol(a$inner)
+  if (length(weightVar)) {
+    names(a$inner)[renameIndex] <- "weight"
+    renameIndex <- renameIndex - 1L
+  }
+  if (length(freqVar)) {   # but never 0 in current application
+    names(a$inner)[renameIndex] <- "freq"
+  }
+
   a$inner$isPublish <- FALSE
   a$inner$isInner <- TRUE
   
