@@ -300,6 +300,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   if(innerReturn){
     attr(data, "freqVar") <- freqVar
+    attr(data, "weightVar") <- weightVar
+    attr(data, "numVar") <- numVar
   }
   
 
@@ -367,6 +369,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     
     if(innerReturn){
       attr(data, "freqVar") <- freqVar
+      attr(data, "weightVar") <- weightVar
+      attr(data, "numVar") <- numVar
     }
   
     if (is.null(formula) & is.null(hierarchies)) {
