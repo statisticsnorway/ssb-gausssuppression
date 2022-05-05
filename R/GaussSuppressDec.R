@@ -80,6 +80,8 @@ GaussSuppressDec = function(data,
   
   a <- GaussSuppressionFromData(data, ..., output = "publish_inner_x")
   
+  startRow <- attr(a$publish, "startRow", exact = TRUE)
+
   freqVar <- attr(a$inner, "freqVar")
   weightVar <- attr(a$inner, "weightVar")
   numVar <- attr(a$inner, "numVar")
@@ -129,6 +131,10 @@ GaussSuppressDec = function(data,
     
     if (any(a$publish$suppressed != suppressionFromDecimals))
       warning("Mismatch between whole numbers and suppression.")
+  }
+  
+  if (!is.null(startRow)) {
+    attr(a$publish, "startRow") <- startRow
   }
   
   if (output == "publish_inner_x") 

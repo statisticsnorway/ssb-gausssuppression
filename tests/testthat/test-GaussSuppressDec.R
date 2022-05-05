@@ -7,7 +7,7 @@ test_that("GaussSuppressDec and more", {
   printInc <- FALSE
   
   # Error here if overlapping freqVar, numVar, weightVar not treated correctly.
-  a <- GaussSuppressDec(z2, dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+  a <- GaussSuppressDec(z2, formula = ~region * fylke * kostragr * hovedint,
                         freqVar = "ant", protectZeros = FALSE, maxN = 2, 
                         numVar = c("y1", "y2", "ant"), 
                         weightVar = "y1", printInc = printInc)
@@ -23,5 +23,8 @@ test_that("GaussSuppressDec and more", {
   
   # Check that b and d are identical after sorting 
   expect_identical(range(diff(sort(SSBtools::Match(b[names(d)], d)))), c(1L, 1L))
+  
+  # Check that startRow attribute exists
+  expect_identical(length(attr(a, "startRow")), 16L)
   
 })
