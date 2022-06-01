@@ -1,4 +1,4 @@
-#' CandidatesDefault
+#' Default candidates function
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
 #' 
@@ -16,7 +16,6 @@
 #'
 #' @return candidates, \code{\link{GaussSuppression}} input 
 #' @export
-#' @keywords internal
 CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
   
   if(is.null(secondaryZeros)) stop("A non-NULL value of secondaryZeros is required.")

@@ -2,7 +2,7 @@
 % Please edit documentation in R/Candidates.R
 \name{CandidatesDefault}
 \alias{CandidatesDefault}
-\title{CandidatesDefault}
+\title{Default candidates function}
 \usage{
 CandidatesDefault(freq, x, secondaryZeros = FALSE, weight, ...)
 }
@@ -30,4 +30,3 @@ This main part of this function orders the indices decreasingly according to \co
 when \code{weight} is non-NULL,  \code{(freq+1)*weight}. Ties are handled by prioritizing output cells
 that are calculated from many input cells. In addition, zeros are handled according to parameter \code{secondaryZeros}.
 }
-\keyword{internal}
