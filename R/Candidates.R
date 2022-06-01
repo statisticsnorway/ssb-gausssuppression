@@ -5,6 +5,7 @@
 #' This main part of this function orders the indices decreasingly according to `freq` or, 
 #' when `weight` is non-NULL,  `(freq+1)*weight`. Ties are handled by prioritizing output cells 
 #' that are calculated from many input cells. In addition, zeros are handled according to parameter `secondaryZeros`. 
+#' When `freq` is negative (special hierarchy), `abs(freq)*weight` is used.  
 #'
 #' @param freq Vector of output frequencies 
 #' @param x The model matrix
@@ -31,12 +32,31 @@ CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
       weight <- weight + max(weight)*1E-20
     } 
   }
-  tie <- as.matrix(Matrix::crossprod(x, x %*% ((freq+1)*weight)))
+  freq1weight <- FreqPlus1(freq)*weight   # As (freq+1)*weight with treatment of negative freq
+  tie <- abs(as.matrix(Matrix::crossprod(x, x %*% (freq1weight))))
   tie <- tie/max(tie)
-  freqOrd <- ((freq+1)*weight + 0.99 * tie)[, 1, drop = TRUE]
+  freqOrd <- (abs(freq1weight) + 0.99 * tie)[, 1, drop = TRUE]
   if (!secondaryZeros) {
     freqOrd[freq == 0] <- 0.01 + max(freqOrd) + freqOrd[freq == 0]
   }
   candidates <- order(freqOrd, decreasing = TRUE)
   candidates
 }
+
+
+# Add ones, but not for negative numbers 
+# FreqPlus1(-5:5)
+FreqPlus1 <- function(freq) {
+  freq <- freq + 1L
+  if (min(freq) <= 0) {
+    freqNonPos <- freq <= 0
+    freq[freqNonPos] <- freq[freqNonPos] - 1L
+  }
+  freq
+}
+
+
+
+
+
+

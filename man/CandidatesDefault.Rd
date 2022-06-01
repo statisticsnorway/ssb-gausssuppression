@@ -29,4 +29,5 @@ Function for \code{\link{GaussSuppressionFromData}}
 This main part of this function orders the indices decreasingly according to \code{freq} or,
 when \code{weight} is non-NULL,  \code{(freq+1)*weight}. Ties are handled by prioritizing output cells
 that are calculated from many input cells. In addition, zeros are handled according to parameter \code{secondaryZeros}.
+When \code{freq} is negative (special hierarchy), \code{abs(freq)*weight} is used.
 }
