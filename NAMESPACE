@@ -2,6 +2,7 @@
 
 export(AdditionalSuppression)
 export(CandidatesDefault)
+export(CandidatesNum)
 export(ChainedSuppression)
 export(ChainedSuppressionHi)
 export(ChainedSuppressionHi1)

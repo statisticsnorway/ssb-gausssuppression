@@ -1,11 +1,14 @@
-#' Default candidates function
+#' Candidates functions
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
 #' 
-#' This main part of this function orders the indices decreasingly according to `freq` or, 
+#' `CandidatesDefault` orders the indices decreasingly according to `freq` or, 
 #' when `weight` is non-NULL,  `(freq+1)*weight`. Ties are handled by prioritizing output cells 
 #' that are calculated from many input cells. In addition, zeros are handled according to parameter `secondaryZeros`. 
 #' When `freq` is negative (special hierarchy), `abs(freq)*weight` is used.  
+#'
+#' `CandidatesNum` orders the indices decreasingly according to absolute values of the numeric variable (according to  `abs(num[[1]])`).
+#' In practice this is done by running `CandidatesDefault` with manipulated weights.
 #'
 #' @param freq Vector of output frequencies 
 #' @param x The model matrix
@@ -42,6 +45,22 @@ CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
   candidates <- order(freqOrd, decreasing = TRUE)
   candidates
 }
+
+
+#' @rdname CandidatesDefault
+#' @param num Data frame of output aggregates calculated from `numVar`. When several variables, only first is used. 
+#' @export
+CandidatesNum <- function(secondaryZeros = FALSE, freq, num, weight, ...) {
+  if (ncol(num) > 1){
+    warning("Multiple numVar were supplied, only the first is used in candidates function.")
+  }
+  newWeight <- abs(num[[1]]/FreqPlus1(freq))
+  if (!is.null(weight)) {
+    newWeight <- newWeight * weight
+  }
+  CandidatesDefault(weight = newWeight, freq = freq, secondaryZeros = secondaryZeros, ...)
+}
+
 
 
 # Add ones, but not for negative numbers 
