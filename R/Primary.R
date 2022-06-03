@@ -45,3 +45,28 @@ Primary <- function(primary, crossTable, eachPrimary = FALSE, ...) {
   }
   list(primary = pri, numExtra = num)
 }
+
+
+
+#' Default primary function
+#'
+#' Function for \code{\link{GaussSuppressionFromData}}
+#'
+#' @param freq Vector of output frequencies 
+#' @param maxN Cells with frequency `<= maxN` are set as primary suppressed. 
+#' @param protectZeros When `TRUE`, cells with zero frequency are set as primary suppressed. 
+#' @param ... Unused parameters 
+#'
+#' @return primary, \code{\link{GaussSuppression}} input 
+#' @export
+PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
+  
+  if(is.null(maxN))         stop("A non-NULL value of maxN is required.")
+  if(is.null(protectZeros)) stop("A non-NULL value of protectZeros is required.")
+  
+  primary <- freq <= maxN
+  if (!protectZeros) 
+    primary[freq == 0] <- FALSE
+  
+  primary
+}
