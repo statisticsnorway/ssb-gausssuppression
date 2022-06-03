@@ -48,7 +48,7 @@ Primary <- function(primary, crossTable, eachPrimary = FALSE, ...) {
 
 
 
-#' PrimaryDefault
+#' Default primary function
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
 #'
@@ -59,7 +59,6 @@ Primary <- function(primary, crossTable, eachPrimary = FALSE, ...) {
 #'
 #' @return primary, \code{\link{GaussSuppression}} input 
 #' @export
-#' @keywords internal
 PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
   
   if(is.null(maxN))         stop("A non-NULL value of maxN is required.")

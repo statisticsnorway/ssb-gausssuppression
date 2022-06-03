@@ -2,7 +2,7 @@
 % Please edit documentation in R/Primary.R
 \name{PrimaryDefault}
 \alias{PrimaryDefault}
-\title{PrimaryDefault}
+\title{Default primary function}
 \usage{
 PrimaryDefault(freq, maxN = 3, protectZeros = TRUE, ...)
 }
@@ -21,4 +21,3 @@ primary, \code{\link{GaussSuppression}} input
 \description{
 Function for \code{\link{GaussSuppressionFromData}}
 }
-\keyword{internal}
