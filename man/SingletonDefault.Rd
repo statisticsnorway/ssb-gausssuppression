@@ -2,7 +2,7 @@
 % Please edit documentation in R/Singleton.R
 \name{SingletonDefault}
 \alias{SingletonDefault}
-\title{SingletonDefault}
+\title{Default singleton function}
 \usage{
 SingletonDefault(data, freqVar, protectZeros, secondaryZeros, ...)
 }
@@ -28,4 +28,3 @@ This function marks input cells as singletons according to the input frequencies
 Zeros are set to singletons when \code{protectZeros} or \code{secondaryZeros} is \code{TRUE}.
 Otherwise, ones are set to singletons.
 }
-\keyword{internal}

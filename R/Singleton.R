@@ -1,4 +1,4 @@
-#' SingletonDefault
+#' Default singleton function
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
 #' 
@@ -14,7 +14,6 @@
 #'
 #' @return singleton, \code{\link{GaussSuppression}} input 
 #' @export
-#' @keywords internal
 SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
   
   if(is.null(protectZeros))   stop("A non-NULL value of protectZeros is required.")
