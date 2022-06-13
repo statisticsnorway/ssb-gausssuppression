@@ -18,26 +18,26 @@ Primary <- function(primary, crossTable, eachPrimary = FALSE, ...) {
       a <- a[[1]]
     }
     if (is.null(dim(a)) ){ # One way to test non-matrix  (both matrix and Matrix) 
-    if (!is.logical(a)) { # Indices instead are allowed/possible  
-      aInd <- a
-      a <- rep(FALSE, n)
-      a[aInd] <- TRUE
-    }
-    if (length(a) != n)
-      stop("wrong length of primary function output")
-    if (eachPrimary) {
-      if (is.numeric(eachPrimary)) {
-        pnum <- as.data.frame(matrix(as.integer(a), dimnames = list(NULL, paste0("primary", i))))
-      } else {
-        pnum <- as.data.frame(matrix(            a, dimnames = list(NULL, paste0("primary", i))))
+      if (!is.logical(a)) { # Indices instead are allowed/possible  
+        aInd <- a
+        a <- rep(FALSE, n)
+        a[aInd] <- TRUE
       }
-      if (is.null(num)) {
-        num <- pnum
-      } else {
-        num <- cbind(num, pnum)
+      if (length(a) != n)
+        stop("wrong length of primary function output")
+      if (eachPrimary) {
+        if (is.numeric(eachPrimary)) {
+          pnum <- as.data.frame(matrix(as.integer(a), dimnames = list(NULL, paste0("primary", i))))
+        } else {
+          pnum <- as.data.frame(matrix(            a, dimnames = list(NULL, paste0("primary", i))))
+        }
+        if (is.null(num)) {
+          num <- pnum
+        } else {
+          num <- cbind(num, pnum)
+        }
       }
-    }
-    pri <- pri * as.integer(!a)    # zeros (=TRUE since !) and NA’s are preserved
+      pri <- pri * as.integer(!a)    # zeros (=TRUE since !) and NA’s are preserved
     } else { # When matrix or Matrix 
       xExtraPrimary <- cbind(xExtraPrimary, a)
     }
