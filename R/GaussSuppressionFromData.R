@@ -425,6 +425,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     xExtraPrimary <- NULL
   }
   
+  if (!is.null(xExtraPrimary) & extraAggregate) {
+    stop("Combination of xExtraPrimary and extraAggregate is not implemented")
+  }
+  
+  
   if(output=="inputGaussSuppression_x"){
     return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, x = x))
   }
