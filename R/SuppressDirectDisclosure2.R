@@ -203,3 +203,69 @@ find_sub_category <- function(dimlist,
   else
     NULL
 }
+# function returning all nodes in tree that are not root or leaf
+extract_inner_nodes <- function(dimList) {
+  result <- NULL
+  for (i in seq_len(nrow(dimList) - 1)) {
+    not_total <- nchar(dimList[i, "levels"]) >= 2
+    parent <- nchar(dimList[i, "levels"]) < nchar(dimList[i + 1, "levels"])
+    if (not_total & parent)
+      result <- c(result, dimList[i, "codes"])
+  }
+  result
+}
+ExtendModelMatrix <- function(data, mc= NULL, formula = NULL, hierarchies = NULL, ...) {
+  mm <- ModelMatrix(data, formula = formula, hierarchies = hierarchies, crossTable = TRUE, ...)
+  x <- mm$modelMatrix
+  ct <- mm$crossTable
+  if (!is.null(mc)){
+    mc.mm <- ModelMatrix(data, hierarchies = mc, crossTable=  TRUE)
+    mc.mm <<- mc.mm
+    mc.x <- mc.mm$modelMatrix[, find_mc_cells(mc.mm$crossTable, mc)]
+    mm <- cbind(x, mc.x)
+    attr(mm, "mc.index") <- ncol(x) + 1
+    return(list(modelMatrix = mm, crossTable = ct))
+  }
+  mm
+}
+
+find_mc_cells <- function(mc.crossTable, mc.dimlist) {
+  unique_vars <- unique(names(mc.dimlist))
+  mc.labels <- sapply(unique_vars,
+                      function(x)
+                        extract_inner_nodes(Reduce(rbind,
+                                                   mc.dimlist[which(x == names(mc.dimlist))])))
+  mc.labels <- mc.labels[sapply(mc.labels, function (x) !is.null(x))]
+  # gives all in hierarchy, not only "relevant" cells
+  mc.indices <- unique(Reduce(c, sapply(names(mc.labels),
+         function(x) which(!is.na(match(mc.crossTable[[x]], mc.labels[[x]]))))))
+ #  mc.indices <- 
+ # mc.indices
+}
+
+
+
+FDC <- function(x,
+                freq,
+                coalition = 1,...) {
+  mc.index <- attr(x, "mc.index")
+  k <- crossprod(x)
+  k <- as(k, "dgTMatrix")
+  colSums_x <- colSums(x)
+  # row i is child of column j in r
+  r <- colSums_x[k@i + 1] == k@x & colSums_x[k@j + 1] != k@x
+  k@x <- k@x[r]
+  k@j <- k@j[r]
+  k@i <- k@i[r]
+  # k <- TransitiveReduction(k)
+  
+  child_parent <- cbind(child = k@i + 1,
+                        parent = k@j + 1,
+                        diff = freq[k@j + 1] - freq[k@i + 1])
+  child_parent <- child_parent[freq[child_parent[,2]] > 0 & freq[child_parent[,1]] > 0,]
+  disclosures <- child_parent[child_parent[,3] <= coalition, ]
+  disclosures <<- disclosures
+  primary_matrix <- as(apply(disclosures, 1, function(row) x[,row[2]] - x[,row[1]]), "dgTMatrix")
+  colnames(primary_matrix) <- apply(disclosures[,2:1], 1, function(x) paste(x, collapse = "-"))
+  primary_matrix
+}
