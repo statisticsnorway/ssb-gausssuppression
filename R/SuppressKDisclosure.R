@@ -140,7 +140,7 @@ find_difference_cells <- function(x,
                         diff = freq[k@j + 1] - freq[k@i + 1])
   child_parent <- child_parent[freq[child_parent[,2]] > 0 & freq[child_parent[,1]] > 0,]
   disclosures <- child_parent[child_parent[,3] <= coalition, ]
-  disclosures <<- disclosures
+  # disclosures <<- disclosures
   if (nrow(disclosures))
     primary_matrix <- as(apply(disclosures, 1, function(row) x[,row[2]] - x[,row[1]]), "dgTMatrix")
   else primary_matrix <- NULL
