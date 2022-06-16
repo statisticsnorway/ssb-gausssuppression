@@ -13,9 +13,9 @@ GaussSuppressionFromData(
   charVar = NULL,
   hierarchies = NULL,
   formula = NULL,
-  maxN = 3,
-  protectZeros = TRUE,
-  secondaryZeros = FALSE,
+  maxN = suppressWarnings(formals(c(primary)[[1]])$maxN),
+  protectZeros = suppressWarnings(formals(c(primary)[[1]])$protectZeros),
+  secondaryZeros = suppressWarnings(formals(candidates)$secondaryZeros),
   candidates = CandidatesDefault,
   primary = PrimaryDefault,
   forced = NULL,
@@ -28,6 +28,8 @@ GaussSuppressionFromData(
   crossTable = NULL,
   preAggregate = is.null(freqVar),
   extraAggregate = preAggregate & !is.null(charVar),
+  structuralEmpty = FALSE,
+  extend0 = FALSE,
   ...
 )
 }
@@ -49,11 +51,17 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{formula}{A model formula}
 
-\item{maxN}{Suppression parameter. Default: Cells having counts \verb{<= maxN} are set as primary suppressed.}
+\item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
+Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
 
-\item{protectZeros}{Suppression parameter. Default when TRUE: Empty cells (count=0) are set as primary suppressed.}
+\item{protectZeros}{Suppression parameter.
+When \code{TRUE}, cells with zero frequency or value are set as primary suppressed.
+Using the default \code{primary} function, \code{protectZeros} is by default set to \code{TRUE}. See details.}
 
-\item{secondaryZeros}{Suppression parameter.}
+\item{secondaryZeros}{Suppression parameter.
+When \code{TRUE}, cells with zero frequency or value are prioritized to be published so that they are not secondary suppressed.
+Using the default \code{candidates} function, \code{secondaryZeros} is by default set to \code{FALSE}.
+See details.}
 
 \item{candidates}{GaussSuppression input or a function generating it (see details) Default: \code{\link{CandidatesDefault}}}
 
@@ -65,14 +73,19 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{singleton}{GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}}
 
-\item{singletonMethod}{\code{\link{GaussSuppression}} input}
+\item{singletonMethod}{\code{\link{GaussSuppression}} input. The default value depends on parameter \code{secondaryZeros} which depends on \code{candidates} (see details).}
 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
 \item{output}{One of \code{"publish"} (default), \code{"inner"}, \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"},
-\code{"inner_x"}, and \code{"input2functions"} (input to supplied functions).
+\code{"inner_x"}, \code{"input2functions"} (input to supplied functions),
+\code{"inputGaussSuppression"}, \code{"inputGaussSuppression_x"},
+\code{"outputGaussSuppression"}  \code{"outputGaussSuppression_x"},
+\code{"primary"} and \code{"secondary"}.
 Here "inner" means input data (possibly pre-aggregated) and
-"x" means dummy matrix (as input parameter x).}
+"x" means dummy matrix (as input parameter x).
+All input to and output from \code{\link{GaussSuppression}}, except \code{...}, are returned when \code{"outputGaussSuppression_x"}.
+Excluding x and only input are also possible.}
 
 \item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}}
 
@@ -88,7 +101,19 @@ This extra aggregation is useful when parameter \code{charVar} is used.
 Supply \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"} or \code{"inner_x"} as \code{output} to obtain extra aggregated results.
 Supply \code{"inner"} or \code{"input2functions"} to obtain other results.}
 
-\item{...}{Further arguments to be passed to the supplied functions.}
+\item{structuralEmpty}{When \code{TRUE}, output cells with no contributing inner cells (only zeros in column of \code{x})
+are forced to be not primary suppressed.
+Thus, these cells are considered as structural zeros.
+When \code{structuralEmpty} is \code{TRUE}, the following error message is avoided:
+\code{Suppressed} \code{cells} \code{with} \code{empty} \code{input} \code{will} \code{not} \code{be} \code{protected.}
+\code{Extend} \code{input} \code{data} \code{with} \verb{zeros?}.
+When \code{removeEmpty} is \code{TRUE} (see "\code{...}" below), \code{structuralEmpty} is superfluous}
+
+\item{extend0}{Data is automatically extended by \code{Extend0} when \code{TRUE}.
+Can also be set to \code{"all"} which means that input codes in hierarchies are considered in addition to those in data.
+Parameter \code{extend0} can also be specified as a list meaning parameter \code{varGroups} to \code{Extend0}.}
+
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }
 \value{
 Aggregated data with suppression information
@@ -106,6 +131,16 @@ The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}
 Similarly, \code{num}, is a data frame of aggregated numerical variables.
 It is possible to supply several primary functions joined by \code{c}, e.g. (\code{c(FunPrim1, FunPrim2)}).
 All \code{NA}s returned from any of the functions force the corresponding cells not to be primary suppressed.
+
+The effect of \code{maxN} , \code{protectZeros} and \code{secondaryZeros} depends on the supplied functions where these parameters are used.
+Their default values are inherited from the default values of the first \code{primary} function (several possible) or,
+in the case of \code{secondaryZeros}, the \code{candidates} function.
+When defaults cannot be inherited, they are set to \code{NULL}.
+In practice the function \code{formals} are still used to generate the defaults when \code{primary} and/or \code{candidates} are not functions.
+Then \code{NULL} is correctly returned, but \code{suppressWarnings} are needed.
+
+Singleton handling can be turned off by \code{singleton = NULL} or \code{singletonMethod = "none"}.
+Both of these choices are identical in the sense that \code{singletonMethod} is set to \code{"none"} whenever \code{singleton} is \code{NULL} and vice versa.
 }
 \examples{
 
@@ -122,14 +157,15 @@ df <- data.frame(values = c(1, 1, 1, 5, 5, 9, 9, 9, 9, 9, 0, 0, 0, 7, 7),
 
 GaussSuppressionFromData(df, c("var1", "var2"), "values")
 GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10)
-GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
+GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10,
+      protectZeros = TRUE, # Parameter needed by SingletonDefault and default not in primary  
       primary = function(freq, crossTable, maxN, ...) 
                    which(freq <= maxN & crossTable[[2]] != "A" & crossTable[, 2] != "C"))
                    
 # Combining several primary functions 
 # Note that NA & c(TRUE, FALSE) equals c(NA, FALSE)                      
 GaussSuppressionFromData(df, c("var1", "var2"), "values", formula = ~var1 + var2, maxN = 10, 
-       primary = c(function(freq, maxN, ...) freq >= 45,
+       primary = c(function(freq, maxN, protectZeros = TRUE, ...) freq >= 45,
                    function(freq, maxN, ...) freq <= maxN,
                    function(crossTable, ...) NA & crossTable[[2]] == "C",  
                    function(crossTable, ...) NA & crossTable[[1]]== "Total" 

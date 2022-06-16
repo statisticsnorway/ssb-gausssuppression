@@ -4,7 +4,17 @@
 \alias{DominanceRule}
 \title{Dominance \verb{(n,k)} rule for magnitude tables}
 \usage{
-DominanceRule(data, x, crossTable, numVar, n, k, ...)
+DominanceRule(
+  data,
+  x,
+  crossTable,
+  numVar,
+  n,
+  k,
+  protectZeros = FALSE,
+  charVar,
+  ...
+)
 }
 \arguments{
 \item{data}{the dataset}
@@ -19,6 +29,10 @@ DominanceRule(data, x, crossTable, numVar, n, k, ...)
 
 \item{k}{parameter \code{k} in dominance rule.}
 
+\item{protectZeros}{parameter determining whether cells with value 0 should be suppressed.}
+
+\item{charVar}{Variable in data holding grouping information. Dominance will be calculated after aggregation within these groups.}
+
 \item{...}{unused parameters}
 }
 \value{
@@ -28,7 +42,7 @@ logical vector that is \code{TRUE} in positions corresponding to cells breaching
 Supports application of multiple values for \code{n} and \code{k}. The function works on magnitude tables containing negative cell values by calculating contribution based on absolute values.
 }
 \details{
-Currently the implementation only supports a single numeric variable.
+This methodn only supports suppressing a single numeric variable.
 }
 \author{
 Daniel Lupp

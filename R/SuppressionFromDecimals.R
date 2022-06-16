@@ -44,7 +44,7 @@ SuppressionFromDecimals = function(data, decVar, freqVar = NULL, numVar = NULL,
                             candidates = integer(0),
                             primary = PrimaryDecimals,
                             singleton = NULL,
-                            singletonMethod = function(...){integer(0)},
+                            singletonMethod = "none",
                             digitsPrimary = digits,
                             ...) 
 }
