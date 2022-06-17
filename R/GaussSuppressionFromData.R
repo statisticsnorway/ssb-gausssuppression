@@ -80,7 +80,7 @@
 #'                 Can also be set to `"all"` which means that input codes in hierarchies are considered in addition to those in data.   
 #'                 Parameter `extend0` can also be specified as a list meaning parameter `varGroups` to `Extend0`. 
 #' @param spec `NULL` or a named list of arguments that will act as default values.
-#' @param specOverride When `TRUE`, `spec` will override other input.                                                        
+#' @param specLock When `TRUE`, arguments in `spec` cannot be changed.                                                        
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -156,15 +156,23 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            structuralEmpty = FALSE, 
                            extend0 = FALSE,
                            spec = NULL,
-                           specOverride = FALSE,
+                           specLock = FALSE,
                            ...){ 
   if (!is.null(spec)) {
     if (is.list(spec)) {
       if (length(names(spec)[!(names(spec) %in% c("", NA))]) == length(spec)) {
-        sysCall <- match.call() #  sys.call() is similar to match.call, but does not expand the argument name (needed here)
+        sysCall <- match.call()  #  sys.call() is similar to match.call, but does not expand the argument name (needed here)
         sysCall[["spec"]] <- NULL
         names_spec <- names(spec)
-        if (!specOverride) names_spec <- names_spec[!(names_spec %in% names(sysCall))] 
+        names_spec_in_names_sysCall <- names_spec %in% names(sysCall)
+        specLock <- any(c(specLock, spec[["specLock"]]))
+        if (specLock) {
+          if (any(names_spec_in_names_sysCall)) {
+            stop(paste("Non-allowed argument(s) due to specLock:", paste(names_spec[names_spec_in_names_sysCall], collapse = ", ")))
+          }
+        } else {
+          names_spec <- names_spec[!names_spec_in_names_sysCall]
+        }
         sysCall[names_spec] <- spec[names_spec]
         parentFrame <- parent.frame()
         return(eval(sysCall, envir = parentFrame))

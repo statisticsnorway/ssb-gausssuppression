@@ -31,7 +31,7 @@ GaussSuppressionFromData(
   structuralEmpty = FALSE,
   extend0 = FALSE,
   spec = NULL,
-  specOverride = FALSE,
+  specLock = FALSE,
   ...
 )
 }
@@ -117,7 +117,7 @@ Parameter \code{extend0} can also be specified as a list meaning parameter \code
 
 \item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 
-\item{specOverride}{When \code{TRUE}, \code{spec} will override other input.}
+\item{specLock}{When \code{TRUE}, arguments in \code{spec} cannot be changed.}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }
