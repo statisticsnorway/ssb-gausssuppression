@@ -92,12 +92,12 @@ SuppressKDisclosure <- function(data,
 }
 
 KDisclosurePrimary <- function(data, x, crossTable, mc.dimlist, freqVar, coalition, upper.bound, ...) {
-  x <- x_with_mc(x, crossTable, dimVar = names(crossTable), mc.dimlist = mc.dimlist)
+  x <- x_with_mc(x, crossTable, mc.dimlist = mc.dimlist)
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   find_difference_cells(x = x, freq = freq, coalition = coalition, upper.bound = upper.bound)
 }
 
-x_with_mc <- function(x, crossTable, dimVar, mc.dimlist) {
+x_with_mc <- function(x, crossTable, mc.dimlist) {
   if (is.null(mc.dimlist))
     return(x)
   unique_vars <- unique(names(mc.dimlist))
@@ -107,20 +107,22 @@ x_with_mc <- function(x, crossTable, dimVar, mc.dimlist) {
                                                    mc.dimlist[which(x == names(mc.dimlist))])))
   mc.labels <- mc.labels[sapply(mc.labels, function (x) !is.null(x))]
   mcHier <- AutoHierarchies(mc.dimlist)
+  dimVar <- names(crossTable)
   for (var in names(mc.labels)) {
     tVar <- dimVar[!(dimVar == var)]
     for (mc in mc.labels[[var]]) {
-      # check whether everything in this loop works with length(tVar) >= 2
       mcsubs <- unique(mcHier[[var]]$mapsFrom[mcHier[[var]]$mapsTo == mc])
-      mcmatrix <- sapply(unique(crossTable[[tVar]][crossTable[[var]] %in% mcsubs]),
-                         function(y)
-                           which(crossTable[[var]] %in% mcsubs & crossTable[[tVar]] == y))
+      mcsubinds <- which(crossTable[[var]] %in% mcsubs)
+      unqs <- unique(crossTable[crossTable[[var]] %in% mcsubs, tVar, drop = FALSE])
+      mcct <- crossTable[crossTable[[var]] %in% mcsubs, tVar, drop = FALSE]
+      mcmatrix <- cbind(mcsubinds, Match(mcct, unqs))
+      cx <- sapply(unique(mcmatrix[,2]), function(x) Reduce(c, mcmatrix[mcmatrix[,2] == x,1]))
       cx <- as(Reduce(cbind,
-                      apply(mcmatrix, 2,
+                      apply(cx, 2,
                             function(y)
-                              as(matrix(rowSums(x[,y])), "dgTMatrix"))), 
+                              as(matrix(rowSums(x2[,y])), "dgTMatrix"))),
                "dgCMatrix")
-      colnames(cx) <- paste(unique(crossTable[[tVar]][crossTable[[var]] %in% mcsubs]), mc, sep = ":")
+      colnames(cx) <- paste(apply(unqs,1, function(x) paste(x, collapse = ":")), "injured", sep = ":")
       x <- cbind(x, cx)
     }
   }
