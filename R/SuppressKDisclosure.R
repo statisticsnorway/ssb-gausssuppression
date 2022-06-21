@@ -45,10 +45,13 @@
 #' codes = c("Total", "serious", "light", "none", "unknown"))
 #' inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"), 
 #' codes = c("Total", "injured", "serious", "light", "none", "unknown"))
+#' inj2.1 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@"), 
+#' codes = c("Total", "injured", "serious", "light"))
 #' inj3 <- data.frame(levels = c("@", "@@", "@@@","@@@", "@@@", "@@@"), 
 #' codes = c("Total", "hiddentotal", "serious", "light", "none", "unknown"))
 #' dimlists <- list(mun = mun, inj = inj)
 #' dimlists2 <- list(mun = mun, inj = inj2)
+#' dimlists2.1 <- list(mun = mun, inj = inj2.1)
 #' dimlists3 <- list(mun = mun, inj = inj3, inj = inj2)
 #' 
 #' # Example with formula, without meaningful combinations
@@ -56,7 +59,7 @@
 #' 
 #' # Example with hierarchy and meaningful combination
 #' out2 <- SuppressKDisclosure(data, k = 1, freqVar = "freq", 
-#' dimVar = c("mun", "inj"), hierarchies = dimlists, mc.dimlist = dimlists2)
+#' dimVar = c("mun", "inj"), hierarchies = dimlists, mc.dimlist = dimlists2.1)
 #' 
 #' # Example without published row/column marginals,but with meaningful
 #' # combinations
@@ -68,17 +71,19 @@ SuppressKDisclosure <- function(data,
                                 formula = NULL,
                                 hierarchies = NULL,
                                 freqVar = NULL,
-                                mc.dimlist = NULL, 
+                                mc.dimlist = NULL,
+                                upper.bound = Inf,
                                 ...) {
   if (is.null(hierarchies) & is.null(formula) & is.null(dimVar))
     stop("You must specify hierarchy, formula, or dimVar.")
   GaussSuppressionFromData(data,
-                           hierarches = hierarchies,
+                           hierarchies = hierarchies,
                            formula = formula,
                            dimVar = dimVar,
                            freqVar = freqVar,
                            coalition = k,
                            mc.dimlist = mc.dimlist,
+                           upper.bound = upper.bound,
                            primary = KDisclosurePrimary,
                            candidates = DirectDisclosureCandidates,
                            protectZeros = FALSE,
@@ -86,10 +91,10 @@ SuppressKDisclosure <- function(data,
                            ...)
 }
 
-KDisclosurePrimary <- function(data, x, crossTable, mc.dimlist, freq, coalition, ...) {
+KDisclosurePrimary <- function(data, x, crossTable, mc.dimlist, freqVar, coalition, upper.bound, ...) {
   x <- x_with_mc(x, crossTable, dimVar = names(crossTable), mc.dimlist = mc.dimlist)
-  freq <- as.vector(crossprod(x, data$freq))
-  find_difference_cells(x, freq, coalition, ...)
+  freq <- as.vector(crossprod(x, data[[freqVar]]))
+  find_difference_cells(x = x, freq = freq, coalition = coalition, upper.bound = upper.bound)
 }
 
 x_with_mc <- function(x, crossTable, dimVar, mc.dimlist) {
@@ -122,9 +127,19 @@ x_with_mc <- function(x, crossTable, dimVar, mc.dimlist) {
   x
 }
 
+
+x_with_mc2 <- function(x, data, mc.dimlist) {
+  xx <- cbind(x, SSBtools::ModelMatrix(data, hierarchies = mc.dimlist))
+  xx <- xx[, !SSBtools::DummyDuplicated(xx, rnd = TRUE), drop = FALSE]
+  xx <- xx[, colSums(xx) != 0, drop = FALSE]
+  xx
+}
+
+
 find_difference_cells <- function(x,
                 freq,
-                coalition = 1,...) {
+                coalition = 1,
+                upper.bound = Inf) {
   k <- crossprod(x)
   k <- as(k, "dgTMatrix")
   colSums_x <- colSums(x)
@@ -134,13 +149,13 @@ find_difference_cells <- function(x,
   k@j <- k@j[r]
   k@i <- k@i[r]
   # k <- TransitiveReduction(k)
-  
   child_parent <- cbind(child = k@i + 1,
                         parent = k@j + 1,
                         diff = freq[k@j + 1] - freq[k@i + 1])
-  child_parent <- child_parent[freq[child_parent[,2]] > 0 & freq[child_parent[,1]] > 0,]
+  child_parent <- child_parent[freq[child_parent[,2]] > 0 &
+                                 freq[child_parent[,1]] > 0 & 
+                                 freq[child_parent[,1]] <= upper.bound,]
   disclosures <- child_parent[child_parent[,3] <= coalition, ]
-  # disclosures <<- disclosures
   if (nrow(disclosures))
     primary_matrix <- as(apply(disclosures, 1, function(row) x[,row[2]] - x[,row[1]]), "dgTMatrix")
   else primary_matrix <- NULL
