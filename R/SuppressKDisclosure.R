@@ -91,10 +91,19 @@ SuppressKDisclosure <- function(data,
                            ...)
 }
 
-KDisclosurePrimary <- function(data, x, crossTable, mc.dimlist, freqVar, coalition, upper.bound, ...) {
+KDisclosurePrimary <- function(data,
+                               x,
+                               crossTable,
+                               mc.dimlist,
+                               freqVar,
+                               coalition,
+                               upper.bound, ...) {
   x <- x_with_mc(x, crossTable, mc.dimlist = mc.dimlist)
   freq <- as.vector(crossprod(x, data[[freqVar]]))
-  find_difference_cells(x = x, freq = freq, coalition = coalition, upper.bound = upper.bound)
+  find_difference_cells(x = x,
+                        freq = freq,
+                        coalition = coalition,
+                        upper.bound = upper.bound)
 }
 
 x_with_mc <- function(x, crossTable, mc.dimlist) {
@@ -113,16 +122,19 @@ x_with_mc <- function(x, crossTable, mc.dimlist) {
     for (mc in mc.labels[[var]]) {
       mcsubs <- unique(mcHier[[var]]$mapsFrom[mcHier[[var]]$mapsTo == mc])
       mcsubinds <- which(crossTable[[var]] %in% mcsubs)
-      unqs <- unique(crossTable[crossTable[[var]] %in% mcsubs, tVar, drop = FALSE])
+      unqs <- unique(crossTable[crossTable[[var]] %in% mcsubs, tVar,
+                                drop = FALSE])
       mcct <- crossTable[crossTable[[var]] %in% mcsubs, tVar, drop = FALSE]
       mcmatrix <- cbind(mcsubinds, Match(mcct, unqs))
-      cx <- sapply(unique(mcmatrix[,2]), function(x) Reduce(c, mcmatrix[mcmatrix[,2] == x,1]))
+      cx <- sapply(unique(mcmatrix[,2]),
+                   function(x) Reduce(c, mcmatrix[mcmatrix[,2] == x,1]))
       cx <- as(Reduce(cbind,
                       apply(cx, 2,
                             function(y)
                               as(matrix(rowSums(x2[,y])), "dgTMatrix"))),
                "dgCMatrix")
-      colnames(cx) <- paste(apply(unqs,1, function(x) paste(x, collapse = ":")), "injured", sep = ":")
+      colnames(cx) <- paste(apply(unqs,1, function(x) paste(x, collapse = ":")),
+                            "injured", sep = ":")
       x <- cbind(x, cx)
     }
   }
@@ -139,9 +151,9 @@ x_with_mc2 <- function(x, data, mc.dimlist) {
 
 
 find_difference_cells <- function(x,
-                freq,
-                coalition = 1,
-                upper.bound = Inf) {
+                                  freq,
+                                  coalition = 1,
+                                  upper.bound = Inf) {
   k <- crossprod(x)
   k <- as(k, "dgTMatrix")
   colSums_x <- colSums(x)
@@ -159,7 +171,10 @@ find_difference_cells <- function(x,
                                  freq[child_parent[,1]] <= upper.bound,]
   disclosures <- child_parent[child_parent[,3] <= coalition, ]
   if (nrow(disclosures))
-    primary_matrix <- as(apply(disclosures, 1, function(row) x[,row[2]] - x[,row[1]]), "dgTMatrix")
+    primary_matrix <- as(apply(disclosures,
+                               1,
+                               function(row) x[,row[2]] - x[,row[1]]),
+                         "dgTMatrix")
   else primary_matrix <- NULL
   # colnames(primary_matrix) <- apply(disclosures[,2:1], 1, function(x) paste(x, collapse = "-"))
   primary_matrix
