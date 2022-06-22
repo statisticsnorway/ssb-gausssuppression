@@ -30,6 +30,8 @@ GaussSuppressionFromData(
   extraAggregate = preAggregate & !is.null(charVar),
   structuralEmpty = FALSE,
   extend0 = FALSE,
+  spec = NULL,
+  specLock = FALSE,
   ...
 )
 }
@@ -73,7 +75,7 @@ See details.}
 
 \item{singleton}{GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}}
 
-\item{singletonMethod}{\code{\link{GaussSuppression}} input}
+\item{singletonMethod}{\code{\link{GaussSuppression}} input. The default value depends on parameter \code{secondaryZeros} which depends on \code{candidates} (see details).}
 
 \item{printInc}{\code{\link{GaussSuppression}} input}
 
@@ -113,6 +115,10 @@ When \code{removeEmpty} is \code{TRUE} (see "\code{...}" below), \code{structura
 Can also be set to \code{"all"} which means that input codes in hierarchies are considered in addition to those in data.
 Parameter \code{extend0} can also be specified as a list meaning parameter \code{varGroups} to \code{Extend0}.}
 
+\item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
+
+\item{specLock}{When \code{TRUE}, arguments in \code{spec} cannot be changed.}
+
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }
 \value{
@@ -138,6 +144,9 @@ in the case of \code{secondaryZeros}, the \code{candidates} function.
 When defaults cannot be inherited, they are set to \code{NULL}.
 In practice the function \code{formals} are still used to generate the defaults when \code{primary} and/or \code{candidates} are not functions.
 Then \code{NULL} is correctly returned, but \code{suppressWarnings} are needed.
+
+Singleton handling can be turned off by \code{singleton = NULL} or \code{singletonMethod = "none"}.
+Both of these choices are identical in the sense that \code{singletonMethod} is set to \code{"none"} whenever \code{singleton} is \code{NULL} and vice versa.
 }
 \examples{
 

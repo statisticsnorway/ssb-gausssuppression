@@ -145,6 +145,18 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
 
   force(preAggregate)
   
+  if (length(singletonMethod)) { # Default is logical(0) when secondaryZeros is NULL
+    if (singletonMethod == "none") {
+      singleton <- NULL
+    }
+  }
+  if (is.null(singleton)) {
+    singletonMethod <- "none"
+  }
+  if (!length(singletonMethod)) {
+    stop("A value of singletonMethod is required.")
+  }
+  
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
   if (is.name(protectZeros)) protectZeros <- NULL
