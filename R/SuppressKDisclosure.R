@@ -73,6 +73,13 @@ SuppressKDisclosure <- function(data,
                                 ...) {
   if (is.null(hierarchies) & is.null(formula) & is.null(dimVar))
     stop("You must specify hierarchy, formula, or dimVar.")
+  additional_params <- list(...)
+  if (length(additional_params)) {
+    if ("singletonMethod" %in% names(additional_params) & 
+        "none" %in% additional_params[["singletonMethod"]])
+    warning("SuppressKDisclosure should use a singleton method for protecting the zero singleton problem. The output might not be safe, consider rerunning with a singleton method (default).")
+  }
+  # if ("singletonMethod" %in% names(match.call(expand.dots = FALSE)))
   GaussSuppressionFromData(data,
                            hierarchies = hierarchies,
                            formula = formula,
