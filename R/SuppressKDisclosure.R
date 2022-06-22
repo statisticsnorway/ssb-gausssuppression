@@ -45,13 +45,10 @@
 #' codes = c("Total", "serious", "light", "none", "unknown"))
 #' inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"), 
 #' codes = c("Total", "injured", "serious", "light", "none", "unknown"))
-#' inj2.1 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@"), 
-#' codes = c("Total", "injured", "serious", "light"))
 #' inj3 <- data.frame(levels = c("@", "@@", "@@@","@@@", "@@@", "@@@"), 
 #' codes = c("Total", "hiddentotal", "serious", "light", "none", "unknown"))
 #' dimlists <- list(mun = mun, inj = inj)
 #' dimlists2 <- list(mun = mun, inj = inj2)
-#' dimlists2.1 <- list(mun = mun, inj = inj2.1)
 #' dimlists3 <- list(mun = mun, inj = inj3, inj = inj2)
 #' 
 #' # Example with formula, without meaningful combinations
@@ -59,7 +56,7 @@
 #' 
 #' # Example with hierarchy and meaningful combination
 #' out2 <- SuppressKDisclosure(data, k = 1, freqVar = "freq", 
-#' dimVar = c("mun", "inj"), hierarchies = dimlists, mc.dimlist = dimlists2.1)
+#' dimVar = c("mun", "inj"), hierarchies = dimlists, mc.dimlist = dimlists2)
 #' 
 #' # Example without published row/column marginals,but with meaningful
 #' # combinations
@@ -131,7 +128,7 @@ x_with_mc <- function(x, crossTable, mc.dimlist) {
       cx <- as(Reduce(cbind,
                       apply(cx, 2,
                             function(y)
-                              as(matrix(rowSums(x2[,y])), "dgTMatrix"))),
+                              as(matrix(rowSums(x[,y])), "dgTMatrix"))),
                "dgCMatrix")
       colnames(cx) <- paste(apply(unqs,1, function(x) paste(x, collapse = ":")),
                             "injured", sep = ":")
