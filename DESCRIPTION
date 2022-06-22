@@ -1,7 +1,6 @@
 Package: GaussSuppression
 Type: Package
 Title: Tabular Data Suppression using Gaussian Elimination
-
 Version: 0.3.1
 Date: 2022-06-03
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
@@ -13,12 +12,11 @@ Depends: Matrix
 Imports: SSBtools, stats, methods
 Description: A statistical disclosure control tool to protect tables by suppression using the Gaussian elimination secondary suppression algorithm.
 License: Apache License 2.0
-
 URL: https://github.com/statisticsnorway/GaussSuppression
 BugReports: https://github.com/statisticsnorway/GaussSuppression/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
