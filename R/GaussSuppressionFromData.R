@@ -443,15 +443,23 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   # hack
   if(is.list(primary)){
-    num <- cbind(num, primary[[2]])
+    num <- cbind(num, primary$numExtra)
+    xExtraPrimary <- primary$xExtraPrimary
     primary <- primary[[1]]
+  } else {
+    xExtraPrimary <- NULL
   }
   
+  if (!is.null(xExtraPrimary) & extraAggregate) {
+    stop("Combination of xExtraPrimary and extraAggregate is not implemented")
+  }
+  
+  
   if(output=="inputGaussSuppression_x"){
-    return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, x = x))
+    return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, x = x))
   }
   if(output=="inputGaussSuppression"){
-    return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc))
+    return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary))
   }
   
   if( output %in% c("outputGaussSuppression", "outputGaussSuppression_x", "secondary")){
@@ -464,9 +472,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
-    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, ...)
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, ...)
   } else {
-    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, ...)
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, ...)
   }
   
   if (output == "secondary"){
