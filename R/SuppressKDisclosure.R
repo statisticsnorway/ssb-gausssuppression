@@ -66,6 +66,8 @@ SuppressKDisclosure <- function(data,
                                 ...) {
   if (is.null(hierarchies) & is.null(formula) & is.null(dimVar))
     stop("You must specify hierarchy, formula, or dimVar.")
+  if (!is.function(mc_function))
+    stop("Parameter mc_function must be a function.")
   additional_params <- list(...)
   if (length(additional_params)) {
     if ("singletonMethod" %in% names(additional_params) & 
