@@ -62,7 +62,7 @@ SuppressKDisclosure <- function(data,
                                 freqVar = NULL,
                                 mc_function = x_with_mc,
                                 mc_hierarchies = NULL,
-                                upper.bound = Inf,
+                                upper_bound = Inf,
                                 ...) {
   if (is.null(hierarchies) & is.null(formula) & is.null(dimVar))
     stop("You must specify hierarchy, formula, or dimVar.")
@@ -82,7 +82,7 @@ SuppressKDisclosure <- function(data,
                            coalition = k,
                            mc_hierarchies = mc_hierarchies,
                            mc_function = mc_function,
-                           upper.bound = upper.bound,
+                           upper_bound = upper_bound,
                            primary = KDisclosurePrimary,
                            candidates = DirectDisclosureCandidates,
                            protectZeros = FALSE,
@@ -97,14 +97,14 @@ KDisclosurePrimary <- function(data,
                                mc_hierarchies,
                                freqVar,
                                coalition,
-                               upper.bound, ...) {
+                               upper_bound, ...) {
   x <- cbind(x, mc_function(data = data,
                             x = x,
                             crossTable = crossTable,
                             mc_hierarchies = mc_hierarchies,
                             freqVar = freqVar,
                             coalition = coalition,
-                            upper.bound = upper.bound,
+                            upper_bound = upper_bound,
                             ...
                             ))
   # x <- x_with_mc(x, crossTable, mc_hierarchies = mc_hierarchies)
@@ -112,23 +112,23 @@ KDisclosurePrimary <- function(data,
   find_difference_cells(x = x,
                         freq = freq,
                         coalition = coalition,
-                        upper.bound = upper.bound)
+                        upper_bound = upper_bound)
 }
 
 x_with_mc <- function(x, crossTable, mc_hierarchies, ...) {
   if (is.null(mc_hierarchies))
     return(NULL)
   unique_vars <- unique(names(mc_hierarchies))
-  mc.labels <- sapply(unique_vars,
+  mc_labels <- sapply(unique_vars,
                       function(x)
                         extract_inner_nodes(Reduce(rbind,
                                                    mc_hierarchies[which(x == names(mc_hierarchies))])))
-  mc.labels <- mc.labels[sapply(mc.labels, function (x) !is.null(x))]
+  mc_labels <- mc_labels[sapply(mc_labels, function (x) !is.null(x))]
   mcHier <- AutoHierarchies(mc_hierarchies)
   dimVar <- names(crossTable)
-  for (var in names(mc.labels)) {
+  for (var in names(mc_labels)) {
     tVar <- dimVar[!(dimVar == var)]
-    for (mc in mc.labels[[var]]) {
+    for (mc in mc_labels[[var]]) {
       mcsubs <- unique(mcHier[[var]]$mapsFrom[mcHier[[var]]$mapsTo == mc])
       mcsubinds <- which(crossTable[[var]] %in% mcsubs)
       unqs <- unique(crossTable[crossTable[[var]] %in% mcsubs, tVar,
@@ -162,7 +162,7 @@ x_with_mc2 <- function(x, data, mc_hierarchies) {
 find_difference_cells <- function(x,
                                   freq,
                                   coalition = 1,
-                                  upper.bound = Inf) {
+                                  upper_bound = Inf) {
   k <- crossprod(x)
   k <- as(k, "dgTMatrix")
   colSums_x <- colSums(x)
@@ -177,7 +177,7 @@ find_difference_cells <- function(x,
                         diff = freq[k@j + 1] - freq[k@i + 1])
   child_parent <- child_parent[freq[child_parent[,2]] > 0 &
                                  freq[child_parent[,1]] > 0 & 
-                                 freq[child_parent[,1]] <= upper.bound,]
+                                 freq[child_parent[,1]] <= upper_bound,]
   disclosures <- child_parent[child_parent[,3] <= coalition, ]
   if (nrow(disclosures))
     primary_matrix <- as(apply(disclosures,
