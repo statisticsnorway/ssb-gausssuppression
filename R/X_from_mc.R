@@ -1,8 +1,19 @@
 
 
-# Possible function to be used within KDisclosurePrimary
-X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, returnNewCrossTable = FALSE) {
-  
+
+#' Possible `mc_function` to be used within `KDisclosurePrimary`
+#' 
+#' 
+#' @inheritParams SuppressKDisclosure
+#' @inheritParams DominanceRule
+#'
+#' @param removeIncomplete When `TRUE`,  the input code contributions are checked and incomplete entries are removed.
+#' @param returnNewCrossTable When `TRUE`, the crossTable corresponding to the created x-matrix is also returned (in a list)
+#' 
+#' @keywords internal
+#' @export
+#'
+X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, returnNewCrossTable = FALSE, ...) {
   mcHier <- AutoHierarchies(mc_hierarchies, data = crossTable)
   dimVar <- names(crossTable)
   
