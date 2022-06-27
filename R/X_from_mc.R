@@ -14,6 +14,9 @@
 #' @export
 #'
 X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, returnNewCrossTable = FALSE, ...) {
+  if (is.null(mc_hierarchies))
+    return(NULL)
+  
   mcHier <- AutoHierarchies(mc_hierarchies, data = crossTable)
   dimVar <- names(crossTable)
   
@@ -31,7 +34,7 @@ X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, r
     }
   }
   
-  if (returnNewCrossTable) {
+  if (returnNewCrossTable | removeIncomplete) {
     mm <- ModelMatrix(data = crossTable, hierarchies = mcHier, removeEmpty = TRUE, crossTable = TRUE)
     x2 <- mm$modelMatrix
     crossTable2 <- mm$crossTable
@@ -46,9 +49,20 @@ X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, r
   x2 <- x2[, colSums_x2_1, drop = FALSE]
   crossTable2 <- crossTable2[colSums_x2_1, , drop = FALSE]
   
-  
   if (removeIncomplete) {
-    stop("To be implemented")
+    hc <- HierarchyContributors(data = crossTable, x = x2, crossTable = crossTable2, hierarchies = mcHier, inputInOutput = TRUE)
+    ok_min_max <- rowSums(hc$min != hc$max) == 0
+    ok_ac_n <- rowSums(hc$ac != hc$n) == 0
+    if (any(!ok_min_max)) {
+      message("min_max elimination")
+      # print(cbind(crossTable2, hc$max - hc$min)[!ok_min_max, , drop = FALSE])
+    }
+    if (any(!ok_ac_n)) {
+      message("ac_n elimination")
+      # print(cbind(crossTable2, hc$ac - hc$n)[!ok_ac_n, , drop = FALSE])
+    }
+    x2 <- x2[, ok_min_max & ok_ac_n, drop = FALSE]
+    crossTable2 <- crossTable2[ok_min_max & ok_ac_n, , drop = FALSE]
   }
   
   # the trick here
@@ -62,4 +76,9 @@ X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, r
   cx
 }
 
+#' @rdname X_from_mc
+#' @export
+X_from_mc_remove <- function(..., removeIncomplete = TRUE) {
+  X_from_mc(..., removeIncomplete = removeIncomplete)
+}  
 
