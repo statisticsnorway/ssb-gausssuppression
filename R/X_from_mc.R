@@ -1,0 +1,54 @@
+
+
+# Possible function to be used within KDisclosurePrimary
+X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, returnNewCrossTable = FALSE) {
+  
+  mcHier <- AutoHierarchies(mc_hierarchies, data = crossTable)
+  dimVar <- names(crossTable)
+  
+  # Removes rows where mapsTo codes are in crossTable
+  # Sets missing or empty (after removal) dimensions to "rowFactor"
+  for (i in seq_along(dimVar)) {
+    if (is.null(mcHier[[dimVar[i]]])) {
+      mcHier[[dimVar[i]]] <- "rowFactor"
+    } else {
+      rem <- mcHier[[dimVar[i]]]$mapsTo %in% unique(crossTable[[dimVar[i]]])
+      mcHier[[dimVar[i]]] <- mcHier[[dimVar[i]]][!rem, , drop = FALSE]
+      if (!nrow(mcHier[[dimVar[i]]])) {
+        mcHier[[dimVar[i]]] <- "rowFactor"
+      }
+    }
+  }
+  
+  if (returnNewCrossTable) {
+    mm <- ModelMatrix(data = crossTable, hierarchies = mcHier, removeEmpty = TRUE, crossTable = TRUE)
+    x2 <- mm$modelMatrix
+    crossTable2 <- mm$crossTable
+    rm(mm)
+  } else {
+    x2 <- ModelMatrix(data = crossTable, hierarchies = mcHier, removeEmpty = TRUE)
+    crossTable2 <- NULL
+  }
+  
+  # colSums(x2) == 1 means copy from x
+  colSums_x2_1 <- colSums(x2) > 1
+  x2 <- x2[, colSums_x2_1, drop = FALSE]
+  crossTable2 <- crossTable2[colSums_x2_1, , drop = FALSE]
+  
+  
+  if (removeIncomplete) {
+    stop("To be implemented")
+  }
+  
+  # the trick here
+  cx <- x %*% x2
+  
+  cx <- cx[, colSums(cx) != 0, drop = FALSE]
+  
+  if (returnNewCrossTable) {
+    return(list(x = cx, crossTable = crossTable2))
+  }
+  cx
+}
+
+
