@@ -17,7 +17,7 @@
 #' \code{\link{AutoHierarchies}}. Thus, the variables can also be coded by 
 #' `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param freqVar name of the frequency variable in `data`
-#' @param mc.dimlist a DimList representing meaningful combinations to be
+#' @param mc_hierarchies a hierarchy representing meaningful combinations to be
 #' protected
 #' @param ... parameters passed to children functions
 #'
@@ -45,30 +45,23 @@
 #' codes = c("Total", "serious", "light", "none", "unknown"))
 #' inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"), 
 #' codes = c("Total", "injured", "serious", "light", "none", "unknown"))
-#' inj3 <- data.frame(levels = c("@", "@@", "@@@","@@@", "@@@", "@@@"), 
-#' codes = c("Total", "hiddentotal", "serious", "light", "none", "unknown"))
 #' dimlists <- list(mun = mun, inj = inj)
 #' dimlists2 <- list(mun = mun, inj = inj2)
-#' dimlists3 <- list(mun = mun, inj = inj3, inj = inj2)
 #' 
 #' # Example with formula, without meaningful combinations
 #' out <- SuppressKDisclosure(data, k = 1, freqVar = "freq", formula = ~mun*inj)
 #' 
 #' # Example with hierarchy and meaningful combination
 #' out2 <- SuppressKDisclosure(data, k = 1, freqVar = "freq", 
-#' dimVar = c("mun", "inj"), hierarchies = dimlists, mc.dimlist = dimlists2)
-#' 
-#' # Example without published row/column marginals,but with meaningful
-#' # combinations
-#' out3 <- SuppressKDisclosure(data, k = 1, freqVar = "freq", 
-#' formula = ~mun:inj, mc.dimlist = dimlists3)
+#' hierarchies = dimlists, mc_hierarchies = dimlists2)
 SuppressKDisclosure <- function(data,
                                 k = 1,
                                 dimVar = NULL,
                                 formula = NULL,
                                 hierarchies = NULL,
                                 freqVar = NULL,
-                                mc.dimlist = NULL,
+                                mc_function = x_with_mc,
+                                mc_hierarchies = NULL,
                                 upper.bound = Inf,
                                 ...) {
   if (is.null(hierarchies) & is.null(formula) & is.null(dimVar))
@@ -79,14 +72,14 @@ SuppressKDisclosure <- function(data,
         "none" %in% additional_params[["singletonMethod"]])
     warning("SuppressKDisclosure should use a singleton method for protecting the zero singleton problem. The output might not be safe, consider rerunning with a singleton method (default).")
   }
-  # if ("singletonMethod" %in% names(match.call(expand.dots = FALSE)))
   GaussSuppressionFromData(data,
                            hierarchies = hierarchies,
                            formula = formula,
                            dimVar = dimVar,
                            freqVar = freqVar,
                            coalition = k,
-                           mc.dimlist = mc.dimlist,
+                           mc_hierarchies = mc_hierarchies,
+                           mc_function = mc_function,
                            upper.bound = upper.bound,
                            primary = KDisclosurePrimary,
                            candidates = DirectDisclosureCandidates,
@@ -98,11 +91,21 @@ SuppressKDisclosure <- function(data,
 KDisclosurePrimary <- function(data,
                                x,
                                crossTable,
-                               mc.dimlist,
+                               mc_function,
+                               mc_hierarchies,
                                freqVar,
                                coalition,
                                upper.bound, ...) {
-  x <- x_with_mc(x, crossTable, mc.dimlist = mc.dimlist)
+  x <- cbind(x, mc_function(data = data,
+                            x = x,
+                            crossTable = crossTable,
+                            mc_hierarchies = mc_hierarchies,
+                            freqVar = freqVar,
+                            coalition = coalition,
+                            upper.bound = upper.bound,
+                            ...
+                            ))
+  # x <- x_with_mc(x, crossTable, mc_hierarchies = mc_hierarchies)
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   find_difference_cells(x = x,
                         freq = freq,
@@ -110,16 +113,16 @@ KDisclosurePrimary <- function(data,
                         upper.bound = upper.bound)
 }
 
-x_with_mc <- function(x, crossTable, mc.dimlist) {
-  if (is.null(mc.dimlist))
-    return(x)
-  unique_vars <- unique(names(mc.dimlist))
+x_with_mc <- function(x, crossTable, mc_hierarchies, ...) {
+  if (is.null(mc_hierarchies))
+    return(NULL)
+  unique_vars <- unique(names(mc_hierarchies))
   mc.labels <- sapply(unique_vars,
                       function(x)
                         extract_inner_nodes(Reduce(rbind,
-                                                   mc.dimlist[which(x == names(mc.dimlist))])))
+                                                   mc_hierarchies[which(x == names(mc_hierarchies))])))
   mc.labels <- mc.labels[sapply(mc.labels, function (x) !is.null(x))]
-  mcHier <- AutoHierarchies(mc.dimlist)
+  mcHier <- AutoHierarchies(mc_hierarchies)
   dimVar <- names(crossTable)
   for (var in names(mc.labels)) {
     tVar <- dimVar[!(dimVar == var)]
@@ -138,16 +141,16 @@ x_with_mc <- function(x, crossTable, mc.dimlist) {
                               as(matrix(rowSums(x[,y])), "dgTMatrix"))),
                "dgCMatrix")
       colnames(cx) <- paste(apply(unqs,1, function(x) paste(x, collapse = ":")),
-                            "injured", sep = ":")
-      x <- cbind(x, cx)
+                            mc, sep = ":")
+      # x <- cbind(x, cx)
     }
   }
-  x
+  cx
 }
 
 
-x_with_mc2 <- function(x, data, mc.dimlist) {
-  xx <- cbind(x, SSBtools::ModelMatrix(data, hierarchies = mc.dimlist))
+x_with_mc2 <- function(x, data, mc_hierarchies) {
+  xx <- cbind(x, SSBtools::ModelMatrix(data, hierarchies = mc_hierarchies))
   xx <- xx[, !SSBtools::DummyDuplicated(xx, rnd = TRUE), drop = FALSE]
   xx <- xx[, colSums(xx) != 0, drop = FALSE]
   xx
