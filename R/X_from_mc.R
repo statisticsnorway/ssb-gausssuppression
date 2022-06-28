@@ -107,7 +107,7 @@ X_from_mc_remove_noinner <- function(..., removeIncomplete = TRUE, noInner = TRU
 
 
 ModelMatrixNoInner <- function(data, hierarchies, removeEmpty, crossTable, 
-                               init_modelMatrix = Matrix(0, nrow(data), 0), init_crossTable = as.data.frame(matrix(0, ncol = length(hi), nrow = 0, dimnames = list(NULL, names(hi))))) {
+                               init_modelMatrix = Matrix::Matrix(0, nrow(data), 0), init_crossTable = as.data.frame(matrix(0, ncol = length(hierarchies), nrow = 0, dimnames = list(NULL, names(hierarchies))))) {
   ind_hi <- match(TRUE, !sapply(hierarchies, is.character))
   if (is.na(ind_hi)) {
     if (crossTable) {
