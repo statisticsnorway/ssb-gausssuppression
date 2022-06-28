@@ -9,11 +9,12 @@
 #'
 #' @param removeIncomplete When `TRUE`,  the input code contributions are checked and incomplete entries are removed.
 #' @param returnNewCrossTable When `TRUE`, the crossTable corresponding to the created x-matrix is also returned (in a list)
+#' @param noInner When `TRUE`,  more efficient generation of model matrix.  (removing inner cells according to colSums not needed)
 #' 
 #' @keywords internal
 #' @export
 #'
-X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, returnNewCrossTable = FALSE, ...) {
+X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, returnNewCrossTable = FALSE, noInner = FALSE, ...) {
   if (is.null(mc_hierarchies))
     return(NULL)
   
@@ -34,20 +35,28 @@ X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, r
     }
   }
   
+  if(noInner){
+    ModelMatrix_here <- ModelMatrixNoInner
+  } else {
+    ModelMatrix_here <- ModelMatrix
+  }
+  
   if (returnNewCrossTable | removeIncomplete) {
-    mm <- ModelMatrix(data = crossTable, hierarchies = mcHier, removeEmpty = TRUE, crossTable = TRUE)
+    mm <- ModelMatrix_here(data = crossTable, hierarchies = mcHier, removeEmpty = TRUE, crossTable = TRUE)
     x2 <- mm$modelMatrix
     crossTable2 <- mm$crossTable
     rm(mm)
   } else {
-    x2 <- ModelMatrix(data = crossTable, hierarchies = mcHier, removeEmpty = TRUE)
+    x2 <- ModelMatrix_here(data = crossTable, hierarchies = mcHier, removeEmpty = TRUE, crossTable = FALSE)
     crossTable2 <- NULL
   }
   
-  # colSums(x2) == 1 means copy from x
-  colSums_x2_1 <- colSums(x2) > 1
-  x2 <- x2[, colSums_x2_1, drop = FALSE]
-  crossTable2 <- crossTable2[colSums_x2_1, , drop = FALSE]
+  if(!noInner){   # With noInner this can be avoided. Then removing "not-inner 1-cells" is avoided.
+    # colSums(x2) == 1 means copy from x
+    colSums_x2_1 <- colSums(x2) > 1
+    x2 <- x2[, colSums_x2_1, drop = FALSE]
+    crossTable2 <- crossTable2[colSums_x2_1, , drop = FALSE]
+  }
   
   if (removeIncomplete) {
     hc <- HierarchyContributors(data = crossTable, x = x2, crossTable = crossTable2, hierarchies = mcHier, inputInOutput = TRUE)
@@ -81,4 +90,52 @@ X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, r
 X_from_mc_remove <- function(..., removeIncomplete = TRUE) {
   X_from_mc(..., removeIncomplete = removeIncomplete)
 }  
+
+#' @rdname X_from_mc
+#' @export
+X_from_mc_noinner <- function(..., noInner = TRUE) {
+  X_from_mc(..., noInner = noInner)
+}
+
+
+#' @rdname X_from_mc
+#' @export
+X_from_mc_remove_noinner <- function(..., removeIncomplete = TRUE, noInner = TRUE) {
+  X_from_mc(..., removeIncomplete = removeIncomplete, noInner = noInner)
+} 
+
+
+ModelMatrixNoInner <- function(data, hierarchies, removeEmpty, crossTable, 
+                               init_modelMatrix = Matrix(0, nrow(data), 0), init_crossTable = as.data.frame(matrix(0, ncol = length(hi), nrow = 0, dimnames = list(NULL, names(hi))))) {
+  ind_hi <- match(TRUE, !sapply(hierarchies, is.character))
+  if (is.na(ind_hi)) {
+    if (crossTable) {
+      return(list(modelMatrix = init_modelMatrix, crossTable = init_crossTable))
+    } else {
+      return(init_modelMatrix)
+    }
+  }
+  inputInOutput <- rep_len(TRUE, length(hierarchies))
+  inputInOutput[ind_hi] <- FALSE
+  mm <- ModelMatrix(data, hierarchies, removeEmpty = removeEmpty, crossTable = crossTable, inputInOutput = inputInOutput)
+  
+  if (crossTable) {
+    init_modelMatrix <- cbind(init_modelMatrix, mm$modelMatrix)
+    init_crossTable <- rbind(init_crossTable, mm$crossTable)
+  } else {
+    init_modelMatrix <- cbind(init_modelMatrix, mm)
+  }
+  hierarchies[[ind_hi]] <- "rowFactor"
+  ModelMatrixNoInner(data, hierarchies, removeEmpty, crossTable, init_modelMatrix, init_crossTable)
+}
+
+
+
+
+
+
+
+
+
+
 
