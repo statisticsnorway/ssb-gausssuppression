@@ -30,6 +30,8 @@ GaussSuppressionFromData(
   extraAggregate = preAggregate & !is.null(charVar),
   structuralEmpty = FALSE,
   extend0 = FALSE,
+  spec = NULL,
+  specLock = FALSE,
   ...
 )
 }
@@ -112,6 +114,10 @@ When \code{removeEmpty} is \code{TRUE} (see "\code{...}" below), \code{structura
 \item{extend0}{Data is automatically extended by \code{Extend0} when \code{TRUE}.
 Can also be set to \code{"all"} which means that input codes in hierarchies are considered in addition to those in data.
 Parameter \code{extend0} can also be specified as a list meaning parameter \code{varGroups} to \code{Extend0}.}
+
+\item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
+
+\item{specLock}{When \code{TRUE}, arguments in \code{spec} cannot be changed.}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }

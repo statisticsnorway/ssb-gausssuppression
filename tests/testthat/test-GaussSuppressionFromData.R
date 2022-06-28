@@ -119,3 +119,33 @@ test_that("extend0 and various hierarchy input", {
   expect_true(nrow(a3_$publish) < nrow(a3$publish))
 })
 
+
+
+test_that("DominanceRule and NcontributorsRule", {
+  set.seed(123)
+  z <- SSBtools::MakeMicro(SSBtoolsData("z2"), "ant")
+  z$char <- sample(paste0("char", 1:10), nrow(z), replace = TRUE)
+  z$value <- rnorm(nrow(z))^2
+  
+  a <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                candidates = CandidatesNum, primary = DominanceRule, singletonMethod = "sub2Sum",
+                                n = c(1, 2), k = c(65, 85), printInc = printInc)
+  
+  
+  b <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                candidates = CandidatesNum, primary = NcontributorsRule, singletonMethod = "none",
+                                removeCodes = paste0("char", 1:2), printInc = printInc)
+  
+  expect_identical(as.numeric(which(a$primary)), c(8, 17, 18, 23, 52, 53, 58, 63, 73, 77, 78, 80, 83, 87, 90, 92, 97, 98))
+  expect_identical(as.numeric(which(b$primary)), c(8, 18, 23, 53, 63, 78, 83, 87, 90, 97, 98))
+})
+
+
+
+
+
+
+
+
+
+
