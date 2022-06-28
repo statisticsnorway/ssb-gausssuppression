@@ -33,7 +33,7 @@ protected}
 \item{k}{numeric vector of length one, representing possible size of
 attacking coalition}
 
-\item{upper_bound}{an integer representing minimum count considered safe.
+\item{upper_bound}{numeric value representing minimum count considered safe.
 Default set to \code{Inf}}
 
 \item{...}{parameters passed to children functions}

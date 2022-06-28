@@ -40,7 +40,7 @@ unspecified.}
 \item{mc_hierarchies}{a hierarchy representing meaningful combinations to be
 protected}
 
-\item{upper_bound}{an integer representing minimum count considered safe.
+\item{upper_bound}{numeric value representing minimum count considered safe.
 Default set to \code{Inf}}
 
 \item{...}{parameters passed to children functions}
