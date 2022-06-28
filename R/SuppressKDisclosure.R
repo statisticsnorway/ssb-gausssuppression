@@ -2,10 +2,6 @@
 #' 
 #' A function for suppressing frequency tables using the k-disclosure method.
 #' 
-#' Untested for tables with more than two dimensions, likely some small changes
-#' needed (the problem will probably be in x_with_mc). Future versions will
-#' support disclosive/non-disclosive unknowns.
-#'
 #' @param data a data.frame representing the data set
 #' @param k numeric vector of length one, representing possible size of
 #' attacking coalition
@@ -20,6 +16,8 @@
 #' @param mc_function a function for creating model matrix from mc_hierarchies
 #' @param mc_hierarchies a hierarchy representing meaningful combinations to be
 #' protected
+#' @param upper_bound an integer representing minimum count considered safe.
+#' Default set to `Inf`
 #' @param ... parameters passed to children functions
 #'
 #' @return A data.frame containing the publishable data set, with a boolean
@@ -73,8 +71,6 @@ SuppressKDisclosure <- function(data,
                                 mc_hierarchies = NULL,
                                 upper_bound = Inf,
                                 ...) {
-  if (is.null(hierarchies) & is.null(formula) & is.null(dimVar))
-    stop("You must specify hierarchy, formula, or dimVar.")
   if (!is.function(mc_function))
     stop("Parameter mc_function must be a function.")
   additional_params <- list(...)
@@ -88,7 +84,7 @@ SuppressKDisclosure <- function(data,
                            formula = formula,
                            dimVar = dimVar,
                            freqVar = freqVar,
-                           coalition = k,
+                           k = k,
                            mc_hierarchies = mc_hierarchies,
                            mc_function = mc_function,
                            upper_bound = upper_bound,
@@ -99,20 +95,31 @@ SuppressKDisclosure <- function(data,
                            ...)
 }
 
+#' Construct primary suppressed difference matrix
+#' 
+#' Function for constructing model matrix columns representing primary suppressed
+#' difference cells
+#'
+#' @inheritParams SuppressKDisclosure
+#' @inheritParams DominanceRule
+
+#'
+#' @return dgCMatrix corresponding to primary suppressed cells
+#' @export
 KDisclosurePrimary <- function(data,
                                x,
                                crossTable,
                                mc_function,
                                mc_hierarchies,
                                freqVar,
-                               coalition,
+                               k = 1,
                                upper_bound, ...) {
   x <- cbind(x, mc_function(data = data,
                             x = x,
                             crossTable = crossTable,
                             mc_hierarchies = mc_hierarchies,
                             freqVar = freqVar,
-                            coalition = coalition,
+                            k = k,
                             upper_bound = upper_bound,
                             ...
                             ))
@@ -120,91 +127,34 @@ KDisclosurePrimary <- function(data,
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   find_difference_cells(x = x,
                         freq = freq,
-                        coalition = coalition,
+                        k = k,
                         upper_bound = upper_bound)
 }
 
-x_with_mc <- function(x, crossTable, mc_hierarchies, ...) {
-  if (is.null(mc_hierarchies))
-    return(NULL)
-  unique_vars <- unique(names(mc_hierarchies))
-  mc_labels <- sapply(unique_vars,
-                      function(x)
-                        extract_inner_nodes(Reduce(rbind,
-                                                   mc_hierarchies[which(x == names(mc_hierarchies))])))
-  mc_labels <- mc_labels[sapply(mc_labels, function (x) !is.null(x))]
-  mcHier <- AutoHierarchies(mc_hierarchies)
-  dimVar <- names(crossTable)
-  for (var in names(mc_labels)) {
-    tVar <- dimVar[!(dimVar == var)]
-    for (mc in mc_labels[[var]]) {
-      mcsubs <- unique(mcHier[[var]]$mapsFrom[mcHier[[var]]$mapsTo == mc])
-      mcsubinds <- which(crossTable[[var]] %in% mcsubs)
-      unqs <- unique(crossTable[crossTable[[var]] %in% mcsubs, tVar,
-                                drop = FALSE])
-      mcct <- crossTable[crossTable[[var]] %in% mcsubs, tVar, drop = FALSE]
-      mcmatrix <- cbind(mcsubinds, Match(mcct, unqs))
-      cx <- sapply(unique(mcmatrix[,2]),
-                   function(x) Reduce(c, mcmatrix[mcmatrix[,2] == x,1]))
-      cx <- as(Reduce(cbind,
-                      apply(cx, 2,
-                            function(y)
-                              as(matrix(rowSums(x[,y])), "dgTMatrix"))),
-               "dgCMatrix")
-      colnames(cx) <- paste(apply(unqs,1, function(x) paste(x, collapse = ":")),
-                            mc, sep = ":")
-      # x <- cbind(x, cx)
-    }
-  }
-  cx
-}
-
-
-x_with_mc2 <- function(x, data, mc_hierarchies) {
-  xx <- cbind(x, SSBtools::ModelMatrix(data, hierarchies = mc_hierarchies))
-  xx <- xx[, !SSBtools::DummyDuplicated(xx, rnd = TRUE), drop = FALSE]
-  xx <- xx[, colSums(xx) != 0, drop = FALSE]
-  xx
-}
-
-
 find_difference_cells <- function(x,
                                   freq,
-                                  coalition = 1,
+                                  k,
                                   upper_bound = Inf) {
-  k <- crossprod(x)
-  k <- as(k, "dgTMatrix")
+  publ_x <- crossprod(x)
+  publ_x <- as(publ_x, "dgTMatrix")
   colSums_x <- colSums(x)
   # row i is child of column j in r
-  r <- colSums_x[k@i + 1] == k@x & colSums_x[k@j + 1] != k@x
-  k@x <- k@x[r]
-  k@j <- k@j[r]
-  k@i <- k@i[r]
-  # k <- TransitiveReduction(k)
-  child_parent <- cbind(child = k@i + 1,
-                        parent = k@j + 1,
-                        diff = freq[k@j + 1] - freq[k@i + 1])
+  r <- colSums_x[publ_x@i + 1] == publ_x@x & colSums_x[publ_x@j + 1] != publ_x@x
+  publ_x@x <- publ_x@x[r]
+  publ_x@j <- publ_x@j[r]
+  publ_x@i <- publ_x@i[r]
+  child_parent <- cbind(child = publ_x@i + 1,
+                        parent = publ_x@j + 1,
+                        diff = freq[publ_x@j + 1] - freq[publ_x@i + 1])
   child_parent <- child_parent[freq[child_parent[,2]] > 0 &
                                  freq[child_parent[,1]] > 0 & 
                                  freq[child_parent[,1]] <= upper_bound,]
-  disclosures <- child_parent[child_parent[,3] <= coalition, ]
+  disclosures <- child_parent[child_parent[,3] <= k, ]
   if (nrow(disclosures))
     primary_matrix <- as(apply(disclosures,
                                1,
                                function(row) x[,row[2]] - x[,row[1]]),
                          "dgTMatrix")
   else primary_matrix <- NULL
-  # colnames(primary_matrix) <- apply(disclosures[,2:1], 1, function(x) paste(x, collapse = "-"))
   primary_matrix
-}
-
-extract_inner_nodes <- function(dimList) {
-  result <- NULL
-  for (i in seq_len(nrow(dimList) - 1)) {
-    not_total <- nchar(dimList[i, "levels"]) >= 2
-    parent <- nchar(dimList[i, "levels"]) < nchar(dimList[i + 1, "levels"])
-    if (not_total & parent)
-      result <- c(result, dimList[i, "codes"])
-  }
-  result
 }

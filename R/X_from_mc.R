@@ -1,7 +1,7 @@
 
 
 
-#' Possible `mc_function` to be used within `KDisclosurePrimary`
+#' Default `mc_function` to be used within `KDisclosurePrimary`
 #' 
 #' 
 #' @inheritParams SuppressKDisclosure
@@ -11,6 +11,7 @@
 #' @param returnNewCrossTable When `TRUE`, the crossTable corresponding to the created x-matrix is also returned (in a list)
 #' @param noInner When `TRUE`,  more efficient generation of model matrix.  (removing inner cells according to colSums not needed)
 #' 
+#' @author Øyvind Langsrud
 #' @keywords internal
 #' @export
 #'

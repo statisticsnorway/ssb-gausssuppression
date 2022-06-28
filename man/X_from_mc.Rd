@@ -5,7 +5,7 @@
 \alias{X_from_mc_remove}
 \alias{X_from_mc_noinner}
 \alias{X_from_mc_remove_noinner}
-\title{Possible \code{mc_function} to be used within \code{KDisclosurePrimary}}
+\title{Default \code{mc_function} to be used within \code{KDisclosurePrimary}}
 \usage{
 X_from_mc(
   x,
@@ -40,6 +40,9 @@ protected}
 \item{...}{parameters passed to children functions}
 }
 \description{
-Possible \code{mc_function} to be used within \code{KDisclosurePrimary}
+Default \code{mc_function} to be used within \code{KDisclosurePrimary}
+}
+\author{
+Øyvind Langsrud
 }
 \keyword{internal}
