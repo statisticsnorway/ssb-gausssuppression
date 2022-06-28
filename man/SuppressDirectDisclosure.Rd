@@ -28,7 +28,8 @@ SuppressDirectDisclosure(
 \item{candidates}{function parameter for gauss suppression.}
 
 \item{...}{optional parameters that can be passed to the primary suppression
-method. See \link[SSBtools]{FindDisclosiveCells} for details.}
+method. See \link[SSBtools]{FindDisclosiveCells} for details.
+In the case of SuppressDirectDisclosure2, \code{...} are parameters to GaussSuppressionFromData.}
 }
 \value{
 data.frame containing the result of the suppression
@@ -40,7 +41,8 @@ detects and primary suppresses directly-disclosive cells with the
 using Gauss suppression (see \link{GaussSuppressionFromData}).
 }
 \details{
-Currently, the method has no support for hierarchical data.
+SuppressDirectDisclosure has no support for hierarchical data.
+SuppressDirectDisclosure2 has, but is less general in other ways.
 }
 \examples{
 tex <- data.frame(v1 = rep(c('a', 'b', 'c'), times = 4),
@@ -49,6 +51,11 @@ tex <- data.frame(v1 = rep(c('a', 'b', 'c'), times = 4),
                   freq = c(0,0,5,0,2,3,1,0,3,1,1,2))
 SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq")
 SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
+
+z3 <- SSBtools::SSBtoolsData("z3")
+a1 <- SuppressDirectDisclosure(z3, c(1, 4, 5), 7)
+b1 <- try(SuppressDirectDisclosure(z3, 1:6, 7))
+
 }
 \author{
 Daniel Lupp

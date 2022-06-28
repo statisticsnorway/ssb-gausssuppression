@@ -5,13 +5,15 @@
 #' \link[SSBtools]{FindDisclosiveCells} function, and applies a secondary suppression
 #' using Gauss suppression (see \link{GaussSuppressionFromData}).
 #' 
-#' Currently, the method has no support for hierarchical data.
+#' SuppressDirectDisclosure has no support for hierarchical data. 
+#' SuppressDirectDisclosure2 has, but is less general in other ways.
 #'
 #' @param data the input data
 #' @param dimVar main dimensional variables for the output table
 #' @param freqVar variable containing frequency counts
 #' @param ... optional parameters that can be passed to the primary suppression
 #' method. See \link[SSBtools]{FindDisclosiveCells} for details.
+#' In the case of SuppressDirectDisclosure2, `...` are parameters to GaussSuppressionFromData. 
 #' @param coalition numeric variable, parameter for primary suppression. Default value is 1.
 #' @param secondaryZeros logical or numeric value for secondary suppression. If logical, it is converted to resp numeric value (0 or 1). If numeric, it describes the largest number that is prioritized over zeroes in secondary suppression. Default value is equal to coalition.
 #' @param candidates function parameter for gauss suppression.
@@ -29,7 +31,12 @@
 #'                   freq = c(0,0,5,0,2,3,1,0,3,1,1,2))
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq")
 #' SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknown.threshold = 10)
-                   
+#' 
+#' z3 <- SSBtools::SSBtoolsData("z3")
+#' a1 <- SuppressDirectDisclosure(z3, c(1, 4, 5), 7)
+#' b1 <- try(SuppressDirectDisclosure(z3, 1:6, 7))
+#'
+                  
 SuppressDirectDisclosure <- function(data, dimVar, freqVar,
                                      coalition = 1,
                                      secondaryZeros = coalition,
@@ -39,7 +46,7 @@ SuppressDirectDisclosure <- function(data, dimVar, freqVar,
   mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE, ...)
   
   if (ncol(mm$crossTable) < length(dimVar))
-    stop("Hierarchies have been detected. This method does not currently support hierarchical data.")
+    stop("Try SuppressKDisclosure? - Hierarchies have been detected. This method does not currently support hierarchical data.")
   if (is.logical(secondaryZeros)) {
     if (secondaryZeros) secondaryZeros <- coalition
     else secondaryZeros <- 0
