@@ -38,15 +38,15 @@
 #' 0,0,0,0,0,0)
 #' 
 #' # hierarchies as DimLists
-#' mun <- data.frame(levels = c("@", rep("@@", 6)), 
+#' mun <- data.frame(levels = c("@@", rep("@@@@", 6)), 
 #' codes = c("Total", paste("k", 1:6, sep = "")))
-#' inj <- data.frame(levels = c("@", "@@" ,"@@", "@@", "@@"), 
+#' inj <- data.frame(levels = c("@@", "@@@@" ,"@@@@", "@@@@", "@@@@"), 
 #' codes = c("Total", "serious", "light", "none", "unknown"))
 #' dimlists <- list(mun = mun, inj = inj)
 #' 
-#' inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"), 
+#' inj2 <- data.frame(levels = c("@@", "@@@@", "@@@@@@" ,"@@@@@@", "@@@@", "@@@@"), 
 #' codes = c("Total", "injured", "serious", "light", "none", "unknown"))
-#' inj3 <- data.frame(levels = c("@", "@@", "@@" ,"@@", "@@"), 
+#' inj3 <- data.frame(levels = c("@@", "@@@@", "@@@@" ,"@@@@", "@@@@"), 
 #' codes = c( "shadowtotal", "serious", "light", "none", "unknown"))
 #' mc_dimlist <- list(inj = inj2)
 #' mc_nomargs <- list(inj = inj3)
