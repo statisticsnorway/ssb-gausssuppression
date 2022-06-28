@@ -54,11 +54,8 @@ SuppressDirectDisclosure(tex, c("v1", "v2", "v3"), "freq", coalition = 2, unknow
 
 z3 <- SSBtools::SSBtoolsData("z3")
 a1 <- SuppressDirectDisclosure(z3, c(1, 4, 5), 7)
-a2 <- SuppressDirectDisclosure2(z3, c(1, 4, 5), 7)
 b1 <- try(SuppressDirectDisclosure(z3, 1:6, 7))
-b2 <- SuppressDirectDisclosure2(z3, 1:6, 7)
-b3 <- SuppressDirectDisclosure2(z3, freqVar = 7, 
-               formula = ~region * hovedint * mnd2 + (fylke + kostragr) * hovedint * mnd)
+
 }
 \author{
 Daniel Lupp

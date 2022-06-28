@@ -34,11 +34,8 @@
 #' 
 #' z3 <- SSBtools::SSBtoolsData("z3")
 #' a1 <- SuppressDirectDisclosure(z3, c(1, 4, 5), 7)
-#' a2 <- SuppressDirectDisclosure2(z3, c(1, 4, 5), 7)
 #' b1 <- try(SuppressDirectDisclosure(z3, 1:6, 7))
-#' b2 <- SuppressDirectDisclosure2(z3, 1:6, 7)
-#' b3 <- SuppressDirectDisclosure2(z3, freqVar = 7, 
-#'                formula = ~region * hovedint * mnd2 + (fylke + kostragr) * hovedint * mnd)
+#'
                   
 SuppressDirectDisclosure <- function(data, dimVar, freqVar,
                                      coalition = 1,
@@ -49,7 +46,7 @@ SuppressDirectDisclosure <- function(data, dimVar, freqVar,
   mm <- SSBtools::ModelMatrix(data, dimVar = dimVar, crossTable = TRUE, ...)
   
   if (ncol(mm$crossTable) < length(dimVar))
-    stop("Try SuppressDirectDisclosure2? - Hierarchies have been detected. This method does not currently support hierarchical data.")
+    stop("Try SuppressKDisclosure? - Hierarchies have been detected. This method does not currently support hierarchical data.")
   if (is.logical(secondaryZeros)) {
     if (secondaryZeros) secondaryZeros <- coalition
     else secondaryZeros <- 0
