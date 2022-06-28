@@ -44,17 +44,25 @@
 #' codes = c("Total", paste("k", 1:6, sep = "")))
 #' inj <- data.frame(levels = c("@", "@@" ,"@@", "@@", "@@"), 
 #' codes = c("Total", "serious", "light", "none", "unknown"))
+#' dimlists <- list(mun = mun, inj = inj)
+#' 
 #' inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"), 
 #' codes = c("Total", "injured", "serious", "light", "none", "unknown"))
-#' dimlists <- list(mun = mun, inj = inj)
-#' dimlists2 <- list(mun = mun, inj = inj2)
+#' inj3 <- data.frame(levels = c("@", "@@", "@@" ,"@@", "@@"), 
+#' codes = c( "shadowtotal", "serious", "light", "none", "unknown"))
+#' mc_dimlist <- list(inj = inj2)
+#' mc_nomargs <- list(inj = inj3)
 #' 
-#' # Example with formula, without meaningful combinations
+#' #' # Example with formula, no meaningful combination
 #' out <- SuppressKDisclosure(data, k = 1, freqVar = "freq", formula = ~mun*inj)
 #' 
 #' # Example with hierarchy and meaningful combination
 #' out2 <- SuppressKDisclosure(data, k = 1, freqVar = "freq", 
-#' hierarchies = dimlists, mc_hierarchies = dimlists2)
+#' hierarchies = dimlists, mc_hierarchies = mc_dimlist)
+#' 
+#' #' # Example of table without mariginals, and mc_hierarchies to protect
+#' out3 <- SuppressKDisclosure(data, k = 1, freqVar = "freq",
+#' formula = ~mun:inj, mc_hierarchies = mc_nomargs )
 SuppressKDisclosure <- function(data,
                                 k = 1,
                                 dimVar = NULL,
