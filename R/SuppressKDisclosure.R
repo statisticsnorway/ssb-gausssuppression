@@ -16,7 +16,7 @@
 #' @param mc_function a function for creating model matrix from mc_hierarchies
 #' @param mc_hierarchies a hierarchy representing meaningful combinations to be
 #' protected
-#' @param upper_bound an integer representing minimum count considered safe.
+#' @param upper_bound numeric value representing minimum count considered safe.
 #' Default set to `Inf`
 #' @param ... parameters passed to children functions
 #'
