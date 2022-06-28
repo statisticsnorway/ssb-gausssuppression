@@ -17,6 +17,7 @@
 #' \code{\link{AutoHierarchies}}. Thus, the variables can also be coded by 
 #' `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param freqVar name of the frequency variable in `data`
+#' @param mc_function a function for creating model matrix from mc_hierarchies
 #' @param mc_hierarchies a hierarchy representing meaningful combinations to be
 #' protected
 #' @param ... parameters passed to children functions
@@ -60,7 +61,7 @@ SuppressKDisclosure <- function(data,
                                 formula = NULL,
                                 hierarchies = NULL,
                                 freqVar = NULL,
-                                mc_function = x_with_mc,
+                                mc_function = X_from_mc,
                                 mc_hierarchies = NULL,
                                 upper_bound = Inf,
                                 ...) {
@@ -107,7 +108,7 @@ KDisclosurePrimary <- function(data,
                             upper_bound = upper_bound,
                             ...
                             ))
-  # x <- x_with_mc(x, crossTable, mc_hierarchies = mc_hierarchies)
+  x <- x[, !SSBtools::DummyDuplicated(x, rnd = TRUE), drop = FALSE]
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   find_difference_cells(x = x,
                         freq = freq,
