@@ -250,7 +250,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                           colSelect = colSelect, rowSelect = rowSelect,
                           output = "matrixComponents", inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   
-  if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
+  if( !all(range(diff(sort(As_TsparseMatrix(hc1$hcRow$valueMatrix)@x))) == c(1L, 1L))){ # if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
     extratext <- ""
     if (!preAggregate) {
       extratext <- "  Try preAggregate=TRUE?"
@@ -264,12 +264,12 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   outputMatrix <- hc1$hcRow$dataDummyHierarchy %*% hc1$hcRow$valueMatrix %*% t(hc1$hcCol$dataDummyHierarchy)
   
-  value_dgT <- as(drop0(hc1$hcRow$valueMatrix), "dgTMatrix")
+  value_dgT <- As_TsparseMatrix(hc1$hcRow$valueMatrix) # value_dgT <- as(drop0(hc1$hcRow$valueMatrix), "dgTMatrix")
   value_i <- value_dgT
   
   if(removeEmpty){
     
-    dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
+    dgTframe_mT <- As_TsparseMatrix(outputMatrix) # dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
     dgTframe <- AsDgTframe(dgTframe_mT, x = FALSE, frame = FALSE)
     
     freq_num_weight <- matrix(1, nrow(dgTframe), 0)
@@ -558,7 +558,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
 
 AsDgTframe <- function(m = NULL, mT = NULL, x = TRUE, frame = TRUE) {
   if (is.null(mT)) {
-    mT <- as(drop0(m), "dgTMatrix")
+    mT <- As_TsparseMatrix(m) # mT <- as(drop0(m), "dgTMatrix")
   }
   if (frame) {
     Cbind <- data.frame
