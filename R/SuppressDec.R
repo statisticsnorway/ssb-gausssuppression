@@ -109,7 +109,7 @@ IpsoExtra <- function(y, x = NULL, ensureIntercept = TRUE, returnParts = FALSE, 
   
   y <- EnsureMatrix(y)
   
-  sparse <- (nrow(y) > sparseLimit) & (class(x)[1] != "matrix") 
+  sparse <- (nrow(y) > sparseLimit) & (!is.matrix(x)) 
   
   if(sparse){
     if(nrow(y) != nrow(x))

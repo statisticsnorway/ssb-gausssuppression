@@ -589,7 +589,7 @@ AsDgTframe <- function(m = NULL, mT = NULL, x = TRUE, frame = TRUE) {
 }
 
 DgTframeNewValue <- function(obj, newM) {
-  if (class(obj)[1] == "data.frame") {
+  if (is.data.frame(obj)) {
     value <- newM[cbind(obj$row, obj$col)]
   } else {
     value <- newM[obj[, c("row", "col")]]
