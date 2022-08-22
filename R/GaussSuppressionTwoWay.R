@@ -52,6 +52,7 @@
 #' @param candidatesFromTotal When TRUE (default), same candidates for all rows and for all columns, computed from row/column totals.          
 #' @param structuralEmpty See `GaussSuppressionFromData`.
 #' @param ... Further arguments to be passed to the supplied functions.
+#' @inheritParams GaussSuppressionFromData
 #'
 #' @return Aggregated data with suppression information
 #' 
@@ -112,6 +113,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            inputInOutput = TRUE,
                            candidatesFromTotal = TRUE, 
                            structuralEmpty = FALSE, 
+                           freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            ...){ 
   if (is.null(hierarchies)) {
     stop("Hierarchies must be specified")
@@ -208,11 +210,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
     if (preAggregate) {
       if (!length(freqVar)) {
-        if ("freq" %in% names(data)) {
-          freqVar <- "f_Re_qVa_r"
-        } else {
-          freqVar <- "freq"
-        }
+        freqVar <- freqVarNew
         data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
       } 
       data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)

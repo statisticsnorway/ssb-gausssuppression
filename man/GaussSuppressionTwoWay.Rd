@@ -30,6 +30,7 @@ GaussSuppressionTwoWay(
   inputInOutput = TRUE,
   candidatesFromTotal = TRUE,
   structuralEmpty = FALSE,
+  freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
   ...
 )
 }
@@ -88,6 +89,9 @@ TRUE means that codes from input are included in output. Values corresponding to
 \item{candidatesFromTotal}{When TRUE (default), same candidates for all rows and for all columns, computed from row/column totals.}
 
 \item{structuralEmpty}{See \code{GaussSuppressionFromData}.}
+
+\item{freqVarNew}{Name of new frequency variable generated when input \code{freqVar} is NULL and \code{preAggregate} is TRUE.
+Default is \code{"freq"} provided this is not found in \code{names(data)}.}
 
 \item{...}{Further arguments to be passed to the supplied functions.}
 }
