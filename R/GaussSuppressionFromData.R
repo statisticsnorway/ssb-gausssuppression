@@ -492,9 +492,25 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   primary <- suppressed
   suppressed[secondary] <- TRUE
   suppressed[hidden] <- NA
-
   
-  publish <- cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
+  
+  if (length(freq)) {
+    freq <- matrix(freq)
+    colnames(freq) <- freqVar
+  }
+  if (length(weight)) {
+    weight <- matrix(weight)
+    colnames(weight) <- weightVar
+  }
+  
+  if (ncol(num)) {
+    colnames_num_in_fw <- colnames(num) %in% c(freqVar, weightVar)
+    if (any(colnames_num_in_fw)) {
+      num <- num[, !colnames_num_in_fw, drop = FALSE]
+    }
+  }
+  
+  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, suppressed = suppressed)
   
   startCol <- attr(x, "startCol", exact = TRUE)
   if (!is.null(startCol)) {
