@@ -80,7 +80,9 @@
 #'                 Can also be set to `"all"` which means that input codes in hierarchies are considered in addition to those in data.   
 #'                 Parameter `extend0` can also be specified as a list meaning parameter `varGroups` to `Extend0`. 
 #' @param spec `NULL` or a named list of arguments that will act as default values.
-#' @param specLock When `TRUE`, arguments in `spec` cannot be changed.                                                        
+#' @param specLock When `TRUE`, arguments in `spec` cannot be changed.       
+#' @param freqVarNew Name of new frequency variable generated when input `freqVar` is NULL and `preAggregate` is TRUE.  
+#'                   Default is `"freq"` provided this is not found in `names(data)`.                                             
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -156,7 +158,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            structuralEmpty = FALSE, 
                            extend0 = FALSE,
                            spec = NULL,
-                           specLock = FALSE,
+                           specLock = FALSE, 
+                           freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            ...){ 
   if (!is.null(spec)) {
     if (is.list(spec)) {
@@ -265,11 +268,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     
     if (preAggregate) {
       if (!length(freqVar)) {
-        if ("freq" %in% names(data)) {
-          freqVar <- "f_Re_qVa_r"
-        } else {
-          freqVar <- "freq"
-        }
+        freqVar <- freqVarNew
         data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
       } 
       data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
@@ -493,9 +492,25 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   primary <- suppressed
   suppressed[secondary] <- TRUE
   suppressed[hidden] <- NA
-
   
-  publish <- cbind(as.data.frame(crossTable), freq = freq, num, weight = weight, primary = primary, suppressed = suppressed)
+  
+  if (length(freq)) {
+    freq <- matrix(freq)
+    colnames(freq) <- freqVar
+  }
+  if (length(weight)) {
+    weight <- matrix(weight)
+    colnames(weight) <- weightVar
+  }
+  
+  if (ncol(num)) {
+    colnames_num_in_fw <- colnames(num) %in% c(freqVar, weightVar)
+    if (any(colnames_num_in_fw)) {
+      num <- num[, !colnames_num_in_fw, drop = FALSE]
+    }
+  }
+  
+  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, suppressed = suppressed)
   
   startCol <- attr(x, "startCol", exact = TRUE)
   if (!is.null(startCol)) {

@@ -52,7 +52,7 @@ test_that("structuralEmpty and removeEmpty", {
   k <- a1$suppressed != a2$suppressed
   expect_equal(a1[!k, ], a3)
   expect_equal(a2[!k, ], a3)
-  expect_equal(unique(a1[k, "freq"]), 0)
+  expect_equal(unique(a1[k, "ant"]), 0)
 })
 
 

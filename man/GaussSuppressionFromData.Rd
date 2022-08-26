@@ -32,6 +32,7 @@ GaussSuppressionFromData(
   extend0 = FALSE,
   spec = NULL,
   specLock = FALSE,
+  freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
   ...
 )
 }
@@ -118,6 +119,9 @@ Parameter \code{extend0} can also be specified as a list meaning parameter \code
 \item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 
 \item{specLock}{When \code{TRUE}, arguments in \code{spec} cannot be changed.}
+
+\item{freqVarNew}{Name of new frequency variable generated when input \code{freqVar} is NULL and \code{preAggregate} is TRUE.
+Default is \code{"freq"} provided this is not found in \code{names(data)}.}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }
