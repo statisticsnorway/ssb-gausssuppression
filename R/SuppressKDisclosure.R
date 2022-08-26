@@ -136,7 +136,7 @@ find_difference_cells <- function(x,
                                   k,
                                   upper_bound = Inf) {
   publ_x <- crossprod(x)
-  publ_x <- as(publ_x, "dgTMatrix")
+  publ_x <- As_TsparseMatrix(publ_x) # publ_x <- as(publ_x, "dgTMatrix")
   colSums_x <- colSums(x)
   # row i is child of column j in r
   r <- colSums_x[publ_x@i + 1] == publ_x@x & colSums_x[publ_x@j + 1] != publ_x@x
@@ -151,10 +151,13 @@ find_difference_cells <- function(x,
                                  freq[child_parent[,1]] <= upper_bound,]
   disclosures <- child_parent[child_parent[,3] <= k, ]
   if (nrow(disclosures))
-    primary_matrix <- as(apply(disclosures,
-                               1,
-                               function(row) x[,row[2]] - x[,row[1]]),
-                         "dgTMatrix")
+    #primary_matrix <- as(apply(disclosures,
+    #                           1,
+    #                           function(row) x[,row[2]] - x[,row[1]]),
+    #                     "dgTMatrix")
+    primary_matrix <- As_TsparseMatrix(apply(disclosures,
+                             1,
+                             function(row) x[,row[2]] - x[,row[1]]))
   else primary_matrix <- NULL
   primary_matrix
 }
