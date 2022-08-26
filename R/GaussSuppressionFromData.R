@@ -442,7 +442,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   # hack
   if(is.list(primary)){
-    num <- cbind(num, primary$numExtra)
+    if (!is.null(primary$numExtra)) {
+      num <- cbind(num, primary$numExtra)
+    }
     xExtraPrimary <- primary$xExtraPrimary
     primary <- primary[[1]]
   } else {
