@@ -30,7 +30,9 @@
 #' @return A data frame where inner cells and cells to be published are combined or output according to parameter `output`. 
 #' 
 #' @importFrom SSBtools RoundWhole Match Mipf
+#' @importFrom RegSDC SuppressDec
 #' @importFrom Matrix crossprod
+#' @importFrom stats runif
 #' @export
 #' 
 #' @author Øyvind Langrsud
