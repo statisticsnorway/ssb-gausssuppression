@@ -128,8 +128,10 @@ dimListsB <- SSBtools::FindDimLists(z3[, c(1, 4, 5)])
 set.seed(123)
 z <- z3[sample(nrow(z3),250),]
 
+\dontrun{
 out1 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
                                colVar = c("hovedint"))
+}                                
 out2 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
                                colVar = c("hovedint", "mnd"))
 out3 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsB, 
