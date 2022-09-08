@@ -149,7 +149,7 @@ find_difference_cells <- function(x,
   child_parent <- child_parent[freq[child_parent[,2]] > 0 &
                                  freq[child_parent[,1]] > 0 & 
                                  freq[child_parent[,1]] <= upper_bound,]
-  disclosures <- child_parent[child_parent[,3] <= k, ]
+  disclosures <- child_parent[child_parent[,3] <= k, , drop = FALSE]
   if (nrow(disclosures))
     #primary_matrix <- as(apply(disclosures,
     #                           1,
