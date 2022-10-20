@@ -15,9 +15,8 @@
 #'
 #' @return Matrix with lagest contributors in first column, second largest in second column and so on.  
 #' @export
-#' @importFrom SSBtools SortRows
+#' @importFrom SSBtools SortRows As_TsparseMatrix
 #' @importFrom Matrix drop0
-#' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
 #' 
@@ -61,7 +60,7 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE, index = FALSE, group
   
   ordy <- order(y, decreasing = decreasing)
   
-  xT <- as(drop0(x[ordy, ]), "dgTMatrix")
+  xT <- As_TsparseMatrix(x[ordy, ]) # xT <- as(drop0(x[ordy, ]), "dgTMatrix")
   
   xM <- cbind(col = xT@j + 1, row = xT@i + 1)
   
@@ -110,7 +109,7 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups) {
   
   groups <- as.integer(factor(groups))
   
-  xT <- as(drop0(x), "dgTMatrix")
+  xT <- As_TsparseMatrix(x) # xT <- as(drop0(x), "dgTMatrix")
   
   xM <- data.frame(y = -decreasing * y[xT@i + 1], col = xT@j + 1, gr = groups[xT@i + 1])  # row = xT@i + 1 
   

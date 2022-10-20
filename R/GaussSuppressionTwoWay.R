@@ -52,6 +52,7 @@
 #' @param candidatesFromTotal When TRUE (default), same candidates for all rows and for all columns, computed from row/column totals.          
 #' @param structuralEmpty See `GaussSuppressionFromData`.
 #' @param ... Further arguments to be passed to the supplied functions.
+#' @inheritParams GaussSuppressionFromData
 #'
 #' @return Aggregated data with suppression information
 #' 
@@ -69,8 +70,10 @@
 #' set.seed(123)
 #' z <- z3[sample(nrow(z3),250),]
 #' 
+#' \dontrun{
 #' out1 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
 #'                                colVar = c("hovedint"))
+#' }                                
 #' out2 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsA, 
 #'                                colVar = c("hovedint", "mnd"))
 #' out3 <- GaussSuppressionTwoWay(z, freqVar = "ant", hierarchies = dimListsB, 
@@ -112,6 +115,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                            inputInOutput = TRUE,
                            candidatesFromTotal = TRUE, 
                            structuralEmpty = FALSE, 
+                           freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            ...){ 
   if (is.null(hierarchies)) {
     stop("Hierarchies must be specified")
@@ -208,11 +212,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
     
     if (preAggregate) {
       if (!length(freqVar)) {
-        if ("freq" %in% names(data)) {
-          freqVar <- "f_Re_qVa_r"
-        } else {
-          freqVar <- "freq"
-        }
+        freqVar <- freqVarNew
         data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
       } 
       data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
@@ -250,7 +250,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
                           colSelect = colSelect, rowSelect = rowSelect,
                           output = "matrixComponents", inputInOutput = inputInOutput, reduceData = removeEmpty_in_x)
   
-  if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
+  if( !all(range(diff(sort(As_TsparseMatrix(hc1$hcRow$valueMatrix)@x))) == c(1L, 1L))){ # if( !all(range(diff(sort(as(hc1$hcRow$valueMatrix,"dgTMatrix")@x))) == c(1L, 1L))){
     extratext <- ""
     if (!preAggregate) {
       extratext <- "  Try preAggregate=TRUE?"
@@ -264,12 +264,12 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   outputMatrix <- hc1$hcRow$dataDummyHierarchy %*% hc1$hcRow$valueMatrix %*% t(hc1$hcCol$dataDummyHierarchy)
   
-  value_dgT <- as(drop0(hc1$hcRow$valueMatrix), "dgTMatrix")
+  value_dgT <- As_TsparseMatrix(hc1$hcRow$valueMatrix) # value_dgT <- as(drop0(hc1$hcRow$valueMatrix), "dgTMatrix")
   value_i <- value_dgT
   
   if(removeEmpty){
     
-    dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
+    dgTframe_mT <- As_TsparseMatrix(outputMatrix) # dgTframe_mT <- as(drop0(outputMatrix), "dgTMatrix")
     dgTframe <- AsDgTframe(dgTframe_mT, x = FALSE, frame = FALSE)
     
     freq_num_weight <- matrix(1, nrow(dgTframe), 0)
@@ -549,8 +549,8 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
   
   suppressed[hidden] <- NA
   
-  if (length(freqVar)) names(hc2)[names(hc2) == freqVar] <- "freq"
-  if (length(weightVar)) names(hc2)[names(hc2) == weightVar] <- "weight"
+  # if (length(freqVar)) names(hc2)[names(hc2) == freqVar] <- "freq"
+  # if (length(weightVar)) names(hc2)[names(hc2) == weightVar] <- "weight"
   
   cbind(hc2, primary = primary, numExtra, suppressed = suppressed )
   
@@ -558,7 +558,7 @@ GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NU
 
 AsDgTframe <- function(m = NULL, mT = NULL, x = TRUE, frame = TRUE) {
   if (is.null(mT)) {
-    mT <- as(drop0(m), "dgTMatrix")
+    mT <- As_TsparseMatrix(m) # mT <- as(drop0(m), "dgTMatrix")
   }
   if (frame) {
     Cbind <- data.frame
@@ -589,7 +589,7 @@ AsDgTframe <- function(m = NULL, mT = NULL, x = TRUE, frame = TRUE) {
 }
 
 DgTframeNewValue <- function(obj, newM) {
-  if (class(obj)[1] == "data.frame") {
+  if (is.data.frame(obj)) {
     value <- newM[cbind(obj$row, obj$col)]
   } else {
     value <- newM[obj[, c("row", "col")]]

@@ -52,7 +52,7 @@ test_that("structuralEmpty and removeEmpty", {
   k <- a1$suppressed != a2$suppressed
   expect_equal(a1[!k, ], a3)
   expect_equal(a2[!k, ], a3)
-  expect_equal(unique(a1[k, "freq"]), 0)
+  expect_equal(unique(a1[k, "ant"]), 0)
 })
 
 
@@ -118,4 +118,88 @@ test_that("extend0 and various hierarchy input", {
   expect_true(nrow(a3_$inner) < nrow(a3$inner))
   expect_true(nrow(a3_$publish) < nrow(a3$publish))
 })
+
+
+
+test_that("DominanceRule and NcontributorsRule", {
+  set.seed(123)
+  z <- SSBtools::MakeMicro(SSBtoolsData("z2"), "ant")
+  z$char <- sample(paste0("char", 1:10), nrow(z), replace = TRUE)
+  z$value <- rnorm(nrow(z))^2
+  
+  a <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                candidates = CandidatesNum, primary = DominanceRule, singletonMethod = "sub2Sum",
+                                n = c(1, 2), k = c(65, 85), printInc = printInc)
+  
+  
+  b <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                candidates = CandidatesNum, primary = NcontributorsRule, singletonMethod = "none",
+                                removeCodes = paste0("char", 1:2), printInc = printInc)
+  
+  expect_identical(as.numeric(which(a$primary)), c(8, 17, 18, 23, 52, 53, 58, 63, 73, 77, 78, 80, 83, 87, 90, 92, 97, 98))
+  expect_identical(as.numeric(which(b$primary)), c(8, 18, 23, 53, 63, 78, 83, 87, 90, 97, 98))
+})
+
+
+test_that("Interpret primary output correctly", {
+  x <- SSBtoolsData("sprt_emp_withEU")[, c(1, 2, 5, 3, 4)]
+  
+  p1 <- function(num, ...) round(10 * num[, 1])%%10 == 3
+  p2 <- function(num, ...) round(10 * num)%%10 == 3
+  p3 <- function(num, ...) as.data.frame(round(10 * num)%%10 == 3)
+  p4 <- function(num, ...) list(primary = as.data.frame(round(10 * num)%%10 == 3), 
+                                numExtra = data.frame(numExtra = round(10 * num[, 1])%%10))
+  
+  p12 <- function(...) {
+    p <- p2(...)
+    p[] <- as.integer(p)
+    p
+  }
+  
+  G <- function(primary, formula = ~eu * year + age:geo) {
+    which(GaussSuppressionFromData(data = x, formula = formula, numVar = "ths_per", 
+                                   primary = primary, singleton = NULL, 
+                                   output = "inputGaussSuppression", 
+                                   printInc = printInc)$primary)
+  }
+  
+  # Case when x is square
+  gp1 <- G(p1)
+  expect_identical(G(p2), gp1)
+  expect_identical(G(p3), gp1)
+  expect_identical(G(p4), gp1)
+  expect_identical(length(G(p12)), 0L)  # since interpret as xExtraPrimary
+
+  # Case when x is not square
+  gp1_ <- G(p1, formula = ~age * geo)
+  expect_identical(G(p2, formula = ~age * geo), gp1_)
+  expect_identical(G(p3, formula = ~age * geo), gp1_)
+  expect_identical(G(p4, formula = ~age * geo), gp1_)
+  expect_error(G(p12, formula = ~age * geo)) #  Error 0 index found in primary output (change to logical?)
+  
+  
+  # Single column xExtraPrimary, Matrix and matrix 
+  
+  x$freq <- round(sqrt(x$ths_per) + as.integer(x$year) - 2014 + 0.2 * (-7:10))
+  z <- x[x$year == "2014", -(4:5)]
+  
+  
+  K <- function(primary) {
+    GaussSuppressionFromData(data = z, formula = ~geo + age, freqVar = "freq", k=7, 
+                             primary = primary, 
+                             mc_function = X_from_mc, mc_hierarchies = NULL, upper_bound = Inf, 
+                             protectZeros = FALSE, secondaryZeros = TRUE, 
+                             output ="outputGaussSuppression_x", 
+                             printInc = printInc)$xExtraPrimary
+  }
+  
+  e1 <- K(KDisclosurePrimary)
+  e2 <- K(function (...) as.matrix(KDisclosurePrimary(...)))
+    
+  expect_equal(max(abs(e2 - e1)), 0)
+  expect_warning({e3 <- K(function (...) round(1 + 0.1*as.matrix(KDisclosurePrimary(...))))}) # Warning message: Primary output interpreted as xExtraPrimary (rare case of doubt)
+  expect_true(all(dim(e3) == c(6, 1)))
+  
+})
+
 

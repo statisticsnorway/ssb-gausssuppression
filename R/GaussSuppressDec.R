@@ -30,7 +30,9 @@
 #' @return A data frame where inner cells and cells to be published are combined or output according to parameter `output`. 
 #' 
 #' @importFrom SSBtools RoundWhole Match Mipf
+#' @importFrom RegSDC SuppressDec
 #' @importFrom Matrix crossprod
+#' @importFrom stats runif
 #' @export
 #' 
 #' @author Øyvind Langrsud
@@ -87,10 +89,11 @@ GaussSuppressDec = function(data,
   numVar <- attr(a$inner, "numVar")
   
   dimVarPub <- colnames(a$publish)
-  dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed", "weight", numVar))]
+  # dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed", "weight", numVar))]
+  dimVarPub <- dimVarPub[!(dimVarPub %in% c(freqVar, "primary", "suppressed", weightVar, numVar))]
   dimVarPub <- dimVarPub[(dimVarPub %in% colnames(a$inner))]
   
-  z <- as.matrix(a$publish["freq"])
+  z <- as.matrix(a$publish[freqVar])
   y <- as.matrix(a$inner[freqVar])
   
   if (nRep) {
@@ -127,7 +130,7 @@ GaussSuppressDec = function(data,
     }
     
     # Re-use primary-function originally made for SuppressionFromDecimals
-    suppressionFromDecimals <- PrimaryDecimals(freq = a$publish[["freq"]], num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
+    suppressionFromDecimals <- PrimaryDecimals(freq = a$publish[[freqVar]], num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
     
     if (any(a$publish$suppressed != suppressionFromDecimals))
       warning("Mismatch between whole numbers and suppression.")
@@ -168,17 +171,17 @@ GaussSuppressDec = function(data,
     whenMixedDuplicatedInner("Duplicated inner rows, some aggregated.")
   }
   
-  a$inner <- a$inner[is.na(ma), c(dimVarPub, numVar, freqDecNames, freqVar, weightVar), drop = FALSE]
+  a$inner <- a$inner[is.na(ma), unique(c(dimVarPub, numVar, freqDecNames, freqVar, weightVar)), drop = FALSE]
   
   # rename in a way that takes into account possible overlap between freqVar, weightVar, numVar
-  renameIndex <- ncol(a$inner)
-  if (length(weightVar)) {
-    names(a$inner)[renameIndex] <- "weight"
-    renameIndex <- renameIndex - 1L
-  }
-  if (length(freqVar)) {   # but never 0 in current application
-    names(a$inner)[renameIndex] <- "freq"
-  }
+  #  renameIndex <- ncol(a$inner)
+  #  if (length(weightVar)) {
+  #    names(a$inner)[renameIndex] <- "weight"
+  #    renameIndex <- renameIndex - 1L
+  #  }
+  #  if (length(freqVar)) {   # but never 0 in current application
+  #    names(a$inner)[renameIndex] <- "freq"
+  #  }
 
   a$inner$isPublish <- FALSE
   a$inner$isInner <- TRUE

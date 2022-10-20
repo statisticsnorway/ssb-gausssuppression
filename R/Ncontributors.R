@@ -12,9 +12,8 @@
 #' 
 #' @return Vector of numbers of unique groups
 #' @export
-#' @importFrom SSBtools SortRows
+#' @importFrom SSBtools SortRows As_TsparseMatrix
 #' @importFrom Matrix drop0
-#' @importFrom methods as
 #' 
 #' @seealso \code{\link{ModelMatrix}}
 #' 
@@ -67,7 +66,7 @@ Ncontributors <- function(x, groups) {
   ordgroups <- order(groups)
   groups <- groups[ordgroups]
   
-  xT <- as(drop0(x[ordgroups, , drop=FALSE]), "dgTMatrix")
+  xT <- As_TsparseMatrix(x[ordgroups, , drop=FALSE]) # xT <- as(drop0(x[ordgroups, , drop=FALSE]), "dgTMatrix")
   
   xM <- cbind(col = xT@j + 1, row = xT@i + 1)
   
