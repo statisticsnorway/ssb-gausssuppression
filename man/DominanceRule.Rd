@@ -13,6 +13,8 @@ DominanceRule(
   k,
   protectZeros = FALSE,
   charVar,
+  sWeightVar = NULL,
+  representativeSample = TRUE,
   ...
 )
 }
@@ -29,17 +31,27 @@ DominanceRule(
 
 \item{k}{parameter \code{k} in dominance rule.}
 
-\item{protectZeros}{parameter determining whether cells with value 0 should be suppressed.}
+\item{protectZeros}{parameter determining whether cells with value 0 should
+be suppressed.}
 
-\item{charVar}{Variable in data holding grouping information. Dominance will be calculated after aggregation within these groups.}
+\item{charVar}{Variable in data holding grouping information. Dominance will
+be calculated after aggregation within these groups.}
+
+\item{sWeightVar}{variable with sampling weights to be used in dominance rule}
+
+\item{representativeSample}{logical value, default \code{FALSE}. Determines how
+sampling weights should be treated.}
 
 \item{...}{unused parameters}
 }
 \value{
-logical vector that is \code{TRUE} in positions corresponding to cells breaching the dominance rules.
+logical vector that is \code{TRUE} in positions corresponding to cells
+breaching the dominance rules.
 }
 \description{
-Supports application of multiple values for \code{n} and \code{k}. The function works on magnitude tables containing negative cell values by calculating contribution based on absolute values.
+Supports application of multiple values for \code{n} and \code{k}. The function works
+on magnitude tables containing negative cell values by calculating
+contribution based on absolute values.
 }
 \details{
 This methodn only supports suppressing a single numeric variable.

@@ -17,7 +17,7 @@
 #' @param charVar Variable in data holding grouping information. Dominance will
 #'  be calculated after aggregation within these groups.
 #' @param sWeightVar variable with sampling weights to be used in dominance rule
-#' @param representativeSample logical value, default `TRUE`. Determines how 
+#' @param representativeSample logical value, default `FALSE`. Determines how 
 #' sampling weights should be treated.
 #' @param ... unused parameters
 #'
@@ -102,8 +102,8 @@ DominanceRule <- function(data,
 #' variables, as well as calculating dominance in surveys with a given sampling
 #' weight. Two methods are implemented, depending on whether the sampling 
 #' weights sum to total population. The parameter `representativeSample` 
-#' determines this. If `TRUE`, unweighted contributions are compared to weighted
-#' cell values. If `FALSE`, the approach is the same as described in  in the 
+#' determines this. If `FALSE`, unweighted contributions are compared to weighted
+#' cell values. If `TRUE`, the approach is the same as described in  in the 
 #' book "Statistical Disclosure Control" (Hundepool et al 2012), p. 151.
 #'
 #' @param x model matrix describing relationship between input and published
@@ -117,13 +117,12 @@ DominanceRule <- function(data,
 #' `n` parameter.
 #' @param charVar_groups vector describing which input records should be grouped
 #' @param samplingWeight vector of sampling weights associated to input records
-#' @param representativeSample logical value, default `TRUE`. determines how to 
+#' @param representativeSample logical value, default `FALSE`. determines how to 
 #' handle sampling weights in the dominance rule (see details).
 #'
 #' @return logical vector describing which publish-cells need to be suppressed.
 #' @export
 #'
-#' @examples
 FindDominantCells <- function(x,
                               inputnum,
                               num,
@@ -131,7 +130,7 @@ FindDominantCells <- function(x,
                               k,
                               charVar_groups,
                               samplingWeight,
-                              representativeSample) {
+                              representativeSample = FALSE) {
   if (is.null(samplingWeight)) {
     # without sampling weight, calculate dominance directly from numerical values
     max_cont <-
@@ -150,7 +149,7 @@ FindDominantCells <- function(x,
       apply(max_cont_index, 2, function(t)
         ifelse(is.na(t), 0, inputnum[t]))
     
-    if (representativeSample) {
+    if (!representativeSample) {
       weighted_num <- crossprod(x, inputnum * samplingWeight)
       ncontributions <- rowSums(max_cont)
     }
