@@ -57,7 +57,9 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
     pt <- NULL
     for (name in names(specList)) {
       y <- specList[[name]]
-      pt <- cbind(pt, c(name = sapply(rows, function(x) ifelse(x %in% names(y), as.character(y[[x]]), ""))))
+      pt <-
+        cbind(pt, c(name = sapply(rows, function(x)
+          ifelse(x %in% names(y), as.character(y[[x]]), ""))))
     }
     colnames(pt) <- names(specList)
     rownames(pt) <- rows
