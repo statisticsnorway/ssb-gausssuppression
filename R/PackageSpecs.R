@@ -6,13 +6,14 @@
 #' @details The following table summarizes the built-in specs. Columns represent
 #' different specs, and rows represent the parameter settings.
 #'
-#' |              | `smallCountSpec`    | `dominanceSpec` | `fewContributorsSpec` |
-#' | :----------- | :---------------- | :------------ | :------------------ |
-#'   | `primary`      | `PrimaryDefault`    | `DominanceRule` | `PrimaryDefault` |
-#'   | `protectZeros` | `TRUE`              |               | `FALSE`               |
-#'   | `extend0`      | `TRUE`              |               | `FALSE`               |
-#'   | `candidates`   | `CandidatesDefault` | `CandidatesNum` |                     |
-#'   |  `singleton`   | `SingletonDefault`  |               |                     |
+#'  |                     |smallCountSpec    |dominanceSpec |fewContributorsSpec |
+#'  |:--------------------|:-----------------|:-------------|:-------------------|
+#'  |primary              |PrimaryDefault    |DominanceRule |PrimaryDefault      |
+#'  |protectZeros         |TRUE              |              |FALSE               |
+#'  |candidates           |CandidatesDefault |CandidatesNum |                    |
+#'  |singleton            |SingletonDefault  |              |                    |
+#'  |extend0              |TRUE              |              |FALSE               |
+#'  |representativeSample |                  |FALSE         |                    |
 #'
 #' @return list of built-in specs
 #' @export
