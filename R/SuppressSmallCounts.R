@@ -2,15 +2,15 @@
 
 #' Small count frequency table suppression.
 #'
-#' @description This is a wrapper function of \link[GaussSuppressionFromData][GaussSuppressionFromData]
+#' @description This is a wrapper function of \code{\link{GaussSuppressionFromData}}
 #' for small count frequency suppression. For common applications, the `spec`
-#' parameter can be adjusted, see \link[PackageSpecs][PackageSpecs] for more
+#' parameter can be adjusted, see \code{\link{PackageSpecs}} for more
 #' information. See Details for more information on function call customization.
 #'
-#' @details The specs provided in the package (see \link[PackageSpecs][PackageSpecs])
+#' @details The specs provided in the package (see \code{\link{PackageSpecs}})
 #' provide common parameter setups for small count suppression. However, it might
 #' be necessary to customize the parameters further. In this case, certain
-#' parameters from \link[GaussSuppressionFromData][GaussSuppressionFromData]
+#' parameters from \code{\link{GaussSuppressionFromData}}
 #' might need adjusting from the values provided by the package specs. In
 #' particular, the parameters `protectZeros` (should zeros be primary
 #' suppressed), `extend0` (should empty cells be added before primary
@@ -37,7 +37,8 @@
 #'
 #' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3)
 #' # use different spec
-#' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3, spec = PackageSpecs("fewContributorsSpec"))
+#' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3,
+#'  spec = PackageSpecs("fewContributorsSpec"))
 #' # override default spec
 #' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3, protectZeros = FALSE)
 SuppressSmallCounts <- function(data,
