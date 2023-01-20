@@ -6,16 +6,22 @@
 #' @details The following table summarizes the built-in specs. Columns represent
 #' different specs, and rows represent the parameter settings.
 #'
-#'  |                     |smallCountSpec    |dominanceSpec |fewContributorsSpec |
-#'  |:--------------------|:-----------------|:-------------|:-------------------|
-#'  |primary              |PrimaryDefault    |DominanceRule |PrimaryDefault      |
-#'  |protectZeros         |TRUE              |              |FALSE               |
-#'  |candidates           |CandidatesDefault |CandidatesNum |                    |
-#'  |singleton            |SingletonDefault  |              |                    |
-#'  |extend0              |TRUE              |              |FALSE               |
-#'  |representativeSample |                  |FALSE         |                    |
+
+#'   |                              |\strong{smallCountSpec} |\strong{dominanceSpec} |\strong{fewContributorsSpec} |
+#'   |:-----------------------------|:-----------------------|:----------------------|:----------------------------|
+#'   |\strong{primary}              |PrimaryDefault          |DominanceRule          |PrimaryDefault               |
+#'   |\strong{protectZeros}         |TRUE                    |                       |FALSE                        |
+#'   |\strong{candidates}           |CandidatesDefault       |CandidatesNum          |                             |
+#'   |\strong{singleton}            |SingletonDefault        |                       |                             |
+#'   |\strong{extend0}              |TRUE                    |                       |FALSE                        |
+#'   |\strong{representativeSample} |                        |FALSE                  |                             |
 #'
-#' @return list of built-in specs
+#' @param x the character name or index of the spec to be returned. If `NULL` (default),
+#' returns list of all specs
+#' @param printTable Logical value (default `FALSE`). If `TRUE`, prints a table
+#' description of all specs. Primarily used for documentation purposes.
+#' @return returns a spec (if `!is.null(x)`), list of all specs (if `is.null(x)`
+#'  and `printTable = FALSE`), or markdown table describing all specs (if `printTable = TRUE`).
 #' @export
 #'
 #' @examples
@@ -61,8 +67,8 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         cbind(pt, c(name = sapply(rows, function(x)
           ifelse(x %in% names(y), as.character(y[[x]]), ""))))
     }
-    colnames(pt) <- names(specList)
-    rownames(pt) <- rows
+    colnames(pt) <- paste0("\\", "strong{",names(specList), "}")
+    rownames(pt) <- paste0("\\strong{", rows, "}")
     return(knitr::kable(pt, format = "markdown", result = "asis"))
   }
   if (is.null(x)) {
