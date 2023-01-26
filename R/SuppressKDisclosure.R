@@ -13,11 +13,12 @@
 #' \code{\link{AutoHierarchies}}. Thus, the variables can also be coded by
 #' `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param freqVar name of the frequency variable in `data`
-#' @param mc_function a function for creating model matrix from mc_hierarchies
 #' @param mc_hierarchies a hierarchy representing meaningful combinations to be
-#' protected
+#' protected. Default value is `NULL`.
 #' @param upper_bound numeric value representing minimum count considered safe.
 #' Default set to `Inf`
+#' @param extend0 Logical parameter to add empty cells to data set. Do not change
+#' to `FALSE` unless you are sure missing cells are structural zeros.
 #' @param ... parameters passed to children functions
 #'
 #' @return A data.frame containing the publishable data set, with a boolean
@@ -67,12 +68,10 @@ SuppressKDisclosure <- function(data,
                                 formula = NULL,
                                 hierarchies = NULL,
                                 freqVar = NULL,
-                                mc_function = X_from_mc,
                                 mc_hierarchies = NULL,
                                 upper_bound = Inf,
+                                extend0 = TRUE,
                                 ...) {
-  if (!is.function(mc_function))
-    stop("Parameter mc_function must be a function.")
   additional_params <- list(...)
   if (length(additional_params)) {
     if ("singletonMethod" %in% names(additional_params) &
@@ -89,7 +88,6 @@ SuppressKDisclosure <- function(data,
     freqVar = freqVar,
     coalition = coalition,
     mc_hierarchies = mc_hierarchies,
-    mc_function = mc_function,
     upper_bound = upper_bound,
     primary = KDisclosurePrimary,
     candidates = DirectDisclosureCandidates,
@@ -106,22 +104,23 @@ SuppressKDisclosure <- function(data,
 #'
 #' @inheritParams SuppressKDisclosure
 #' @inheritParams DominanceRule
-
+#' 
 #'
 #' @return dgCMatrix corresponding to primary suppressed cells
 #' @export
+#'
+#' @author Daniel P. Lupp
 KDisclosurePrimary <- function(data,
                                x,
                                crossTable,
-                               mc_function,
-                               mc_hierarchies,
                                freqVar,
+                               mc_hierarchies = NULL,
                                coalition = 1,
-                               upper_bound,
+                               upper_bound = Inf,
                                ...) {
   x <- cbind(
     x,
-    mc_function(
+    X_from_mc(
       data = data,
       x = x,
       crossTable = crossTable,
@@ -148,7 +147,7 @@ find_difference_cells <- function(x,
                                   upper_bound = Inf) {
   publ_x <- crossprod(x)
   publ_x <-
-    As_TsparseMatrix(publ_x) # publ_x <- as(publ_x, "dgTMatrix")
+    As_TsparseMatrix(publ_x)
   colSums_x <- colSums(x)
   # row i is child of column j in r
   r <-
@@ -165,10 +164,6 @@ find_difference_cells <- function(x,
                                  freq[child_parent[, 1]] <= upper_bound, ]
   disclosures <- child_parent[child_parent[, 3] <= coalition, , drop = FALSE]
   if (nrow(disclosures))
-    #primary_matrix <- as(apply(disclosures,
-    #                           1,
-    #                           function(row) x[,row[2]] - x[,row[1]]),
-    #                     "dgTMatrix")
     primary_matrix <- As_TsparseMatrix(apply(disclosures,
                                              1,
                                              function(row)
