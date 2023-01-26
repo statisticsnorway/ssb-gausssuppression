@@ -187,7 +187,7 @@ test_that("Interpret primary output correctly", {
   K <- function(primary) {
     GaussSuppressionFromData(data = z, formula = ~geo + age, freqVar = "freq", coalition=7, 
                              primary = primary, 
-                             mc_function = X_from_mc, mc_hierarchies = NULL, upper_bound = Inf, 
+                             mc_hierarchies = NULL, upper_bound = Inf, 
                              protectZeros = FALSE, secondaryZeros = TRUE, 
                              output ="outputGaussSuppression_x", 
                              printInc = printInc)$xExtraPrimary
