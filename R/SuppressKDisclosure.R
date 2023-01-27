@@ -3,8 +3,9 @@
 #' A function for suppressing frequency tables using the k-disclosure method.
 #'
 #' @param data a data.frame representing the data set
-#' @param coalition numeric vector of length one, representing possible size of
-#' attacking coalition
+#' @param coalition numeric vector of length one, representing possible size of an
+#' attacking coalition. This parameter corresponds to the parameter k in the
+#' definition of k-disclosure.
 #' @param dimVar The main dimensional variables and additional aggregating
 #' variables. This parameter can be  useful when hierarchies and formula are
 #' unspecified.
@@ -133,7 +134,7 @@ KDisclosurePrimary <- function(data,
   )
   x <- x[,!SSBtools::DummyDuplicated(x, rnd = TRUE), drop = FALSE]
   freq <- as.vector(crossprod(x, data[[freqVar]]))
-  find_difference_cells(
+  FindDifferenceCells(
     x = x,
     freq = freq,
     coalition = coalition,
@@ -141,7 +142,7 @@ KDisclosurePrimary <- function(data,
   )
 }
 
-find_difference_cells <- function(x,
+FindDifferenceCells <- function(x,
                                   freq,
                                   coalition,
                                   upper_bound = Inf) {
