@@ -12,9 +12,9 @@ DominanceRule(
   n,
   k,
   protectZeros = FALSE,
-  charVar,
+  charVar = NULL,
   sWeightVar = NULL,
-  representativeSample = TRUE,
+  domWeightMethod = "default",
   ...
 )
 }
@@ -39,8 +39,8 @@ be calculated after aggregation within these groups.}
 
 \item{sWeightVar}{variable with sampling weights to be used in dominance rule}
 
-\item{representativeSample}{logical value, default \code{FALSE}. Determines how
-sampling weights should be treated.}
+\item{domWeightMethod}{character representing how weights should be treated
+in the dominance rule. See Details.}
 
 \item{...}{unused parameters}
 }
@@ -54,7 +54,13 @@ on magnitude tables containing negative cell values by calculating
 contribution based on absolute values.
 }
 \details{
-This methodn only supports suppressing a single numeric variable.
+This methodn only supports suppressing a single numeric variable. There are
+multiple ways of handling sampling weights in the dominance rule. the default
+method implemented here compares unweighted sample values with the corresponding
+weighted cell totals. if \code{domWeightMethod} is set to \code{"tauargus"}, the
+method implemented in tauArgus is used. For more information on this
+method, see "Statistical Disclosure Control" by Hundepool et al (2012,
+p. 151).
 }
 \author{
 Daniel Lupp
