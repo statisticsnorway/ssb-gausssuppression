@@ -4,7 +4,7 @@
 #' on magnitude tables containing negative cell values by calculating
 #'  contribution based on absolute values.
 #'
-#' This methodn only supports suppressing a single numeric variable. There are
+#' This method only supports suppressing a single numeric variable. There are
 #' multiple ways of handling sampling weights in the dominance rule. the default
 #' method implemented here compares unweighted sample values with the corresponding
 #' weighted cell totals. if `domWeightMethod` is set to `"tauargus"`, the
