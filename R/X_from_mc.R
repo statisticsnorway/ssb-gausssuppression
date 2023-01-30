@@ -1,7 +1,7 @@
 
 
 
-#' Default `mc_function` to be used within `KDisclosurePrimary`
+#' Function to be used within `KDisclosurePrimary`
 #' 
 #' 
 #' @inheritParams SuppressKDisclosure

@@ -6,22 +6,23 @@
 \usage{
 SuppressKDisclosure(
   data,
-  k = 1,
+  coalition = 1,
   dimVar = NULL,
   formula = NULL,
   hierarchies = NULL,
   freqVar = NULL,
-  mc_function = X_from_mc,
   mc_hierarchies = NULL,
   upper_bound = Inf,
+  extend0 = TRUE,
   ...
 )
 }
 \arguments{
 \item{data}{a data.frame representing the data set}
 
-\item{k}{numeric vector of length one, representing possible size of
-attacking coalition}
+\item{coalition}{numeric vector of length one, representing possible size of an
+attacking coalition. This parameter corresponds to the parameter k in the
+definition of k-disclosure.}
 
 \item{dimVar}{The main dimensional variables and additional aggregating
 variables. This parameter can be  useful when hierarchies and formula are
@@ -35,13 +36,14 @@ unspecified.}
 
 \item{freqVar}{name of the frequency variable in \code{data}}
 
-\item{mc_function}{a function for creating model matrix from mc_hierarchies}
-
 \item{mc_hierarchies}{a hierarchy representing meaningful combinations to be
-protected}
+protected. Default value is \code{NULL}.}
 
 \item{upper_bound}{numeric value representing minimum count considered safe.
 Default set to \code{Inf}}
+
+\item{extend0}{Logical parameter to add empty cells to data set. Do not change
+to \code{FALSE} unless you are sure missing cells are structural zeros.}
 
 \item{...}{parameters passed to children functions}
 }
@@ -64,28 +66,28 @@ data$freq <- c(4,5,3,4,1,6,
 0,0,0,0,0,0)
 
 # hierarchies as DimLists
-mun <- data.frame(levels = c("@", rep("@@", 6)), 
+mun <- data.frame(levels = c("@", rep("@@", 6)),
 codes = c("Total", paste("k", 1:6, sep = "")))
-inj <- data.frame(levels = c("@", "@@" ,"@@", "@@", "@@"), 
+inj <- data.frame(levels = c("@", "@@" ,"@@", "@@", "@@"),
 codes = c("Total", "serious", "light", "none", "unknown"))
 dimlists <- list(mun = mun, inj = inj)
 
-inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"), 
+inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"),
 codes = c("Total", "injured", "serious", "light", "none", "unknown"))
-inj3 <- data.frame(levels = c("@", "@@", "@@" ,"@@", "@@"), 
+inj3 <- data.frame(levels = c("@", "@@", "@@" ,"@@", "@@"),
 codes = c( "shadowtotal", "serious", "light", "none", "unknown"))
 mc_dimlist <- list(inj = inj2)
 mc_nomargs <- list(inj = inj3)
 
 #' # Example with formula, no meaningful combination
-out <- SuppressKDisclosure(data, k = 1, freqVar = "freq", formula = ~mun*inj)
+out <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", formula = ~mun*inj)
 
 # Example with hierarchy and meaningful combination
-out2 <- SuppressKDisclosure(data, k = 1, freqVar = "freq", 
+out2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 hierarchies = dimlists, mc_hierarchies = mc_dimlist)
 
 #' # Example of table without mariginals, and mc_hierarchies to protect
-out3 <- SuppressKDisclosure(data, k = 1, freqVar = "freq",
+out3 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 formula = ~mun:inj, mc_hierarchies = mc_nomargs )
 }
 \author{
