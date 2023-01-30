@@ -24,7 +24,7 @@
 #' @param sWeightVar variable with sampling weights to be used in dominance rule
 #' @param domWeightMethod character representing how weights should be treated
 #' in the dominance rule. See Details.
-#' @param allPrimary Logical parameter. If `TRUE`, adds primary columns for each 
+#' @param allDominance Logical parameter. If `TRUE`, adds primary columns for each 
 #' pair of parameters n,k in the dominance rules
 #' @param ... unused parameters
 #'
@@ -37,9 +37,9 @@
 #' z <- SSBtools::MakeMicro(SSBtoolsData("z2"), "ant")
 #' z$value <- sample(1:1000, nrow(z), replace = TRUE)
 #' 
-#' GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", 
-#'                               candidates = CandidatesNum, primary = DominanceRule, singletonMethod = "sub2Sum",
-#'                               n = c(1, 2), k = c(65, 85), allPrimary = TRUE)
+#' GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+#' numVar = "value", candidates = CandidatesNum, primary = DominanceRule, 
+#' singletonMethod = "sub2Sum", n = c(1, 2), k = c(65, 85), allDominance = TRUE)
 #'num <- c(100,
 #'          90, 10,
 #'          80, 20,
@@ -55,7 +55,7 @@
 #' d <- data.frame(v1 = v1, num = num, sw1 = 1, sw2 = sw2, freq = 1)
 #' 
 #' GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
-#'  numVar = "num",  n = c(1,2), k = c(80,70), primary = DominanceRule, allPrimary = TRUE)
+#'  numVar = "num",  n = c(1,2), k = c(80,70), primary = DominanceRule, allDominance = TRUE)
 #' 
 #'
 #' @author Daniel Lupp
@@ -69,7 +69,7 @@ DominanceRule <- function(data,
                           charVar = NULL,
                           sWeightVar = NULL,
                           domWeightMethod = "default",
-                          allPrimary = FALSE,
+                          allDominance = FALSE,
                           ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
@@ -130,12 +130,12 @@ DominanceRule <- function(data,
     Reduce(`|`, x))
   colnames(primary) <- paste0("primary.", paste(n, k, sep = ":"))
   if (!protectZeros) {
-    if (allPrimary)
+    if (allDominance)
       return(list(primary = dominant, numExtra = as.data.frame(primary)))
     else 
       return(dominant)
   }
-  if (allPrimary)
+  if (allDominance)
   return(list(primary = dominant | (abs_num == 0),
        numExtra = as.data.frame(primary)))
   else
