@@ -258,8 +258,9 @@ FindDominantCells <- function(x,
       weighted_num <- crossprod(x, inputnum * samplingWeight)
     }
     if (returnContrib) {
-      out <- ncontributions/weighted_num
-      return(as.vector(out))
+      out <- as.vector(ncontributions/weighted_num)
+      out[is.nan(out)] <- 0
+      return(out)
     }
     return(as.vector(weighted_num > 0 &
                        ncontributions >= weighted_num * k / 100))
