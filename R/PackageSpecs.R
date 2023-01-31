@@ -44,12 +44,13 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       list(
         primary = as.name("DominanceRule"),
         candidates = as.name("CandidatesNum"),
+        preAggregate = FALSE,
         domWeightMethod = "default"
       ),
     
     fewContributorsSpec =
       list(
-        primary = as.name("PrimaryDefault"),
+        primary = as.name("NContributorsRule"),
         protectZeros = FALSE,
         extend0 = FALSE
       )
