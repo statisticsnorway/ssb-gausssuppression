@@ -122,8 +122,8 @@ DominanceRule <- function(data,
     else
       sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
   }
-  
-  primary <-
+
+  prim <-
     mapply(
       function (a, b)
         FindDominantCells(
@@ -134,29 +134,31 @@ DominanceRule <- function(data,
           b,
           charVar_groups = charVar_groups,
           samplingWeight = sweight,
-          tauArgusDominance = tauArgusDominance
+          tauArgusDominance = tauArgusDominance,
+          returnContrib = TRUE
         ),
       n,
       k
     )
-  
+  primary <- sapply(seq_len(ncol(prim)), function(x) prim[,x] >= k[x]/100)
   dominant <- apply(primary, 1, function (x)
     Reduce(`|`, x))
-  colnames(primary) <- paste0("primary.", paste(n, k, sep = ":"))
+  colnames(primary) <- colnames(prim) <- paste0("primary.", paste(n, k, sep = ":"))
   if (!protectZeros)
     output <- list(primary = dominant)
   else
     output <- list(primary = (dominant | (abs_num == 0)))
   if (outputWeightedNum) {
-    wnum <- data.frame(as.vector(crossprod(x, sweight * data[[numVar]])))
-    names(wnum) <- paste0("weighted.", numVar)
+    wnum <- data.frame(v1 = as.vector(crossprod(x, sweight)),
+                       v2 = as.vector(crossprod(x, sweight * data[[numVar]])))
+    names(wnum) <- c(sWeightVar, paste0("weighted.", numVar))
     output[["numExtra"]] <- wnum
   }
   if (allDominance) {
     if ("numExtra" %in% names(output)) 
-      output[["numExtra"]] <- cbind(output[["numExtra"]], as.data.frame(primary))
+      output[["numExtra"]] <- cbind(output[["numExtra"]], as.data.frame(prim))
     else 
-      output[["numExtra"]] <- as.data.frame(primary)
+      output[["numExtra"]] <- as.data.frame(prim)
   }
   if (length(names(output)) == 1)
     output <- unlist(output)
@@ -187,6 +189,8 @@ DominanceRule <- function(data,
 #' @param samplingWeight vector of sampling weights associated to input records
 #' @param tauArgusDominance logical value, default `FALSE`. determines how to
 #' handle sampling weights in the dominance rule (see details).
+#' @param returnContrib logical value, default `FALSE`. If `TRUE` return value is 
+#' the percentage of the first n contributors
 #'
 #' @return logical vector describing which publish-cells need to be suppressed.
 #'
@@ -197,7 +201,8 @@ FindDominantCells <- function(x,
                               k,
                               charVar_groups,
                               samplingWeight,
-                              tauArgusDominance = FALSE) {
+                              tauArgusDominance = FALSE,
+                              returnContrib = FALSE) {
   if (is.null(samplingWeight)) {
     # without sampling weight, calculate dominance directly from numerical values
     max_cont <-
@@ -251,6 +256,10 @@ FindDominantCells <- function(x,
       # sampling weights multiplied with contributions and added up
       ncontributions <- rowSums(max_cont * cont_weights)
       weighted_num <- crossprod(x, inputnum * samplingWeight)
+    }
+    if (returnContrib) {
+      out <- ncontributions/weighted_num
+      return(as.vector(out))
     }
     return(as.vector(weighted_num > 0 &
                        ncontributions >= weighted_num * k / 100))

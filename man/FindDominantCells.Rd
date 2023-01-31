@@ -13,7 +13,8 @@ FindDominantCells(
   k,
   charVar_groups,
   samplingWeight,
-  tauArgusDominance = FALSE
+  tauArgusDominance = FALSE,
+  returnContrib = FALSE
 )
 }
 \arguments{
@@ -37,6 +38,9 @@ percentages are described as numbers less than 100. Must be same length as
 
 \item{tauArgusDominance}{logical value, default \code{FALSE}. determines how to
 handle sampling weights in the dominance rule (see details).}
+
+\item{returnContrib}{logical value, default \code{FALSE}. If \code{TRUE} return value is
+the percentage of the first n contributors}
 }
 \value{
 logical vector describing which publish-cells need to be suppressed.
