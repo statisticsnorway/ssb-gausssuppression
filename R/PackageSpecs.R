@@ -7,14 +7,14 @@
 #' different specs, and rows represent the parameter settings.
 #'
 
-#'   |                              |\strong{smallCountSpec} |\strong{dominanceSpec} |\strong{fewContributorsSpec} |
-#'   |:-----------------------------|:-----------------------|:----------------------|:----------------------------|
-#'   |\strong{primary}              |PrimaryDefault          |DominanceRule          |PrimaryDefault               |
-#'   |\strong{protectZeros}         |TRUE                    |                       |FALSE                        |
-#'   |\strong{candidates}           |CandidatesDefault       |CandidatesNum          |                             |
-#'   |\strong{singleton}            |SingletonDefault        |                       |                             |
-#'   |\strong{extend0}              |TRUE                    |                       |FALSE                        |
-#'   |\strong{representativeSample} |                        |FALSE                  |                             |
+#'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec} |\strong{fewContributorsSpec} |
+#'  |:------------------------|:-----------------------|:----------------------|:----------------------------|
+#'  |\strong{primary}         |PrimaryDefault          |DominanceRule          |PrimaryDefault               |
+#'  |\strong{protectZeros}    |TRUE                    |                       |FALSE                        |
+#'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum          |                             |
+#'  |\strong{singleton}       |SingletonDefault        |                       |                             |
+#'  |\strong{extend0}         |TRUE                    |                       |FALSE                        |
+#'  |\strong{domWeightMethod} |                        |default                |                             |
 #'
 #' @param x the character name or index of the spec to be returned. If `NULL` (default),
 #' returns list of all specs
@@ -43,7 +43,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
     list(
       primary = as.name("DominanceRule"),
       candidates = as.name("CandidatesNum"),
-      representativeSample = FALSE
+      domWeightMethod = "default"
     )
   
   fewContributorsSpec <-
@@ -75,7 +75,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
     return(specList)
   }
   else if (is.numeric(x)) {
-    if (x > 4)
+    if (x > length(specList))
       stop("Invalid spec index.")
   }
   else if (is.character(x)) {
