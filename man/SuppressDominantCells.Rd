@@ -25,7 +25,7 @@ SuppressDominantCells(
 
 \item{k}{parameter \code{k} in dominance rule.}
 
-\item{numVar}{Other numerical variables to be aggregated}
+\item{numVar}{numerical variable to be aggregated and used in dominance rule}
 
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 

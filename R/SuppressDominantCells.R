@@ -4,6 +4,7 @@
 #'
 #' @inheritParams GaussSuppressionFromData
 #' @inheritParams DominanceRule
+#' @param numVar numerical variable to be aggregated and used in dominance rule
 #' @param preAggVar Extra variables to be used as grouping elements in the dominance rule.
 #' @param sWeightVar Name of variable which represents sampling weights to be used
 #' in dominance rule
