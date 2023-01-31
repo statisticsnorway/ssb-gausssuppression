@@ -47,7 +47,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         candidates = as.name("CandidatesNum"),
         preAggregate = FALSE,
         domWeightMethod = "default",
-        singletonMethod =
+        singletonMethod = "sub2Sum"
       ),
     
     fewContributorsSpec =
