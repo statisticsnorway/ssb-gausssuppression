@@ -30,34 +30,31 @@
 #' PackageSpecs("smallCountSpec")
 #' PackageSpecs(printTable = TRUE)
 PackageSpecs <- function(x = NULL, printTable = FALSE) {
-  smallCountSpec <-
-    list(
-      primary = as.name("PrimaryDefault"),
-      protectZeros = TRUE,
-      candidates = as.name("CandidatesDefault"),
-      singleton = as.name("SingletonDefault"),
-      extend0 = TRUE
-    )
-  
-  dominanceSpec <-
-    list(
-      primary = as.name("DominanceRule"),
-      candidates = as.name("CandidatesNum"),
-      domWeightMethod = "default"
-    )
-  
-  fewContributorsSpec <-
-    list(
-      primary = as.name("PrimaryDefault"),
-      protectZeros = FALSE,
-      extend0 = FALSE
-    )
-  
   specList <- list(
-    smallCountSpec = smallCountSpec,
-    dominanceSpec = dominanceSpec,
-    fewContributorsSpec = fewContributorsSpec
+    smallCountSpec =
+      list(
+        primary = as.name("PrimaryDefault"),
+        protectZeros = TRUE,
+        candidates = as.name("CandidatesDefault"),
+        singleton = as.name("SingletonDefault"),
+        extend0 = TRUE
+      ),
+    
+    dominanceSpec =
+      list(
+        primary = as.name("DominanceRule"),
+        candidates = as.name("CandidatesNum"),
+        domWeightMethod = "default"
+      ),
+    
+    fewContributorsSpec =
+      list(
+        primary = as.name("PrimaryDefault"),
+        protectZeros = FALSE,
+        extend0 = FALSE
+      )
   )
+  
   if (printTable) {
     rows <- unique(unlist(lapply(specList, names)))
     pt <- NULL
@@ -67,7 +64,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         cbind(pt, c(name = sapply(rows, function(x)
           ifelse(x %in% names(y), as.character(y[[x]]), ""))))
     }
-    colnames(pt) <- paste0("\\", "strong{",names(specList), "}")
+    colnames(pt) <- paste0("\\", "strong{", names(specList), "}")
     rownames(pt) <- paste0("\\strong{", rows, "}")
     return(knitr::kable(pt, format = "markdown", result = "asis"))
   }
