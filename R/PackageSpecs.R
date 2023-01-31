@@ -52,7 +52,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
     
     fewContributorsSpec =
       list(
-        primary = as.name("NContributorsRule"),
+        primary = as.name("NcontributorsRule"),
         protectZeros = FALSE,
         extend0 = FALSE
       )

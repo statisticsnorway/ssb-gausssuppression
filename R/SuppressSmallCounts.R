@@ -36,9 +36,6 @@
 #' 0,0,0,0,0,0)
 #'
 #' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3)
-#' # use different spec
-#' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3,
-#'  spec = PackageSpecs("fewContributorsSpec"))
 #' # override default spec
 #' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3, protectZeros = FALSE)
 SuppressSmallCounts <- function(data,
