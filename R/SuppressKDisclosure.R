@@ -116,6 +116,8 @@ KDisclosurePrimary <- function(data,
                                x,
                                crossTable,
                                freqVar,
+                               sensitiveVars = NULL,
+                               idVars = NULL,
                                mc_hierarchies = NULL,
                                coalition = 1,
                                upper_bound = Inf,
@@ -137,16 +139,22 @@ KDisclosurePrimary <- function(data,
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   FindDifferenceCells(
     x = x,
+    crossTable = crossTable,
     freq = freq,
     coalition = coalition,
+    sensitiveVars = sensitiveVars,
+    idVars = idVars,
     upper_bound = upper_bound
   )
 }
 
 FindDifferenceCells <- function(x,
-                                  freq,
-                                  coalition,
-                                  upper_bound = Inf) {
+                                freq,
+                                crossTable,
+                                coalition,
+                                sensitiveVars = NULL,
+                                idVars = NULL,
+                                upper_bound = Inf) {
   publ_x <- crossprod(x)
   publ_x <-
     As_TsparseMatrix(publ_x)
@@ -165,6 +173,16 @@ FindDifferenceCells <- function(x,
                                  freq[child_parent[, 1]] > 0 &
                                  freq[child_parent[, 1]] <= upper_bound, ]
   disclosures <- child_parent[child_parent[, 3] <= coalition, , drop = FALSE]
+  
+  if (!is.null(idVars)) {
+    nonIdVars <- names(crossTable)[!(idVars %in% names(crossTable))]
+    nonIdTots <- as.list(rep("Total", length(nonIdVars)))
+    names(nonIdTots) <- nonIdVars
+    nonIdTots <- as.data.frame(nonIdTots)
+    idRows <- SSBtools::Match(nonIdTots, crossTable[, nonIdVars])
+    disclosures <- disclosures[disclosures[, 2] %in% idRows, , drop = FALSE]
+  }
+  
   if (nrow(disclosures))
     primary_matrix <- As_TsparseMatrix(apply(disclosures,
                                              1,
