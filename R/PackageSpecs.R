@@ -45,7 +45,8 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         primary = as.name("DominanceRule"),
         candidates = as.name("CandidatesNum"),
         preAggregate = FALSE,
-        domWeightMethod = "default"
+        domWeightMethod = "default",
+        singletonMethod = "sub2Sum"
       ),
     
     fewContributorsSpec =
