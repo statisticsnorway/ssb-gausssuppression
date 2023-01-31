@@ -53,7 +53,7 @@ test_that("Unweighted dominance", {
       k = 90,
       sWeightVar = "sw1",
     )
-  expect_true(all.equal(p1, p2, p3))
+  expect_true(all.equal(as.logical(p1), p2$primary, p3$primary))
 })
 
 test_that("Default weighted dominance", {
@@ -67,7 +67,7 @@ test_that("Default weighted dominance", {
       k = 90,
       sWeightVar = "sw2",
     )
-  expect_equal(p, c(T, rep(F, 6)))
+  expect_equal(p$primary, c(T, rep(F, 6)))
 })
 
 test_that("tauargus dominance", {
@@ -82,7 +82,7 @@ test_that("tauargus dominance", {
       sWeightVar = "sw2",
       domWeightMethod = "tauargus"
     )
-  expect_equal(p, c(T, T, F, F, F, F, F))
+  expect_equal(p$primary, c(T, T, F, F, F, F, F))
   expect_warning(
     DominanceRule(
       d,

@@ -15,6 +15,7 @@ DominanceRule(
   sWeightVar = NULL,
   domWeightMethod = "default",
   allDominance = FALSE,
+  outputWeightedNum = !is.null(sWeightVar),
   ...
 )
 }
@@ -42,6 +43,9 @@ in the dominance rule. See Details.}
 
 \item{allDominance}{Logical parameter. If \code{TRUE}, adds primary columns for each
 pair of parameters n,k in the dominance rules}
+
+\item{outputWeightedNum}{logical value to determine whether weighted numerical
+value should be included in output. Default is \code{TRUE} if \code{sWeightVar} is provided.}
 
 \item{...}{unused parameters}
 }
@@ -85,9 +89,20 @@ v1 <- c("v1",
 sw2 <- c(1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1)
 d <- data.frame(v1 = v1, num = num, sw1 = 1, sw2 = sw2, freq = 1)
 
+# without weights
 GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
- numVar = "num",  n = c(1,2), k = c(80,70), primary = DominanceRule, allDominance = TRUE)
+ numVar = "num",  n = c(1,2), k = c(80,70),
+ allDominance = TRUE, primary = DominanceRule)
 
+# with weights, standard method
+GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
+ numVar = "num",  n = c(1,2), k = c(80,70), sWeightVar = "sw2",
+ allDominance = TRUE, primary = DominanceRule)
+
+# with weights, tauargus method
+GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
+ numVar = "num",  n = c(1,2), k = c(80,70), sWeightVar = "sw2",
+ allDominance = TRUE, primary = DominanceRule, domWeightMethod = "tauargus")
 
 }
 \author{

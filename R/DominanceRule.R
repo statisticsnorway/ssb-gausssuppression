@@ -26,6 +26,8 @@
 #' in the dominance rule. See Details.
 #' @param allDominance Logical parameter. If `TRUE`, adds primary columns for each 
 #' pair of parameters n,k in the dominance rules
+#' @param outputWeightedNum logical value to determine whether weighted numerical
+#' value should be included in output. Default is `TRUE` if `sWeightVar` is provided.
 #' @param ... unused parameters
 #'
 #' @return logical vector that is `TRUE` in positions corresponding to cells
@@ -54,9 +56,20 @@
 #' sw2 <- c(1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1)
 #' d <- data.frame(v1 = v1, num = num, sw1 = 1, sw2 = sw2, freq = 1)
 #' 
+#' # without weights
 #' GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
-#'  numVar = "num",  n = c(1,2), k = c(80,70), primary = DominanceRule, allDominance = TRUE)
-#' 
+#'  numVar = "num",  n = c(1,2), k = c(80,70),
+#'  allDominance = TRUE, primary = DominanceRule)
+#'
+#' # with weights, standard method
+#' GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
+#'  numVar = "num",  n = c(1,2), k = c(80,70), sWeightVar = "sw2",
+#'  allDominance = TRUE, primary = DominanceRule)
+#'
+#' # with weights, tauargus method
+#' GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
+#'  numVar = "num",  n = c(1,2), k = c(80,70), sWeightVar = "sw2",
+#'  allDominance = TRUE, primary = DominanceRule, domWeightMethod = "tauargus")
 #'
 #' @author Daniel Lupp
 #'
@@ -70,6 +83,7 @@ DominanceRule <- function(data,
                           sWeightVar = NULL,
                           domWeightMethod = "default",
                           allDominance = FALSE,
+                          outputWeightedNum = !is.null(sWeightVar),
                           ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
@@ -78,7 +92,7 @@ DominanceRule <- function(data,
   
   tauArgusDominance <- as.character(domWeightMethod) == "tauargus"
   
-  if (!is.null(charVar) & tauArgusDominance)
+  if (length(charVar) & tauArgusDominance)
     stop("the tauArgus weight method does not work with charVar.")
   if (length(numVar) > 1) {
     warning("Multiple numVar were supplied, only the first is suppressed.")
@@ -129,17 +143,24 @@ DominanceRule <- function(data,
   dominant <- apply(primary, 1, function (x)
     Reduce(`|`, x))
   colnames(primary) <- paste0("primary.", paste(n, k, sep = ":"))
-  if (!protectZeros) {
-    if (allDominance)
-      return(list(primary = dominant, numExtra = as.data.frame(primary)))
-    else 
-      return(dominant)
-  }
-  if (allDominance)
-  return(list(primary = dominant | (abs_num == 0),
-       numExtra = as.data.frame(primary)))
+  if (!protectZeros)
+    output <- list(primary = dominant)
   else
-    dominant | (abs_num == 0)
+    output <- list(primary = (dominant | (abs_num == 0)))
+  if (outputWeightedNum) {
+    wnum <- data.frame(as.vector(crossprod(x, sweight * data[[numVar]])))
+    names(wnum) <- paste0("weighted.", numVar)
+    output[["numExtra"]] <- wnum
+  }
+  if (allDominance) {
+    if ("numExtra" %in% names(output)) 
+      output[["numExtra"]] <- cbind(output[["numExtra"]], as.data.frame(primary))
+    else 
+      output[["numExtra"]] <- as.data.frame(primary)
+  }
+  if (length(names(output)) == 1)
+    output <- unlist(output)
+  output
 }
 
 #' Method for finding dominant cells according to (possibly multiple) n,k
