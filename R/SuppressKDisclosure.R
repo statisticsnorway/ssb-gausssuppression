@@ -182,7 +182,15 @@ FindDifferenceCells <- function(x,
     idRows <- which(!is.na(SSBtools::Match(crossTable[, nonIdVars, drop = FALSE], nonIdTots)))
     disclosures <- disclosures[disclosures[, 2] %in% idRows, , drop = FALSE]
   }
-  
+  if (!is.null(sensitiveVars)) {
+    # check whether parent and child have different sensitiveVars values
+    sensitiveRows <- which(apply(disclosures, 1, function(x) 
+      is.na(SSBtools::Match(crossTable[x[1], sensitiveVars, drop = FALSE],
+                            crossTable[x[2], sensitiveVars, drop = FALSE]))))
+    # sensitive disclosure if parent and child are different
+    disclosures <- disclosures[sensitiveRows, , drop = FALSE]
+  }
+  disclosures <<- disclosures
   if (nrow(disclosures))
     primary_matrix <- As_TsparseMatrix(apply(disclosures,
                                              1,
