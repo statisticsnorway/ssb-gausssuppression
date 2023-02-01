@@ -63,7 +63,7 @@
 #' #' # Example of table without mariginals, and mc_hierarchies to protect
 #' out3 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #' formula = ~mun:inj, mc_hierarchies = mc_nomargs )
-#' 
+#'
 #'
 #' # Examples of sensitive vars and values
 #' mun <- c("k1", "k2", "k3", "k4", "k5", "k6")
@@ -79,28 +79,28 @@
 #'   out$prikket[out$suppressed] <- "-"
 #'   out
 #' }
-#' out_v <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#' out_v <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, sensitiveVars = "inj")
 #' out_v <- addPrikket(out_v)
 #' reshape2::dcast(out_v, mun~inj, value.var = "prikket")
 #'
-#' out_v1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#' out_v1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, sensitiveVars = list(inj = "none", mun = "k3"))
 #' out_v1 <- addPrikket(out_v1)
 #' reshape2::dcast(out_v1, mun~inj, value.var = "prikket")
 
-#' out_v2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#' out_v2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, sensitiveVars = list(inj = "serious", mun = "k3"))
 #' out_v2 <- addPrikket(out_v2)
 #' reshape2::dcast(out_v2, mun~inj, value.var = "prikket")
 #'
 #' # example of idVars
-#' out_id1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#' out_id1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, idVars = "mun")
 #' out_id1 <- addPrikket(out_id1)
 #' reshape2::dcast(out_id1, mun~inj, value.var = "prikket")
 
-#' out_id2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#' out_id2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, idVars = "inj")
 #' out_id2 <- addPrikket(out_id2)
 #' reshape2::dcast(out_id2, mun~inj, value.var = "prikket")
@@ -176,7 +176,7 @@ KDisclosurePrimary <- function(data,
       ...
     )
   )
-  x <- x[,!SSBtools::DummyDuplicated(x, rnd = TRUE), drop = FALSE]
+  x <- x[, !SSBtools::DummyDuplicated(x, rnd = TRUE), drop = FALSE]
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   FindDifferenceCells(
     x = x,
@@ -212,16 +212,22 @@ FindDifferenceCells <- function(x,
                         diff = freq[publ_x@j + 1] - freq[publ_x@i + 1])
   child_parent <- child_parent[freq[child_parent[, 2]] > 0 &
                                  freq[child_parent[, 1]] > 0 &
-                                 freq[child_parent[, 1]] <= upper_bound, ]
-  disclosures <- child_parent[child_parent[, 3] <= coalition, , drop = FALSE]
+                                 freq[child_parent[, 1]] <= upper_bound,]
+  disclosures <-
+    child_parent[child_parent[, 3] <= coalition, , drop = FALSE]
   
   if (!is.null(idVars)) {
-    nonIdVars <- names(crossTable)[!(names(crossTable) %in% idVars)]
-    nonIdTots <- as.list(rep("Total", length(nonIdVars)))
-    names(nonIdTots) <- nonIdVars
-    nonIdTots <- as.data.frame(nonIdTots)
-    idRows <- which(!is.na(SSBtools::Match(crossTable[, nonIdVars, drop = FALSE], nonIdTots)))
-    disclosures <- disclosures[disclosures[, 2] %in% idRows, , drop = FALSE]
+    if (!all(names(crossTable) %in% idVars)) {
+      nonIdVars <- names(crossTable)[!(names(crossTable) %in% idVars)]
+      nonIdTots <- as.list(rep("Total", length(nonIdVars)))
+      names(nonIdTots) <- nonIdVars
+      nonIdTots <- as.data.frame(nonIdTots)
+      idRows <-
+        which(!is.na(SSBtools::Match(crossTable[, nonIdVars, drop = FALSE],
+                                     nonIdTots)))
+      disclosures <-
+        disclosures[disclosures[, 2] %in% idRows, , drop = FALSE]
+    }
   }
   if (!is.null(sensitiveVars)) {
     sensitiveVals <- NULL
@@ -230,9 +236,11 @@ FindDifferenceCells <- function(x,
       sensitiveVars <- names(sensitiveVars)
     }
     # check whether parent and child have different sensitiveVars values
-    sensitiveRows <- which(apply(disclosures, 1, function(x) 
-      is.na(SSBtools::Match(crossTable[x[1], sensitiveVars, drop = FALSE],
-                            crossTable[x[2], sensitiveVars, drop = FALSE]))))
+    sensitiveRows <- which(apply(disclosures, 1, function(x)
+      is.na(
+        SSBtools::Match(crossTable[x[1], sensitiveVars, drop = FALSE],
+                        crossTable[x[2], sensitiveVars, drop = FALSE])
+      )))
     # sensitive disclosure if parent and child are different
     disclosures <- disclosures[sensitiveRows, , drop = FALSE]
     if (!is.null(sensitiveVals)) {
@@ -240,10 +248,13 @@ FindDifferenceCells <- function(x,
       # for each row in disclosures, check whether any sensitiveVal occurs in sensitiveVars
       for (sv in sensitiveVars) {
         sensitiveRows <- c(sensitiveRows,
-                           which(apply(disclosures, 1, function(x) 
-                             crossTable[x[1],sv] %in% sensitiveVals[[sv]])))
+                           which(
+                             apply(disclosures, 1, function(x)
+                               crossTable[x[1], sv] %in% sensitiveVals[[sv]])
+                           ))
       }
-      disclosures <- disclosures[unique(sensitiveRows), , drop = FALSE]
+      disclosures <-
+        disclosures[unique(sensitiveRows), , drop = FALSE]
     }
   }
   disclosures <<- disclosures
