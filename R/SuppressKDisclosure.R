@@ -175,11 +175,11 @@ FindDifferenceCells <- function(x,
   disclosures <- child_parent[child_parent[, 3] <= coalition, , drop = FALSE]
   
   if (!is.null(idVars)) {
-    nonIdVars <- names(crossTable)[!(idVars %in% names(crossTable))]
+    nonIdVars <- names(crossTable)[!(names(crossTable) %in% idVars)]
     nonIdTots <- as.list(rep("Total", length(nonIdVars)))
     names(nonIdTots) <- nonIdVars
     nonIdTots <- as.data.frame(nonIdTots)
-    idRows <- SSBtools::Match(nonIdTots, crossTable[, nonIdVars])
+    idRows <- which(!is.na(SSBtools::Match(crossTable[, nonIdVars, drop = FALSE], nonIdTots)))
     disclosures <- disclosures[disclosures[, 2] %in% idRows, , drop = FALSE]
   }
   
@@ -189,6 +189,7 @@ FindDifferenceCells <- function(x,
                                              function(row)
                                                x[, row[2]] - x[, row[1]]))
   else
-    primary_matrix <- NULL
+    # primary_matrix <- NULL
+    return(rep(FALSE, nrow(crossTable)))
   primary_matrix
 }
