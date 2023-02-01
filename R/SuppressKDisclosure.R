@@ -63,6 +63,47 @@
 #' #' # Example of table without mariginals, and mc_hierarchies to protect
 #' out3 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #' formula = ~mun:inj, mc_hierarchies = mc_nomargs )
+#' 
+#'
+#' # Examples of sensitive vars and values
+#' mun <- c("k1", "k2", "k3", "k4", "k5", "k6")
+#' inj <- c("serious", "light", "none", "unknown")
+#' data <- expand.grid(mun, inj)
+#' names(data) <- c("mun", "inj")
+#' data$freq <- c(0,5,3,4,1,6,
+#'                0,0,2,0,0,0,
+#'                4,1,1,4,0,0,
+#'                0,0,0,0,0,0)
+#' addPrikket <- function(out){
+#'   out$prikket <- out$freq
+#'   out$prikket[out$suppressed] <- "-"
+#'   out
+#' }
+#' out_v <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#'                             formula = ~mun*inj, sensitiveVars = "inj")
+#' out_v <- addPrikket(out_v)
+#' reshape2::dcast(out_v, mun~inj, value.var = "prikket")
+#'
+#' out_v1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#'                             formula = ~mun*inj, sensitiveVars = list(inj = "none", mun = "k3"))
+#' out_v1 <- addPrikket(out_v1)
+#' reshape2::dcast(out_v1, mun~inj, value.var = "prikket")
+
+#' out_v2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#'                             formula = ~mun*inj, sensitiveVars = list(inj = "serious", mun = "k3"))
+#' out_v2 <- addPrikket(out_v2)
+#' reshape2::dcast(out_v2, mun~inj, value.var = "prikket")
+#'
+#' # example of idVars
+#' out_id1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#'                             formula = ~mun*inj, idVars = "mun")
+#' out_id1 <- addPrikket(out_id1)
+#' reshape2::dcast(out_id1, mun~inj, value.var = "prikket")
+
+#' out_id2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", 
+#'                             formula = ~mun*inj, idVars = "inj")
+#' out_id2 <- addPrikket(out_id2)
+#' reshape2::dcast(out_id2, mun~inj, value.var = "prikket")
 SuppressKDisclosure <- function(data,
                                 coalition = 1,
                                 dimVar = NULL,
