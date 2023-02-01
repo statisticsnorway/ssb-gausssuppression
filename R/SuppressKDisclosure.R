@@ -183,12 +183,27 @@ FindDifferenceCells <- function(x,
     disclosures <- disclosures[disclosures[, 2] %in% idRows, , drop = FALSE]
   }
   if (!is.null(sensitiveVars)) {
+    sensitiveVals <- NULL
+    if (is.list(sensitiveVars)) {
+      sensitiveVals <- sensitiveVars
+      sensitiveVars <- names(sensitiveVars)
+    }
     # check whether parent and child have different sensitiveVars values
     sensitiveRows <- which(apply(disclosures, 1, function(x) 
       is.na(SSBtools::Match(crossTable[x[1], sensitiveVars, drop = FALSE],
                             crossTable[x[2], sensitiveVars, drop = FALSE]))))
     # sensitive disclosure if parent and child are different
     disclosures <- disclosures[sensitiveRows, , drop = FALSE]
+    if (!is.null(sensitiveVals)) {
+      sensitiveRows <- NULL
+      # for each row in disclosures, check whether any sensitiveVal occurs in sensitiveVars
+      for (sv in sensitiveVars) {
+        sensitiveRows <- c(sensitiveRows,
+                           which(apply(disclosures, 1, function(x) 
+                             crossTable[x[1],sv] %in% sensitiveVals[[sv]])))
+      }
+      disclosures <- disclosures[unique(sensitiveRows), , drop = FALSE]
+    }
   }
   disclosures <<- disclosures
   if (nrow(disclosures))
