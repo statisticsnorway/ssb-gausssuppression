@@ -257,7 +257,6 @@ FindDifferenceCells <- function(x,
         disclosures[unique(sensitiveRows), , drop = FALSE]
     }
   }
-  disclosures <<- disclosures
   if (nrow(disclosures))
     primary_matrix <- As_TsparseMatrix(apply(disclosures,
                                              1,
