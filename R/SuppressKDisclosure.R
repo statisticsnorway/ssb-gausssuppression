@@ -46,10 +46,11 @@
 #' codes = c("Total", "serious", "light", "none", "unknown"))
 #' dimlists <- list(mun = mun, inj = inj)
 #'
-#' inj2 <- data.frame(levels = c("@@", "@@@@", "@@@@@@" ,"@@@@@@", "@@@@", "@@@@"),
-#' codes = c("Total", "injured", "serious", "light", "none", "unknown"))
+#'  inj2 <- data.frame(levels = c("@@", "@@@@", "@@@@@@", "@@@@@@"),
+#' codes = c("Total", "injured", "serious", "light"))
 #' inj3 <- data.frame(levels = c("@@", "@@@@", "@@@@" ,"@@@@", "@@@@"),
 #' codes = c( "shadowtotal", "serious", "light", "none", "unknown"))
+
 #' mc_dimlist <- list(inj = inj2)
 #' mc_nomargs <- list(inj = inj3)
 #'
@@ -62,7 +63,7 @@
 #'
 #' #' # Example of table without mariginals, and mc_hierarchies to protect
 #' out3 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
-#' formula = ~mun:inj, mc_hierarchies = mc_nomargs )
+#' formula = ~mun:inj, mc_hierarchies = mc_dimlist )
 #'
 #'
 #' # Examples of sensitive vars and values
@@ -70,9 +71,9 @@
 #' inj <- c("serious", "light", "none", "unknown")
 #' data <- expand.grid(mun, inj)
 #' names(data) <- c("mun", "inj")
-#' data$freq <- c(0,5,3,4,1,6,
-#'                0,0,2,0,0,0,
-#'                4,1,1,4,0,0,
+#' data$freq <- c(0,5,3,4,1,0,
+#'                0,0,2,0,0,6,
+#'                4,1,0,4,0,0,
 #'                0,0,0,0,0,0)
 #' addPrikket <- function(out){
 #'   out$prikket <- out$freq
@@ -85,9 +86,10 @@
 #' reshape2::dcast(out_v, mun~inj, value.var = "prikket")
 #'
 #' out_v1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
-#'                             formula = ~mun*inj, sensitiveVars = list(inj = "none", mun = "k3"))
+#'                             formula = ~mun*inj, mc_hierarchies = mc_dimlist,
+#'                             sensitiveVars = list(mun =  "k3", inj = "injured"))
 #' out_v1 <- addPrikket(out_v1)
-#' reshape2::dcast(out_v1, mun~inj, value.var = "prikket")
+#' reshape2::dcast(out_v1, mun~inj, value.var = "freq")
 
 #' out_v2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, sensitiveVars = list(inj = "serious", mun = "k3"))
@@ -106,6 +108,8 @@
 #' reshape2::dcast(out_id2, mun~inj, value.var = "prikket")
 SuppressKDisclosure <- function(data,
                                 coalition = 1,
+                                idVars = NULL,
+                                sensitiveVars = NULL,
                                 dimVar = NULL,
                                 formula = NULL,
                                 hierarchies = NULL,
@@ -113,6 +117,7 @@ SuppressKDisclosure <- function(data,
                                 mc_hierarchies = NULL,
                                 upper_bound = Inf,
                                 extend0 = TRUE,
+                                combineSensitive = FALSE,
                                 ...) {
   additional_params <- list(...)
   if (length(additional_params)) {
@@ -129,6 +134,8 @@ SuppressKDisclosure <- function(data,
     dimVar = dimVar,
     freqVar = freqVar,
     coalition = coalition,
+    idVars = idVars,
+    sensitiveVars = sensitiveVars,
     mc_hierarchies = mc_hierarchies,
     upper_bound = upper_bound,
     primary = KDisclosurePrimary,
@@ -163,19 +170,20 @@ KDisclosurePrimary <- function(data,
                                coalition = 1,
                                upper_bound = Inf,
                                ...) {
-  x <- cbind(
-    x,
-    X_from_mc(
-      data = data,
-      x = x,
-      crossTable = crossTable,
-      mc_hierarchies = mc_hierarchies,
-      freqVar = freqVar,
-      coalition = coalition,
-      upper_bound = upper_bound,
-      ...
-    )
+  mcModelMatrix <- X_from_mc(
+    data = data,
+    x = x,
+    crossTable = crossTable,
+    mc_hierarchies = mc_hierarchies,
+    freqVar = freqVar,
+    coalition = coalition,
+    upper_bound = upper_bound,
+    returnNewCrossTable = TRUE,
+    ...
   )
+  x <- cbind(x, mcModelMatrix$x)
+  crossTable <- rbind(crossTable, mcModelMatrix$crossTable)
+
   x <- x[, !SSBtools::DummyDuplicated(x, rnd = TRUE), drop = FALSE]
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   FindDifferenceCells(
@@ -266,4 +274,12 @@ FindDifferenceCells <- function(x,
     # primary_matrix <- NULL
     return(rep(FALSE, nrow(crossTable)))
   primary_matrix
+}
+
+createSensitiveDimList <- function(sensitiveVar) {
+  if (length(sensitiveVar) > 1) 
+  data.frame(levels = c("@", "@@", rep("@@@", length(sensitiveVar))),
+             codes = c("Total", paste(sensitiveVar, collapse = ":"), sensitiveVar))
+  else 
+    NULL
 }
