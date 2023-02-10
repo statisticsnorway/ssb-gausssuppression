@@ -20,7 +20,7 @@
 #'         in rule and where `nAll` is similar, but without omitting codes in `removeCodes`. 
 #' @export
 #'
-NcontributorsRule <- function(data, freq, numVar, x, maxN = 3, protectZeros = FALSE, charVar, removeCodes = character(0), remove0 = TRUE, ...) {
+NContributorsRule <- function(data, freq, numVar, x, maxN = 3, protectZeros = FALSE, charVar, removeCodes = character(0), remove0 = TRUE, ...) {
   if (length(charVar)>1) {
     stop("Only single charVar implemented in suppression rule")
   }
@@ -44,5 +44,32 @@ NcontributorsRule <- function(data, freq, numVar, x, maxN = 3, protectZeros = FA
 }
 
 
+NContributorsRule_identical <- NContributorsRule
 
+
+#' Identical to ´NContributorsRule´
+#' 
+#' The function is included for compatibility after changing the name to 
+#' \code{\link{NContributorsRule}}
+#' 
+#' @rdname NcontributorsRule_identical
+#' 
+#' @inheritParams NContributorsRule
+#' 
+#' @export
+#' @keywords internal
+#'
+NcontributorsRule <- NContributorsRule_identical
+
+
+# Without @rdname NcontributorsRule_identical:
+# Default NcontributorsRule overwrites NContributorsRule.Rd  
+
+# With 
+# NcontributorsRule <- NContributorsRule 
+# it is impossible to hide  function in separate rd-file with keywords internal
+
+# With 
+# NcontributorsRule <- function(...) NContributorsRule(...)   
+# test fails since default values cannot be found in function
 
