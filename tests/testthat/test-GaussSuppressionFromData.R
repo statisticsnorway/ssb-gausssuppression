@@ -121,7 +121,7 @@ test_that("extend0 and various hierarchy input", {
 
 
 
-test_that("DominanceRule and NcontributorsRule", {
+test_that("DominanceRule and NcontributorsRule + CandidatesNum", {
   set.seed(123)
   z <- SSBtools::MakeMicro(SSBtoolsData("z2"), "ant")
   z$char <- sample(paste0("char", 1:10), nrow(z), replace = TRUE)
@@ -149,9 +149,9 @@ test_that("DominanceRule and NcontributorsRule", {
   d2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", 
                                  candidates = CandidatesNum, primary = NContributorsRule, singletonMethod = "none",
                                  removeCodes = 1:20, printInc = printInc, 
-                                 freqVar = "ant", preAggregate = FALSE, maxN = 10)
+                                 preAggregate = FALSE, maxN = 10) # Empty freq in CandidatesNum
   
-  expect_equal(d1, d2)
+  expect_equal(d1[names(d1) != "ant"], d2, ignore_attr = TRUE)
   
   
 })
