@@ -11,7 +11,7 @@ NContributorsRule(
   x,
   maxN = 3,
   protectZeros = FALSE,
-  charVar,
+  charVar = NULL,
   removeCodes = character(0),
   remove0 = TRUE,
   ...
@@ -30,9 +30,12 @@ NContributorsRule(
 
 \item{protectZeros}{Suppression parameter. Only TRUE (default) is used implemented.}
 
-\item{charVar}{Variable with contributor codes.}
+\item{charVar}{Variable with contributor codes.
+When empty, unique contributor in each row is assumed.}
 
-\item{removeCodes}{Vector of codes to be omitted when counting contributors.}
+\item{removeCodes}{Vector of codes to be omitted when counting contributors.
+With empty \code{charVar} row indices are assumed
+and conversion to integer is performed.}
 
 \item{remove0}{When \code{FALSE} (default), data rows where \code{numVar} (if any) is zero are omitted when counting contributors.}
 
