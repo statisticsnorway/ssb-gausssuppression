@@ -138,6 +138,22 @@ test_that("DominanceRule and NcontributorsRule", {
   
   expect_identical(as.numeric(which(a$primary)), c(8, 17, 18, 23, 52, 53, 58, 63, 73, 77, 78, 80, 83, 87, 90, 92, 97, 98))
   expect_identical(as.numeric(which(b$primary)), c(8, 18, 23, 53, 63, 78, 83, 87, 90, 97, 98))
+  
+  
+  z$char <- paste0("char", 1:nrow(z))
+  d1 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                candidates = CandidatesNum, primary = NcontributorsRule, singletonMethod = "none",
+                                removeCodes = paste0("char", 1:20), printInc = printInc, 
+                                freqVar = "ant", preAggregate = FALSE, maxN = 10)
+  
+  d2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", 
+                                 candidates = CandidatesNum, primary = NContributorsRule, singletonMethod = "none",
+                                 removeCodes = 1:20, printInc = printInc, 
+                                 freqVar = "ant", preAggregate = FALSE, maxN = 10)
+  
+  expect_equal(d1, d2)
+  
+  
 })
 
 
