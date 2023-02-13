@@ -11,7 +11,10 @@
 #' @param maxN Primary suppression when number of contributors `<= maxN`.
 #' @param protectZeros Suppression parameter. Only TRUE (default) is used implemented. 
 #' @param charVar Variable with contributor codes. 
-#' @param removeCodes Vector of codes to be omitted when counting contributors. 
+#'                When empty, unique contributor in each row is assumed.
+#' @param removeCodes Vector of codes to be omitted when counting contributors.
+#'                With empty `charVar` row indices are assumed
+#'                and conversion to integer is performed.
 #' @param remove0 When `FALSE` (default), data rows where `numVar` (if any) is zero are omitted when counting contributors.
 #' @param ... unused parameters
 #'
@@ -20,7 +23,13 @@
 #'         in rule and where `nAll` is similar, but without omitting codes in `removeCodes`. 
 #' @export
 #'
-NcontributorsRule <- function(data, freq, numVar, x, maxN = 3, protectZeros = FALSE, charVar, removeCodes = character(0), remove0 = TRUE, ...) {
+NContributorsRule <- function(data, freq, numVar, x, 
+                              maxN = 3, 
+                              protectZeros = FALSE, 
+                              charVar = NULL, 
+                              removeCodes = character(0), 
+                              remove0 = TRUE, 
+                              ...) {
   if (length(charVar)>1) {
     stop("Only single charVar implemented in suppression rule")
   }
@@ -31,7 +40,12 @@ NcontributorsRule <- function(data, freq, numVar, x, maxN = 3, protectZeros = FA
   if (protectZeros) {
     stop("TRUE protectZeros not implemented")
   }
-  y <- data[[charVar]]
+  if (length(charVar)) {
+    y <- data[[charVar]]
+  } else {
+    y <- seq_len(nrow(data))
+    removeCodes <- as.integer(removeCodes)
+  }
   if (remove0 & length(numVar) > 0) {
     y[data[[numVar]] == 0] <- NA
   }
@@ -44,5 +58,32 @@ NcontributorsRule <- function(data, freq, numVar, x, maxN = 3, protectZeros = FA
 }
 
 
+NContributorsRule_identical <- NContributorsRule
 
+
+#' Identical to ´NContributorsRule´
+#' 
+#' The function is included for compatibility after changing the name to 
+#' \code{\link{NContributorsRule}}
+#' 
+#' @rdname NcontributorsRule_identical
+#' 
+#' @inheritParams NContributorsRule
+#' 
+#' @export
+#' @keywords internal
+#'
+NcontributorsRule <- NContributorsRule_identical
+
+
+# Without @rdname NcontributorsRule_identical:
+# Default NcontributorsRule overwrites NContributorsRule.Rd  
+
+# With 
+# NcontributorsRule <- NContributorsRule 
+# it is impossible to hide  function in separate rd-file with keywords internal
+
+# With 
+# NcontributorsRule <- function(...) NContributorsRule(...)   
+# test fails since default values cannot be found in function
 
