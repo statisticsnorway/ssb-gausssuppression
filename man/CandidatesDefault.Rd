@@ -7,7 +7,7 @@
 \usage{
 CandidatesDefault(freq, x, secondaryZeros = FALSE, weight, ...)
 
-CandidatesNum(secondaryZeros = FALSE, freq = NULL, num, weight, ...)
+CandidatesNum(secondaryZeros = FALSE, freq = NULL, num, weight, x, ...)
 }
 \arguments{
 \item{freq}{Vector of output frequencies}

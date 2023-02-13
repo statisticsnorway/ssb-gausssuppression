@@ -20,6 +20,7 @@
 #'
 #' @return candidates, \code{\link{GaussSuppression}} input 
 #' @export
+#' @importFrom Matrix colSums
 CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
   
   if(is.null(secondaryZeros)) stop("A non-NULL value of secondaryZeros is required.")
@@ -50,18 +51,18 @@ CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
 #' @rdname CandidatesDefault
 #' @param num Data frame of output aggregates calculated from `numVar`. When several variables, only first is used. 
 #' @export
-CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, ...) {
+CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, x,  ...) {
   if (ncol(num) > 1){
     warning("Multiple numVar were supplied, only the first is used in candidates function.")
   }
   if (!length(freq)) {
-    freq <- rep(1L, nrow(num))
+    freq <- colSums(x)
   }
   newWeight <- abs(num[[1]]/FreqPlus1(freq))
   if (!is.null(weight)) {
     newWeight <- newWeight * weight
   }
-  CandidatesDefault(weight = newWeight, freq = freq, secondaryZeros = secondaryZeros, ...)
+  CandidatesDefault(weight = newWeight, freq = freq, secondaryZeros = secondaryZeros, x = x, ...)
 }
 
 

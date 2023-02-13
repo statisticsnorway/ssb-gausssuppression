@@ -144,12 +144,14 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum", {
   d1 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
                                 candidates = CandidatesNum, primary = NcontributorsRule, singletonMethod = "none",
                                 removeCodes = paste0("char", 1:20), printInc = printInc, 
-                                freqVar = "ant", preAggregate = FALSE, maxN = 10)
+                                freqVar = "ant", preAggregate = FALSE, maxN = 10,
+                                whenEmptyUnsuppressed = "stop")
   
   d2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", 
                                  candidates = CandidatesNum, primary = NContributorsRule, singletonMethod = "none",
                                  removeCodes = 1:20, printInc = printInc, 
-                                 preAggregate = FALSE, maxN = 10) # Empty freq in CandidatesNum
+                                 preAggregate = FALSE, maxN = 10, # Empty freq in CandidatesNum
+                                 whenEmptyUnsuppressed = "stop") 
   
   expect_equal(d1[names(d1) != "ant"], d2, ignore_attr = TRUE)
   
