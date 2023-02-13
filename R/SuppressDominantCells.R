@@ -25,7 +25,7 @@
 #'         rep("v5", 3),
 #'         rep(c("v6", "v7"), each = 4))
 #' sweight <- c(1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1)
-#' d <- data.frame(v1 = v1, num = num, sweight = sweight, freq = 1)
+#' d <- data.frame(v1 = v1, num = num, sweight = sweight)
 #' 
 #' # basic use
 #' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1)
@@ -50,10 +50,6 @@ SuppressDominantCells <- function(data,
                                   ...,
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
-  if (is.null(freqVar)) {
-    freqVar <- rev(make.unique(c(names(data), "freq")))[1]
-    data[[freqVar]] <- 1
-  }
   GaussSuppressionFromData(
     data = data,
     n = n,

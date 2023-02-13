@@ -8,12 +8,12 @@
 #'
 #'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec} |\strong{fewContributorsSpec} |
 #'  |:------------------------|:-----------------------|:----------------------|:----------------------------|
-#'  |\strong{primary}         |PrimaryDefault          |DominanceRule          |NContributorsRule            |
+#'  |\strong{primary}         |PrimaryDefault          |DominanceRule          |NcontributorsRule            |
 #'  |\strong{protectZeros}    |TRUE                    |                       |FALSE                        |
 #'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum          |                             |
 #'  |\strong{singleton}       |SingletonDefault        |                       |                             |
 #'  |\strong{extend0}         |TRUE                    |                       |FALSE                        |
-#'  |\strong{preAggregate}    |                        |FALSE                  |                             |
+#'  |\strong{preAggregate}    |                        |FALSE                  |FALSE                        |
 #'  |\strong{domWeightMethod} |                        |default                |                             |
 #'  |\strong{singletonMethod} |                        |sub2Sum                |                             |
 #'
@@ -54,7 +54,8 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       list(
         primary = as.name("NcontributorsRule"),
         protectZeros = FALSE,
-        extend0 = FALSE
+        extend0 = FALSE,
+        preAggregate = FALSE
       )
   )
   
