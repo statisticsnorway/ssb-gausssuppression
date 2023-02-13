@@ -24,7 +24,8 @@ singleton, \code{\link{GaussSuppression}} input
 Function for \code{\link{GaussSuppressionFromData}}
 }
 \details{
-This function marks input cells as singletons according to the input frequencies.
-Zeros are set to singletons when \code{protectZeros} or \code{secondaryZeros} is \code{TRUE}.
+This function marks input cells as singletons according to the input frequencies (\code{freqVar}).
+Zero frequencies are set to singletons when \code{protectZeros} or \code{secondaryZeros} is \code{TRUE}.
 Otherwise, ones are set to singletons.
+Empty \code{freqVar} is treated as all frequencies being ones.
 }

@@ -2,9 +2,10 @@
 #'
 #' Function for \code{\link{GaussSuppressionFromData}}
 #' 
-#' This function marks input cells as singletons according to the input frequencies. 
-#' Zeros are set to singletons when `protectZeros` or `secondaryZeros` is `TRUE`. 
+#' This function marks input cells as singletons according to the input frequencies (`freqVar`). 
+#' Zero frequencies are set to singletons when `protectZeros` or `secondaryZeros` is `TRUE`. 
 #' Otherwise, ones are set to singletons.
+#' Empty `freqVar` is treated as all frequencies being ones. 
 #'
 #' @param data  Input data, possibly pre-aggregated within `GaussSuppressionFromData`  
 #' @param freqVar A single variable holding counts (input to `GaussSuppressionFromData`)
@@ -20,7 +21,13 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
   if(is.null(secondaryZeros)) stop("A non-NULL value of secondaryZeros is required.")
   
   if (protectZeros | secondaryZeros){ 
+    if (!length(freqVar)) {
+      return(rep(FALSE, nrow(data)))
+    }
     return(data[[freqVar]] == 0)
+  }
+  if (!length(freqVar)) {
+    return(rep(TRUE, nrow(data)))
   }
   data[[freqVar]] == 1
 }
