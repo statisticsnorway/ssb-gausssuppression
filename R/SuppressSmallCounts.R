@@ -48,6 +48,7 @@ SuppressSmallCounts <- function(data,
                                 spec = PackageSpecs("smallCountSpec")) {
   GaussSuppressionFromData(
     data,
+    maxN = maxN,
     freqVar = freqVar,
     dimVar = dimVar,
     hierarchies = hierarchies,
