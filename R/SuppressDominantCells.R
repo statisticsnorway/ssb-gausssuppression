@@ -37,6 +37,13 @@
 #' # overwriting some parameters in default spec
 #' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num",
 #' dimVar = "v1", sWeightVar = "sweight", domWeightMethod = "tauargus")
+#' 
+#' # using dominance and few contributors rule together, see second example compared to first
+#' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1,
+#' primary = c(DominanceRule, NContributorsRule), maxN = 3, allDominance = TRUE)
+#' 
+#' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1,
+#' primary = c(DominanceRule, NContributorsRule), maxN = 4, allDominance = TRUE)
 SuppressDominantCells <- function(data,
                                   n,
                                   k,
@@ -55,6 +62,7 @@ SuppressDominantCells <- function(data,
     data = data,
     n = n,
     k = k,
+    allDominance = allDominance,
     freqVar = freqVar,
     numVar = numVar,
     dimVar = dimVar,
