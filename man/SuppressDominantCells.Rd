@@ -8,6 +8,7 @@ SuppressDominantCells(
   data,
   n,
   k,
+  allDominance = FALSE,
   freqVar = NULL,
   numVar = NULL,
   dimVar = NULL,
@@ -25,6 +26,9 @@ SuppressDominantCells(
 \item{n}{parameter \code{n} in dominance rule.}
 
 \item{k}{parameter \code{k} in dominance rule.}
+
+\item{allDominance}{Logical parameter. If \code{TRUE}, adds primary columns for each
+pair of parameters n,k in the dominance rules}
 
 \item{freqVar}{A single variable holding counts (name or number).}
 
@@ -65,7 +69,7 @@ v1 <- c("v1",
         rep("v5", 3),
         rep(c("v6", "v7"), each = 4))
 sweight <- c(1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1)
-d <- data.frame(v1 = v1, num = num, sweight = sweight, freq = 1)
+d <- data.frame(v1 = v1, num = num, sweight = sweight)
 
 # basic use
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1)

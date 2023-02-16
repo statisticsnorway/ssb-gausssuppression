@@ -6,15 +6,15 @@
 \usage{
 SuppressKDisclosure(
   data,
-  coalition = 1,
+  coalition = 0,
+  mc_hierarchies = NULL,
+  upper_bound = Inf,
   dimVar = NULL,
   formula = NULL,
   hierarchies = NULL,
   freqVar = NULL,
-  mc_hierarchies = NULL,
-  upper_bound = Inf,
-  extend0 = TRUE,
-  ...
+  ...,
+  spec = PackageSpecs("kDisclosureSpec")
 )
 }
 \arguments{
@@ -23,6 +23,12 @@ SuppressKDisclosure(
 \item{coalition}{numeric vector of length one, representing possible size of an
 attacking coalition. This parameter corresponds to the parameter k in the
 definition of k-disclosure.}
+
+\item{mc_hierarchies}{a hierarchy representing meaningful combinations to be
+protected. Default value is \code{NULL}.}
+
+\item{upper_bound}{numeric value representing minimum count considered safe.
+Default set to \code{Inf}}
 
 \item{dimVar}{The main dimensional variables and additional aggregating
 variables. This parameter can be  useful when hierarchies and formula are
@@ -36,16 +42,9 @@ unspecified.}
 
 \item{freqVar}{name of the frequency variable in \code{data}}
 
-\item{mc_hierarchies}{a hierarchy representing meaningful combinations to be
-protected. Default value is \code{NULL}.}
-
-\item{upper_bound}{numeric value representing minimum count considered safe.
-Default set to \code{Inf}}
-
-\item{extend0}{Logical parameter to add empty cells to data set. Do not change
-to \code{FALSE} unless you are sure missing cells are structural zeros.}
-
 \item{...}{parameters passed to children functions}
+
+\item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 }
 \value{
 A data.frame containing the publishable data set, with a boolean

@@ -40,6 +40,7 @@
 SuppressDominantCells <- function(data,
                                   n,
                                   k,
+                                  allDominance = FALSE,
                                   freqVar = NULL,
                                   numVar = NULL,
                                   dimVar = NULL,

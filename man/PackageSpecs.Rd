@@ -23,16 +23,17 @@ numerical indices or by specifying the spec name, see Details.
 }
 \details{
 The following table summarizes the built-in specs. Columns represent
-different specs, and rows represent the parameter settings.\tabular{llll}{
-    \tab \strong{smallCountSpec} \tab \strong{dominanceSpec} \tab \strong{fewContributorsSpec} \cr
-   \strong{primary} \tab PrimaryDefault \tab DominanceRule \tab NContributorsRule \cr
-   \strong{protectZeros} \tab TRUE \tab  \tab FALSE \cr
-   \strong{candidates} \tab CandidatesDefault \tab CandidatesNum \tab  \cr
-   \strong{singleton} \tab SingletonDefault \tab  \tab  \cr
-   \strong{extend0} \tab TRUE \tab  \tab FALSE \cr
-   \strong{preAggregate} \tab  \tab FALSE \tab  \cr
-   \strong{domWeightMethod} \tab  \tab default \tab  \cr
-   \strong{singletonMethod} \tab  \tab sub2Sum \tab  \cr
+different specs, and rows represent the parameter settings.\tabular{lllll}{
+    \tab \strong{smallCountSpec} \tab \strong{dominanceSpec} \tab \strong{NContributorsSpec} \tab \strong{KDisclosureSpec} \cr
+   \strong{primary} \tab PrimaryDefault \tab DominanceRule \tab NContributorsRule \tab KDisclosurePrimary \cr
+   \strong{protectZeros} \tab TRUE \tab  \tab FALSE \tab FALSE \cr
+   \strong{candidates} \tab CandidatesDefault \tab CandidatesNum \tab  \tab DirectDisclosureCandidates \cr
+   \strong{singleton} \tab SingletonDefault \tab  \tab  \tab  \cr
+   \strong{extend0} \tab TRUE \tab  \tab FALSE \tab TRUE \cr
+   \strong{preAggregate} \tab  \tab !is.null(charVar) \tab !is.null(charVar) \tab  \cr
+   \strong{domWeightMethod} \tab  \tab default \tab  \tab  \cr
+   \strong{singletonMethod} \tab  \tab sub2Sum \tab  \tab  \cr
+   \strong{secondaryZeros} \tab  \tab  \tab  \tab TRUE \cr
 }
 }
 \examples{
