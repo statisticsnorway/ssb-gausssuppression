@@ -33,39 +33,47 @@
 PackageSpecs <- function(x = NULL, printTable = FALSE) {
   specList <- list(
     smallCountSpec =
-      list(
-        primary = as.name("PrimaryDefault"),
+      alist(
+        primary = PrimaryDefault,
         protectZeros = TRUE,
-        candidates = as.name("CandidatesDefault"),
-        singleton = as.name("SingletonDefault"),
+        candidates = CandidatesDefault,
+        singleton = SingletonDefault,
         extend0 = TRUE
       ),
     
     dominanceSpec =
-      list(
-        primary = as.name("DominanceRule"),
-        candidates = as.name("CandidatesNum"),
-        preAggregate = FALSE,
+      alist(
+        primary = DominanceRule,
+        candidates = CandidatesNum,
+        preAggregate = !is.null(charVar),
         domWeightMethod = "default",
         singletonMethod = "sub2Sum"
       ),
+    dominance2Spec =       
+      alist(
+      primary = DominanceRule,
+      candidates = CandidatesNum,
+      preAggregate = !is.null(preAggVar),
+      domWeightMethod = "default",
+      singletonMethod = "sub2Sum"
+    ),
     
     nContributorsSpec =
-      list(
-        primary = as.name("NContributorsRule"),
+      alist(
+        primary = NContributorsRule,
         protectZeros = FALSE,
         extend0 = FALSE,
-        preAggregate = FALSE,
-        candidates = as.name("CandidatesNum"),
+        preAggregate = !is.null(charVar),
+        candidates = CandidatesNum,
         singletonMethod = "sub2Sum"
       ),
     
     kDisclosureSpec = 
-      list(
-        primary = as.name("KDisclosurePrimary"),
+      alist(
+        primary = KDisclosurePrimary,
         protectZeros = FALSE,
         secondaryZeros = 1,
-        candidates = as.name("DirectDisclosureCandidates"),
+        candidates = DirectDisclosureCandidates,
         extend0 = TRUE,
         singletonMethod = "anySumNOTprimary"
       )
