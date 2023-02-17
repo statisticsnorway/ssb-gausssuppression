@@ -30,12 +30,6 @@
 #' # basic use
 #' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1)
 #' 
-#' # testing dominanceSpec and dominance2Spec
-#' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1,
-#'  preAggVar = "sweight")
-#' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1,
-#'  preAggVar = "sweight", spec = PackageSpecs("dominance2Spec"))
-#' 
 #' # with weights
 #' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num",
 #' dimVar = "v1", sWeightVar = "sweight")

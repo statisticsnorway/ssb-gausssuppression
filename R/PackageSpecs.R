@@ -41,15 +41,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         extend0 = TRUE
       ),
     
-    dominanceSpec =
-      alist(
-        primary = DominanceRule,
-        candidates = CandidatesNum,
-        preAggregate = !is.null(charVar),
-        domWeightMethod = "default",
-        singletonMethod = "sub2Sum"
-      ),
-    dominance2Spec =       
+    dominanceSpec =       
       alist(
       primary = DominanceRule,
       candidates = CandidatesNum,
@@ -86,7 +78,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       y <- specList[[name]]
       pt <-
         cbind(pt, c(name = sapply(rows, function(x)
-          ifelse(x %in% names(y), as.character(y[[x]]), ""))))
+          ifelse(x %in% names(y), (y[[x]]), ""))))
     }
     colnames(pt) <- paste0("\\", "strong{", names(specList), "}")
     rownames(pt) <- paste0("\\strong{", rows, "}")
