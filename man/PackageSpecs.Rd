@@ -30,9 +30,9 @@ different specs, and rows represent the parameter settings.\tabular{lllll}{
    \strong{candidates} \tab CandidatesDefault \tab CandidatesNum \tab CandidatesNum \tab DirectDisclosureCandidates \cr
    \strong{singleton} \tab SingletonDefault \tab  \tab  \tab  \cr
    \strong{extend0} \tab TRUE \tab  \tab FALSE \tab TRUE \cr
-   \strong{preAggregate} \tab  \tab FALSE \tab FALSE \tab  \cr
-   \strong{domWeightMethod} \tab  \tab default \tab  \tab  \cr
-   \strong{singletonMethod} \tab  \tab sub2Sum \tab sub2Sum \tab anySumNOTprimary \cr
+   \strong{preAggregate} \tab  \tab !is.null(preAggVar) \tab !is.null(preAggVar) \tab  \cr
+   \strong{domWeightMethod} \tab  \tab "default" \tab  \tab  \cr
+   \strong{singletonMethod} \tab  \tab "sub2Sum" \tab "sub2Sum" \tab "anySumNOTprimary" \cr
    \strong{secondaryZeros} \tab  \tab  \tab  \tab 1 \cr
 }
 }

@@ -5,7 +5,7 @@
 #'
 #' @details The following table summarizes the built-in specs. Columns represent
 #' different specs, and rows represent the parameter settings.
-
+#'
 #'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec} |\strong{nContributorsSpec} |\strong{kDisclosureSpec}   |
 #'  |:------------------------|:-----------------------|:----------------------|:--------------------------|:--------------------------|
 #'  |\strong{primary}         |PrimaryDefault          |DominanceRule          |NContributorsRule          |KDisclosurePrimary         |
@@ -13,10 +13,11 @@
 #'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum          |CandidatesNum              |DirectDisclosureCandidates |
 #'  |\strong{singleton}       |SingletonDefault        |                       |                           |                           |
 #'  |\strong{extend0}         |TRUE                    |                       |FALSE                      |TRUE                       |
-#'  |\strong{preAggregate}    |                        |FALSE                  |FALSE                      |                           |
-#'  |\strong{domWeightMethod} |                        |default                |                           |                           |
-#'  |\strong{singletonMethod} |                        |sub2Sum                |sub2Sum                    |anySumNOTprimary           |
+#'  |\strong{preAggregate}    |                        |!is.null(preAggVar)    |!is.null(preAggVar)        |                           |
+#'  |\strong{domWeightMethod} |                        |"default"              |                           |                           |
+#'  |\strong{singletonMethod} |                        |"sub2Sum"              |"sub2Sum"                  |"anySumNOTprimary"         |
 #'  |\strong{secondaryZeros}  |                        |                       |                           |1                          |
+
 #' @param x the character name or index of the spec to be returned. If `NULL` (default),
 #' returns list of all specs
 #' @param printTable Logical value (default `FALSE`). If `TRUE`, prints a table
@@ -55,7 +56,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         primary = NContributorsRule,
         protectZeros = FALSE,
         extend0 = FALSE,
-        preAggregate = !is.null(charVar),
+        preAggregate = !is.null(preAggVar),
         candidates = CandidatesNum,
         singletonMethod = "sub2Sum"
       ),
@@ -78,7 +79,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       y <- specList[[name]]
       pt <-
         cbind(pt, c(name = sapply(rows, function(x)
-          ifelse(x %in% names(y), (y[[x]]), ""))))
+          ifelse(x %in% names(y), deparse(y[[x]]), ""))))
     }
     colnames(pt) <- paste0("\\", "strong{", names(specList), "}")
     rownames(pt) <- paste0("\\strong{", rows, "}")
