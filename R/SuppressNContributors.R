@@ -32,8 +32,10 @@ SuppressNContributors <- function(data,
                                   dimVar = NULL,
                                   hierarchies = NULL,
                                   formula = NULL,
+                                  preAggVar = NULL,
                                   ...,
                                   spec = PackageSpecs("nContributorsSpec")) {
+  charVar <- preAggVar
   GaussSuppressionFromData(
     data,
     maxN = maxN,
@@ -41,6 +43,7 @@ SuppressNContributors <- function(data,
     dimVar = dimVar,
     hierarchies = hierarchies,
     formula  = formula,
+    charVar = charVar,
     spec = spec,
     ...
   )

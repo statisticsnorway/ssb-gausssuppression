@@ -46,7 +46,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       alist(
       primary = DominanceRule,
       candidates = CandidatesNum,
-      preAggregate = !is.null(preAggVar),
+      preAggregate = !is.null(charVar),
       domWeightMethod = "default",
       singletonMethod = "sub2Sum"
     ),
@@ -56,7 +56,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         primary = NContributorsRule,
         protectZeros = FALSE,
         extend0 = FALSE,
-        preAggregate = !is.null(preAggVar),
+        preAggregate = !is.null(charVar),
         candidates = CandidatesNum,
         singletonMethod = "sub2Sum"
       ),
