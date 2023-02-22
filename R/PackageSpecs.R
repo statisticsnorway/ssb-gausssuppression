@@ -34,42 +34,42 @@
 PackageSpecs <- function(x = NULL, printTable = FALSE) {
   specList <- list(
     smallCountSpec =
-      alist(
+      quote(list(
         primary = PrimaryDefault,
         protectZeros = TRUE,
         candidates = CandidatesDefault,
         singleton = SingletonDefault,
         extend0 = TRUE
-      ),
+      )),
     
     dominanceSpec =       
-      alist(
+      quote(list(
       primary = DominanceRule,
       candidates = CandidatesNum,
       preAggregate = !is.null(charVar),
       domWeightMethod = "default",
       singletonMethod = "sub2Sum"
-    ),
+    )),
     
     nContributorsSpec =
-      alist(
+      quote(list(
         primary = NContributorsRule,
         protectZeros = FALSE,
         extend0 = FALSE,
         preAggregate = !is.null(charVar),
         candidates = CandidatesNum,
         singletonMethod = "sub2Sum"
-      ),
+      )),
     
     kDisclosureSpec = 
-      alist(
+      quote(list(
         primary = KDisclosurePrimary,
         protectZeros = FALSE,
         secondaryZeros = 1,
         candidates = DirectDisclosureCandidates,
         extend0 = TRUE,
         singletonMethod = "anySumNOTprimary"
-      )
+      ))
   )
   
   if (printTable) {
