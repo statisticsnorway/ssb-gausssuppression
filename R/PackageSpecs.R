@@ -74,6 +74,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
   
   if (printTable) {
     rows <- unique(unlist(lapply(specList, names)))
+    rows <- rows[rows != ""]
     pt <- NULL
     for (name in names(specList)) {
       y <- specList[[name]]
