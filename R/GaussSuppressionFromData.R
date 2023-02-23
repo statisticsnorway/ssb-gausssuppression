@@ -162,6 +162,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            ...){ 
   if (!is.null(spec)) {
+    if(is.call(spec)){
+      spec = eval(spec)
+    }
     if (is.list(spec)) {
       if (length(names(spec)[!(names(spec) %in% c("", NA))]) == length(spec)) {
         sysCall <- match.call()  #  sys.call() is similar to match.call, but does not expand the argument name (needed here)
