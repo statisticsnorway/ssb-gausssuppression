@@ -57,16 +57,44 @@ below illustrate how to override parameters specified by a spec. Note
 that this is only possible if \code{specLock = FALSE}.
 }
 \examples{
-mun <- c("k1", "k2", "k3", "k4", "k5", "k6")
-inj <- c("serious", "light", "none", "unknown")
-data <- expand.grid(mun, inj)
-names(data) <- c("mun", "inj")
-data$freq <- c(4,5,3,4,1,6,
-0,0,2,1,0,0,
-0,1,1,4,0,0,
-0,0,0,0,0,0)
+mun_accidents <- SSBtoolsData("mun_accidents")
 
-SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3)
+SuppressSmallCounts(data = mun_accidents, maxN = 3, dimVar = 1:2, freqVar = 3)
 # override default spec
-SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3, protectZeros = FALSE)
+SuppressSmallCounts(data = mun_accidents, maxN = 3, dimVar = 1:2, freqVar = 3, 
+                    protectZeros = FALSE)
+                    
+                    
+d2 <- SSBtoolsData("d2")
+d2$f <- round(d2$freq/10)  # tenth as frequency in examples
+
+# Hierarchical region variables are detected automatically -> same output column
+SuppressSmallCounts(data = d2, maxN = 2, freqVar = "f", 
+                    dimVar = c("region", "county", "k_group"))
+
+# Formula. Hierarchical variables still detected automatically.
+SuppressSmallCounts(data = d2, maxN = 3, freqVar = "freq", 
+                    formula = ~main_income * k_group + region + county - k_group)
+
+# With hierarchies created manually
+ml <- data.frame(levels = c("@", "@@", "@@@", "@@@", "@@@", "@@"), 
+        codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
+SuppressSmallCounts(data = d2, maxN = 2, freqVar = "f", 
+                    hierarchies = list(main_income = ml, k_group = "Total_Norway"))
+
+
+# Data without pensions in k_group 400 
+# And assume these are structural zeros (will not be suppressed)
+SuppressSmallCounts(data = d2[1:41, ], maxN = 3, freqVar = "f", 
+                    hierarchies = list(main_income = ml, k_group = "Total_Norway"), 
+                    extend0 = FALSE, structuralEmpty = TRUE)
+# -- Note for the example above -- 
+# With protectZeros = FALSE 
+#   - No zeros suppressed
+# With extend0 = FALSE and structuralEmpty = FALSE 
+#   - Primary suppression without protection (with warning) 
+# With extend0 = TRUE and structuralEmpty = TRUE 
+#   - As default behavior. Suppression/protection of all zeros (since nothing empty)
+# With formula instead of hierarchies: Extra parameter needed when extend0 = FALSE.
+#   - removeEmpty = FALSE,  to include empty zeros in output.                      
 }

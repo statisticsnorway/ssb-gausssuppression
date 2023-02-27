@@ -32,6 +32,40 @@
 #' # override default spec
 #' SuppressSmallCounts(data = mun_accidents, maxN = 3, dimVar = 1:2, freqVar = 3, 
 #'                     protectZeros = FALSE)
+#'                     
+#'                     
+#' d2 <- SSBtoolsData("d2")
+#' d2$f <- round(d2$freq/10)  # tenth as frequency in examples
+#' 
+#' # Hierarchical region variables are detected automatically -> same output column
+#' SuppressSmallCounts(data = d2, maxN = 2, freqVar = "f", 
+#'                     dimVar = c("region", "county", "k_group"))
+#' 
+#' # Formula. Hierarchical variables still detected automatically.
+#' SuppressSmallCounts(data = d2, maxN = 3, freqVar = "freq", 
+#'                     formula = ~main_income * k_group + region + county - k_group)
+#' 
+#' # With hierarchies created manually
+#' ml <- data.frame(levels = c("@@", "@@@@", "@@@@@@", "@@@@@@", "@@@@@@", "@@@@"), 
+#'         codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
+#' SuppressSmallCounts(data = d2, maxN = 2, freqVar = "f", 
+#'                     hierarchies = list(main_income = ml, k_group = "Total_Norway"))
+#' 
+#' 
+#' # Data without pensions in k_group 400 
+#' # And assume these are structural zeros (will not be suppressed)
+#' SuppressSmallCounts(data = d2[1:41, ], maxN = 3, freqVar = "f", 
+#'                     hierarchies = list(main_income = ml, k_group = "Total_Norway"), 
+#'                     extend0 = FALSE, structuralEmpty = TRUE)
+#' # -- Note for the example above -- 
+#' # With protectZeros = FALSE 
+#' #   - No zeros suppressed
+#' # With extend0 = FALSE and structuralEmpty = FALSE 
+#' #   - Primary suppression without protection (with warning) 
+#' # With extend0 = TRUE and structuralEmpty = TRUE 
+#' #   - As default behavior. Suppression/protection of all zeros (since nothing empty)
+#' # With formula instead of hierarchies: Extra parameter needed when extend0 = FALSE.
+#' #   - removeEmpty = FALSE,  to include empty zeros in output.                      
 SuppressSmallCounts <- function(data,
                                 maxN,
                                 freqVar = NULL,
