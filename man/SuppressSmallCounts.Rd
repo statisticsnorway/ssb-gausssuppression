@@ -73,7 +73,7 @@ SuppressSmallCounts(data = d2, maxN = 2, freqVar = "f",
                     dimVar = c("region", "county", "k_group"))
 
 # Formula. Hierarchical variables still detected automatically.
-SuppressSmallCounts(data = d2, maxN = 3, freqVar = "freq", 
+SuppressSmallCounts(data = d2, maxN = 3, freqVar = "f", 
                     formula = ~main_income * k_group + region + county - k_group)
 
 # With hierarchies created manually
