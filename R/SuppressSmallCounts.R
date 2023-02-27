@@ -26,18 +26,12 @@
 #' @export
 #'
 #' @examples
-#' mun <- c("k1", "k2", "k3", "k4", "k5", "k6")
-#' inj <- c("serious", "light", "none", "unknown")
-#' data <- expand.grid(mun, inj)
-#' names(data) <- c("mun", "inj")
-#' data$freq <- c(4,5,3,4,1,6,
-#' 0,0,2,1,0,0,
-#' 0,1,1,4,0,0,
-#' 0,0,0,0,0,0)
+#' mun_accidents <- SSBtoolsData("mun_accidents")
 #'
-#' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3)
+#' SuppressSmallCounts(data = mun_accidents, maxN = 3, dimVar = 1:2, freqVar = 3)
 #' # override default spec
-#' SuppressSmallCounts(data = data, maxN = 3, dimVar = 1:2, freqVar = 3, protectZeros = FALSE)
+#' SuppressSmallCounts(data = mun_accidents, maxN = 3, dimVar = 1:2, freqVar = 3, 
+#'                     protectZeros = FALSE)
 SuppressSmallCounts <- function(data,
                                 maxN,
                                 freqVar = NULL,
