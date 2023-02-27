@@ -23,10 +23,10 @@
 #' sweight <- c(1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1)
 #' d <- data.frame(v1 = v1, num = num, sweight = sweight)
 #' 
-#' SuppressNContributors(d, formula = ~v1, maxN = 1, numVar = "num")
-#' SuppressNContributors(d, formula = ~v1, maxN = 2, numVar = "num")
-#' SuppressNContributors(d, formula = ~v1, maxN = 3, numVar = "num")
-SuppressNContributors <- function(data,
+#' SuppressFewContributors(d, formula = ~v1, maxN = 1, numVar = "num")
+#' SuppressFewContributors(d, formula = ~v1, maxN = 2, numVar = "num")
+#' SuppressFewContributors(d, formula = ~v1, maxN = 3, numVar = "num")
+SuppressFewContributors <- function(data,
                                   maxN,
                                   freqVar = NULL,
                                   dimVar = NULL,
