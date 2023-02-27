@@ -162,8 +162,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            ...){ 
   if (!is.null(spec)) {
-    if(is.call(spec)){
-      spec = eval(spec)
+    if (is.call(spec)) {
+      spec <- eval(spec)
     }
     if (is.list(spec)) {
       if (length(names(spec)[!(names(spec) %in% c("", NA))]) == length(spec)) {
@@ -515,6 +515,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   }
   
   publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, suppressed = suppressed)
+  rownames(publish) <- NULL
   
   startCol <- attr(x, "startCol", exact = TRUE)
   if (!is.null(startCol)) {
