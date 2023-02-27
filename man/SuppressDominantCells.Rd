@@ -88,4 +88,23 @@ primary = c(DominanceRule, NContributorsRule), maxN = 3, allDominance = TRUE)
 
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1,
 primary = c(DominanceRule, NContributorsRule), maxN = 4, allDominance = TRUE)
+
+
+d2 <- SSBtoolsData("d2")
+set.seed(123)
+d2$v <- rnorm(nrow(d2))^2
+
+# Hierarchical region variables are detected automatically -> same output column
+SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
+                      dimVar = c("region", "county", "k_group"), allDominance = TRUE)
+
+# Formula. Hierarchical variables still detected automatically.
+SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
+                      formula = ~main_income * k_group + region + county - k_group)
+
+# With hierarchies created manually
+ml <- data.frame(levels = c("@", "@@", "@@@", "@@@", "@@@", "@@"), 
+        codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
+SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
+                      hierarchies = list(main_income = ml, k_group = "Total_Norway"))
 }
