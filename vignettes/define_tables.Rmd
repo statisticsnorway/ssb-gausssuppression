@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 )
 ```
 ## Introduction and setup
-The `GaussSuppression` package uses a common interface shared by other SDC packages developed at Statistics Norway (see also `SmallCountRounding` on CRAN and `SSBcellKey` on GitHub). In the background, these packages use a *model matrix* representation, which connects the input data to the intended output. This functionality is provided by the R package `SSBtools`. In this vignette, we look at multiple ways of specifying output tables given different forms of input. Note that this vignette only scratches the surface of what is possible with the provided interface, and rather is intended to help users get going with the package.
+The `GaussSuppression` package uses a common interface shared by other SDC packages developed at Statistics Norway (see also [`SmallCountRounding`](https://cran.r-project.org/package=SmallCountRounding) and [`SSBcellKey`](https://github.com/statisticsnorway/SSBcellKey)). In the background, these packages use a *model matrix* representation, which connects the input data to the intended output. This functionality is provided by the R package `SSBtools`. In this vignette, we look at multiple ways of specifying output tables given different forms of input. Note that this vignette only scratches the surface of what is possible with the provided interface, and rather is intended to help users get going with the package.
 
 We begin by importing the necessary dependencies as well as loading a test data set provided in the SSBtools package.
 
@@ -144,7 +144,7 @@ GaussSuppressionFromData(data = microdata,
 If there is no hierarchical relationship between variables, multiplication in the `formula` and specification in `dimVar` yield the same results.
 ```{r}
 
-  GaussSuppressionFromData(data = microdata,
+GaussSuppressionFromData(data = microdata,
                          formula = ~ county * main_income,
                          freqVar = "freq",
                          primary = FALSE,
@@ -159,7 +159,7 @@ If there is no hierarchical relationship between variables, multiplication in th
 However, `formula` lets us specify different shapes for our tables. For example, if we are only interested in marginal values, we can supply this with the use of the addition operator:
 ```{r}
 
-  GaussSuppressionFromData(data = microdata,
+GaussSuppressionFromData(data = microdata,
                          formula = ~ county + main_income,
                          freqVar = "freq",
                          primary = FALSE,
@@ -168,7 +168,7 @@ However, `formula` lets us specify different shapes for our tables. For example,
 This example demonstrates, in fact, the ability of specifying multiple linked tables: a one-dimensional table for county linked with a one-dimensional table for main_income. 
 Similarly, we can use the colon (":") operator to omit certain marginals:
 ```{r}
-  GaussSuppressionFromData(data = microdata,
+GaussSuppressionFromData(data = microdata,
                          formula = ~ county : main_income,
                          freqVar = "freq",
                          primary = FALSE,
@@ -188,7 +188,7 @@ head(dataset)
 ```
 Then we can specify the desired output with the following formula:
 ```{r}
-  GaussSuppressionFromData(data = dataset,
+GaussSuppressionFromData(data = dataset,
                          formula = ~ region * income2 + (county + k_group) * main_income,
                          freqVar = "freq",
                          primary = FALSE,
