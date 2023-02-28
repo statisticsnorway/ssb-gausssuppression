@@ -194,4 +194,4 @@ Then we can specify the desired output with the following formula:
                          primary = FALSE,
                          protectZeros = FALSE)
 ```
-In this manner, we can specify multiple linked tables, which each can use different non-nested hierarchies. This allows the suppression algorithm to protect all of these tables simultaneously (indeed, they are treated as a single table internally), avoiding a stratified protection paradigm.
+In this manner, we can specify multiple linked tables, which each can use different non-nested hierarchies. This allows the suppression algorithm to protect all of these tables simultaneously (indeed, they are treated as a single table internally), avoiding the need for a stratified protection paradigm. See the other vignettes in this package for more details on setting up the protection methods.
