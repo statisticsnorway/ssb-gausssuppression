@@ -77,7 +77,6 @@ SuppressDominantCells <- function(data,
                                   ...,
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
-  charVar <- preAggVar
   GaussSuppressionFromData(
     data = data,
     n = n,
@@ -88,7 +87,7 @@ SuppressDominantCells <- function(data,
     dimVar = dimVar,
     hierarchies = hierarchies,
     formula = formula,
-    charVar = charVar,
+    charVar = preAggVar,
     sWeightVar = sWeightVar,
     spec = spec,
     ...
