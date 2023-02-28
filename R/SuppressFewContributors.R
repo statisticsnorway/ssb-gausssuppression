@@ -1,11 +1,19 @@
 #' Few contributors suppression
 #' 
 #' This function provides functionality for suppressing volume tables based on
-#' the few contributors rule.
+#' the few contributors rule (\code{\link{NContributorsRule}}).
 #'
 #' @inheritParams GaussSuppressionFromData
+#' @param numVar numerical variable to be aggregated. Also see patameter `remove0` below.  
+#' @param preAggVar Extra variables to be used as grouping elements when counting contributors. 
+#' @param removeCodes Vector of codes to be omitted when counting contributors.
+#'                With empty `preAggVar` row indices are assumed
+#'                and conversion to integer is performed.
+#' @inheritParams NContributorsRule                 
 #'
 #' @return data.frame containing aggregated data and supppression information.
+#'         Columns `nRule` and `nAll` contain the number of contributors.
+#'         In the former, `removeCodes` is taken into account.  
 #' @export
 #'
 #' @examples
@@ -26,24 +34,53 @@
 #' SuppressFewContributors(d, formula = ~v1, maxN = 1, numVar = "num")
 #' SuppressFewContributors(d, formula = ~v1, maxN = 2, numVar = "num")
 #' SuppressFewContributors(d, formula = ~v1, maxN = 3, numVar = "num")
+#' 
+#' 
+#' d2 <- SSBtoolsData("d2")[-5]
+#' set.seed(123)
+#' d2$v <- round(rnorm(nrow(d2))^2, 1)
+#' d2$family_id <- round(2*as.integer(factor(d2$region)) + runif(nrow(d2)))
+#' 
+#' # Hierarchical region variables are detected automatically -> same output column
+#' SuppressFewContributors(data = d2, maxN = 2, numVar = "v", preAggVar = "family_id",
+#'                       dimVar = c("region", "county", "k_group"))
+#' 
+#' # Formula. Hierarchical variables still detected automatically.
+#' # And codes 1:9 not counted 
+#' SuppressFewContributors(data = d2, maxN = 1, numVar = "v", preAggVar = "family_id",
+#'                       formula = ~main_income * k_group + region + county - k_group,
+#'                       removeCodes = 1:9)
+#' 
+#' # With hierarchies created manually
+#' ml <- data.frame(levels = c("@@", "@@@@", "@@@@@@", "@@@@@@", "@@@@@@", "@@@@"), 
+#'         codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
+#' SuppressFewContributors(data = d2, maxN = 1, numVar = "v", preAggVar = "family_id",
+#'                       hierarchies = list(main_income = ml, k_group = "Total_Norway"))
+#'                       
+#'                       
 SuppressFewContributors <- function(data,
                                   maxN,
                                   freqVar = NULL,
+                                  numVar = NULL,
                                   dimVar = NULL,
                                   hierarchies = NULL,
                                   formula = NULL,
                                   preAggVar = NULL,
+                                  removeCodes = character(0), 
+                                  remove0 = TRUE,
                                   ...,
                                   spec = PackageSpecs("nContributorsSpec")) {
-  charVar <- preAggVar
   GaussSuppressionFromData(
     data,
     maxN = maxN,
     freqVar = freqVar,
+    numVar = numVar,
     dimVar = dimVar,
     hierarchies = hierarchies,
     formula  = formula,
-    charVar = charVar,
+    charVar = preAggVar,
+    removeCodes = removeCodes,
+    remove0 = remove0,
     spec = spec,
     ...
   )
