@@ -50,8 +50,8 @@ test_that("structuralEmpty and removeEmpty", {
   a2 <- GaussSuppressionFromData(z3[100:300, ], 1:6, 7, printInc = printInc, structuralEmpty = TRUE)
   a3 <- GaussSuppressionFromData(z3[100:300, ], 1:6, 7, printInc = printInc, removeEmpty = TRUE)
   k <- a1$suppressed != a2$suppressed
-  expect_equal(a1[!k, ], a3)
-  expect_equal(a2[!k, ], a3)
+  expect_equal(a1[!k, ], a3, ignore_attr = TRUE)
+  expect_equal(a2[!k, ], a3, ignore_attr = TRUE)
   expect_equal(unique(a1[k, "ant"]), 0)
 })
 
