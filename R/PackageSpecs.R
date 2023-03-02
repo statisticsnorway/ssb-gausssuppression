@@ -6,17 +6,17 @@
 #' @details The following table summarizes the built-in specs. Columns represent
 #' different specs, and rows represent the parameter settings.
 #'
-#'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec} |\strong{nContributorsSpec} |\strong{kDisclosureSpec}   |
-#'  |:------------------------|:-----------------------|:----------------------|:--------------------------|:--------------------------|
-#'  |\strong{primary}         |PrimaryDefault          |DominanceRule          |NContributorsRule          |KDisclosurePrimary         |
-#'  |\strong{protectZeros}    |TRUE                    |                       |FALSE                      |FALSE                      |
-#'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum          |CandidatesNum              |DirectDisclosureCandidates |
-#'  |\strong{singleton}       |SingletonDefault        |                       |                           |                           |
-#'  |\strong{extend0}         |TRUE                    |                       |FALSE                      |TRUE                       |
-#'  |\strong{preAggregate}    |                        |!is.null(preAggVar)    |!is.null(preAggVar)        |                           |
-#'  |\strong{domWeightMethod} |                        |"default"              |                           |                           |
-#'  |\strong{singletonMethod} |                        |"sub2Sum"              |"sub2Sum"                  |"anySumNOTprimary"         |
-#'  |\strong{secondaryZeros}  |                        |                       |                           |1                          |
+#'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec} |\strong{fewContributorsSpec} |\strong{kDisclosureSpec}   |
+#'  |:------------------------|:-----------------------|:----------------------|:----------------------------|:--------------------------|
+#'  |\strong{primary}         |PrimaryDefault          |DominanceRule          |NContributorsRule            |KDisclosurePrimary         |
+#'  |\strong{protectZeros}    |TRUE                    |                       |FALSE                        |FALSE                      |
+#'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum          |CandidatesNum                |DirectDisclosureCandidates |
+#'  |\strong{singleton}       |SingletonDefault        |                       |                             |                           |
+#'  |\strong{extend0}         |TRUE                    |                       |FALSE                        |TRUE                       |
+#'  |\strong{preAggregate}    |                        |!is.null(charVar)      |!is.null(charVar)            |                           |
+#'  |\strong{domWeightMethod} |                        |"default"              |                             |                           |
+#'  |\strong{singletonMethod} |                        |"sub2Sum"              |"sub2Sum"                    |"anySumNOTprimary"         |
+#'  |\strong{secondaryZeros}  |                        |                       |                             |1                          |
 
 #' @param x the character name or index of the spec to be returned. If `NULL` (default),
 #' returns list of all specs
@@ -51,7 +51,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       singletonMethod = "sub2Sum"
     )),
     
-    nContributorsSpec =
+    fewContributorsSpec =
       quote(list(
         primary = NContributorsRule,
         protectZeros = FALSE,

@@ -69,7 +69,7 @@ SuppressFewContributors <- function(data,
                                   removeCodes = character(0), 
                                   remove0 = TRUE,
                                   ...,
-                                  spec = PackageSpecs("nContributorsSpec")) {
+                                  spec = PackageSpecs("fewContributorsSpec")) {
   GaussSuppressionFromData(
     data,
     maxN = maxN,

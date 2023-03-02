@@ -16,7 +16,7 @@ SuppressFewContributors(
   removeCodes = character(0),
   remove0 = TRUE,
   ...,
-  spec = PackageSpecs("nContributorsSpec")
+  spec = PackageSpecs("fewContributorsSpec")
 )
 }
 \arguments{
