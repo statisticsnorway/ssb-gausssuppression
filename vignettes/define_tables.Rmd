@@ -33,8 +33,8 @@ nrow(microdata)
 ```
 The imported data set is a fictitious data set containing the variables: `r names(dataset)`, where region, county, and k_group are different (non-nested) regional hierarchies. `GaussSuppression` can take microdata as input as well, which we will demonstrate in the following sections.
 
+# Defining Table Dimensions
 Output tables are mainly specified using the following three parameters: `dimVar`, `hierarchies`, and `formula`.
-
 ## Creating tables using `dimVar`
 The most basic way of defining output tables is by using the `dimVar` parameter. This generates by default all combinations of the variables provided, including marginals. For example, the following function call creates a one dimensional frequency table over the variable region.
 
@@ -184,6 +184,7 @@ Using these features, we can define more complicated linked tables. To illustrat
 To do this, we begin by adding a column encoding whether the main source of income was "wages" or "not wages".
 ```{r}
 dataset$income2 <- ifelse(dataset$main_income == "wages", "wages", "not wages")
+microdata$income2 <- ifelse(microdata$main_income == "wages", "wages", "not wages")
 head(dataset)
 ```
 Then we can specify the desired output with the following formula:
@@ -195,3 +196,22 @@ GaussSuppressionFromData(data = dataset,
                          protectZeros = FALSE)
 ```
 In this manner, we can specify multiple linked tables, each of which can use different non-nested hierarchies. This allows the suppression algorithm to protect all of these tables simultaneously (indeed, they are treated as a single table internally), avoiding the need for a stratified protection paradigm. See the other vignettes in this package for more details on setting up the protection methods.
+
+# Frequency or Volume Tables? 
+In addition to defining the dimensions of the output tables, we need to decide whether they should be frequency tables (where we count contributing records) or volume tables (where we add contributing records' numerical values for a given variable). All of the above examples have been frequency tables. However, the process is exactly the same if one wishes to construct volume tables; the only difference is that one must specify the numerical variable with the help of the parameter `numVar`.
+
+Let us first add a fake numerical variable to our microdata:
+```{r}
+set.seed(12345)
+microdata$num <-sample(0:1000, nrow(microdata), replace = TRUE) 
+```
+
+Then in order to construct a volume table where records' contributions to `num` are summed, we supply this as a parameter to `GaussSuppressionFromData`:
+```{r}
+GaussSuppressionFromData(data = microdata,
+                         formula = ~ region * income2 + (county + k_group) * main_income,
+                         freqVar = "freq",
+                         numVar = "num",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
