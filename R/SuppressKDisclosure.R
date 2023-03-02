@@ -171,6 +171,6 @@ FindDifferenceCells <- function(x,
                                              function(row)
                                                x[, row[2]] - x[, row[1]]))
   else
-    primary_matrix <- NULL
+    return(rep(FALSE, nrow(crossTable)))
   primary_matrix
 }
