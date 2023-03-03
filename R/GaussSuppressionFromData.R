@@ -221,6 +221,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     }
   }
   
+  nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1]
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
@@ -397,7 +398,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       cat("[extraAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
     }
-    data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(dVar)], sum)
+    uniqueCharVar <- charVar[!(charVar %in% dVar)]
+    if (length(uniqueCharVar)) {
+      charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
+    }
+    data[[nUniqueVar]] <- 1L
+    data <- aggregate(data[unique(c(freqVar, numVar, weightVar, nUniqueVar))], data[unique(dVar)], sum) 
     if (printInc) {
       cat(dim(data)[1], "*", dim(data)[2], "] ", sep = "")
       flush.console()
@@ -413,6 +419,18 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       xExtra <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE, ...)
     } else {
       xExtra <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, ...)
+    }
+    if (length(uniqueCharVar)) {
+      if (printInc) {
+        cat("Checking dim-variables ..")
+        flush.console()
+      }
+      if (!isTRUE(all.equal(data[unique(dVar)], charData[unique(dVar)]))) {
+        stop("dim variables not equal")
+      }
+      data[uniqueCharVar] <- charData[uniqueCharVar]
+      rm(charData)
+      data[uniqueCharVar][data[[nUniqueVar]] > 1, ] <- NA  # uniqueCharVar created as the first row is ok when the first row is the only row
     }
     if (printInc) {
       cat("Checking crossTables ..")
@@ -599,11 +617,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   publish
 }
-
-
-
-
-
 
 
 
