@@ -33,6 +33,7 @@ GaussSuppressionFromData(
   spec = NULL,
   specLock = FALSE,
   freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
+  forcedInOutput = "ifNonNULL",
   ...
 )
 }
@@ -122,6 +123,10 @@ Parameter \code{extend0} can also be specified as a list meaning parameter \code
 
 \item{freqVarNew}{Name of new frequency variable generated when input \code{freqVar} is NULL and \code{preAggregate} is TRUE.
 Default is \code{"freq"} provided this is not found in \code{names(data)}.}
+
+\item{forcedInOutput}{Whether to include \code{forced} as an output column.
+One of \code{"ifNonNULL"} (default), \code{"always"}, \code{"ifany"} and \code{"no"}.
+In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{"always"} and \code{"no"}.}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 }

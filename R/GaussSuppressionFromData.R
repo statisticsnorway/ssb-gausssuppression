@@ -82,7 +82,10 @@
 #' @param spec `NULL` or a named list of arguments that will act as default values.
 #' @param specLock When `TRUE`, arguments in `spec` cannot be changed.       
 #' @param freqVarNew Name of new frequency variable generated when input `freqVar` is NULL and `preAggregate` is TRUE.  
-#'                   Default is `"freq"` provided this is not found in `names(data)`.                                             
+#'                   Default is `"freq"` provided this is not found in `names(data)`.    
+#' @param  forcedInOutput Whether to include `forced` as an output column.      
+#'               One of `"ifNonNULL"` (default), `"always"`, `"ifany"` and `"no"`. 
+#'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.                                                     
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -160,6 +163,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            spec = NULL,
                            specLock = FALSE, 
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
+                           forcedInOutput = "ifNonNULL",
                            ...){ 
   if (!is.null(spec)) {
     if (is.list(spec)) {
@@ -208,6 +212,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   if (!length(singletonMethod)) {
     stop("A value of singletonMethod is required.")
   }
+  
+  if (is.logical(forcedInOutput)) {
+    if (forcedInOutput) {
+      forcedInOutput <- "always"
+    } else {
+      forcedInOutput <- "no"
+    }
+  }
+  
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
@@ -454,6 +467,21 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     stop("Combination of xExtraPrimary and extraAggregate is not implemented")
   }
   
+  if(!is.null(forced)){
+    if (!is.logical(forced)) {   # logical allowed in  SSBtools::GaussSuppression
+      if(min(forced) < 0 | max(forced) > m){
+        stop("forced input outside range")
+      }
+      forcedA <- rep(FALSE, m)
+      forcedA[forced] <- TRUE
+      forced <- forcedA
+    } else {
+      if(length(forced) != m){
+        stop("wrong length of forced")
+      }
+    }
+  } 
+
   
   if(output=="inputGaussSuppression_x"){
     return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, x = x))
@@ -493,6 +521,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   primary <- suppressed
   suppressed[secondary] <- TRUE
   suppressed[hidden] <- NA
+  suppressed[forced] <- FALSE
   
   
   if (length(freq)) {
@@ -511,7 +540,42 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     }
   }
   
-  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, suppressed = suppressed)
+  forcedInOut <- NA
+  if (is.null(forced)) {
+    if (forcedInOutput == "always") {
+      forced <- rep(FALSE, m)
+      forcedInOut <- TRUE
+    } else {
+      forcedInOut <- FALSE
+    }
+  } else {
+    if (forcedInOutput == "always") {
+      forcedInOut <- TRUE
+    }
+    if (forcedInOutput == "ifNonNULL") {
+      forcedInOut <- TRUE
+    }
+    if (forcedInOutput == "ifany") {
+      forcedInOut <- any(forced)
+    }
+    if (forcedInOutput == "no") {
+      forcedInOut <- FALSE
+    }
+  }
+  if (is.na(forcedInOut)) {
+    warning('Wrong forcedInOutput input treated as "ifNonNULL"')
+    forcedInOut <- TRUE
+  }
+  
+  
+  if (forcedInOut) {
+    forced <- matrix(forced)
+    colnames(forced) <- "forced"
+  } else {
+    forced <- matrix(0, m, 0)
+  }
+  
+  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, forced, suppressed = suppressed)
   
   startCol <- attr(x, "startCol", exact = TRUE)
   if (!is.null(startCol)) {
