@@ -139,14 +139,16 @@ KDisclosurePrimary <- function(data,
     x = x,
     freq = freq,
     coalition = coalition,
-    upper_bound = upper_bound
+    upper_bound = upper_bound,
+    crossTable = crossTable
   )
 }
 
 FindDifferenceCells <- function(x,
                                   freq,
                                   coalition,
-                                  upper_bound = Inf) {
+                                  upper_bound = Inf,
+                                  crossTable) {
   publ_x <- crossprod(x)
   publ_x <-
     As_TsparseMatrix(publ_x)
