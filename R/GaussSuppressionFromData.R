@@ -11,6 +11,8 @@
 #' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` and `...`. 
 #' where the two first are  \code{\link{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
 #' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
+#' In addition, the supplied `singleton` function also takes `nUniqueVar` and (output from) `primary` as input.
+#' 
 #' Similarly, `num`, is a data frame of aggregated numerical variables.   
 #' It is possible to supply several primary functions joined by `c`, e.g. (`c(FunPrim1, FunPrim2)`). 
 #' All `NA`s returned from any of the functions force the corresponding cells not to be primary suppressed.
@@ -83,6 +85,11 @@
 #' @param specLock When `TRUE`, arguments in `spec` cannot be changed.       
 #' @param freqVarNew Name of new frequency variable generated when input `freqVar` is NULL and `preAggregate` is TRUE.  
 #'                   Default is `"freq"` provided this is not found in `names(data)`.    
+#' @param nUniqueVar Name of variable holding the number of unique contributors.
+#'                   This variable will be generated in the `extraAggregate` step.
+#'                   Default is `"nUnique"` provided this is not found in `names(data)`.
+#'                   If an existing variable is passed as input, 
+#'                   this variable will apply only when `preAggregate`/`extraAggregate` is not done.
 #' @param  forcedInOutput Whether to include `forced` as an output column.      
 #'               One of `"ifNonNULL"` (default), `"always"`, `"ifany"` and `"no"`. 
 #'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.                                                     
@@ -143,7 +150,10 @@
 #' GaussSuppressionFromData(z, 1:2, 3)
 #' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE, singleton = NULL)
 #' GaussSuppressionFromData(z, 1:2, 3, protectZeros = FALSE, secondaryZeros = TRUE)      
-GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
+GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, 
+                                    ...,
+                                    numVar = NULL, 
+                                    weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies = NULL, formula = NULL,
                            maxN = suppressWarnings(formals(c(primary)[[1]])$maxN), 
                            protectZeros = suppressWarnings(formals(c(primary)[[1]])$protectZeros), 
@@ -163,8 +173,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
                            spec = NULL,
                            specLock = FALSE, 
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
-                           forcedInOutput = "ifNonNULL",
-                           ...){ 
+                           nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
+                           forcedInOutput = "ifNonNULL"){ 
   if (!is.null(spec)) {
     if (is.list(spec)) {
       if (length(names(spec)[!(names(spec) %in% c("", NA))]) == length(spec)) {
@@ -200,6 +210,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
 
   force(preAggregate)
   force(extraAggregate)
+  force(nUniqueVar)
   
   if (length(singletonMethod)) { # Default is logical(0) when secondaryZeros is NULL
     if (singletonMethod == "none") {
@@ -220,8 +231,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
       forcedInOutput <- "no"
     }
   }
-  
-  nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1]
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
@@ -257,6 +266,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   numVar <- names(data[1, numVar, drop = FALSE])
   weightVar <- names(data[1, weightVar, drop = FALSE])
   charVar <- names(data[1, charVar, drop = FALSE])
+  
+  
+  if (preAggregate | extraAggregate){
+    if(nUniqueVar %in% names(data)){
+      warning("nUniqueVar in input data ignored when preAggregate/extraAggregate")
+    }
+  }
   
   if (extend0 | preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
     if (printInc & preAggregate) {
@@ -443,13 +459,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
     rm(xExtra)
   }
   
-  if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  #if (is.function(singleton))   singleton <-   singleton(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, primary = primary, ...)
   
   m <- ncol(x)
   
   if (is.null(candidates)) candidates <- 1:m
   
-  
+  freq_ <- freq
+  num_ <- num
+  weight_ <- weight 
   if (is.null(freq)) freq <- matrix(0, m, 0)
   if (is.null(num)) num <- matrix(0, m, 0)
   if (is.null(weight)) weight <- matrix(0, m, 0)
@@ -483,6 +501,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL, numVar = 
   
   if (!is.null(xExtraPrimary) & extraAggregate) {
     stop("Combination of xExtraPrimary and extraAggregate is not implemented")
+  }
+  
+  if (is.function(singleton)){   
+    singleton <-   singleton(crossTable = crossTable, x = x, 
+                             freq = freq_, num = num_, weight = weight_, 
+                             maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, 
+                             data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, 
+                             charVar = charVar, dimVar = dimVar, 
+                             nUniqueVar = nUniqueVar, primary = primary, ...)
   }
   
   if(!is.null(forced)){
