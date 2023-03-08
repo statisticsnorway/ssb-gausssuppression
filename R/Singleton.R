@@ -61,6 +61,7 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' @return logical or integer vector
 #' @export
 #' @importFrom SSBtools RowGroups
+#' @importFrom utils compareVersion packageVersion
 #'
 #' @examples
 #' S <- function(data, ...) {
@@ -100,7 +101,7 @@ SingletonUniqueContributor <- function(data,
                                        nUniqueVar=NULL, 
                                        charVar=NULL, 
                                        removeCodes = character(0), 
-  integerSingleton = compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0, # provisional default
+  integerSingleton = compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0, # provisional default. Later: Remove importFrom utils compareVersion packageVersion
                                        x,
                                        primary = integer(0),
                                        ...) {
