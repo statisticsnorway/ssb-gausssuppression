@@ -8,6 +8,7 @@ GaussSuppressionFromData(
   data,
   dimVar = NULL,
   freqVar = NULL,
+  ...,
   numVar = NULL,
   weightVar = NULL,
   charVar = NULL,
@@ -33,7 +34,8 @@ GaussSuppressionFromData(
   spec = NULL,
   specLock = FALSE,
   freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
-  ...
+  nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
+  forcedInOutput = "ifNonNULL"
 )
 }
 \arguments{
@@ -42,6 +44,8 @@ GaussSuppressionFromData(
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
 \item{freqVar}{A single variable holding counts (name or number).}
+
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
 \item{numVar}{Other numerical variables to be aggregated}
 
@@ -123,7 +127,15 @@ Parameter \code{extend0} can also be specified as a list meaning parameter \code
 \item{freqVarNew}{Name of new frequency variable generated when input \code{freqVar} is NULL and \code{preAggregate} is TRUE.
 Default is \code{"freq"} provided this is not found in \code{names(data)}.}
 
-\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+\item{nUniqueVar}{Name of variable holding the number of unique contributors.
+This variable will be generated in the \code{extraAggregate} step.
+Default is \code{"nUnique"} provided this is not found in \code{names(data)}.
+If an existing variable is passed as input,
+this variable will apply only when \code{preAggregate}/\code{extraAggregate} is not done.}
+
+\item{forcedInOutput}{Whether to include \code{forced} as an output column.
+One of \code{"ifNonNULL"} (default), \code{"always"}, \code{"ifany"} and \code{"no"}.
+In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{"always"} and \code{"no"}.}
 }
 \value{
 Aggregated data with suppression information
@@ -138,6 +150,8 @@ The supplied functions for generating \code{\link{GaussSuppression}} input takes
 \code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
 where the two first are  \code{\link{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
+In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
+
 Similarly, \code{num}, is a data frame of aggregated numerical variables.
 It is possible to supply several primary functions joined by \code{c}, e.g. (\code{c(FunPrim1, FunPrim2)}).
 All \code{NA}s returned from any of the functions force the corresponding cells not to be primary suppressed.

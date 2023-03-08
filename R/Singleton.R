@@ -31,3 +31,151 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
   }
   data[[freqVar]] == 1
 }
+
+
+
+
+#' Unique contributor singleton function
+#' 
+#' Function for \code{\link{GaussSuppressionFromData}}
+#' 
+#' This function marks input cells as singletons according to ones in 
+#' `data[[nUniqueVar]]`, if available, and otherwise according to `data[[freqVar]]`.
+#' The output vector can be logical or integer. When, integer, singletons are given as positive values. 
+#' Their unique values represent the unique values/combinations of `data[[charVar]]`.
+#'
+#' @inheritParams SingletonDefault
+#' @inheritParams DominanceRule
+#' @param nUniqueVar  A single variable holding the number of unique contributors.
+#' @param charVar Variable with contributor codes. 
+#' @param removeCodes Vector, list or data frame of codes considered non-singletons.
+#'                Single element lists and single column data frames behave just like vectors.
+#'                In other cases, `charVar`-names must be used.
+#'                With empty `charVar` a vector of row indices is assumed and conversion to integer is performed.
+#'                See examples.
+#' @param integerSingleton Integer output when `TRUE`. See details.
+#' @param primary Vector (integer or logical) specifying primary suppressed cells.
+#'                It will be ensured that any non-suppressed inner cell is not considered a singleton.
+#' @param ... Unused parameters
+#'
+#' @return logical or integer vector
+#' @export
+#' @importFrom SSBtools RowGroups
+#' @importFrom utils compareVersion packageVersion
+#'
+#' @examples
+#' S <- function(data, ...) {
+#'   cbind(data, singleton = SingletonUniqueContributor(data, ...))
+#' }
+#' d2 <- SSBtoolsData("d2")
+#' d <- d2[d2$freq < 5, ]
+#' d$nUnique <- round((5 - d$freq)/3)
+#' d$freq <- round(d$freq/2)
+#' d[7:8, 2:4] <- NA
+#' rownames(d) <- NULL
+#' 
+#' S(d, freqVar = "freq", integerSingleton = FALSE)
+#' S(d, freqVar = "freq", nUniqueVar = "nUnique", integerSingleton = TRUE, charVar = "main_income")
+#' S(d, nUniqueVar = "nUnique", integerSingleton = TRUE, charVar = c("main_income", "k_group"))
+#' S(d, freqVar = "freq", nUniqueVar = "nUnique", integerSingleton = FALSE, 
+#'   charVar = "main_income", removeCodes = "other")
+#' S(d, nUniqueVar = "nUnique", integerSingleton = FALSE, charVar = c("main_income", "k_group"), 
+#'   removeCodes = c("other", "400"))
+#' S(d, nUniqueVar = "nUnique", integerSingleton = FALSE, charVar = c("main_income", "k_group"), 
+#'   removeCodes = data.frame(anyname = c("other", "400")))
+#' S(d, nUniqueVar = "nUnique", integerSingleton = FALSE, charVar = c("main_income", "k_group"), 
+#'   removeCodes = list(main_income = c("other", "pensions"), k_group = "300"))
+#' S(d, nUniqueVar = "nUnique", integerSingleton = FALSE, charVar = c("main_income", "k_group"), 
+#'   removeCodes = data.frame(main_income = "other", k_group = "400"))
+#' S(d, nUniqueVar = "nUnique", integerSingleton = FALSE, removeCodes = 1:5)
+#' 
+#' x <- SSBtools::ModelMatrix(d, hierarchies = list(region = "Total"))
+#' which(colSums(x) == 1)
+#' which(rowSums(x[, colSums(x) == 1]) > 0)
+#' # columns 2, 3, 4, 5, 7 correspond to inner cells: rows 3, 4, 5, 6, 8 
+#' # with 2:4 not primary rows 3:5 are forced non-singleton
+#' S(d, freqVar = "freq", nUniqueVar = "nUnique", integerSingleton = FALSE, x = x, primary = 5:8)
+#' 
+SingletonUniqueContributor <- function(data, 
+                                       freqVar = NULL, 
+                                       nUniqueVar=NULL, 
+                                       charVar=NULL, 
+                                       removeCodes = character(0), 
+  integerSingleton = compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0, # provisional default. Later: Remove importFrom utils compareVersion packageVersion
+                                       x,
+                                       primary = integer(0),
+                                       ...) {
+  
+  if(length(nUniqueVar)){
+    if(is.null(data[[nUniqueVar]])){
+      nUniqueVar <- NULL
+    }
+  }
+  
+  if(length(nUniqueVar)){
+    singleton = data[[nUniqueVar]] == 1
+  } else {
+    singleton = data[[freqVar]] == 1  
+  }
+  
+  if(length(removeCodes)){
+    if (length(charVar)) {
+      if(is.list(removeCodes) & length(removeCodes) == 1){
+        removeCodes = unlist(removeCodes)
+      }
+      if(is.list(removeCodes)){
+        if(is.data.frame(removeCodes)){
+          ma = Match(removeCodes, data[charVar])
+          singleton[ma] = FALSE
+        } else {
+          for(i in seq_along(charVar)){
+            singleton[data[[charVar[i]]] %in% removeCodes[[charVar[i]]]] = FALSE  # Ordinary when single charVar 
+          }  
+        }
+      } else {
+        for(i in seq_along(charVar)){
+          singleton[data[[charVar[i]]] %in% removeCodes] = FALSE  # Ordinary when single charVar 
+        }
+      }
+    } else {
+      if(!is.vector(removeCodes)){
+        stop("removeCodes must be vector when empty charVar")
+      }
+      singleton[as.integer(removeCodes)] = FALSE
+    }
+  }
+  
+  if (is.logical(primary)) 
+    primary <- which(primary) 
+  else 
+    primary <- unique(primary)
+  
+  if(length(primary)){
+    inner <- rowSums(x[, colSums(x) == 1, drop = FALSE])>0
+    innerprimary <- rowSums(x[, primary[colSums(x[, primary, drop = FALSE]) == 1], drop = FALSE]) > 0
+    singleton[!innerprimary & inner] = FALSE
+  }
+  if(!integerSingleton){
+    return(singleton)
+  } 
+  if (length(charVar)) {
+    singleton_integer = RowGroups(data[charVar])
+  } else {
+    singleton_integer = seq_len(nrow(data))
+  }
+  singleton_integer[!singleton] = 0L
+  singleton_integer
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

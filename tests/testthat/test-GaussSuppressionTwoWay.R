@@ -28,7 +28,8 @@ test_that("Ok GaussSuppressionTwoWay special cases", {
   a <- TestTwoWay(z, freqVar = "ant", hierarchies = dimListsA, removeEmpty = FALSE, 
                   singletonMethod = "anySum", protectZeros = FALSE,  
                   hidden = function(freq, ...){freq==10},
-                  forced = function(freq, ...){freq==14} )
+                  forced = function(freq, ...){freq==14}, 
+                  forcedInOutput = FALSE)
   
   expect_identical(a, c(0L, 0L))
   
