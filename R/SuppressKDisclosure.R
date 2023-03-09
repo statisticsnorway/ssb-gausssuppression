@@ -30,14 +30,7 @@
 
 #' @examples
 #' # data
-#' mun <- c("k1", "k2", "k3", "k4", "k5", "k6")
-#' inj <- c("serious", "light", "none", "unknown")
-#' data <- expand.grid(mun, inj)
-#' names(data) <- c("mun", "inj")
-#' data$freq <- c(4,5,3,4,1,6,
-#' 0,0,2,1,0,0,
-#' 0,1,1,4,0,0,
-#' 0,0,0,0,0,0)
+#' data <- SSBtools::SSBtoolsData("mun_accidents") 
 #'
 #' # hierarchies as DimLists
 #' mun <- data.frame(levels = c("@@", rep("@@@@", 6)),
@@ -83,13 +76,14 @@
 #' out_v <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, sensitiveVars = "inj")
 #' out_v <- addPrikket(out_v)
+#' reshape2::dcast(out_v, mun~inj, value.var = "freq")
 #' reshape2::dcast(out_v, mun~inj, value.var = "prikket")
 #'
 #' out_v1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, mc_hierarchies = mc_dimlist,
 #'                             sensitiveVars = list(mun =  "k3", inj = "injured"))
 #' out_v1 <- addPrikket(out_v1)
-#' reshape2::dcast(out_v1, mun~inj, value.var = "freq")
+#' reshape2::dcast(out_v1, mun~inj, value.var = "prikket")
 
 #' out_v2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, sensitiveVars = list(inj = "serious", mun = "k3"))
@@ -265,13 +259,15 @@ FindDifferenceCells <- function(x,
         disclosures[unique(sensitiveRows), , drop = FALSE]
     }
   }
-  if (nrow(disclosures))
-    primary_matrix <- As_TsparseMatrix(apply(disclosures,
-                                             1,
-                                             function(row)
-                                               x[, row[2]] - x[, row[1]]))
+  if (nrow(disclosures)) {
+    disclosures <- new("dgTMatrix", 
+                       i = as.integer(c(disclosures[, 1:2]) - 1),
+                       j = as.integer(rep(0:(nrow(disclosures)-1), 2)),
+                       x = rep(c(-1, 1), each = nrow(disclosures)),
+                       Dim = c(ncol(x), nrow(disclosures)))
+    primary_matrix <- x %*% disclosures 
+  }
   else
-    # primary_matrix <- NULL
     return(rep(FALSE, nrow(crossTable)))
   primary_matrix
 }
