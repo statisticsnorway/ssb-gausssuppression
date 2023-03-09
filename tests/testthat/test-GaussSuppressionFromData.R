@@ -121,7 +121,7 @@ test_that("extend0 and various hierarchy input", {
 
 
 
-test_that("DominanceRule and NcontributorsRule + CandidatesNum", {
+test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
   set.seed(123)
   z <- SSBtools::MakeMicro(SSBtoolsData("z2"), "ant")
   z$char <- sample(paste0("char", 1:10), nrow(z), replace = TRUE)
@@ -154,6 +154,44 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum", {
                                  whenEmptyUnsuppressed = "stop") 
   
   expect_equal(d1[names(d1) != "ant"], d2, ignore_attr = TRUE)
+  
+  
+  if(compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0){   # provisional
+    set.seed(123)
+    z$value <- rnorm(nrow(z))^2  # Need to generate again ... not same as above 
+    set.seed(1986) # Seed is not randomly chosen
+    z$char <- sample(paste0("char", c(1, 1, 1, 1, 1, 2, 2, 2, 3, 4)), nrow(z), replace = TRUE)
+    b0 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                   maxN = 2, candidates = CandidatesNum, primary = NcontributorsRule, printInc = printInc, 
+                                   singleton = SingletonUniqueContributor, 
+                                   singletonMethod = "none") 
+    b1 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                   maxN = 2, candidates = CandidatesNum, primary = NcontributorsRule, printInc = printInc, 
+                                   singleton = SingletonUniqueContributor, 
+                                   singletonMethod = "sub2Sum")
+    b2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                   maxN = 2, candidates = CandidatesNum, primary = NcontributorsRule, printInc = printInc, 
+                                   singleton = SingletonUniqueContributor, 
+                                   singletonMethod = "sub2SumUnique") 
+    expect_equal(sum(b0$suppressed), 32)
+    expect_equal(sum(b1$suppressed), 33)
+    expect_equal(sum(b2$suppressed), 35)
+    # Code to see differences:
+    #"sub2Sum" solves G-problem 
+    #"sub2SumUnique" needed to solve K-problem. 
+    if (FALSE) for (myChar in c("G", "K")) {
+      kp <- b0[b0$region == myChar & b0$primary, ]
+      k0 <- b0[b0$region == myChar & b0$suppressed, ]
+      k1 <- b1[b2$region == myChar & b1$suppressed, ]
+      k2 <- b2[b2$region == myChar & b2$suppressed, ]
+      cat("===============", myChar, "=============== \n")
+      for (kk in c("kp", "k0", "k1", "k2")) {
+        cat("   -----", kk, "-----\n")
+        ma <- Match(z[c("region", "hovedint")], get(kk)[c("region", "hovedint")])
+        print(z[!is.na(ma), ])
+      }
+    }
+  }
   
   
 })

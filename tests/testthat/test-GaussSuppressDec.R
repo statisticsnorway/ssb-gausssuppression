@@ -19,7 +19,7 @@ test_that("GaussSuppressDec and more", {
   
   # Special case where all suppressions found in suppressedData.   
   d <- AdditionalSuppression(z2, suppressedData = a, dimVar = c("region", "fylke", "hovedint"), 
-                             freqVar = "ant", maxN = 20, singleton = NULL, printInc = printInc)
+                             freqVar = "ant", maxN = 20, singleton = NULL, printInc = printInc, forcedInOutput = FALSE)
   
   # Check that b and d are identical after sorting 
   expect_identical(range(diff(sort(SSBtools::Match(b[names(d)], d)))), c(1L, 1L))
