@@ -191,6 +191,24 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
         print(z[!is.na(ma), ])
       }
     }
+    sn <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 1, 0, 1, 
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
+    sf <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
+    sum_suppressed <- integer(0)
+    for (m1 in c("none", "anySumNOTprimary")) 
+      for (m2 in c("none", "sub2Sum", "sub2SumUnique")) {
+        b <- GaussSuppressionFromData(z, 
+                                    dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                    numVar = "value", charVar = "char", maxN = 2, 
+                                    candidates = CandidatesNum, 
+                                    primary = NcontributorsRule, 
+                                    printInc = printInc, 
+            singleton = list(freq = as.logical(sf), num = as.integer(sn)), 
+            singletonMethod = c(freq = m1, num = m2))
+            sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
+      }
+    expect_equal(sum_suppressed, c(32, 33, 35, 35, 38, 40))
   }
   
   

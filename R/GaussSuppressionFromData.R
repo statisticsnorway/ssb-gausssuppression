@@ -216,7 +216,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   force(nUniqueVar)
   
   if (length(singletonMethod)) { # Default is logical(0) when secondaryZeros is NULL
-    if (singletonMethod == "none") {
+    if (all(singletonMethod == "none")) {
       singleton <- NULL
     }
   }
