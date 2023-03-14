@@ -219,7 +219,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
         b <- GaussSuppressionFromData(zz, 
                                       dimVar = c("region", "fylke", "kostragr", "hovedint"), 
                                       numVar = "value", charVar = "char", 
-                                      maxN = 2, 
+                                      maxN = 2, printInc = printInc, 
                                       candidates = CandidatesNum, 
                                       primary = NcontributorsRule,  
                                       singleton = SingletonUniqueContributor, 
@@ -233,6 +233,37 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
     # zz[zz$fylke == 5 & zz$hovedint == "annet", ]
     # zz[zz$fylke == 5 & zz$hovedint == "arbeid", ]
     # zz[zz$fylke == 5 & zz$hovedint == "soshjelp", ]  
+    
+    sum_suppressed <- integer(0)
+    for (singletonMethod  in c("numFFF", "numtFF","numTFF", "numtTT", "numtTH")) {
+        b <- GaussSuppressionFromData(zz, 
+                                      dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                      numVar = "value", charVar = "char", 
+                                      maxN = 2, printInc = printInc, 
+                                      candidates = CandidatesNum, 
+                                      primary = NcontributorsRule,  
+                                      singleton = SingletonUniqueContributor, 
+                                      singletonMethod = singletonMethod,
+          inputInOutput = c(FALSE, TRUE)) # singleton not in publish and therefore not primary suppressed  
+        sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
+      }
+    expect_equal(sum_suppressed, c(17, 18, 18, 19, 19))
+    
+    # To make non-suppressed singletons
+    SUC <- function(..., removeCodes, primary) SingletonUniqueContributor(..., removeCodes = character(0), primary = integer(0))
+    sum_suppressed <- integer(0)
+    for (singletonMethod  in c("numFFF", "numtFF","numTFF")) {
+      b <- GaussSuppressionFromData(zz, 
+                                  dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                  numVar = "value", charVar = "char", 
+                                  maxN = 2, printInc = printInc, 
+                                  candidates = CandidatesNum, 
+                                  primary = NcontributorsRule,  
+                                  removeCodes = "char1",
+                                  singleton = SUC, 
+                                  singletonMethod = singletonMethod)
+      sum_suppressed <- c(sum_suppressed, c(59, 59, 67))
+    }
     
   }
 })
