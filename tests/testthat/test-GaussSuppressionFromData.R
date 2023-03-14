@@ -209,9 +209,32 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
             sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
       }
     expect_equal(sum_suppressed, c(32, 33, 35, 35, 38, 40))
+    
+    
+    set.seed(1138)
+    sum_suppressed <- integer(0)
+    zz = z[sample.int(nrow(z), 100, replace = TRUE), ]
+    for (c2 in c("F", "T")) 
+      for (c3 in c("F", "T", "H")) {
+        b <- GaussSuppressionFromData(zz, 
+                                      dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                      numVar = "value", charVar = "char", 
+                                      maxN = 2, 
+                                      candidates = CandidatesNum, 
+                                      primary = NcontributorsRule,  
+                                      singleton = SingletonUniqueContributor, 
+                                      singletonMethod = paste0("numF", c2, c3))
+        sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
+      }
+    expect_equal(sum_suppressed, c(49, 51, 53, 49, 52, 55))
+    # Why extra primary needed for 5:Total when "numFTH"
+    # can be seen by looking at 
+    # b[b$region == 5, ]
+    # zz[zz$fylke == 5 & zz$hovedint == "annet", ]
+    # zz[zz$fylke == 5 & zz$hovedint == "arbeid", ]
+    # zz[zz$fylke == 5 & zz$hovedint == "soshjelp", ]  
+    
   }
-  
-  
 })
 
 
