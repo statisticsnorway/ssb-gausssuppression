@@ -56,6 +56,8 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' @param integerSingleton Integer output when `TRUE`. See details.
 #' @param primary Vector (integer or logical) specifying primary suppressed cells.
 #'                It will be ensured that any non-suppressed inner cell is not considered a singleton.
+#' @param whenNoVar When `TRUE`, and without `nUniqueVar` and `freqVar` in input, 
+#'                all cells will be marked as singletons.                
 #' @param ... Unused parameters
 #'
 #' @return logical or integer vector
@@ -101,9 +103,10 @@ SingletonUniqueContributor <- function(data,
                                        nUniqueVar=NULL, 
                                        charVar=NULL, 
                                        removeCodes = character(0), 
-  integerSingleton = compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0, # provisional default. Later: Remove importFrom utils compareVersion packageVersion
+  integerSingleton = length(charVar) & compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0, # provisional default. Later: Only length(charVar) Remove importFrom utils compareVersion packageVersion
                                        x,
                                        primary = integer(0),
+                                       whenNoVar = TRUE,
                                        ...) {
   
   if(length(nUniqueVar)){
@@ -115,7 +118,11 @@ SingletonUniqueContributor <- function(data,
   if(length(nUniqueVar)){
     singleton = data[[nUniqueVar]] == 1
   } else {
-    singleton = data[[freqVar]] == 1  
+    if(length(freqVar)){
+      singleton <- data[[freqVar]] == 1
+    } else {
+      singleton <- rep(whenNoVar, nrow(data))
+    }
   }
   
   if(length(removeCodes)){

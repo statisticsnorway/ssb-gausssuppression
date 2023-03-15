@@ -10,10 +10,11 @@ SingletonUniqueContributor(
   nUniqueVar = NULL,
   charVar = NULL,
   removeCodes = character(0),
-  integerSingleton = compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") >
-    0,
+  integerSingleton = length(charVar) &
+    compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0,
   x,
   primary = integer(0),
+  whenNoVar = TRUE,
   ...
 )
 }
@@ -38,6 +39,9 @@ See examples.}
 
 \item{primary}{Vector (integer or logical) specifying primary suppressed cells.
 It will be ensured that any non-suppressed inner cell is not considered a singleton.}
+
+\item{whenNoVar}{When \code{TRUE}, and without \code{nUniqueVar} and \code{freqVar} in input,
+all cells will be marked as singletons.}
 
 \item{...}{Unused parameters}
 }
