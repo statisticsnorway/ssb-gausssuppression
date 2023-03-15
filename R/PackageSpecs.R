@@ -45,10 +45,11 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
     dominanceSpec =       
       quote(list(
       primary = DominanceRule,
-      candidates = CandidatesNum,
+      candidates = CandidatesNum,  
+      singleton = SingletonUniqueContributor,
       preAggregate = !is.null(charVar),
       domWeightMethod = "default",
-      singletonMethod = "sub2Sum"
+      singletonMethod = "sub2Sum"   # proposed change "numttT"
     )),
     
     fewContributorsSpec =
@@ -57,8 +58,9 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         protectZeros = FALSE,
         extend0 = FALSE,
         preAggregate = !is.null(charVar),
-        candidates = CandidatesNum,
-        singletonMethod = "sub2Sum"
+        candidates = CandidatesNum,  
+        singleton = SingletonUniqueContributor,
+        singletonMethod = "sub2Sum"  # proposed change "numttT"
       )),
     
     kDisclosureSpec = 
