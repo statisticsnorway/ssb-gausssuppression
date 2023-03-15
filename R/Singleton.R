@@ -109,68 +109,69 @@ SingletonUniqueContributor <- function(data,
                                        whenNoVar = TRUE,
                                        ...) {
   
-  if(length(nUniqueVar)){
-    if(is.null(data[[nUniqueVar]])){
+  if (length(nUniqueVar)) {
+    if (is.null(data[[nUniqueVar]])) {
       nUniqueVar <- NULL
     }
   }
   
-  if(length(nUniqueVar)){
-    singleton = data[[nUniqueVar]] == 1
+  if (length(nUniqueVar)) {
+    singleton <- data[[nUniqueVar]] == 1
   } else {
-    if(length(freqVar)){
+    if (length(freqVar)) {
       singleton <- data[[freqVar]] == 1
     } else {
       singleton <- rep(whenNoVar, nrow(data))
     }
   }
   
-  if(length(removeCodes)){
+  if (length(removeCodes)) {
     if (length(charVar)) {
-      if(is.list(removeCodes) & length(removeCodes) == 1){
-        removeCodes = unlist(removeCodes)
+      if (is.list(removeCodes) & length(removeCodes) == 1) {
+        removeCodes <- unlist(removeCodes)
       }
-      if(is.list(removeCodes)){
-        if(is.data.frame(removeCodes)){
-          ma = Match(removeCodes, data[charVar])
-          singleton[ma] = FALSE
+      if (is.list(removeCodes)) {
+        if (is.data.frame(removeCodes)) {
+          ma <- Match(removeCodes, data[charVar])
+          singleton[ma] <- FALSE
         } else {
-          for(i in seq_along(charVar)){
-            singleton[data[[charVar[i]]] %in% removeCodes[[charVar[i]]]] = FALSE  # Ordinary when single charVar 
-          }  
+          for (i in seq_along(charVar)) {
+            singleton[data[[charVar[i]]] %in% removeCodes[[charVar[i]]]] <- FALSE  # Ordinary when single charVar 
+          }
         }
       } else {
-        for(i in seq_along(charVar)){
-          singleton[data[[charVar[i]]] %in% removeCodes] = FALSE  # Ordinary when single charVar 
+        for (i in seq_along(charVar)) {
+          singleton[data[[charVar[i]]] %in% removeCodes] <- FALSE  # Ordinary when single charVar 
         }
       }
     } else {
-      if(!is.vector(removeCodes)){
+      if (!is.vector(removeCodes)) {
         stop("removeCodes must be vector when empty charVar")
       }
-      singleton[as.integer(removeCodes)] = FALSE
+      singleton[as.integer(removeCodes)] <- FALSE
     }
   }
   
-  if (is.logical(primary)) 
-    primary <- which(primary) 
-  else 
-    primary <- unique(primary)
-  
-  if(length(primary)){
-    inner <- rowSums(x[, colSums(x) == 1, drop = FALSE])>0
-    innerprimary <- rowSums(x[, primary[colSums(x[, primary, drop = FALSE]) == 1], drop = FALSE]) > 0
-    singleton[!innerprimary & inner] = FALSE
-  }
-  if(!integerSingleton){
-    return(singleton)
-  } 
-  if (length(charVar)) {
-    singleton_integer = RowGroups(data[charVar])
+  if (is.logical(primary)) {
+    primary <- which(primary)
   } else {
-    singleton_integer = seq_len(nrow(data))
+    primary <- unique(primary)
   }
-  singleton_integer[!singleton] = 0L
+  
+  if (length(primary)) {
+    inner <- rowSums(x[, colSums(x) == 1, drop = FALSE]) > 0
+    innerprimary <- rowSums(x[, primary[colSums(x[, primary, drop = FALSE]) == 1], drop = FALSE]) > 0
+    singleton[!innerprimary & inner] <- FALSE
+  }
+  if (!integerSingleton) {
+    return(singleton)
+  }
+  if (length(charVar)) {
+    singleton_integer <- RowGroups(data[charVar])
+  } else {
+    singleton_integer <- seq_len(nrow(data))
+  }
+  singleton_integer[!singleton] <- 0L
   singleton_integer
 }
 
