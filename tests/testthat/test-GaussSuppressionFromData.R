@@ -172,13 +172,13 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
     b2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
                                    maxN = 2, candidates = CandidatesNum, primary = NcontributorsRule, printInc = printInc, 
                                    singleton = SingletonUniqueContributor, 
-                                   singletonMethod = "sub2SumUnique") 
+                                   singletonMethod = "numFTT") 
     expect_equal(sum(b0$suppressed), 32)
     expect_equal(sum(b1$suppressed), 33)
     expect_equal(sum(b2$suppressed), 35)
     # Code to see differences:
     #"sub2Sum" solves G-problem 
-    #"sub2SumUnique" needed to solve K-problem. 
+    #"numFTT" needed to solve K-problem. 
     if (FALSE) for (myChar in c("G", "K")) {
       kp <- b0[b0$region == myChar & b0$primary, ]
       k0 <- b0[b0$region == myChar & b0$suppressed, ]
@@ -197,7 +197,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
     sum_suppressed <- integer(0)
     for (m1 in c("none", "anySumNOTprimary")) 
-      for (m2 in c("none", "sub2Sum", "sub2SumUnique")) {
+      for (m2 in c("none", "sub2Sum", "numFTT")) {
         b <- GaussSuppressionFromData(z, 
                                     dimVar = c("region", "fylke", "kostragr", "hovedint"), 
                                     numVar = "value", charVar = "char", maxN = 2, 
