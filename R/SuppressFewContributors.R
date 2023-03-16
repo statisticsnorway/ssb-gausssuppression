@@ -55,7 +55,7 @@
 #' # With hierarchies created manually
 #' ml <- data.frame(levels = c("@@", "@@@@", "@@@@@@", "@@@@@@", "@@@@@@", "@@@@"), 
 #'         codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
-#' SuppressFewContributors(data = d2, maxN = 1, numVar = "v", contributorVar = "family_id",
+#' SuppressFewContributors(data = d2, maxN = 2, numVar = "v", contributorVar = "family_id",
 #'                       hierarchies = list(main_income = ml, k_group = "Total_Norway"))
 #'                       
 #'                       
