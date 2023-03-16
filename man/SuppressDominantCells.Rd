@@ -14,7 +14,7 @@ SuppressDominantCells(
   dimVar = NULL,
   hierarchies = NULL,
   formula = NULL,
-  preAggVar = NULL,
+  contributorVar = NULL,
   sWeightVar = NULL,
   ...,
   spec = PackageSpecs("dominanceSpec")
@@ -41,7 +41,8 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{formula}{A model formula}
 
-\item{preAggVar}{Extra variables to be used as grouping elements in the dominance rule.}
+\item{contributorVar}{Extra variables to be used as grouping elements in the dominance rule.
+Typically, the variable contains the contributor IDs.}
 
 \item{sWeightVar}{Name of variable which represents sampling weights to be used
 in dominance rule}

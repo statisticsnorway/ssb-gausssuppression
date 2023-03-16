@@ -5,7 +5,8 @@
 #' @inheritParams GaussSuppressionFromData
 #' @inheritParams DominanceRule
 #' @param numVar numerical variable to be aggregated and used in dominance rule
-#' @param preAggVar Extra variables to be used as grouping elements in the dominance rule.
+#' @param contributorVar Extra variables to be used as grouping elements in the dominance rule.
+#'                  Typically, the variable contains the contributor IDs.
 #' @param sWeightVar Name of variable which represents sampling weights to be used
 #' in dominance rule
 #'
@@ -72,7 +73,7 @@ SuppressDominantCells <- function(data,
                                   dimVar = NULL,
                                   hierarchies = NULL,
                                   formula = NULL,
-                                  preAggVar = NULL,
+                                  contributorVar = NULL,
                                   sWeightVar = NULL,
                                   ...,
                                   spec = PackageSpecs("dominanceSpec")
@@ -87,7 +88,7 @@ SuppressDominantCells <- function(data,
     dimVar = dimVar,
     hierarchies = hierarchies,
     formula = formula,
-    charVar = preAggVar,
+    charVar = contributorVar,
     sWeightVar = sWeightVar,
     spec = spec,
     ...
