@@ -156,7 +156,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
   expect_equal(d1[names(d1) != "ant"], d2, ignore_attr = TRUE)
   
   
-  if(compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0){   # provisional
+  if(TRUE){   
     set.seed(123)
     z$value <- rnorm(nrow(z))^2  # Need to generate again ... not same as above 
     set.seed(1986) # Seed is not randomly chosen

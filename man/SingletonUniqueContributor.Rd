@@ -10,8 +10,7 @@ SingletonUniqueContributor(
   nUniqueVar = NULL,
   charVar = NULL,
   removeCodes = character(0),
-  integerSingleton = length(charVar) &
-    compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0,
+  integerSingleton = length(charVar) > 0,
   x,
   primary = integer(0),
   whenNoVar = TRUE,
