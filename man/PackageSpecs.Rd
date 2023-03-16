@@ -28,11 +28,11 @@ different specs, and rows represent the parameter settings.\tabular{lllll}{
    \strong{primary} \tab PrimaryDefault \tab DominanceRule \tab NContributorsRule \tab KDisclosurePrimary \cr
    \strong{protectZeros} \tab TRUE \tab  \tab FALSE \tab FALSE \cr
    \strong{candidates} \tab CandidatesDefault \tab CandidatesNum \tab CandidatesNum \tab DirectDisclosureCandidates \cr
-   \strong{singleton} \tab SingletonDefault \tab  \tab  \tab  \cr
+   \strong{singleton} \tab SingletonDefault \tab SingletonUniqueContributor \tab SingletonUniqueContributor \tab  \cr
    \strong{extend0} \tab TRUE \tab  \tab FALSE \tab TRUE \cr
    \strong{preAggregate} \tab  \tab !is.null(charVar) \tab !is.null(charVar) \tab  \cr
    \strong{domWeightMethod} \tab  \tab "default" \tab  \tab  \cr
-   \strong{singletonMethod} \tab  \tab "sub2Sum" \tab "sub2Sum" \tab "anySumNOTprimary" \cr
+   \strong{singletonMethod} \tab  \tab "numttH" \tab "numttH" \tab "anySumNOTprimary" \cr
    \strong{secondaryZeros} \tab  \tab  \tab  \tab 1 \cr
 }
 }
