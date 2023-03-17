@@ -56,6 +56,7 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' @param integerSingleton Integer output when `TRUE`. See details.
 #' @param primary Vector (integer or logical) specifying primary suppressed cells.
 #'                It will be ensured that any non-suppressed inner cell is not considered a singleton.
+#' @param whenPrimaryMatters Function to be called when `primary` caused non-singleton. Supply `NULL` to do nothing.
 #' @param whenNoVar When `TRUE`, and without `nUniqueVar` and `freqVar` in input, 
 #'                all cells will be marked as singletons.                
 #' @param ... Unused parameters
@@ -105,6 +106,7 @@ SingletonUniqueContributor <- function(data,
                                        integerSingleton = length(charVar) > 0,
                                        x,
                                        primary = integer(0),
+                                       whenPrimaryMatters = warning,
                                        whenNoVar = TRUE,
                                        ...) {
   
@@ -160,7 +162,12 @@ SingletonUniqueContributor <- function(data,
   if (length(primary)) {
     inner <- rowSums(x[, colSums(x) == 1, drop = FALSE]) > 0
     innerprimary <- rowSums(x[, primary[colSums(x[, primary, drop = FALSE]) == 1], drop = FALSE]) > 0
-    singleton[!innerprimary & inner] <- FALSE
+    if (any(singleton[!innerprimary & inner])) {
+      if (!is.null(whenPrimaryMatters)) {
+        whenPrimaryMatters("primary caused non-singleton")
+      }
+      singleton[!innerprimary & inner] <- FALSE
+    }
   }
   if (!integerSingleton) {
     return(singleton)
