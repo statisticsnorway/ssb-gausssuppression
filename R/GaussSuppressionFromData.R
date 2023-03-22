@@ -92,7 +92,12 @@
 #'                   this variable will apply only when `preAggregate`/`extraAggregate` is not done.
 #' @param  forcedInOutput Whether to include `forced` as an output column.      
 #'               One of `"ifNonNULL"` (default), `"always"`, `"ifany"` and `"no"`. 
-#'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.                                                     
+#'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.   
+#' @param  unsafeInOutput Whether to include `usafe` as an output column.
+#'               One of `"ifForcedInOutput"` (default), `"always"`, `"ifany"` and `"no"`. 
+#'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`. 
+#'               
+#'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -174,7 +179,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            specLock = FALSE, 
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
-                           forcedInOutput = "ifNonNULL"){ 
+                           forcedInOutput = "ifNonNULL",
+                           unsafeInOutput = "ifForcedInOutput"){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
       spec <- eval(spec)
@@ -234,6 +240,14 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       forcedInOutput <- "no"
     }
   }
+  if (is.logical(unsafeInOutput)) {
+    if (unsafeInOutput) {
+      unsafeInOutput <- "always"
+    } else {
+      unsafeInOutput <- "no"
+    }
+  }
+  
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
@@ -548,14 +562,23 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
-    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, ...)
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
+                                  unsafeAsNegative = TRUE, ...)
   } else {
-    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, ...)
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
+                                  unsafeAsNegative = TRUE, ...)
   }
   
-  if (output == "secondary"){
-    return(secondary)
-  } 
+  if (output == "secondary") {
+    if (unsafeInOutput %in% c("ifany", "always")) {
+      return(secondary)
+    } else {
+      return(secondary[secondary > 0])
+    }
+  }
+  
+  unsafePrimary <- -secondary[secondary < 0]
+  secondary <- secondary[secondary > 0]
   
   if(output=="outputGaussSuppression_x"){
     return(list(secondary = secondary, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, x = x))
@@ -616,6 +639,36 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
+  unsafeInOut <- NA
+  if (unsafeInOutput == "ifForcedInOutput") {
+    unsafeInOut <- forcedInOut
+  }
+  if (unsafeInOutput == "always") {
+    unsafeInOut <- TRUE
+  }
+  if (unsafeInOutput == "ifany") {
+    unsafeInOut <- length(unsafePrimary) > 0
+  }
+  if (unsafeInOutput == "no") {
+    unsafeInOut <- FALSE
+  }
+  if (is.na(unsafeInOut)) {
+    warning('Wrong unsafeInOutput input treated as "ifForcedInOutput"')
+    unsafeInOut <- forcedInOut
+  }
+  if (unsafeInOut) {
+    unsafe <- rep(FALSE, m)
+    unsafe[unsafePrimary[unsafePrimary <= m]] <- TRUE
+    if (any(unsafe & !primary)) {
+      warning("Calculation of unsafe failed. Non-primary found.")
+    }
+    unsafe <- matrix(unsafe)
+    colnames(unsafe) <- "unsafe"
+  } else {
+    unsafe <- matrix(0, m, 0)
+  }
+  
+  
   if (forcedInOut) {
     forced <- matrix(forced)
     colnames(forced) <- "forced"
@@ -623,7 +676,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     forced <- matrix(0, m, 0)
   }
   
-  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, forced, suppressed = suppressed)
+  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, forced, unsafe, suppressed = suppressed)
   rownames(publish) <- NULL
   
   startCol <- attr(x, "startCol", exact = TRUE)

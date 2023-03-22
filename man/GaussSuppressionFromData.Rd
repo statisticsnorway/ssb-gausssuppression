@@ -35,7 +35,8 @@ GaussSuppressionFromData(
   specLock = FALSE,
   freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
   nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
-  forcedInOutput = "ifNonNULL"
+  forcedInOutput = "ifNonNULL",
+  unsafeInOutput = "ifForcedInOutput"
 )
 }
 \arguments{
@@ -135,6 +136,10 @@ this variable will apply only when \code{preAggregate}/\code{extraAggregate} is 
 
 \item{forcedInOutput}{Whether to include \code{forced} as an output column.
 One of \code{"ifNonNULL"} (default), \code{"always"}, \code{"ifany"} and \code{"no"}.
+In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{"always"} and \code{"no"}.}
+
+\item{unsafeInOutput}{Whether to include \code{usafe} as an output column.
+One of \code{"ifForcedInOutput"} (default), \code{"always"}, \code{"ifany"} and \code{"no"}.
 In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{"always"} and \code{"no"}.}
 }
 \value{
