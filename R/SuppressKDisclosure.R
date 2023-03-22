@@ -30,7 +30,7 @@
 
 #' @examples
 #' # data
-#' data <- SSBtools::SSBtoolsData("mun_accidents") 
+#' data <- SSBtools::SSBtoolsData("mun_accidents")
 #'
 #' # hierarchies as DimLists
 #' mun <- data.frame(levels = c("@@", rep("@@@@", 6)),
@@ -177,7 +177,7 @@ KDisclosurePrimary <- function(data,
   )
   x <- cbind(x, mcModelMatrix$x)
   crossTable <- rbind(crossTable, mcModelMatrix$crossTable)
-
+  
   x <- x[, !SSBtools::DummyDuplicated(x, rnd = TRUE), drop = FALSE]
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   FindDifferenceCells(
@@ -221,6 +221,7 @@ FindDifferenceCells <- function(x,
   if (!is.null(idVars)) {
     if (!all(names(crossTable) %in% idVars)) {
       nonIdVars <- names(crossTable)[!(names(crossTable) %in% idVars)]
+      # need to replace this with variable totals, instead of hardcoded:
       nonIdTots <- as.list(rep("Total", length(nonIdVars)))
       names(nonIdTots) <- nonIdVars
       nonIdTots <- as.data.frame(nonIdTots)
@@ -260,22 +261,37 @@ FindDifferenceCells <- function(x,
     }
   }
   if (nrow(disclosures)) {
-    disclosures <- new("dgTMatrix", 
-                       i = as.integer(c(disclosures[, 1:2]) - 1),
-                       j = as.integer(rep(0:(nrow(disclosures)-1), 2)),
-                       x = rep(c(-1, 1), each = nrow(disclosures)),
-                       Dim = c(ncol(x), nrow(disclosures)))
-    primary_matrix <- x %*% disclosures 
+    pcells <- apply(crossTable[disclosures[, 2],], 1,
+                    function(x)
+                      paste0("(", paste(x, collapse = ","), ")"))
+    ccells <- apply(crossTable[disclosures[, 1],], 1,
+                    function(x)
+                      paste0("(", paste(x, collapse = ","), ")"))
+    
+    diffMatrix <- new(
+      "dgTMatrix",
+      i = as.integer(c(disclosures[, 1:2]) - 1),
+      j = as.integer(rep(0:(
+        nrow(disclosures) - 1
+      ), 2)),
+      x = rep(c(-1, 1), each = nrow(disclosures)),
+      Dim = c(ncol(x), nrow(disclosures))
+    )
+    
+    primary_matrix <- x %*% diffMatrix
+    colnames(primary_matrix) <- paste(pcells, ccells, sep = "-")
+    return(primary_matrix)
   }
   else
     return(rep(FALSE, nrow(crossTable)))
-  primary_matrix
 }
 
 createSensitiveDimList <- function(sensitiveVar) {
-  if (length(sensitiveVar) > 1) 
-  data.frame(levels = c("@", "@@", rep("@@@", length(sensitiveVar))),
-             codes = c("Total", paste(sensitiveVar, collapse = ":"), sensitiveVar))
-  else 
+  if (length(sensitiveVar) > 1)
+    data.frame(
+      levels = c("@", "@@", rep("@@@", length(sensitiveVar))),
+      codes = c("Total", paste(sensitiveVar, collapse = ":"), sensitiveVar)
+    )
+  else
     NULL
 }
