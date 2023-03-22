@@ -286,6 +286,7 @@ FindDifferenceCells <- function(x,
     return(rep(FALSE, nrow(crossTable)))
 }
 
+# function for creating a dimlist to capture combinations of sensitive values
 createSensitiveDimList <- function(sensitiveVar) {
   if (length(sensitiveVar) > 1)
     data.frame(
