@@ -46,23 +46,20 @@
 #' mc_dimlist <- list(inj = inj2)
 #' mc_nomargs <- list(inj = inj3)
 #'
-#' #' # Example with formula, no meaningful combination
+#' # Example with formula, no meaningful combination
 #' out <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", formula = ~mun*inj)
 #'
 #' # Example with hierarchy and meaningful combination
 #' out2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #' hierarchies = dimlists, mc_hierarchies = mc_dimlist)
 #'
-#' #' # Example of table without mariginals, and mc_hierarchies to protect
+#' # Example of table without mariginals, and mc_hierarchies to protect
 #' out3 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #' formula = ~mun:inj, mc_hierarchies = mc_dimlist )
 #'
 #'
 #' # Examples of sensitive vars and values
-#' mun <- c("k1", "k2", "k3", "k4", "k5", "k6")
-#' inj <- c("serious", "light", "none", "unknown")
-#' data <- expand.grid(mun, inj)
-#' names(data) <- c("mun", "inj")
+#' data <- SSBtools::SSBtoolsData("mun_accidents")
 #' data$freq <- c(0,5,3,4,1,0,
 #'                0,0,2,0,0,6,
 #'                4,1,0,4,0,0,
@@ -77,6 +74,8 @@
 #' out_v <- addPrikket(out_v)
 #' reshape2::dcast(out_v, mun~inj, value.var = "freq")
 #' reshape2::dcast(out_v, mun~inj, value.var = "prikket")
+#'
+
 #'
 #' out_v1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 #'                             formula = ~mun*inj, mc_hierarchies = mc_dimlist,
@@ -99,6 +98,17 @@
 #'                             formula = ~mun*inj, idVars = "inj")
 #' out_id2 <- addPrikket(out_id2)
 #' reshape2::dcast(out_id2, mun~inj, value.var = "prikket")
+#' 
+#' Same example as out_v, but with cells forced to be published, yielding unsafe table
+#' out_unsafe <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
+#'                             formula = ~mun*inj, sensitiveVars = "inj", 
+#'                             forced = c(12,14,15), output = "all")
+#' out_unsafe$publish <- addPrikket(out_unsafe$publish)
+#' reshape2::dcast(out_unsafe$publish, mun~inj, value.var = "freq")
+#' reshape2::dcast(out_unsafe$publish, mun~inj, value.var = "prikket")
+#' 
+#' # colnames in $unsafe give an indication as to which cells/differences are unsafe
+#' colnames(out_unsafe$unsafe)
 SuppressKDisclosure <- function(data,
                                 coalition = 0,
                                 idVars = NULL,
