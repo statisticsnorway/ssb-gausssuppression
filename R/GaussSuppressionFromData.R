@@ -26,6 +26,17 @@
 #' 
 #' Singleton handling can be turned off by `singleton = NULL` or `singletonMethod = "none"`. 
 #' Both of these choices are identical in the sense that `singletonMethod` is set to `"none"` whenever `singleton` is `NULL` and vice versa.
+#' 
+#' Information about uncertain primary suppressions due to forced cells can be found 
+#' as described by parameters `unsafeInOutput` and `output`  (`= "all"`). 
+#' When forced cells affect singleton problems, this is not implemented. 
+#' Some information can be seen from warnings. 
+#' This can also be seen by choosing `output = "secondary"` together 
+#' with `unsafeInOutput = "ifany"` or `unsafeInOutput = "always"`. 
+#' Then, negative indices from \code{\link{GaussSuppression}} using 
+#' `unsafeAsNegative = TRUE` will be included in the output. 
+#' Singleton problems may, however, be present even if it cannot be seen as warning/output. 
+#' In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}.  
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
@@ -56,11 +67,18 @@
 #'                      `"inner_x"`, `"input2functions"` (input to supplied functions),
 #'                      `"inputGaussSuppression"`, `"inputGaussSuppression_x"`, 
 #'                      `"outputGaussSuppression"`  `"outputGaussSuppression_x"`,
-#'                      `"primary"` and `"secondary"`.
+#'                      `"primary"`,  `"secondary"` and `"all"`.
 #'               Here "inner" means input data (possibly pre-aggregated) and 
 #'               "x" means dummy matrix (as input parameter x).   
 #'               All input to and output from \code{\link{GaussSuppression}}, except `...`, are returned when `"outputGaussSuppression_x"`. 
 #'               Excluding x and only input are also possible.
+#'               The code `"all"` means all relevant output after all the calculations.
+#'               Currently, this means the same as `"publish_inner_x"` extended with the matrices (or NULL) `xExtraPrimary`  and `unsafe`. 
+#'               The former matrix is usually made by \code{\link{KDisclosurePrimary}}.
+#'               This latter matrix contains the columns representing unsafe primary suppressions. 
+#'               In addition to `x` columns corresponding to unsafe in ordinary output (see parameter `unsafeInOutput` below), 
+#'               possible columns from  `xExtraPrimary` may also be included in the unsafe matrix (see details). 
+#'               
 #' @param x `x` (`modelMatrix`) and `crossTable` can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
@@ -92,7 +110,13 @@
 #'                   this variable will apply only when `preAggregate`/`extraAggregate` is not done.
 #' @param  forcedInOutput Whether to include `forced` as an output column.      
 #'               One of `"ifNonNULL"` (default), `"always"`, `"ifany"` and `"no"`. 
-#'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.                                                     
+#'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.   
+#' @param  unsafeInOutput Whether to include `usafe` as an output column.
+#'               One of `"ifForcedInOutput"` (default), `"always"`, `"ifany"` and `"no"`. 
+#'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.
+#'               see details. 
+#'               
+#'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
@@ -174,7 +198,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            specLock = FALSE, 
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
-                           forcedInOutput = "ifNonNULL"){ 
+                           forcedInOutput = "ifNonNULL",
+                           unsafeInOutput = "ifForcedInOutput"){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
       spec <- eval(spec)
@@ -203,13 +228,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
-                     "primary", "secondary")))
+                     "primary", "secondary", "all")))
     stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions",
          "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
-                     "primary", "secondary")')
+                     "primary", "secondary", "all")')
   
   
-  innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x")
+  innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x", "all")
 
   force(preAggregate)
   force(extraAggregate)
@@ -234,6 +259,14 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       forcedInOutput <- "no"
     }
   }
+  if (is.logical(unsafeInOutput)) {
+    if (unsafeInOutput) {
+      unsafeInOutput <- "always"
+    } else {
+      unsafeInOutput <- "no"
+    }
+  }
+  
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
@@ -548,14 +581,23 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
-    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, ...)
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
+                                  unsafeAsNegative = TRUE, ...)
   } else {
-    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, ...)
+    secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
+                                  unsafeAsNegative = TRUE, ...)
   }
   
-  if (output == "secondary"){
-    return(secondary)
-  } 
+  if (output == "secondary") {
+    if (unsafeInOutput %in% c("ifany", "always")) {
+      return(secondary)
+    } else {
+      return(secondary[secondary > 0])
+    }
+  }
+  
+  unsafePrimary <- -secondary[secondary < 0]
+  secondary <- secondary[secondary > 0]
   
   if(output=="outputGaussSuppression_x"){
     return(list(secondary = secondary, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, x = x))
@@ -616,6 +658,36 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
+  unsafeInOut <- NA
+  if (unsafeInOutput == "ifForcedInOutput") {
+    unsafeInOut <- forcedInOut
+  }
+  if (unsafeInOutput == "always") {
+    unsafeInOut <- TRUE
+  }
+  if (unsafeInOutput == "ifany") {
+    unsafeInOut <- length(unsafePrimary) > 0
+  }
+  if (unsafeInOutput == "no") {
+    unsafeInOut <- FALSE
+  }
+  if (is.na(unsafeInOut)) {
+    warning('Wrong unsafeInOutput input treated as "ifForcedInOutput"')
+    unsafeInOut <- forcedInOut
+  }
+  if (unsafeInOut) {
+    unsafe <- rep(FALSE, m)
+    unsafe[unsafePrimary[unsafePrimary <= m]] <- TRUE
+    if (any(unsafe & !primary)) {
+      warning("Calculation of unsafe failed. Non-primary found.")
+    }
+    unsafe <- matrix(unsafe)
+    colnames(unsafe) <- "unsafe"
+  } else {
+    unsafe <- matrix(0, m, 0)
+  }
+  
+  
   if (forcedInOut) {
     forced <- matrix(forced)
     colnames(forced) <- "forced"
@@ -623,7 +695,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     forced <- matrix(0, m, 0)
   }
   
-  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, forced, suppressed = suppressed)
+  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, forced, unsafe, suppressed = suppressed)
   rownames(publish) <- NULL
   
   startCol <- attr(x, "startCol", exact = TRUE)
@@ -633,6 +705,21 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   attr(publish, "totCode") <- FindTotCode2(x, crossTable)
   
+  
+  if(output == "all"){
+    if( length(unsafePrimary) > 0){
+      unsafe = x[, unsafePrimary[unsafePrimary <= m], drop = FALSE] # reuse object name unsafe here
+      if(any(unsafePrimary > m) & !is.null(xExtraPrimary)){
+        unsafePxEx = unsafePrimary[unsafePrimary > m] - m
+        unsafePxEx = unsafePxEx[unsafePxEx <= ncol(xExtraPrimary)]
+        unsafe = cbind(unsafe, xExtraPrimary[, unsafePxEx, drop = FALSE])
+      }
+      
+    } else {
+      unsafe = NULL
+    }
+    return(list(publish = publish, inner = data, x = x, xExtraPrimary = xExtraPrimary, unsafe = unsafe))
+  }
   
   if (output == "publish_inner_x") {
     return(list(publish = publish, inner = data, x = x))
