@@ -140,7 +140,7 @@ NotPrimaryFromSuppressedData <- function(..., forcedData = TRUE) {
   
 FindTotCode2 <- function(x, crossTable) {   # other function SSBtools:::FindTotCode exist
   totCol <- FindTotCol(x)
-  lapply(as.list(crossTable[totCol, ]), unique)
+  lapply(as.list(crossTable[totCol, , drop = FALSE]), unique)
 }
 
 

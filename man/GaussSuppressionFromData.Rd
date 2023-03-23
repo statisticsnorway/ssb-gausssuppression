@@ -8,6 +8,7 @@ GaussSuppressionFromData(
   data,
   dimVar = NULL,
   freqVar = NULL,
+  ...,
   numVar = NULL,
   weightVar = NULL,
   charVar = NULL,
@@ -33,7 +34,9 @@ GaussSuppressionFromData(
   spec = NULL,
   specLock = FALSE,
   freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
-  ...
+  nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
+  forcedInOutput = "ifNonNULL",
+  unsafeInOutput = "ifForcedInOutput"
 )
 }
 \arguments{
@@ -42,6 +45,8 @@ GaussSuppressionFromData(
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
 \item{freqVar}{A single variable holding counts (name or number).}
+
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
 \item{numVar}{Other numerical variables to be aggregated}
 
@@ -84,11 +89,17 @@ See details.}
 \code{"inner_x"}, \code{"input2functions"} (input to supplied functions),
 \code{"inputGaussSuppression"}, \code{"inputGaussSuppression_x"},
 \code{"outputGaussSuppression"}  \code{"outputGaussSuppression_x"},
-\code{"primary"} and \code{"secondary"}.
+\code{"primary"},  \code{"secondary"} and \code{"all"}.
 Here "inner" means input data (possibly pre-aggregated) and
 "x" means dummy matrix (as input parameter x).
 All input to and output from \code{\link{GaussSuppression}}, except \code{...}, are returned when \code{"outputGaussSuppression_x"}.
-Excluding x and only input are also possible.}
+Excluding x and only input are also possible.
+The code \code{"all"} means all relevant output after all the calculations.
+Currently, this means the same as \code{"publish_inner_x"} extended with the matrices (or NULL) \code{xExtraPrimary}  and \code{unsafe}.
+The former matrix is usually made by \code{\link{KDisclosurePrimary}}.
+This latter matrix contains the columns representing unsafe primary suppressions.
+In addition to \code{x} columns corresponding to unsafe in ordinary output (see parameter \code{unsafeInOutput} below),
+possible columns from  \code{xExtraPrimary} may also be included in the unsafe matrix (see details).}
 
 \item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}}
 
@@ -123,7 +134,20 @@ Parameter \code{extend0} can also be specified as a list meaning parameter \code
 \item{freqVarNew}{Name of new frequency variable generated when input \code{freqVar} is NULL and \code{preAggregate} is TRUE.
 Default is \code{"freq"} provided this is not found in \code{names(data)}.}
 
-\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+\item{nUniqueVar}{Name of variable holding the number of unique contributors.
+This variable will be generated in the \code{extraAggregate} step.
+Default is \code{"nUnique"} provided this is not found in \code{names(data)}.
+If an existing variable is passed as input,
+this variable will apply only when \code{preAggregate}/\code{extraAggregate} is not done.}
+
+\item{forcedInOutput}{Whether to include \code{forced} as an output column.
+One of \code{"ifNonNULL"} (default), \code{"always"}, \code{"ifany"} and \code{"no"}.
+In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{"always"} and \code{"no"}.}
+
+\item{unsafeInOutput}{Whether to include \code{usafe} as an output column.
+One of \code{"ifForcedInOutput"} (default), \code{"always"}, \code{"ifany"} and \code{"no"}.
+In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{"always"} and \code{"no"}.
+see details.}
 }
 \value{
 Aggregated data with suppression information
@@ -138,6 +162,8 @@ The supplied functions for generating \code{\link{GaussSuppression}} input takes
 \code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
 where the two first are  \code{\link{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
+In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
+
 Similarly, \code{num}, is a data frame of aggregated numerical variables.
 It is possible to supply several primary functions joined by \code{c}, e.g. (\code{c(FunPrim1, FunPrim2)}).
 All \code{NA}s returned from any of the functions force the corresponding cells not to be primary suppressed.
@@ -151,6 +177,17 @@ Then \code{NULL} is correctly returned, but \code{suppressWarnings} are needed.
 
 Singleton handling can be turned off by \code{singleton = NULL} or \code{singletonMethod = "none"}.
 Both of these choices are identical in the sense that \code{singletonMethod} is set to \code{"none"} whenever \code{singleton} is \code{NULL} and vice versa.
+
+Information about uncertain primary suppressions due to forced cells can be found
+as described by parameters \code{unsafeInOutput} and \code{output}  (\verb{= "all"}).
+When forced cells affect singleton problems, this is not implemented.
+Some information can be seen from warnings.
+This can also be seen by choosing \code{output = "secondary"} together
+with \code{unsafeInOutput = "ifany"} or \code{unsafeInOutput = "always"}.
+Then, negative indices from \code{\link{GaussSuppression}} using
+\code{unsafeAsNegative = TRUE} will be included in the output.
+Singleton problems may, however, be present even if it cannot be seen as warning/output.
+In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}.
 }
 \examples{
 

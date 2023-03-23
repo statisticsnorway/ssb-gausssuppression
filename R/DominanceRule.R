@@ -40,7 +40,7 @@
 #' z$value <- sample(1:1000, nrow(z), replace = TRUE)
 #' 
 #' GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), 
-#' numVar = "value", candidates = CandidatesNum, primary = DominanceRule, 
+#' numVar = "value", candidates = CandidatesNum, primary = DominanceRule, preAggregate = FALSE,
 #' singletonMethod = "sub2Sum", n = c(1, 2), k = c(65, 85), allDominance = TRUE)
 #' 
 #' 
@@ -56,22 +56,25 @@
 #'         rep("v5", 3),
 #'         rep(c("v6", "v7"), each = 4))
 #' sw <- c(1, 2, 1, 2, 1, 2, 1, 2, 1, 1, 2, 1, 1, 1, 2, 1, 1, 1)
-#' d <- data.frame(v1 = v1, num = num, sw = sw, freq = 1)
+#' d <- data.frame(v1 = v1, num = num, sw = sw)
 #' 
 #' # without weights
-#' GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
+#' GaussSuppressionFromData(d, formula = ~v1 - 1, 
 #'  numVar = "num",  n = c(1,2), k = c(80,70),
-#'  allDominance = TRUE, primary = DominanceRule)
+#'   preAggregate = FALSE, allDominance = TRUE, candidates = CandidatesNum,
+#'   primary = DominanceRule)
 #'
 #' # with weights, standard method
-#' GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
+#' GaussSuppressionFromData(d, formula = ~v1 - 1,
 #'  numVar = "num",  n = c(1,2), k = c(80,70), sWeightVar = "sw",
-#'  allDominance = TRUE, primary = DominanceRule)
+#'  preAggregate = FALSE, allDominance = TRUE, candidates = CandidatesNum,
+#'  primary = DominanceRule)
 #'
 #' # with weights, tauargus method
-#' GaussSuppressionFromData(d, formula = ~v1 - 1, freqVar = "freq",
+#' GaussSuppressionFromData(d, formula = ~v1 - 1,
 #'  numVar = "num",  n = c(1,2), k = c(80,70), sWeightVar = "sw",
-#'  allDominance = TRUE, primary = DominanceRule, domWeightMethod = "tauargus")
+#'  preAggregate = FALSE, allDominance = TRUE, candidates = CandidatesNum,
+#'  primary = DominanceRule, domWeightMethod = "tauargus")
 #'
 #' @author Daniel Lupp
 #'

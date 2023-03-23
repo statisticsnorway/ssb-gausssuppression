@@ -18,9 +18,8 @@
 #' protected. Default value is `NULL`.
 #' @param upper_bound numeric value representing minimum count considered safe.
 #' Default set to `Inf`
-#' @param extend0 Logical parameter to add empty cells to data set. Do not change
-#' to `FALSE` unless you are sure missing cells are structural zeros.
 #' @param ... parameters passed to children functions
+#' @inheritParams GaussSuppressionFromData 
 #'
 #' @return A data.frame containing the publishable data set, with a boolean
 #' variable `$suppressed` representing cell suppressions.
@@ -101,7 +100,7 @@
 #' out_id2 <- addPrikket(out_id2)
 #' reshape2::dcast(out_id2, mun~inj, value.var = "prikket")
 SuppressKDisclosure <- function(data,
-                                coalition = 1,
+                                coalition = 0,
                                 idVars = NULL,
                                 sensitiveVars = NULL,
                                 dimVar = NULL,
@@ -110,9 +109,8 @@ SuppressKDisclosure <- function(data,
                                 freqVar = NULL,
                                 mc_hierarchies = NULL,
                                 upper_bound = Inf,
-                                extend0 = TRUE,
-                                combineSensitive = FALSE,
-                                ...) {
+                                ...,
+                                spec = PackageSpecs("kDisclosureSpec")) {
   additional_params <- list(...)
   if (length(additional_params)) {
     if ("singletonMethod" %in% names(additional_params) &
@@ -132,11 +130,7 @@ SuppressKDisclosure <- function(data,
     sensitiveVars = sensitiveVars,
     mc_hierarchies = mc_hierarchies,
     upper_bound = upper_bound,
-    primary = KDisclosurePrimary,
-    candidates = DirectDisclosureCandidates,
-    protectZeros = FALSE,
-    secondaryZeros = 1,
-    extend0 = extend0,
+    spec = spec,
     ...
   )
 }
@@ -182,8 +176,8 @@ KDisclosurePrimary <- function(data,
   freq <- as.vector(crossprod(x, data[[freqVar]]))
   FindDifferenceCells(
     x = x,
-    crossTable = crossTable,
     freq = freq,
+    crossTable = crossTable,
     coalition = coalition,
     sensitiveVars = sensitiveVars,
     idVars = idVars,
@@ -286,7 +280,7 @@ FindDifferenceCells <- function(x,
     return(rep(FALSE, nrow(crossTable)))
 }
 
-# function for creating a dimlist to capture combinations of sensitive values
+# function for creating a dimlist to capture combinations of sensitive values. Future functionality
 createSensitiveDimList <- function(sensitiveVar) {
   if (length(sensitiveVar) > 1)
     data.frame(
