@@ -7,12 +7,14 @@
 SuppressKDisclosure(
   data,
   coalition = 0,
-  mc_hierarchies = NULL,
-  upper_bound = Inf,
+  idVars = NULL,
+  sensitiveVars = NULL,
   dimVar = NULL,
   formula = NULL,
   hierarchies = NULL,
   freqVar = NULL,
+  mc_hierarchies = NULL,
+  upper_bound = Inf,
   ...,
   spec = PackageSpecs("kDisclosureSpec")
 )
@@ -24,11 +26,13 @@ SuppressKDisclosure(
 attacking coalition. This parameter corresponds to the parameter k in the
 definition of k-disclosure.}
 
-\item{mc_hierarchies}{a hierarchy representing meaningful combinations to be
-protected. Default value is \code{NULL}.}
+\item{idVars}{character vector of variables that can be known to an attacker.
+Experimental}
 
-\item{upper_bound}{numeric value representing minimum count considered safe.
-Default set to \code{Inf}}
+\item{sensitiveVars}{character vector or list describing sensitive variables or values.
+If the input is a character vector, it is must consist of variable names considered sensitive.
+If the input is a list, each list element is a vector of sensitive values,
+and the list names are their corresponding variable names. Experimental}
 
 \item{dimVar}{The main dimensional variables and additional aggregating
 variables. This parameter can be  useful when hierarchies and formula are
@@ -41,6 +45,12 @@ unspecified.}
 \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{freqVar}{name of the frequency variable in \code{data}}
+
+\item{mc_hierarchies}{a hierarchy representing meaningful combinations to be
+protected. Default value is \code{NULL}.}
+
+\item{upper_bound}{numeric value representing minimum count considered safe.
+Default set to \code{Inf}}
 
 \item{...}{parameters passed to children functions}
 
@@ -64,23 +74,73 @@ inj <- data.frame(levels = c("@", "@@" ,"@@", "@@", "@@"),
 codes = c("Total", "serious", "light", "none", "unknown"))
 dimlists <- list(mun = mun, inj = inj)
 
-inj2 <- data.frame(levels = c("@", "@@", "@@@" ,"@@@", "@@", "@@"),
-codes = c("Total", "injured", "serious", "light", "none", "unknown"))
+ inj2 <- data.frame(levels = c("@", "@@", "@@@", "@@@"),
+codes = c("Total", "injured", "serious", "light"))
 inj3 <- data.frame(levels = c("@", "@@", "@@" ,"@@", "@@"),
 codes = c( "shadowtotal", "serious", "light", "none", "unknown"))
 mc_dimlist <- list(inj = inj2)
 mc_nomargs <- list(inj = inj3)
 
-#' # Example with formula, no meaningful combination
+# Example with formula, no meaningful combination
 out <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq", formula = ~mun*inj)
 
 # Example with hierarchy and meaningful combination
 out2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
 hierarchies = dimlists, mc_hierarchies = mc_dimlist)
 
-#' # Example of table without mariginals, and mc_hierarchies to protect
+# Example of table without mariginals, and mc_hierarchies to protect
 out3 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
-formula = ~mun:inj, mc_hierarchies = mc_nomargs )
+formula = ~mun:inj, mc_hierarchies = mc_dimlist )
+
+
+# Examples of sensitive vars and values
+data <- SSBtools::SSBtoolsData("mun_accidents")
+data$freq <- c(0,5,3,4,1,0,
+               0,0,2,0,0,6,
+               4,1,0,4,0,0,
+               0,0,0,0,0,0)
+addPrikket <- function(out){
+  out$prikket <- out$freq
+  out$prikket[out$suppressed] <- "-"
+  out
+}
+out_v <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
+                            formula = ~mun*inj, sensitiveVars = "inj")
+out_v <- addPrikket(out_v)
+reshape2::dcast(out_v, mun~inj, value.var = "freq")
+reshape2::dcast(out_v, mun~inj, value.var = "prikket")
+
+
+out_v1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
+                            formula = ~mun*inj, mc_hierarchies = mc_dimlist,
+                            sensitiveVars = list(mun =  "k3", inj = "injured"))
+out_v1 <- addPrikket(out_v1)
+reshape2::dcast(out_v1, mun~inj, value.var = "prikket")
+out_v2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
+                            formula = ~mun*inj, sensitiveVars = list(inj = "serious", mun = "k3"))
+out_v2 <- addPrikket(out_v2)
+reshape2::dcast(out_v2, mun~inj, value.var = "prikket")
+
+# example of idVars
+out_id1 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
+                            formula = ~mun*inj, idVars = "mun")
+out_id1 <- addPrikket(out_id1)
+reshape2::dcast(out_id1, mun~inj, value.var = "prikket")
+out_id2 <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
+                            formula = ~mun*inj, idVars = "inj")
+out_id2 <- addPrikket(out_id2)
+reshape2::dcast(out_id2, mun~inj, value.var = "prikket")
+
+# Same example as out_v, but with cells forced to be published, yielding unsafe table
+out_unsafe <- SuppressKDisclosure(data, coalition = 1, freqVar = "freq",
+                            formula = ~mun*inj, sensitiveVars = "inj", 
+                            forced = c(12,14,15), output = "all")
+out_unsafe$publish <- addPrikket(out_unsafe$publish)
+reshape2::dcast(out_unsafe$publish, mun~inj, value.var = "freq")
+reshape2::dcast(out_unsafe$publish, mun~inj, value.var = "prikket")
+
+# colnames in $unsafe give an indication as to which cells/differences are unsafe
+colnames(out_unsafe$unsafe)
 }
 \author{
 Daniel P. Lupp
