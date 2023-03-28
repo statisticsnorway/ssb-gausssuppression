@@ -202,6 +202,7 @@ KDisclosurePrimary <- function(data,
   )
 }
 
+# crossprod(x[, sensitivecols], x[, idcols])
 FindDifferenceCells <- function(x,
                                 freq,
                                 crossTable,
