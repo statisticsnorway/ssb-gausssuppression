@@ -1,5 +1,6 @@
 ---
 title: "Defining Tables for GaussSuppression"
+author: "Daniel P. Lupp"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{define_tables}
