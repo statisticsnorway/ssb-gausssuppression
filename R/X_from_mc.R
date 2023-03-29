@@ -79,9 +79,16 @@ X_from_mc <- function(x, crossTable, mc_hierarchies, removeIncomplete = FALSE, r
   # the trick here
   cx <- x %*% x2
   
-  cx <- cx[, colSums(cx) != 0, drop = FALSE]
+  colSums_cx_not_0 <- colSums(cx) != 0
+  if (any(!colSums_cx_not_0)) {
+    cx <- cx[, colSums_cx_not_0, drop = FALSE]
+    crossTable2 <- crossTable2[colSums_cx_not_0, , drop = FALSE]
+  }
   
   if (returnNewCrossTable) {
+    if (ncol(cx) != nrow(crossTable2)) {
+      stop("More bug-fixing needed.")
+    }
     return(list(x = cx, crossTable = crossTable2))
   }
   cx
