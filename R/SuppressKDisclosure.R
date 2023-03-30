@@ -295,7 +295,7 @@ FindDifferenceCells <- function(x,
     return(primary_matrix)
   }
   else
-    return(rep(FALSE, nrow(crossTable)))
+    return(x[, integer(0), drop = FALSE])
 }
 
 # function for creating a dimlist to capture combinations of sensitive values. Future functionality
