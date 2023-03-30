@@ -121,7 +121,7 @@ test_that("extend0 and various hierarchy input", {
 
 
 
-test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
+test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + forced/unsafe", {
   set.seed(123)
   z <- SSBtools::MakeMicro(SSBtoolsData("z2"), "ant")
   z$char <- sample(paste0("char", 1:10), nrow(z), replace = TRUE)
@@ -173,9 +173,50 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
                                    maxN = 2, candidates = CandidatesNum, primary = NcontributorsRule, printInc = printInc, 
                                    singleton = SingletonUniqueContributor, 
                                    singletonMethod = "numFTT") 
+    suppressWarnings({b3 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                   maxN = 2, candidates = CandidatesNum, 
+                                   primary = c(63, 73, 77),   # primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                   forced = c(11, 13, 18, 20, 40),
+                                   printInc = printInc, 
+                                   singleton = SingletonUniqueContributor, 
+                                   singletonMethod = "numFTT")}) 
+    suppressWarnings({b4 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                   maxN = 2, candidates = CandidatesNum, 
+                                   primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                   forced = c(11, 13, 18, 20, 40),
+                                   printInc = printInc, 
+                                   singleton = SingletonUniqueContributor, 
+                                   singletonMethod = "numFTT")}) 
+    
+    suppressWarnings({b5 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                                     maxN = 2, candidates = CandidatesNum, 
+                                                     primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                                     forced =  c(11, 13, 18, 20, 40),
+                                                     printInc = printInc,
+                                                     protectZeros = TRUE)})
+    
+    
+    suppressWarnings({b6 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                                     maxN = 2, candidates = CandidatesNum, 
+                                                     primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                                     forced = 1:30,
+                                                     printInc = printInc,
+                                                     protectZeros = FALSE)})
+    
+    
     expect_equal(sum(b0$suppressed), 32)
     expect_equal(sum(b1$suppressed), 33)
     expect_equal(sum(b2$suppressed), 35)
+    expect_equal(sum(b3$suppressed), 12)
+    expect_equal(sum(b4$suppressed), 32)
+    expect_equal(sum(b5$suppressed), 27)
+    expect_equal(sum(b6$suppressed), 19)
+    expect_equal(sum(b3$unsafe), 0)
+    expect_equal(sum(b4$unsafe), 1)
+    expect_equal(sum(b5$unsafe), 1)
+    expect_equal(sum(b6$unsafe), 3)
+    
+    
     # Code to see differences:
     #"sub2Sum" solves G-problem 
     #"numFTT" needed to solve K-problem. 
