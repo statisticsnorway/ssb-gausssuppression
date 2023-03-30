@@ -216,6 +216,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
     expect_equal(sum(b5$unsafe), 1)
     expect_equal(sum(b6$unsafe), 3)
     
+    skip_on_cran()
     
     # Code to see differences:
     #"sub2Sum" solves G-problem 
