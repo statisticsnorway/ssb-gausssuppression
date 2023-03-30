@@ -11,11 +11,15 @@ Maintainer: Øyvind Langsrud <oyl@ssb.no>
 Depends: Matrix
 Imports: SSBtools (>= 1.4.3), RegSDC (>= 0.7.0), stats, methods
 Description: A statistical disclosure control tool to protect tables by suppression 
-    using the Gaussian elimination secondary suppression algorithm. Primary 
-    suppression functions for the minimum frequency rule, the dominance rule and 
-    a directly-disclosive rule are included. General primary suppression functions 
-    can be supplied as input. Suppressed frequencies can be replaced by synthetic 
-    decimal numbers as described in Langsrud (2019) <doi:10.1007/s11222-018-9848-9>.
+    using the Gaussian elimination secondary suppression algorithm. A suggestion is 
+    to start by working with functions SuppressSmallCounts() and 
+    SuppressDominantCells(). These functions use primary suppression functions for 
+    the minimum frequency rule and the dominance rule, respectively. Novel 
+    functionality for suppression of disclosive cells is also included. General 
+    primary suppression functions can be supplied as input to the general working 
+    horse function, GaussSuppressionFromData(). Suppressed frequencies can be 
+    replaced by synthetic decimal numbers as described in 
+    Langsrud (2019) <doi:10.1007/s11222-018-9848-9>.
 License: Apache License 2.0
 URL: https://github.com/statisticsnorway/GaussSuppression
 BugReports: https://github.com/statisticsnorway/GaussSuppression/issues
