@@ -11,7 +11,9 @@
   - See `SSBtools::GaussSuppression()`.
   - See `SingletonUniqueContributor()`.
 * Now `forced` and `usafe` are possible output columns.
-  - Where unsafe means uncertain primary suppressions due to forced cells.
+  - Where unsafe means unsafe primary suppressions due to forced cells.
+    That, is the unsafe primarily suppressed values can be re-calculated from the 
+    values of the cells forced to be not suppressed.
   - See parameters `forcedInOutput` and `unsafeInOutput` to `GaussSuppressionFromData()`.   
 
 ## GaussSuppression	0.5.0
