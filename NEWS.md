@@ -10,6 +10,9 @@
 * More advanced singleton handling that makes use of new functionality in the SSBtools package (version 1.4.4).
   - See `SSBtools::GaussSuppression()`.
   - See `SingletonUniqueContributor()`.
+* Now `forced` and `usafe` are possible output columns.
+  - Where unsafe means uncertain primary suppressions due to forced cells.
+  - See parameters `forcedInOutput` and `unsafeInOutput` to `GaussSuppressionFromData()`.   
 
 ## GaussSuppression	0.5.0
 * Now the original variable names, as specified by `freqVar` and `weightVar`, are kept in the output. 
