@@ -1,0 +1,232 @@
+---
+title: "Defining Tables for GaussSuppression"
+author: "Daniel P. Lupp"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{define_tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+## Introduction and setup
+The `GaussSuppression` package uses a common interface shared by other SDC packages developed at Statistics Norway (see also [`SmallCountRounding`](https://cran.r-project.org/package=SmallCountRounding) and [`SSBcellKey`](https://github.com/statisticsnorway/SSBcellKey)). In the background, these packages use a *model matrix* representation, which connects the input data to the intended output. This functionality is provided by the R package `SSBtools`. In this vignette, we look at multiple ways of specifying output tables given different forms of input. Note that this vignette only scratches the surface of what is possible with the provided interface, and rather is intended to help users get going with the package.
+
+We begin by importing the necessary dependencies as well as loading a test data set provided in the SSBtools package.
+
+```{r setup}
+library(SSBtools)
+library(GaussSuppression)
+
+dataset <- SSBtools::SSBtoolsData("d2")
+microdata <- SSBtools::MakeMicro(dataset, "freq")
+
+head(dataset)
+nrow(dataset)
+head(microdata)
+nrow(microdata)
+```
+The imported data set is a fictitious data set containing the variables: `r names(dataset)`, where region, county, and k_group are different (non-nested) regional hierarchies. `GaussSuppression` can take microdata as input as well, which we will demonstrate in the following sections.
+
+## Defining Table Dimensions
+Output tables are mainly specified using the following three parameters: `dimVar`, `hierarchies`, and `formula`.
+
+### Creating tables using `dimVar`
+The most basic way of defining output tables is by using the `dimVar` parameter. This generates by default all combinations of the variables provided, including marginals. For example, the following function call creates a one dimensional frequency table over the variable region.
+
+```{r}
+GaussSuppressionFromData(data = dataset,
+                         dimVar = "region",
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+Note the use of the function GaussSuppressionFromData and the inclusion of two parameters `primary` and `protectZeros`. The functions in `GaussSuppression` are designed to incorporate both table building and protection into a single function call. Thus, to illustrate the table building features, we have set that nothing must be protected.
+<!-- To learn more about the different ways of protecting tables, see the other vignettes of this package. -->
+
+In a similar fashion, we can include multiple variables in the `dimVar` parameter:
+```{r}
+GaussSuppressionFromData(data = dataset,
+                         dimVar = c("region", "main_income"),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+Note in particular what happens when we provide two regional variables:
+```{r}
+GaussSuppressionFromData(data = dataset,
+                         dimVar = c("region", "county"),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+The function detects hierarchies encoded in `dimVar` columns, and collapses them into a single column (with the name of the most detailed variable). In this way, it is not necessary to specify hierarchies by hand and include them explicitly in the function call. This also works for non-nested hierarchies:
+```{r}
+GaussSuppressionFromData(data = dataset,
+                         dimVar = c("region", "county", "k_group"),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+In the background, functions from SSBtools are used to find the hierarchies. There are multiple ways of inspecting which hierarchies can be found; users familiar with DimLists used in other SDC packages can for example use the following:
+```{r}
+FindDimLists(dataset[c("region", "county")])
+FindDimLists(dataset[c("region", "county", "k_group")])
+```
+Note the last example which contained non-nested hierarchies. Here, a unique DimList is created for each tree-shaped hierarchy in the data set. This avoids the need for specifying non-nested hierarchies as linked tables.
+
+Finally, for illustration purposes, we see that the same function calls work with microdata as input:
+```{r}
+GaussSuppressionFromData(data = microdata,
+                         dimVar = c("region", "county", "k_group"),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+
+### Creating tables using `hierarchies`
+The `hierarchies` parameter allows the explicit specification of which hierarchies should be used when creating the output table. This allows for a more fine-grained approach as opposed to simply using `dimVar`, as it allows for applying hierarchies not already present in the data set. Hierarchies can be provided in many ways. In this vignette, we will exemplify the following three forms: as a dimlist (as defined in `sdcTable`), using the hrc format from TauArgus, and finally with a more general hierarchy specification (internally, not surprisingly, simply called hierarchy). Any of these can be provided to the `hierarchies` parameter, as they are all translated to the internal hierarchy representation. For the purposes of this vignette, we will use dimlists, however in the following example we shall see how these can be translated to one another using functions from `SSBtools`. Let us begin by defining two hierarchies by using dimlists:
+```{r}
+region_dim <- data.frame(levels = c("@", "@@", rep("@@@", 3), rep("@@", 8)),
+                         codes = c("Total", "ABC", LETTERS[1:11]))
+region_dim
+
+income_dim <- data.frame(levels = c("@", "@@", "@@", "@@@", "@@@", "@@@"),
+                         codes = c("Total", "wages", "not_wages", "other", "assistance", "pensions"))
+income_dim
+SSBtools::DimList2Hrc(income_dim)
+SSBtools::DimList2Hierarchy(income_dim)
+```
+
+We can use these hierarchies to specify our output table. We do this by supplying a named list to the `hierarchies` parameter, where the list names correspond to variables in the data, and the list elements correspond to hierarchies we wish to include.
+
+
+```{r}
+GaussSuppressionFromData(data = dataset,
+                         hierarchies = list(region = region_dim, main_income = income_dim),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+As mentioned previously, the `GaussSuppression` package supports non-nested hierarchies natively. We achieve this by having multiple elements with the same name in the `hierarchies` list:
+
+```{r}
+region2_dim <- data.frame(levels = c("@", rep(c("@@", rep("@@@" ,3)),2), rep("@@", 5)),
+                          codes = c("Total", "ACE", "A", "C", "E", 
+                                    "BDF", "B", "D", "F", 
+                                    "G", "H", "I", "J", "K"))
+region2_dim
+
+GaussSuppressionFromData(data = dataset,
+                         hierarchies = list(region = region_dim, region = region2_dim),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+Finally, as before, all of this functionality works with microdata as input as well.
+```{r}
+GaussSuppressionFromData(data = microdata,
+                         hierarchies = list(region = region_dim, region = region2_dim),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+
+### Creating tables using `formula`
+The most flexible method for specifying the output of GaussSuppression is by using the `formula` interface. This makes use of model formulas in R, and provides a powerful way of specifying multiple different tables. Indeed, all of the above examples---and much more---can be replicated using the formula interface. The formula's predictor variables must be variable names occuring in the data set (the dependent variable is ignored, and thus we leave it empty). In the following, we create a table based on the region and county variables. As before, the hierarchical relationship between these variables is detected automatically:
+```{r}
+GaussSuppressionFromData(data = microdata,
+                         formula = ~ region + county,
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+If there is no hierarchical relationship between variables, multiplication in the `formula` and specification in `dimVar` yield the same results.
+```{r}
+
+GaussSuppressionFromData(data = microdata,
+                         formula = ~ county * main_income,
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+  GaussSuppressionFromData(data = microdata,
+                         dimVar = c("county" , "main_income"),
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+
+```
+However, `formula` lets us specify different shapes for our tables. For example, if we are only interested in marginal values, we can supply this with the use of the addition operator:
+```{r}
+
+GaussSuppressionFromData(data = microdata,
+                         formula = ~ county + main_income,
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+This example demonstrates, in fact, the ability of specifying multiple linked tables: a one-dimensional table for county linked with a one-dimensional table for main_income. 
+Similarly, we can use the colon (":") operator to omit row and column marginals:
+```{r}
+GaussSuppressionFromData(data = microdata,
+                         formula = ~ county : main_income,
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+Using subtraction, we can omit marginals and other cells from the output. For example, the intercept (sum over all records) can be omitted by including `- 1` in the formula, like this: `formula = county : main_income - 1`. 
+
+Using these features, we can define more complicated linked tables. To illustrate this, let us assume we wish to publish the following:
+
+* all levels of detail of main_income for all counties and k_groups,
+* at the region level, we only wish to publish if the main source of income was "wages" or "not_wages".
+
+To do this, we begin by adding a column encoding whether the main source of income was "wages" or "not_wages".
+```{r}
+dataset$income2 <- ifelse(dataset$main_income == "wages", "wages", "not_wages")
+microdata$income2 <- ifelse(microdata$main_income == "wages", "wages", "not_wages")
+head(dataset)
+```
+Then we can specify the desired output with the following formula:
+```{r}
+GaussSuppressionFromData(data = dataset,
+                         formula = ~ region * income2 + (county + k_group) * main_income,
+                         freqVar = "freq",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+In this manner, we can specify multiple linked tables, each of which can use different non-nested hierarchies. This allows the suppression algorithm to protect all of these tables simultaneously (indeed, they are treated as a single table internally), avoiding the need for a stratified protection paradigm. Furthermore, the fine-grained specification of which cells are to be published allows the secondary suppression algorithm to protect with respect to precisely those cells that will be published. If row and column marginals are not published, for example, the suppression algorithm does not need to secondary suppress with respect to these marginals.
+<!-- See the other vignettes in this package for more details on setting up the protection methods. -->
+
+## Tabulating continuous variables 
+In addition to defining the dimensions of the output tables, we need to decide whether they should be frequency tables (where we count contributing records) or magnititude tables (where we add contributing records' numerical values for a given variable). All of the above examples have been frequency tables. However, the process is exactly the same if one wishes to construct magnititude tables; the only difference is that one must specify the numerical variable with the help of the parameter `numVar`.
+
+Since most magnitude table suppression methods are based on comparing units' contributions, input the data will most likely be supplied as microdata. Therefore, let us add a fake numerical variable to our microdata:
+```{r}
+set.seed(12345)
+microdata$num <- sample(0:1000, nrow(microdata), replace = TRUE) 
+```
+
+Then in order to construct a volume table where records' contributions to `num` are aggregated, we supply this as a parameter to `GaussSuppressionFromData`:
+```{r}
+GaussSuppressionFromData(data = microdata,
+                         formula = ~ region * income2 + (county + k_group) * main_income,
+                         numVar = "num",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```
+Note that a new frequency variable is generated with the above call. If a frequency variable is already present in the input data, we can provide it in addition to `numVar` and the method will use that information instead:
+```{r}
+GaussSuppressionFromData(data = microdata,
+                         formula = ~ region * income2 + (county + k_group) * main_income,
+                         freqVar = "freq",
+                         numVar = "num",
+                         primary = FALSE,
+                         protectZeros = FALSE)
+```

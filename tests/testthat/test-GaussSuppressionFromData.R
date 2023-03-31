@@ -50,8 +50,8 @@ test_that("structuralEmpty and removeEmpty", {
   a2 <- GaussSuppressionFromData(z3[100:300, ], 1:6, 7, printInc = printInc, structuralEmpty = TRUE)
   a3 <- GaussSuppressionFromData(z3[100:300, ], 1:6, 7, printInc = printInc, removeEmpty = TRUE)
   k <- a1$suppressed != a2$suppressed
-  expect_equal(a1[!k, ], a3)
-  expect_equal(a2[!k, ], a3)
+  expect_equal(a1[!k, ], a3, ignore_attr = TRUE)
+  expect_equal(a2[!k, ], a3, ignore_attr = TRUE)
   expect_equal(unique(a1[k, "ant"]), 0)
 })
 
@@ -121,7 +121,7 @@ test_that("extend0 and various hierarchy input", {
 
 
 
-test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
+test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + forced/unsafe", {
   set.seed(123)
   z <- SSBtools::MakeMicro(SSBtoolsData("z2"), "ant")
   z$char <- sample(paste0("char", 1:10), nrow(z), replace = TRUE)
@@ -156,7 +156,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
   expect_equal(d1[names(d1) != "ant"], d2, ignore_attr = TRUE)
   
   
-  if(compareVersion(as.character(packageVersion("SSBtools")), "1.4.2") > 0){   # provisional
+  if(TRUE){   
     set.seed(123)
     z$value <- rnorm(nrow(z))^2  # Need to generate again ... not same as above 
     set.seed(1986) # Seed is not randomly chosen
@@ -172,13 +172,55 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
     b2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
                                    maxN = 2, candidates = CandidatesNum, primary = NcontributorsRule, printInc = printInc, 
                                    singleton = SingletonUniqueContributor, 
-                                   singletonMethod = "sub2SumUnique") 
+                                   singletonMethod = "numFTT") 
+    suppressWarnings({b3 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                   maxN = 2, candidates = CandidatesNum, 
+                                   primary = c(63, 73, 77),   # primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                   forced = c(11, 13, 18, 20, 40),
+                                   printInc = printInc, 
+                                   singleton = SingletonUniqueContributor, 
+                                   singletonMethod = "numFTT")}) 
+    suppressWarnings({b4 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                   maxN = 2, candidates = CandidatesNum, 
+                                   primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                   forced = c(11, 13, 18, 20, 40),
+                                   printInc = printInc, 
+                                   singleton = SingletonUniqueContributor, 
+                                   singletonMethod = "numFTT")}) 
+    
+    suppressWarnings({b5 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                                     maxN = 2, candidates = CandidatesNum, 
+                                                     primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                                     forced =  c(11, 13, 18, 20, 40),
+                                                     printInc = printInc,
+                                                     protectZeros = TRUE)})
+    
+    
+    suppressWarnings({b6 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
+                                                     maxN = 2, candidates = CandidatesNum, 
+                                                     primary = c(8, 18, 23, 53, 63, 73, 77, 78, 90, 97, 98, 100), 
+                                                     forced = 1:30,
+                                                     printInc = printInc,
+                                                     protectZeros = FALSE)})
+    
+    
     expect_equal(sum(b0$suppressed), 32)
     expect_equal(sum(b1$suppressed), 33)
     expect_equal(sum(b2$suppressed), 35)
+    expect_equal(sum(b3$suppressed), 12)
+    expect_equal(sum(b4$suppressed), 32)
+    expect_equal(sum(b5$suppressed), 27)
+    expect_equal(sum(b6$suppressed), 19)
+    expect_equal(sum(b3$unsafe), 0)
+    expect_equal(sum(b4$unsafe), 1)
+    expect_equal(sum(b5$unsafe), 1)
+    expect_equal(sum(b6$unsafe), 3)
+    
+    skip_on_cran()
+    
     # Code to see differences:
     #"sub2Sum" solves G-problem 
-    #"sub2SumUnique" needed to solve K-problem. 
+    #"numFTT" needed to solve K-problem. 
     if (FALSE) for (myChar in c("G", "K")) {
       kp <- b0[b0$region == myChar & b0$primary, ]
       k0 <- b0[b0$region == myChar & b0$suppressed, ]
@@ -191,9 +233,81 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton", {
         print(z[!is.na(ma), ])
       }
     }
+    sn <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 0, 0, 0, 0, 1, 0, 1, 
+           0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
+    sf <- c(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0)
+    sum_suppressed <- integer(0)
+    for (m1 in c("none", "anySumNOTprimary")) 
+      for (m2 in c("none", "sub2Sum", "numFTT")) {
+        b <- GaussSuppressionFromData(z, 
+                                    dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                    numVar = "value", charVar = "char", maxN = 2, 
+                                    candidates = CandidatesNum, 
+                                    primary = NcontributorsRule, 
+                                    printInc = printInc, 
+            singleton = list(freq = as.logical(sf), num = as.integer(sn)), 
+            singletonMethod = c(freq = m1, num = m2))
+            sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
+      }
+    expect_equal(sum_suppressed, c(32, 33, 35, 35, 38, 40))
+    
+    
+    set.seed(1138)
+    sum_suppressed <- integer(0)
+    zz = z[sample.int(nrow(z), 100, replace = TRUE), ]
+    for (c2 in c("F", "T")) 
+      for (c3 in c("F", "T", "H")) {
+        b <- GaussSuppressionFromData(zz, 
+                                      dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                      numVar = "value", charVar = "char", 
+                                      maxN = 2, printInc = printInc, 
+                                      candidates = CandidatesNum, 
+                                      primary = NcontributorsRule,  
+                                      singleton = SingletonUniqueContributor, 
+                                      singletonMethod = paste0("numF", c2, c3))
+        sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
+      }
+    expect_equal(sum_suppressed, c(49, 51, 53, 49, 52, 55))
+    # Why extra primary needed for 5:Total when "numFTH"
+    # can be seen by looking at 
+    # b[b$region == 5, ]
+    # zz[zz$fylke == 5 & zz$hovedint == "annet", ]
+    # zz[zz$fylke == 5 & zz$hovedint == "arbeid", ]
+    # zz[zz$fylke == 5 & zz$hovedint == "soshjelp", ]  
+    
+    sum_suppressed <- integer(0)
+    for (singletonMethod  in c("numFFF", "numtFF","numTFF", "numtTT", "numtTH")) {
+        b <- GaussSuppressionFromData(zz, 
+                                      dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                      numVar = "value", charVar = "char", 
+                                      maxN = 2, printInc = printInc, 
+                                      candidates = CandidatesNum, 
+                                      primary = NcontributorsRule,  
+                                      singleton = SingletonUniqueContributor, 
+                                      singletonMethod = singletonMethod,
+          inputInOutput = c(FALSE, TRUE)) # singleton not in publish and therefore not primary suppressed  
+        sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
+      }
+    expect_equal(sum_suppressed, c(17, 18, 18, 19, 19))
+    
+    # To make non-suppressed singletons
+    SUC <- function(..., removeCodes, primary) SingletonUniqueContributor(..., removeCodes = character(0), primary = integer(0))
+    sum_suppressed <- integer(0)
+    for (singletonMethod  in c("numFFF", "numtFF","numTFF")) {
+      b <- GaussSuppressionFromData(zz, 
+                                  dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                  numVar = "value", charVar = "char", 
+                                  maxN = 2, printInc = printInc, 
+                                  candidates = CandidatesNum, 
+                                  primary = NcontributorsRule,  
+                                  removeCodes = "char1",
+                                  singleton = SUC, 
+                                  singletonMethod = singletonMethod)
+      sum_suppressed <- c(sum_suppressed, c(59, 59, 67))
+    }
+    
   }
-  
-  
 })
 
 
