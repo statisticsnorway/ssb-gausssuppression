@@ -1,0 +1,323 @@
+---
+title: "Small count frequency table suppression"
+author: ""
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Small count frequency table suppression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r include = FALSE}
+htmltables = TRUE
+if(htmltables){
+  source("GaussKable.R")
+  P = function(...) G(fun = SuppressSmallCounts, timevar = "geo", ...)
+} else { 
+  P = function(...) cat("Formatted table not avalable")
+}
+```
+
+
+## Introduction 
+The `GaussSuppression` package contains several easy-to-use wrapper functions and in this vignette we will look at 
+the `SuppressSmallCounts` function.
+In this function, small frequencies are primary suppressed.
+Then, as always in this package, secondary suppression is performed using the Gauss method.
+
+We begin by creating datasets to be used below.
+The first examples are based on `dataset_a`, which has six rows.
+
+```{r}
+library(GaussSuppression)
+dataset <- SSBtoolsData("sprt_emp_withEU")[, c(1, 2, 5, 3)]
+dataset$age[dataset$age == "Y15-29"] <- "young"
+dataset$age[dataset$age == "Y30-64"] <- "old"
+dataset$freq <- c(5, 2, 0, 6, 3, 4, 5, 0, 0, 6, 3, 4, 7, 1, 1, 5, 4, 3)
+dataset_a <- dataset[dataset$year == "2014", -4]
+dataset_b <- dataset[dataset$year == "2015", -4]
+dataset_a
+```
+
+## An initial basic example
+
+In the function description (`?SuppressSmallCounts`), the only visible parameter is `maxN` in addition to the parameters considered in the define-tables vignette.
+In the first example, we use `maxN = 1` which means that zeros and ones are primary suppressed.
+
+```{r}
+SuppressSmallCounts(data = dataset_a, 
+                    dimVar = c("age", "geo"), 
+                    freqVar = "freq", 
+                    maxN = 1)
+```
+
+A formatted version of this output is given in Table 1 below. Primary suppressed cells are underlined and labeled in red, while the secondary suppressed cells are labeled in purple.
+
+```{r echo=FALSE}
+P(caption = "Table 1", data = dataset_a, 
+                    dimVar = c("age", "geo"), 
+                    freqVar = "freq", 
+                    maxN = 1)
+```
+
+The same output is obtained if microdata is sent as input as illustrated by de code below.  
+
+```{r}
+microdata_a <- SSBtools::MakeMicro(dataset_a, "freq")[-4]
+output <- SuppressSmallCounts(data = microdata_a, 
+                              dimVar = c("age", "geo"), 
+                              maxN = 1)
+```
+
+A related point is that the third row of the table can be omitted (`data = dataset_a[-3, ]`) since the frequency is zero. 
+Later in this vignette, we address scenarios where the inclusion of zeros may be important.
+
+##  An hierarchical table
+
+A more advanced example is obtained by including the variable "eu". 
+
+```{r}
+SuppressSmallCounts(data = dataset_a, 
+                    dimVar = c("age", "geo", "eu"), 
+                    freqVar = "freq", 
+                    maxN = 2)
+```
+
+A formatted version of this output: 
+
+```{r echo=FALSE}
+P(caption = "Table 2", data = dataset_a, 
+                    dimVar = c("age", "geo", "eu"), 
+                    freqVar = "freq", 
+                    maxN = 2)
+```
+
+As described in the define-tables vignette hierarchies are here treated automatically.
+The same output is obtained if we first generate hierarchies by: 
+
+```{r}
+dimlists <- SSBtools::FindDimLists(dataset_a[c("age", "geo", "eu")])
+dimlists
+```
+
+And thereafter run SuppressSmallCounts with these hierarchies as input:
+
+```{r eval=FALSE}
+SuppressSmallCounts(data = dataset_a[c("age", "geo", "freq")], 
+                    hierarchies = dimlists, 
+                    freqVar = "freq", 
+                    maxN = 2)
+```
+
+
+## Using the formula interface
+
+Using the formula interface is one way to achieve fewer cells in the output: 
+
+
+```{r}
+SuppressSmallCounts(data = dataset_a, 
+                    formula = ~age:eu + geo, 
+                    freqVar = "freq", 
+                    maxN = 2)
+```
+
+In the formatted version of this output, blank cells indicate that they are not included in the output. 
+
+```{r echo=FALSE}
+P(caption = "Table 3", data = dataset_a, 
+                    formula = ~age:eu + geo, 
+                    freqVar = "freq", 
+                    maxN = 2)
+```
+
+
+## About suppression of zeros
+
+By default, zeros are suppressed in order to protect against attribute disclosure in frequency tables. 
+However, there are exceptions.  
+
+### Zeros not suppressed
+
+One option is to use `protectZeros = FALSE`. 
+
+```{r}
+SuppressSmallCounts(data = dataset_a, 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 4,
+                    protectZeros = FALSE)
+```
+
+Formatted version:
+
+```{r echo=FALSE}
+P(caption = "Table 4", data = dataset_a, 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 4,
+                    protectZeros = FALSE)
+```
+
+Another possibility that gives the same output is:
+
+```{r}
+output <- SuppressSmallCounts(data = dataset_a[-3, ], 
+                              dimVar = c("age", "geo", "eu"),  
+                              freqVar = "freq", 
+                              maxN = 4,
+                              extend0 = FALSE, 
+                              structuralEmpty = TRUE)
+```
+
+Here the zero-frequency row is omitted in input. 
+By default, the table is automatically extended so that the Gauss algorithm handles zeros correctly. 
+When this is turned off (`extend0 = FALSE`), a warning with the following text will appear: 
+"*Suppressed cells with empty input will not be protected. Extend input data with zeros?*".
+However, with `structuralEmpty = TRUE`, the "empty zeros" are assumed to represent structural zeros 
+that must not be suppressed. 
+As exemplified a little further below, one can thus handle data with both structural and non-structural zeros.
+
+
+### Secondary suppressed zeros 
+
+We can combine `protectZeros = FALSE` with `secondaryZeros = TRUE`. 
+
+```{r}
+SuppressSmallCounts(data = dataset_a, 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 3,
+                    protectZeros = FALSE, 
+                    secondaryZeros = TRUE)
+```
+
+Formatted version:
+
+```{r echo=FALSE}
+P(caption = "Table 5", data = dataset_a, 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 3,
+                    protectZeros = FALSE, 
+                    secondaryZeros = TRUE)
+```
+
+### Both structural and non-structural zeros
+
+The example below uses `dataset_b`, which has two zeros.
+
+```{r}
+  dataset_b
+```
+
+Now we omit one of the zeros and keep the other.
+In general, we will omit all structural zeros.
+
+```{r}
+SuppressSmallCounts(data = dataset_b[-2,  ], 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 2,
+                    extend0 = FALSE, 
+                    structuralEmpty = TRUE)
+```
+
+Formatted version:
+
+```{r echo=FALSE}
+P(caption = "Table 6", data = dataset_b[-2,  ], 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 2,
+                    extend0 = FALSE, 
+                    structuralEmpty = TRUE)
+```
+
+Now, the data has been processed correctly, the structural zeros will be published while the other zeros are suppressed.
+
+To get the same output with the formula interface, we can use the following code:
+
+```{r eval = FALSE}
+SuppressSmallCounts(data = dataset_b[-2,  ], 
+                    formula = ~age * (geo + eu),  
+                    freqVar = "freq", 
+                    maxN = 2,
+                    extend0 = FALSE, 
+                    structuralEmpty = TRUE,
+                    removeEmpty = FALSE)
+```
+
+Please note that in order to include empty cells in the output, you need to set the `removeEmpty` parameter to `FALSE`. 
+By default, this parameter is set to `TRUE` when using the formula interface.
+
+
+## The problem of singletons and zeros
+
+### The problem of zeros
+
+When using the standard suppression technique on table `dataset_b`, many cells are suppressed. 
+
+```{r}
+SuppressSmallCounts(data = dataset_b, 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 2)
+```
+
+Formatted version:
+
+```{r echo=FALSE}
+P(caption = "Table 7", data = dataset_b, 
+                    dimVar = c("age", "geo", "eu"),  
+                    freqVar = "freq", 
+                    maxN = 2)
+```
+
+
+The reason is that it is easy to reveal the zeros if *young:Spain* is not suppressed. 
+Then the sum of *young:Iceland* and *young:Portugal* can easily be calculated to be zero. 
+Since negative frequencies are not possible, the only possibility is two zeros. 
+
+The handling of this problem is standard, but it can be turned off by `singletonMethod = "none"`.
+
+
+### The problem of singletons
+
+This problem occurs when `protectZeros = FALSE` and `secondaryZeros = FALSE` (default).
+We now also look at a larger example that uses `dataset` which has 18 rows.   
+
+```{r}
+output <- SuppressSmallCounts(data = dataset, 
+                              formula = ~age*geo*year + eu*year,  
+                              freqVar = "freq", 
+                              maxN = 1, 
+                              protectZeros = FALSE)
+head(output)
+```
+
+Formatted version:
+
+```{r echo=FALSE}
+P(caption = "Table 8", data = dataset, 
+                    formula = ~age*geo*year + eu*year,
+                    freqVar = "freq", 
+                    maxN = 1,
+                    protectZeros = FALSE)
+```
+
+By using `singletonMethod = "none"` in this case, *young:2016:Spain* will not be suppressed.
+Then the sum of *young:2016:Iceland* and *young:2016:Portugal* can easily be calculated to be two.
+Since zeros are never suppressed, the only possibility is two ones. 
+
+However, in our output, *young:2016:Spain* is suppressed due to the standard handling of this problem.
+
