@@ -39,7 +39,9 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         protectZeros = TRUE,
         candidates = CandidatesDefault,
         singleton = SingletonDefault,
-        extend0 = TRUE
+        extend0 = TRUE,
+        preAggregate = is.null(freqVar),
+        secondaryZeros = FALSE
       )),
     
     dominanceSpec =       
@@ -49,7 +51,10 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       singleton = SingletonUniqueContributor,
       preAggregate = !is.null(charVar),
       domWeightMethod = "default",
-      singletonMethod = "numttH"
+      singletonMethod = "numttH",
+      protectZeros = FALSE,
+      extend0 = FALSE,
+      secondaryZeros = FALSE 
     )),
     
     fewContributorsSpec =
@@ -60,7 +65,8 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         preAggregate = !is.null(charVar),
         candidates = CandidatesNum,  
         singleton = SingletonUniqueContributor,
-        singletonMethod = "numttH"
+        singletonMethod = "numttH",
+        secondaryZeros = FALSE 
       )),
     
     kDisclosureSpec = 
@@ -70,7 +76,9 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         secondaryZeros = 1,
         candidates = DirectDisclosureCandidates,
         extend0 = TRUE,
-        singletonMethod = "anySumNOTprimary"
+        singletonMethod = "anySumNOTprimary",
+        singleton = SingletonDefault,
+        preAggregate = is.null(freqVar)
       ))
   )
   
