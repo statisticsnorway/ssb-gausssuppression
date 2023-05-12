@@ -41,6 +41,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         singleton = SingletonDefault,
         extend0 = TRUE,
         preAggregate = is.null(freqVar),
+        extraAggregate = FALSE,
         secondaryZeros = FALSE
       )),
     
@@ -78,7 +79,8 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         extend0 = TRUE,
         singletonMethod = "anySumNOTprimary",
         singleton = SingletonDefault,
-        preAggregate = is.null(freqVar)
+        preAggregate = is.null(freqVar),
+        extraAggregate = FALSE
       ))
   )
   
