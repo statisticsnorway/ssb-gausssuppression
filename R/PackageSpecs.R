@@ -9,14 +9,15 @@
 #'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec}     |\strong{fewContributorsSpec} |\strong{kDisclosureSpec}   |
 #'  |:------------------------|:-----------------------|:--------------------------|:----------------------------|:--------------------------|
 #'  |\strong{primary}         |PrimaryDefault          |DominanceRule              |NContributorsRule            |KDisclosurePrimary         |
-#'  |\strong{protectZeros}    |TRUE                    |                           |FALSE                        |FALSE                      |
+#'  |\strong{protectZeros}    |TRUE                    |FALSE                      |FALSE                        |FALSE                      |
 #'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum              |CandidatesNum                |DirectDisclosureCandidates |
-#'  |\strong{singleton}       |SingletonDefault        |SingletonUniqueContributor |SingletonUniqueContributor   |                           |
-#'  |\strong{extend0}         |TRUE                    |                           |FALSE                        |TRUE                       |
-#'  |\strong{preAggregate}    |                        |!is.null(charVar)          |!is.null(charVar)            |                           |
+#'  |\strong{singleton}       |SingletonDefault        |SingletonUniqueContributor |SingletonUniqueContributor   |SingletonDefault           |
+#'  |\strong{extend0}         |TRUE                    |FALSE                      |FALSE                        |TRUE                       |
+#'  |\strong{preAggregate}    |is.null(freqVar)        |!is.null(charVar)          |!is.null(charVar)            |is.null(freqVar)           |
+#'  |\strong{extraAggregate}  |FALSE                   |TRUE                       |TRUE                         |FALSE                      |
+#'  |\strong{secondaryZeros}  |FALSE                   |FALSE                      |FALSE                        |1                          |
 #'  |\strong{domWeightMethod} |                        |"default"                  |                             |                           |
 #'  |\strong{singletonMethod} |                        |"numttH"                   |"numttH"                     |"anySumNOTprimary"         |
-#'  |\strong{secondaryZeros}  |                        |                           |                             |1                          |
 #'  
 #' @param x the character name or index of the spec to be returned. If `NULL` (default),
 #' returns list of all specs
