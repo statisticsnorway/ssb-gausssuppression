@@ -318,5 +318,21 @@ P(caption = '**Table 9**: Output from `SuppressDominantCells`  with `n = 1:2` an
 
 By using `singletonMethod = "none"` in this case, *Entertainment:Spain* will not be suppressed. 
 This cell is suppressed due to the default handling of the singleton problem. 
-The reason is that *Iceland:Spain* has a single contributor. This contributor can reveal *Portugal:Spain* if *Entertainment:Spain* is not suppressed.
+The reason is that *Entertainment:Iceland* has a single contributor. This contributor can reveal *Entertainment:Portugal* if *Entertainment:Spain* is not suppressed.
+
+Note that a similar unsolved problem occurs, *Entertainment:Iceland* can reveal *Industry:Iceland*.
+The reason why this problem is not solved is that *Industry:Iceland* is secondary suppressed. 
+The implemented singleton methods for magnitude tables add virtual primary suppressed 
+cells prior to the secondary suppression algorithm. 
+The sum of *Entertainment:Iceland* and *Entertainment:Portugal* is therefore primary suppressed, 
+but not the sum of *Entertainment:Iceland* and *Industry:Iceland*. 
+This may change in future versions.
+
+
+
+
+
+
+
+
 
