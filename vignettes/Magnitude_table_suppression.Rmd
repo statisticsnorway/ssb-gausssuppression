@@ -73,7 +73,7 @@ but instead assume that each row represents the contribution of a unique company
 Our input data can then be illustrated like this:
 \
 ```{r echo=FALSE}
-M(caption = '**Table 1**: Input data with the 18 "value" contributions.',
+M(caption = '**Table 1**: Input data with the 20 "value" contributions.',
   dataset, formula = ~sector4:geo-1)
 ```
 \
@@ -82,14 +82,14 @@ M(caption = '**Table 1**: Input data with the 18 "value" contributions.',
 
 ### Using few contributors primary suppression
 
-In the first example, we use `SuppressFewContributors` with `maxN = 2`. 
-This means that aggregates from one and two contributors are primary suppressed.
+In the first example, we use `SuppressFewContributors` with `maxN = 1`. 
+This means that cells based on a single contributor are primary suppressed. 
 
 ```{r}
 SuppressFewContributors(data=dataset, 
                         numVar = "value", 
                         dimVar= c("sector4", "geo"), 
-                        maxN=2)
+                        maxN=1)
 ```
 
 In the output, the number of contributors is in columns `nRule` and `nAll`. 
@@ -99,11 +99,11 @@ A formatted version of this output is given in Table 2 below.
 Primary suppressed cells are underlined and labeled in red, while the secondary suppressed cells are labeled in purple.
 \
 ```{r echo=FALSE}
-P(caption = '**Table 2**: Output from `SuppressFewContributors` with `maxN = 2` (number contributors in parenthesis)',
+P(caption = '**Table 2**: Output from `SuppressFewContributors` with `maxN = 1` (number contributors in parenthesis)',
   data=dataset, 
   numVar = "value", 
   dimVar= c("sector4", "geo"), 
-  maxN=2,
+  maxN = 1,
   fun = SuppressFewContributors,
   print_expr = 'paste0(value, " (",nAll ,") ")')
 ```
@@ -111,38 +111,38 @@ P(caption = '**Table 2**: Output from `SuppressFewContributors` with `maxN = 2` 
 
 ### Using dominant cell primary suppression
 
-In the second example, we use `SuppressDominantCells`  with `n = 2` and `k = 90`.
+In the second example, we use `SuppressDominantCells`  with `n = 1` and `k = 80`.
 This means that aggregates are primary suppressed whenever the 
-two largest contributions exceeds 90% of the cell total.
+largest contribution exceeds 80% of the cell total.
 
 ```{r}
 SuppressDominantCells(data=dataset, 
                       numVar = "value", 
                       dimVar= c("sector4", "geo"), 
-                      n = 2, k = 90, allDominance = TRUE)
+                      n = 1, k = 80, allDominance = TRUE)
 ```
 
 To see the percentage from the two largest contributions, `allDominance = TRUE` was used.
 A formatted version of this output is given in Table 3 below.
 \
 ```{r echo=FALSE}
-P(caption = '**Table 3**: Output from `SuppressDominantCells`  with `n = 2` and `k = 90` (percentage from two largest contributions in parenthesis)',
+P(caption = '**Table 3**: Output from `SuppressDominantCells`  with `n = 1` and `k = 80` (percentage from largest contribution in parenthesis)',
   data=dataset, 
   numVar = "value", 
   dimVar= c("sector4", "geo"), 
-  n=2, k=90, allDominance = TRUE,
+  n=1, k=80, allDominance = TRUE,
   fun = SuppressDominantCells,
-  print_expr = 'paste0(value, " (",round(100*`primary.2:90`) ,"%) ")')
+  print_expr = 'paste0(value, " (",round(100*`primary.1:80`) ,"%) ")')
 ```
 \
 \
 
 ## An hierarchical table and two dominance rules  
 
-Here we use `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 90)`.
+Here we use `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)`.
 This means that aggregates are primary suppressed whenever 
 the largest contribution exceeds 80% of the cell total 
-or when the two largest contributions exceed 90% of the cell total.
+or when the two largest contributions exceed 99% of the cell total.
 
 In addition, the example below is made even more advanced by including the variables "sector2" and "eu". 
 
@@ -150,18 +150,18 @@ In addition, the example below is made even more advanced by including the varia
 output <- SuppressDominantCells(data=dataset, 
                                 numVar = "value", 
                                 dimVar= c("sector4", "sector2", "geo", "eu"), 
-                                n = 1:2, k = c(80, 90))
+                                n = 1:2, k = c(80, 99))
 head(output)
 ```
 
 Formatted version:
 \
 ```{r echo=FALSE}
-P(caption = '**Table 4**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 90)`',
+P(caption = '**Table 4**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)`',
   data=dataset, 
   numVar = "value", 
   dimVar= c("sector4", "sector2", "geo", "eu"), 
-  n = 1:2, k = c(80, 90), 
+  n = 1:2, k = c(80, 99), 
   fun = SuppressDominantCells,
   print_expr = 'value')
 ```
@@ -181,14 +181,16 @@ And thereafter run SuppressDominantCells with these hierarchies as input:
 output <- SuppressDominantCells(data=dataset, 
                                 numVar = "value", 
                                 hierarchies = dimlists,  
-                                n = 1:2, k = c(80, 90))
+                                n = 1:2, k = c(80, 99))
 ```
 \
 \
 
 ## Using the formula interface
 
-Using the formula interface is one way to achieve fewer cells in the output:
+Using the formula interface is one way to achieve fewer cells in the output.
+Below we use `SuppressFewContributors` with `maxN = 2`. 
+This means that table cells based on one or two contributors are primary suppressed. 
 
 ```{r}
 output <- SuppressFewContributors(data=dataset, 
@@ -265,19 +267,19 @@ output <- SuppressDominantCells(data=dataset,
                                 numVar = "value", 
                                 formula = ~sector2*geo + sector4*eu,
                                 contributorVar = "company",
-                                n = 1:2, k = c(80, 95))
+                                n = 1:2, k = c(80, 99))
 head(output)
 ```
 
 Formatted version: 
 \
 ```{r echo=FALSE}
-P(caption = '**Table 8**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 95)` and with `contributorVar = "company"`',
+P(caption = '**Table 8**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)` and with `contributorVar = "company"`',
   data=dataset, 
   numVar = "value", 
   formula = ~sector2*geo + sector4*eu,
   contributorVar = "company",
-  n = 1:2, k = c(80, 95), 
+  n = 1:2, k = c(80, 99), 
   fun = SuppressDominantCells,
   print_expr = 'value')
 ```
@@ -295,7 +297,7 @@ output <- SuppressDominantCells(data=dataset,
                                 numVar = "value", 
                                 formula = ~sector4*geo + sector2*eu,
                                 contributorVar = "company",
-                                n = 1:2, k = c(80, 95))
+                                n = 1:2, k = c(80, 99))
 head(output)
 ```
 \
@@ -303,12 +305,12 @@ head(output)
 Formatted version:
 \
 ```{r echo=FALSE}
-P(caption = '**Table 9**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 95)` and with `contributorVar = "company"`',
+P(caption = '**Table 9**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)` and with `contributorVar = "company"`',
   data=dataset, 
   numVar = "value", 
   formula = ~sector4*geo + sector2*eu,
   contributorVar = "company",
-  n = 1:2, k = c(80, 95), 
+  n = 1:2, k = c(80, 99), 
   fun = SuppressDominantCells,
   print_expr = 'value')
 ```
