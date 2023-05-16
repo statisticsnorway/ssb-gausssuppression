@@ -387,7 +387,9 @@ P(caption = '**Table 14**: `formula = ~ region * income2 + (county + k_group) * 
 ```
 \
 
-Note that there are two empty cells in the wages column. One reason is that the `removeEmpty` parameter to `SSBtools::ModelMatrix` has `TRUE` as default in the case of a formula interface. By including `removeEmpty = FALSE`, zeros will be included in the output. Another way to achieve this is to use `extend0 = TRUE`. By this parameter, zeros are added to the input data after the automatic aggregation from microdata. As you will see in other vignettes in this package, the `extend0` parameter can be important for suppression methods.
+Note that there are two empty cells in the wages column. 
+This means that these cells are not included in the output data.
+One reason is that the `removeEmpty` parameter to `SSBtools::ModelMatrix` has `TRUE` as default in the case of a formula interface. By including `removeEmpty = FALSE`, zeros will be included in the output. Another way to achieve this is to use `extend0 = TRUE`. By this parameter, zeros are added to the input data after the automatic aggregation from microdata. As you will see in other vignettes in this package, the `extend0` parameter can be important for suppression methods.
 
 Note also that a new frequency variable is generated with the above call. If a frequency variable is already present in the input data, we can provide it in addition to `numVar` and the method will use that information instead:
 ```{r}
