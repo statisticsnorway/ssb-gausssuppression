@@ -211,4 +211,34 @@ sort_num_nchar <- function(x) {
 }
 
 
-
+# Similar layout as KableSuppressionTable But just a table
+KableTable <- function(data, nvar = 1, caption = NULL, font_size = 14, header = NULL) {
+  
+  icol <- SeqInc(nvar + 1, ncol(data))
+  pvar <- names(data)[icol]
+  
+  # Extra code since vertical lines disappear in vignette.
+  slg <- "1px solid LightGray"
+  
+  d <- kbl(data, "html", caption = caption, escape = FALSE, align = "r") |>
+    kable_styling(full_width = F, bootstrap_options = c("bordered"), font_size = font_size, position = "left")
+  
+  d <- row_spec(d, 0, bold = T, background = SSBgronn2)
+  
+  for (i in icol) d <- column_spec(d, i, border_right = slg)
+  
+  for (i in seq_len(nvar)) d <- column_spec(d, i, background = SSBgronn1, border_left = slg, border_right = slg)
+  
+  if (!is.null(header)) {
+    header_above <- c(nvar, ncol(data) - nvar)
+    if (length(header) == 1) {
+      header <- c(" ", header)
+    }
+    names(header_above) <- header
+    d <- add_header_above(d, header_above, background = SSBgronn4, 
+                          color = "white")
+    
+  }
+  
+  d
+}
