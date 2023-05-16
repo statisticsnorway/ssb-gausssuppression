@@ -1,9 +1,9 @@
 ---
 title: "Defining Tables for GaussSuppression"
-author: "Daniel P. Lupp"
+author: ""
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{define_tables}
+  %\VignetteIndexEntry{Defining Tables for GaussSuppression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -18,13 +18,21 @@ knitr::opts_chunk$set(
 ## Introduction and setup
 The `GaussSuppression` package uses a common interface shared by other SDC packages developed at Statistics Norway (see also [`SmallCountRounding`](https://cran.r-project.org/package=SmallCountRounding) and [`SSBcellKey`](https://github.com/statisticsnorway/SSBcellKey)). In the background, these packages use a *model matrix* representation, which connects the input data to the intended output. This functionality is provided by the R package `SSBtools`. In this vignette, we look at multiple ways of specifying output tables given different forms of input. Note that this vignette only scratches the surface of what is possible with the provided interface, and rather is intended to help users get going with the package.
 
-We begin by importing the necessary dependencies as well as loading a test data set provided in the SSBtools package.
+We begin by importing the necessary dependencies as well as loading (and modifying) a test data set provided in the SSBtools package.
 
 ```{r setup}
 library(SSBtools)
 library(GaussSuppression)
 
 dataset <- SSBtools::SSBtoolsData("d2")
+
+# Modify to smaller/easier data
+sreg <- c("A", "B", "C", "I", "J", "K")
+dataset <- dataset[dataset$region %in% sreg, ]
+dataset$county[dataset$county == 4] <- 5
+dataset$county[dataset$county == 10] <- 9
+rownames(dataset) <- NULL
+
 microdata <- SSBtools::MakeMicro(dataset, "freq")
 
 head(dataset)
@@ -48,7 +56,7 @@ GaussSuppressionFromData(data = dataset,
                          protectZeros = FALSE)
 ```
 Note the use of the function GaussSuppressionFromData and the inclusion of two parameters `primary` and `protectZeros`. The functions in `GaussSuppression` are designed to incorporate both table building and protection into a single function call. Thus, to illustrate the table building features, we have set that nothing must be protected.
-<!-- To learn more about the different ways of protecting tables, see the other vignettes of this package. -->
+To learn more about the different ways of protecting tables, see the other vignettes of this package.
 
 In a similar fashion, we can include multiple variables in the `dimVar` parameter:
 ```{r}
@@ -93,8 +101,8 @@ GaussSuppressionFromData(data = microdata,
 ### Creating tables using `hierarchies`
 The `hierarchies` parameter allows the explicit specification of which hierarchies should be used when creating the output table. This allows for a more fine-grained approach as opposed to simply using `dimVar`, as it allows for applying hierarchies not already present in the data set. Hierarchies can be provided in many ways. In this vignette, we will exemplify the following three forms: as a dimlist (as defined in `sdcTable`), using the hrc format from TauArgus, and finally with a more general hierarchy specification (internally, not surprisingly, simply called hierarchy). Any of these can be provided to the `hierarchies` parameter, as they are all translated to the internal hierarchy representation. For the purposes of this vignette, we will use dimlists, however in the following example we shall see how these can be translated to one another using functions from `SSBtools`. Let us begin by defining two hierarchies by using dimlists:
 ```{r}
-region_dim <- data.frame(levels = c("@", "@@", rep("@@@", 3), rep("@@", 8)),
-                         codes = c("Total", "ABC", LETTERS[1:11]))
+region_dim <- data.frame(levels = c("@", "@@", rep("@@@", 2), rep("@@", 4)),
+                         codes = c("Total", "AB", LETTERS[c(1:3, 9:11)]))
 region_dim
 
 income_dim <- data.frame(levels = c("@", "@@", "@@", "@@@", "@@@", "@@@"),
@@ -117,10 +125,10 @@ GaussSuppressionFromData(data = dataset,
 As mentioned previously, the `GaussSuppression` package supports non-nested hierarchies natively. We achieve this by having multiple elements with the same name in the `hierarchies` list:
 
 ```{r}
-region2_dim <- data.frame(levels = c("@", rep(c("@@", rep("@@@" ,3)),2), rep("@@", 5)),
-                          codes = c("Total", "ACE", "A", "C", "E", 
-                                    "BDF", "B", "D", "F", 
-                                    "G", "H", "I", "J", "K"))
+region2_dim <- data.frame(levels = c("@", rep(c("@@", rep("@@@", 2)), 2), rep("@@", 2)),
+                          codes = c("Total", "AI", "A", "I",  
+                                    "BK", "B", "K", 
+                                    "C", "J"))
 region2_dim
 
 GaussSuppressionFromData(data = dataset,
