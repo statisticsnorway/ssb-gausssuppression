@@ -110,6 +110,7 @@ GaussSuppressionFromData(data = dataset,
 The same output is shown below as a formatted and  reshaped table. 
 Cells that also occur as input/inner cells have white background.
 \
+\
 
 ```{r echo=FALSE}
 P(caption = '**Table 3**: `dimVar = c("region", "main_income")`',
@@ -348,13 +349,16 @@ GaussSuppressionFromData(data = dataset,
 ```
 \
  <p style="text-align: center;"> <font size = 3> **Table 13**: `formula = ~ region * income2 + (county + k_group) * main_income` </font> </p>
-```{r echo=FALSE}
+```{r echo=FALSE, warning = FALSE}
 P(caption = NULL, #caption = '**Table 13**: `formula = ~ region * income2 + (county + k_group) * main_income`',
   data=dataset, 
   formula = ~ region * income2 + (county + k_group) * main_income)
 ```
 In this manner, we can specify multiple linked tables, each of which can use different non-nested hierarchies. This allows the suppression algorithm to protect all of these tables simultaneously (indeed, they are treated as a single table internally), avoiding the need for a stratified protection paradigm. Furthermore, the fine-grained specification of which cells are to be published allows the secondary suppression algorithm to protect with respect to precisely those cells that will be published. If row and column marginals are not published, for example, the suppression algorithm does not need to secondary suppress with respect to these marginals.
-<!-- See the other vignettes in this package for more details on setting up the protection methods. -->
+See the other vignettes in this package for more details on setting up the protection methods.
+
+Looking at the output data above Table 13, you will see that row 9 is duplicated on row 18. The reason is that the code `wages` is used both in the `main_income` variable and in the `income2` variable. Currently, the formula interface does not do any special checking for this phenomenon. The recommended practice is to avoid such duplicate codes. When running `FindDimLists`, you will see that this function performs checking. 
+
 
 ## Tabulating continuous variables 
 In addition to defining the dimensions of the output tables, we need to decide whether they should be frequency tables (where we count contributing records) or magnititude tables (where we add contributing records' numerical values for a given variable). All of the above examples have been frequency tables. However, the process is exactly the same if one wishes to construct magnititude tables; the only difference is that one must specify the numerical variable with the help of the parameter `numVar`.
@@ -374,16 +378,18 @@ GaussSuppressionFromData(data = microdata,
                          protectZeros = FALSE)
 ```
 \
- <p style="text-align: center;"> <font size = 3> **Table 14**: `formula = ~ region * income2 + (county + k_group) * main_income` </font> </p>
-```{r echo=FALSE}
-P(caption = NULL, #caption = '**Table 14**: `formula = ~ region * income2 + (county + k_group) * main_income`',
+```{r echo=FALSE, warning = FALSE}
+P(caption = '**Table 14**: `formula = ~ region * income2 + (county + k_group) * main_income` <br> In each cell: `num` with frequencies in parenthesis.',
   data=microdata, 
   formula = ~ region * income2 + (county + k_group) * main_income,
   numVar = "num",
   print_expr = 'paste0(num, " (", sprintf("%3d",freq) ,") ")')
 ```
 \
-Note that a new frequency variable is generated with the above call. If a frequency variable is already present in the input data, we can provide it in addition to `numVar` and the method will use that information instead:
+
+Note that there are two empty cells in the wages column. One reason is that the `removeEmpty` parameter to `SSBtools::ModelMatrix` has `TRUE` as default in the case of a formula interface. By including `removeEmpty = FALSE`, zeros will be included in the output. Another way to achieve this is to use `extend0 = TRUE`. By this parameter, zeros are added to the input data after the automatic aggregation from microdata. As you will see in other vignettes in this package, the `extend0` parameter can be important for suppression methods.
+
+Note also that a new frequency variable is generated with the above call. If a frequency variable is already present in the input data, we can provide it in addition to `numVar` and the method will use that information instead:
 ```{r}
 GaussSuppressionFromData(data = microdata,
                          formula = ~ region * income2 + (county + k_group) * main_income,
