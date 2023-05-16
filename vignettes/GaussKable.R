@@ -34,6 +34,8 @@ red <- "red"
 lilla <- "#8F00EF"
 SSBgronn1 <- "#e3f1e6"
 SSBgronn2 <- "#90cc93"
+SSBgronn3 <- "#1a9d49"
+SSBgronn4 <- "#00824d"
 
 
 Background <- function(primary, suppressed) {
@@ -83,7 +85,7 @@ KableSuppressionTable <- function(a, printvar = "freq", caption = NULL, font_siz
       }
     }
   }
-
+  
   # d0 = a[!grepl('.', names(a), fixed = TRUE)]
   d0 <- a[!(seq_len(ncol(a)) %in% c(pvar, inner, primary, suppressed))]
   d <- cbind(d0, b)
@@ -98,9 +100,9 @@ KableSuppressionTable <- function(a, printvar = "freq", caption = NULL, font_siz
   
   # Extra code since vertical lines disappear in vignette.
   slg <- "1px solid LightGray"
-
+  
   d <- kbl(d, "html", caption = caption, escape = FALSE, align = "r") |>
-    kable_styling(full_width = F, bootstrap_options = c("bordered"), font_size = font_size, position = "left") 
+    kable_styling(bootstrap_options = c("bordered"), font_size = font_size, position = "left") 
   
   # include_thead = TRUE in column_spec not working, bug
   # see https://github.com/haozhu233/kableExtra/issues/534
@@ -132,7 +134,7 @@ G <- function(data, dimVar = NULL, freqVar = NULL,
              hierarchies = hierarchies, formula = formula, dimVar = dimVar, 
              freqVar = freqVar, printInc = FALSE, ...)
   dimVar <- NamesFromModelMatrixInput(data = data, 
-            hierarchies = hierarchies, formula = formula, dimVar = dimVar, ...)
+                                      hierarchies = hierarchies, formula = formula, dimVar = dimVar, ...)
   dimVar <- dimVar[dimVar %in% names(out)]
   
   out$printtext <- with(out, eval(parse(text = print_expr)))
@@ -165,15 +167,48 @@ G <- function(data, dimVar = NULL, freqVar = NULL,
   }
   s0 <- character(0)
   for (v in dimVar) {
-    s0 <- c(s0, unique(c(data[[v]], out[[v]])))
+    #s0 <- c(s0, unique(c(data[[v]], out[[v]])))
+    s0 <- c(s0, unique(c(
+      sort_num_nchar(data[[v]]), 
+      sort_num_nchar(out[[v]])
+    )))
   }
   s0 <- s0[s0 != "Total"]
   s <- unique(c(s, s0, "Total"))
-  
   a <- sort_reshape(out, direction = "wide", timevar = timevar, idvar = idvar, s = s)
   KableSuppressionTable(a, printvar = "printtext", caption = caption, font_size = font_size)
 }
 
+
+
+# Example: 
+# x <- c("a","B2", 1, -3.14, 3.14, 0, 9, -88, 10, 7, "08", "0001", "1234", 123456, "000000", "000002", "000314")
+# sort(x)
+# stringr::str_sort(x, numeric = TRUE)
+# sort_num_nchar(x)
+sort_num_nchar <- function(x) {
+  numx <- suppressWarnings(as.numeric(x))
+  
+  intx <- suppressWarnings(as.integer(x))
+  intx[intx != numx] <- NA
+  nonnegint <- !is.na(intx)
+  nonnegint[nonnegint][numx[nonnegint] < 0] <- FALSE
+  
+  signx <- sign(numx)
+  signx[is.na(signx)] <- 2
+  signx[signx == 0] <- 1
+  
+  numnchar <- pmax(1, ceiling(log10(abs(numx)) + 1e-12))
+  numnchar[is.na(numnchar)] <- 0
+  numnchar[nonnegint] <- pmax(nchar(x[nonnegint]), numnchar[nonnegint])
+  
+  numx[is.na(numx)] <- 0
+  
+  df <- data.frame(signx, numnchar, numx, x)
+  ord <- SortRows(df, index.return = TRUE)
+  
+  x[ord]
+}
 
 
 
