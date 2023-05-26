@@ -57,6 +57,12 @@ data frame containing aggregated data and suppression information.
 \description{
 Suppress volume tables using dominant cell primary suppression.
 }
+\note{
+Currently, the implementation of \code{sWeightVar} cannot handle all issues involving
+\code{contributorVar} and aggregations. This means that the default for \code{extraAggregate}
+specified in the spec (\code{TRUE}) is ignored when \code{sWeightVar} is non-NULL. Thus,
+the "old" default specified in \code{\link{GaussSuppressionFromData}} is used instead.
+}
 \examples{
 num <- c(100,
          90, 10,
