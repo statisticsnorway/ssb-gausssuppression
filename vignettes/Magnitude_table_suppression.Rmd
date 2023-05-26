@@ -1,0 +1,338 @@
+---
+title: "Magnitude table suppression"
+author: ""
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{table suppression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r include = FALSE}
+htmltables <- TRUE
+if (htmltables) {
+    source("GaussKable.R")
+    source("KableMagnitudeTable.R")
+    P <- function(...) G(timevar = "geo", ...)
+    M <- function(...) KableMagnitudeTable(..., numVar = "value", timevar = "geo")
+} else {
+    P <- function(...) cat("Formatted table not avalable")
+    M <- P
+}
+```
+
+### preliminary since `specs-update` branch not merged 
+```{r}
+SuppressFewContributors <- function(..., extraAggregate = TRUE) 
+  GaussSuppression::SuppressFewContributors(..., extraAggregate = extraAggregate)
+SuppressDominantCells <- function(..., extraAggregate = TRUE) 
+  GaussSuppression::SuppressDominantCells(..., extraAggregate = extraAggregate)
+```
+
+
+## Introduction 
+The `GaussSuppression` package contains several easy-to-use wrapper functions and in this vignette we will look at 
+the `SuppressFewContributors` and  `SuppressDominantCells` functions.
+In these functions, primary suppression is based on the number of contributors or by dominance rules.
+Then, as always in this package, secondary suppression is performed using the Gauss method.
+
+We begin by creating a dataset to be used below.
+
+```{r}
+library(GaussSuppression)
+q <- data.frame(geo = rep(c("Iceland", "Portugal", "Spain"), each = 4), 
+                eu = "EU", 
+                sector4 = c("Agriculture", "Entertainment", "Governmental", "Industry"), 
+                sector2 = "private")[-c(1, 3), ]
+q$eu[1:2] <- "nonEU"
+q$sector2[c(5, 9)] <- "public"
+q <- q[c(2, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 8, 9, 9, 10), ]
+q$company <- c("B", "B", "C", "D", "A", "B", "B", "D", "B", "D", 
+               "B", "D", "A", "B", "A", "B", "C", "C", "D", "C")
+
+q$value <- c(9.6, 16.8, 8.8, 1.9, 75.9, 24.5, 7.1, 2.3, 21.6, 2, 
+             25.7, 3.4, 96.6, 43.2, 77.4, 11.5, 16.4, 6.5, 2.7, 8.4)
+dataset <- SSBtools::SortRows(q[c(3, 4, 1, 2, 5, 6)])
+rownames(dataset) <- NULL
+dataset
+
+```
+
+We can imagine the figures in the variable `"value"` represent sales value to different sectors from different companies. 
+In the first examples, we will not use the `"company"` variable, 
+but instead assume that each row represents the contribution of a unique company.
+Our input data can then be illustrated like this:
+\
+```{r echo=FALSE}
+M(caption = '**Table 1**: Input data with the 20 "value" contributions.',
+  dataset, formula = ~sector4:geo-1)
+```
+\
+
+## Initial basic examples
+
+### Using few contributors primary suppression
+
+In the first example, we use `SuppressFewContributors` with `maxN = 1`. 
+This means that cells based on a single contributor are primary suppressed. 
+
+```{r}
+SuppressFewContributors(data=dataset, 
+                        numVar = "value", 
+                        dimVar= c("sector4", "geo"), 
+                        maxN=1)
+```
+
+In the output, the number of contributors is in columns `nRule` and `nAll`. 
+The two columns are equal under normal usage.
+
+A formatted version of this output is given in Table 2 below.
+Primary suppressed cells are underlined and labeled in red, while the secondary suppressed cells are labeled in purple.
+\
+```{r echo=FALSE}
+P(caption = '**Table 2**: Output from `SuppressFewContributors` with `maxN = 1` (number contributors in parenthesis)',
+  data=dataset, 
+  numVar = "value", 
+  dimVar= c("sector4", "geo"), 
+  maxN = 1,
+  fun = SuppressFewContributors,
+  print_expr = 'paste0(value, " (",nAll ,") ")')
+```
+\
+
+### Using dominant cell primary suppression
+
+In the second example, we use `SuppressDominantCells`  with `n = 1` and `k = 80`.
+This means that aggregates are primary suppressed whenever the 
+largest contribution exceeds 80% of the cell total.
+
+```{r}
+SuppressDominantCells(data=dataset, 
+                      numVar = "value", 
+                      dimVar= c("sector4", "geo"), 
+                      n = 1, k = 80, allDominance = TRUE)
+```
+
+To see the percentage from the two largest contributions, `allDominance = TRUE` was used.
+A formatted version of this output is given in Table 3 below.
+\
+```{r echo=FALSE}
+P(caption = '**Table 3**: Output from `SuppressDominantCells`  with `n = 1` and `k = 80` (percentage from largest contribution in parenthesis)',
+  data=dataset, 
+  numVar = "value", 
+  dimVar= c("sector4", "geo"), 
+  n=1, k=80, allDominance = TRUE,
+  fun = SuppressDominantCells,
+  print_expr = 'paste0(value, " (",round(100*`primary.1:80`) ,"%) ")')
+```
+\
+\
+
+## An hierarchical table and two dominance rules  
+
+Here we use `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)`.
+This means that aggregates are primary suppressed whenever 
+the largest contribution exceeds 80% of the cell total 
+or when the two largest contributions exceed 99% of the cell total.
+
+In addition, the example below is made even more advanced by including the variables "sector2" and "eu". 
+
+```{r}
+output <- SuppressDominantCells(data=dataset, 
+                                numVar = "value", 
+                                dimVar= c("sector4", "sector2", "geo", "eu"), 
+                                n = 1:2, k = c(80, 99))
+head(output)
+```
+
+Formatted version:
+\
+```{r echo=FALSE}
+P(caption = '**Table 4**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)`',
+  data=dataset, 
+  numVar = "value", 
+  dimVar= c("sector4", "sector2", "geo", "eu"), 
+  n = 1:2, k = c(80, 99), 
+  fun = SuppressDominantCells,
+  print_expr = 'value')
+```
+\
+
+As described in the define-tables vignette hierarchies are here treated automatically.
+The same output is obtained if we first generate hierarchies by: 
+
+```{r}
+dimlists <- SSBtools::FindDimLists(dataset[c("sector4", "sector2", "geo", "eu")])
+dimlists
+```
+
+And thereafter run SuppressDominantCells with these hierarchies as input:
+
+```{r}
+output <- SuppressDominantCells(data=dataset, 
+                                numVar = "value", 
+                                hierarchies = dimlists,  
+                                n = 1:2, k = c(80, 99))
+```
+\
+\
+
+## Using the formula interface
+
+Using the formula interface is one way to achieve fewer cells in the output.
+Below we use `SuppressFewContributors` with `maxN = 2`. 
+This means that table cells based on one or two contributors are primary suppressed. 
+
+```{r}
+output <- SuppressFewContributors(data=dataset, 
+                                  numVar = "value", 
+                                  formula = ~sector2*geo + sector4*eu, 
+                                  maxN=2,
+                                  removeEmpty = FALSE)
+head(output)
+tail(output)
+```
+
+In the formatted version of this output, blank cells indicate that they are not included in the output. 
+\
+```{r echo=FALSE}
+P(caption = '**Table 5**: Output from `SuppressFewContributors` with `maxN = 2` (number contributors in parenthesis)',
+                                  data=dataset, 
+                                  numVar = "value", 
+                                  formula = ~sector2*geo + sector4*eu, 
+                                  maxN=2,
+                                  removeEmpty = FALSE,
+                                  fun = SuppressFewContributors,
+                                  print_expr = 'paste0(value, " (",nAll ,") ")')
+```
+\
+
+Please note that in order to include the three empty cells with no contributors, 
+the `removeEmpty` parameter was set to `FALSE`. By default, this parameter is set to `TRUE` when using the formula interface. 
+\
+\
+
+## Using the contributorVar parameter (`contributorVar = "company"`)
+
+According to the `"company"` variable in the data set, 
+there are only four contribution companies (A, B, C and D).
+When this is taken into account, the primary suppression rules will be applied to data that, 
+within each cell, is aggregated within each contributor.
+Our example data aggregated in this way is shown below.
+\
+```{r echo=FALSE}
+M(caption = '**Table 6**: The "value" data aggregated according to hierarchy and contributor',
+  dataset, dimVar = c("sector4", "sector2", "geo", "eu"),   contributorVar = "company")
+```
+\
+
+Below we take into account contributor IDs  when using few contributors primary suppression.
+
+```{r}
+output <- SuppressFewContributors(data=dataset, 
+                                  numVar = "value", 
+                                  dimVar = c("sector4", "sector2", "geo", "eu"),
+                                  maxN=2,
+                                  contributorVar = "company")
+head(output)
+```
+
+Formatted version: 
+\
+```{r echo=FALSE}
+P(caption = '**Table 7**: Output from `SuppressFewContributors` with `maxN = 2` and with `contributorVar = "company"` (number contributors in parenthesis)',
+                                  data=dataset, 
+                                  numVar = "value", 
+                                  dimVar = c("sector4", "sector2", "geo", "eu"), 
+                                  maxN=2,
+                                  contributorVar = "company",
+                                  fun = SuppressFewContributors,
+                                  print_expr = 'paste0(value, " (",nAll ,") ")')
+```
+\
+
+Below we take into account contributor IDs when using dominant cell primary suppression.
+
+```{r}
+output <- SuppressDominantCells(data=dataset, 
+                                numVar = "value", 
+                                formula = ~sector2*geo + sector4*eu,
+                                contributorVar = "company",
+                                n = 1:2, k = c(80, 99))
+head(output)
+```
+
+Formatted version: 
+\
+```{r echo=FALSE}
+P(caption = '**Table 8**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)` and with `contributorVar = "company"`',
+  data=dataset, 
+  numVar = "value", 
+  formula = ~sector2*geo + sector4*eu,
+  contributorVar = "company",
+  n = 1:2, k = c(80, 99), 
+  fun = SuppressDominantCells,
+  print_expr = 'value')
+```
+\
+\
+
+## The singleton problem 
+
+
+Below, the data is suppressed in the same way as in Table 7, but with a different formula.
+\
+
+```{r}
+output <- SuppressDominantCells(data=dataset,
+                                numVar = "value", 
+                                formula = ~sector4*geo + sector2*eu,
+                                contributorVar = "company",
+                                n = 1:2, k = c(80, 99))
+head(output)
+```
+\
+
+Formatted version:
+\
+```{r echo=FALSE}
+P(caption = '**Table 9**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)` and with `contributorVar = "company"`',
+  data=dataset, 
+  numVar = "value", 
+  formula = ~sector4*geo + sector2*eu,
+  contributorVar = "company",
+  n = 1:2, k = c(80, 99), 
+  fun = SuppressDominantCells,
+  print_expr = 'value')
+```
+\
+
+By using `singletonMethod = "none"` in this case, *Entertainment:Spain* will not be suppressed. 
+This cell is suppressed due to the default handling of the singleton problem. 
+The reason is that *Entertainment:Iceland* has a single contributor. This contributor can reveal *Entertainment:Portugal* if *Entertainment:Spain* is not suppressed.
+
+Note that a similar unsolved problem occurs, *Entertainment:Iceland* can reveal *Industry:Iceland*.
+The reason why this problem is not solved is that *Industry:Iceland* is secondary suppressed. 
+The implemented singleton methods for magnitude tables add virtual primary suppressed 
+cells prior to the secondary suppression algorithm. 
+The sum of *Entertainment:Iceland* and *Entertainment:Portugal* is therefore primary suppressed, 
+but not the sum of *Entertainment:Iceland* and *Industry:Iceland*. 
+This may change in future versions.
+
+
+
+
+
+
+
+
+
