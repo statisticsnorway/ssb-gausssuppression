@@ -9,14 +9,15 @@
 #'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec}     |\strong{fewContributorsSpec} |\strong{kDisclosureSpec}   |
 #'  |:------------------------|:-----------------------|:--------------------------|:----------------------------|:--------------------------|
 #'  |\strong{primary}         |PrimaryDefault          |DominanceRule              |NContributorsRule            |KDisclosurePrimary         |
-#'  |\strong{protectZeros}    |TRUE                    |                           |FALSE                        |FALSE                      |
+#'  |\strong{protectZeros}    |TRUE                    |FALSE                      |FALSE                        |FALSE                      |
 #'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum              |CandidatesNum                |DirectDisclosureCandidates |
-#'  |\strong{singleton}       |SingletonDefault        |SingletonUniqueContributor |SingletonUniqueContributor   |                           |
-#'  |\strong{extend0}         |TRUE                    |                           |FALSE                        |TRUE                       |
-#'  |\strong{preAggregate}    |                        |!is.null(charVar)          |!is.null(charVar)            |                           |
+#'  |\strong{singleton}       |SingletonDefault        |SingletonUniqueContributor |SingletonUniqueContributor   |SingletonDefault           |
+#'  |\strong{extend0}         |TRUE                    |FALSE                      |FALSE                        |TRUE                       |
+#'  |\strong{preAggregate}    |is.null(freqVar)        |!is.null(charVar)          |!is.null(charVar)            |is.null(freqVar)           |
+#'  |\strong{extraAggregate}  |FALSE                   |TRUE                       |TRUE                         |FALSE                      |
+#'  |\strong{secondaryZeros}  |FALSE                   |FALSE                      |FALSE                        |1                          |
 #'  |\strong{domWeightMethod} |                        |"default"                  |                             |                           |
 #'  |\strong{singletonMethod} |                        |"numttH"                   |"numttH"                     |"anySumNOTprimary"         |
-#'  |\strong{secondaryZeros}  |                        |                           |                             |1                          |
 #'  
 #' @param x the character name or index of the spec to be returned. If `NULL` (default),
 #' returns list of all specs
@@ -39,7 +40,10 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         protectZeros = TRUE,
         candidates = CandidatesDefault,
         singleton = SingletonDefault,
-        extend0 = TRUE
+        extend0 = TRUE,
+        preAggregate = is.null(freqVar),
+        extraAggregate = FALSE,
+        secondaryZeros = FALSE
       )),
     
     dominanceSpec =       
@@ -48,8 +52,12 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       candidates = CandidatesNum,  
       singleton = SingletonUniqueContributor,
       preAggregate = !is.null(charVar),
+      extraAggregate=TRUE,
       domWeightMethod = "default",
-      singletonMethod = "numttH"
+      singletonMethod = "numttH",
+      protectZeros = FALSE,
+      extend0 = FALSE,
+      secondaryZeros = FALSE 
     )),
     
     fewContributorsSpec =
@@ -58,9 +66,11 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         protectZeros = FALSE,
         extend0 = FALSE,
         preAggregate = !is.null(charVar),
+        extraAggregate=TRUE,
         candidates = CandidatesNum,  
         singleton = SingletonUniqueContributor,
-        singletonMethod = "numttH"
+        singletonMethod = "numttH",
+        secondaryZeros = FALSE 
       )),
     
     kDisclosureSpec = 
@@ -70,7 +80,10 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         secondaryZeros = 1,
         candidates = DirectDisclosureCandidates,
         extend0 = TRUE,
-        singletonMethod = "anySumNOTprimary"
+        singletonMethod = "anySumNOTprimary",
+        singleton = SingletonDefault,
+        preAggregate = is.null(freqVar),
+        extraAggregate = FALSE
       ))
   )
   
