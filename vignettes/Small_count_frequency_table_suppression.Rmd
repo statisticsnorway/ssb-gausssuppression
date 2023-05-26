@@ -39,10 +39,7 @@ The first examples are based on `dataset_a`, which has six rows.
 
 ```{r}
 library(GaussSuppression)
-dataset <- SSBtoolsData("sprt_emp_withEU")[, c(1, 2, 5, 3)]
-dataset$age[dataset$age == "Y15-29"] <- "young"
-dataset$age[dataset$age == "Y30-64"] <- "old"
-dataset$freq <- c(5, 2, 0, 6, 3, 4, 5, 0, 0, 6, 3, 4, 7, 1, 1, 5, 4, 3)
+dataset <- SSBtoolsData("example1")
 dataset_a <- dataset[dataset$year == "2014", -4]
 dataset_b <- dataset[dataset$year == "2015", -4]
 dataset_a

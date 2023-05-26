@@ -34,30 +34,13 @@ if(htmltables){
 ## Introduction and setup
 The `GaussSuppression` package uses a common interface shared by other SDC packages developed at Statistics Norway (see also [`SmallCountRounding`](https://cran.r-project.org/package=SmallCountRounding) and [`SSBcellKey`](https://github.com/statisticsnorway/SSBcellKey)). In the background, these packages use a *model matrix* representation, which connects the input data to the intended output. This functionality is provided by the R package `SSBtools`. In this vignette, we look at multiple ways of specifying output tables given different forms of input. Note that this vignette only scratches the surface of what is possible with the provided interface, and rather is intended to help users get going with the package.
 
-We begin by importing the necessary dependencies as well as loading (and modifying) a test data set provided in the SSBtools package.
+We begin by importing the necessary dependencies as well as loading a test data set provided in the SSBtools package.
 
 ```{r setup}
 library(SSBtools)
 library(GaussSuppression)
 
-dataset <- SSBtools::SSBtoolsData("d2")
-
-# Modify to smaller/easier data
-sreg <- c("A", "B", "C", "I", "J", "K")
-dataset <- dataset[dataset$region %in% sreg, ]
-dataset$county[dataset$county == 4] <- 5
-dataset$county[dataset$county == 10] <- 9
-names(dataset)[names(dataset) == "k_group"] = "size"
-dataset$size[dataset$size == "300"] = "BIG"
-dataset$size[dataset$size == "400"] = "small"
-dataset$county[dataset$county == 1] = "county-1"
-dataset$county[dataset$county == 5] = "county-2"
-dataset$county[dataset$county == 9] = "county-3"
-dataset$region[dataset$region == "I"] = "D"
-dataset$region[dataset$region == "J"] = "E"
-dataset$region[dataset$region == "K"] = "F"
-dataset$freq[1:2] <- 2:3
-rownames(dataset) <- NULL
+dataset <- SSBtools::SSBtoolsData("d2s")
 
 microdata <- SSBtools::MakeMicro(dataset, "freq")
 
@@ -73,23 +56,9 @@ However, please note that data that is input and output in  the `GaussSuppressio
 
 \
 ```{r echo=FALSE}
-d2w <- SSBtools::SSBtoolsData("d2w")
-d2w <- d2w[d2w$region %in% sreg, ]
-d2w$county[d2w$county == 4] <- 5
-d2w$county[d2w$county == 10] <- 9
-names(d2w)[names(d2w) == "k_group"] = "size"
-d2w$size[d2w$size == "300"] = "BIG"
-d2w$size[d2w$size == "400"] = "small"
-d2w$county[d2w$county == 1] = "county-1"
-d2w$county[d2w$county == 5] = "county-2"
-d2w$county[d2w$county == 9] = "county-3"
-d2w$region[d2w$region == "I"] = "D"
-d2w$region[d2w$region == "J"] = "E"
-d2w$region[d2w$region == "K"] = "F"
-d2w$other[1:2] <- 2:3
-rownames(d2w) <- NULL
+d2ws <- SSBtools::SSBtoolsData("d2ws")
 KableTable(caption = '**Table 1**:  `dataset` reshaped to wide format.',
-  data = d2w, nvar = 3, header = c("regional variables", "main_income")) 
+  data = d2ws, nvar = 3, header = c("regional variables", "main_income")) 
 ```
 \
 
