@@ -9,6 +9,11 @@
 #'                  Typically, the variable contains the contributor IDs.
 #' @param sWeightVar Name of variable which represents sampling weights to be used
 #' in dominance rule
+#' 
+#' @note Currently, the implementation of `sWeightVar` cannot handle all issues involving 
+#'       `contributorVar` and aggregations. This means that the default for `extraAggregate` 
+#'       specified in the spec (`TRUE`) is ignored when `sWeightVar` is non-NULL. Thus,
+#'       the "old" default specified in \code{\link{GaussSuppressionFromData}} is used instead. 
 #'
 #' @return data frame containing aggregated data and suppression information.
 #' @export
@@ -78,6 +83,11 @@ SuppressDominantCells <- function(data,
                                   ...,
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
+  
+  if (!is.null(sWeightVar)) {
+    spec["extraAggregate"] <- NULL
+  }
+  
   GaussSuppressionFromData(
     data = data,
     n = n,
