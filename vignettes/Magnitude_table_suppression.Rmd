@@ -30,14 +30,6 @@ if (htmltables) {
 }
 ```
 
-### preliminary since `specs-update` branch not merged 
-```{r}
-SuppressFewContributors <- function(..., extraAggregate = TRUE) 
-  GaussSuppression::SuppressFewContributors(..., extraAggregate = extraAggregate)
-SuppressDominantCells <- function(..., extraAggregate = TRUE) 
-  GaussSuppression::SuppressDominantCells(..., extraAggregate = extraAggregate)
-```
-
 
 ## Introduction 
 The `GaussSuppression` package contains several easy-to-use wrapper functions and in this vignette we will look at 
