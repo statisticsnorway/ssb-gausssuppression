@@ -343,7 +343,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         flush.console()
       }
     } else {
-      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
+      ### START ### preliminary hack to include sWeightVar in SuppressDominantCells
+      MoreVars = function(sWeightVar = character(0), ...){
+        sWeightVar
+      }
+      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, MoreVars(...)))]
+      ### END ###  preliminary hack
+      # data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
   }
   
