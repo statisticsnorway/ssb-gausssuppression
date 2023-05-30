@@ -59,12 +59,15 @@ SuppressSmallCounts(data = dataset_a,
 
 A formatted version of this output is given in Table 1 below. Primary suppressed cells are underlined and labeled in red, while the secondary suppressed cells are labeled in purple.
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 1**: `dimVar = c("age", "geo"), maxN = 1` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 1", data = dataset_a, 
+P(data = dataset_a, # caption = "Table 1", 
                     dimVar = c("age", "geo"), 
                     freqVar = "freq", 
                     maxN = 1)
 ```
+\
 
 The same output is obtained if microdata is sent as input as illustrated by de code below.  
 
@@ -91,12 +94,15 @@ SuppressSmallCounts(data = dataset_a,
 
 A formatted version of this output: 
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 2**: `dimVar = c("age", "geo", "eu"), maxN = 2` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 2", data = dataset_a, 
+P(data = dataset_a, # caption = "Table 2",  
                     dimVar = c("age", "geo", "eu"), 
                     freqVar = "freq", 
                     maxN = 2)
 ```
+\
 
 As described in the define-tables vignette hierarchies are here treated automatically.
 The same output is obtained if we first generate hierarchies by: 
@@ -130,13 +136,15 @@ SuppressSmallCounts(data = dataset_a,
 
 In the formatted version of this output, blank cells indicate that they are not included in the output. 
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 3**: `formula = ~age:eu + geo, maxN = 2` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 3", data = dataset_a, 
+P(data = dataset_a, # caption = "Table 3", 
                     formula = ~age:eu + geo, 
                     freqVar = "freq", 
                     maxN = 2)
 ```
-
+\
 
 ## About suppression of zeros
 
@@ -157,13 +165,16 @@ SuppressSmallCounts(data = dataset_a,
 
 Formatted version:
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 4**: `dimVar = c("age", "geo", "eu"), maxN = 4, protectZeros = FALSE` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 4", data = dataset_a, 
+P(data = dataset_a, # caption = "Table 4", 
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
                     maxN = 4,
                     protectZeros = FALSE)
 ```
+\
 
 Another possibility that gives the same output is:
 
@@ -200,14 +211,17 @@ SuppressSmallCounts(data = dataset_a,
 
 Formatted version:
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 5**: `dimVar = c("age", "geo", "eu"), maxN = 3,` <br> `protectZeros = FALSE, secondaryZeros = TRUE` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 5", data = dataset_a, 
+P(data = dataset_a, # caption = "Table 5",  
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
                     maxN = 3,
                     protectZeros = FALSE, 
                     secondaryZeros = TRUE)
 ```
+\
 
 ### Both structural and non-structural zeros
 
@@ -231,14 +245,17 @@ SuppressSmallCounts(data = dataset_b[-2,  ],
 
 Formatted version:
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 6**: `dimVar = c("age", "geo", "eu"), maxN = 2,` <br> `extend0 = FALSE, structuralEmpty = TRUE` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 6", data = dataset_b[-2,  ], 
+P(data = dataset_b[-2,  ], # caption = "Table 6", 
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
                     maxN = 2,
                     extend0 = FALSE, 
                     structuralEmpty = TRUE)
 ```
+\
 
 Now, the data has been processed correctly, the structural zeros will be published while the other zeros are suppressed.
 
@@ -273,12 +290,15 @@ SuppressSmallCounts(data = dataset_b,
 
 Formatted version:
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 7**: `dimVar = c("age", "geo", "eu"), maxN = 2` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 7", data = dataset_b, 
+P(data = dataset_b, # caption = "Table 7", 
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
                     maxN = 2)
 ```
+\
 
 
 The reason is that it is easy to reveal the zeros if *young:Spain* is not suppressed. 
@@ -304,13 +324,16 @@ head(output)
 
 Formatted version:
 
+\
+ <p style="text-align: center;"> <font size = 3> **Table 8**: `formula = ~age*geo*year + eu*year, maxN = 1, protectZeros = FALSE` </font> </p>
 ```{r echo=FALSE}
-P(caption = "Table 8", data = dataset, 
+P(data = dataset, # caption = "Table 8",
                     formula = ~age*geo*year + eu*year,
                     freqVar = "freq", 
                     maxN = 1,
                     protectZeros = FALSE)
 ```
+\
 
 By using `singletonMethod = "none"` in this case, *young:2016:Spain* will not be suppressed.
 Then the sum of *young:2016:Iceland* and *young:2016:Portugal* can easily be calculated to be two.
