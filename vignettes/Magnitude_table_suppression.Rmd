@@ -253,7 +253,7 @@ output <- SuppressDominantCells(data=dataset,
                                 n = 1:2, k = c(80, 99))
 head(output)
 ```
-
+Here we have also made use of the formula interface.
 
 \
 ```{r echo=FALSE}
