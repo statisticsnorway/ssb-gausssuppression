@@ -163,7 +163,6 @@ SuppressSmallCounts(data = dataset_a,
                     protectZeros = FALSE)
 ```
 
-Formatted version:
 
 \
  <p style="text-align: center;"> <font size = 3> **Table 4**: `dimVar = c("age", "geo", "eu"), maxN = 4, protectZeros = FALSE` </font> </p>
@@ -209,7 +208,6 @@ SuppressSmallCounts(data = dataset_a,
                     secondaryZeros = TRUE)
 ```
 
-Formatted version:
 
 \
  <p style="text-align: center;"> <font size = 3> **Table 5**: `dimVar = c("age", "geo", "eu"), maxN = 3,` <br> `protectZeros = FALSE, secondaryZeros = TRUE` </font> </p>
@@ -243,7 +241,6 @@ SuppressSmallCounts(data = dataset_b[-2,  ],
                     structuralEmpty = TRUE)
 ```
 
-Formatted version:
 
 \
  <p style="text-align: center;"> <font size = 3> **Table 6**: `dimVar = c("age", "geo", "eu"), maxN = 2,` <br> `extend0 = FALSE, structuralEmpty = TRUE` </font> </p>
@@ -288,7 +285,6 @@ SuppressSmallCounts(data = dataset_b,
                     maxN = 2)
 ```
 
-Formatted version:
 
 \
  <p style="text-align: center;"> <font size = 3> **Table 7**: `dimVar = c("age", "geo", "eu"), maxN = 2` </font> </p>
@@ -322,7 +318,6 @@ output <- SuppressSmallCounts(data = dataset,
 head(output)
 ```
 
-Formatted version:
 
 \
  <p style="text-align: center;"> <font size = 3> **Table 8**: `formula = ~age*geo*year + eu*year, maxN = 1, protectZeros = FALSE` </font> </p>
