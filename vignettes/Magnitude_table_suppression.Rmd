@@ -108,7 +108,7 @@ A formatted version of this output is given in Table 3 below.
 
 \
 ```{r echo=FALSE}
-P(caption = '**Table 3**: Output from `SuppressDominantCells`  with `n = 1` and `k = 80` (percentage from largest contribution in parenthesis)',
+P(caption = '**Table 3**: Output from `SuppressDominantCells` <br> with `n = 1` and `k = 80`  <br> (percentage from largest contribution in parenthesis)',
   data=dataset, 
   numVar = "value", 
   dimVar= c("sector4", "geo"), 
@@ -138,7 +138,7 @@ head(output)
 
 \
 ```{r echo=FALSE}
-P(caption = '**Table 4**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)`',
+P(caption = '**Table 4**: Output from `SuppressDominantCells` <br> with `n = 1:2` and `k = c(80, 99)`',
   data=dataset, 
   numVar = "value", 
   dimVar= c("sector4", "sector2", "geo", "eu"), 
@@ -187,7 +187,7 @@ In the formatted version of this output, blank cells indicate that they are not 
 
 \
 ```{r echo=FALSE}
-P(caption = '**Table 5**: Output from `SuppressFewContributors` with `maxN = 2` (number contributors in parenthesis)',
+P(caption = '**Table 5**: Output from `SuppressFewContributors` with `maxN = 2` <br> (number contributors in parenthesis)',
                                   data=dataset, 
                                   numVar = "value", 
                                   formula = ~sector2*geo + sector4*eu, 
@@ -257,7 +257,7 @@ head(output)
 
 \
 ```{r echo=FALSE}
-P(caption = '**Table 8**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)` and with `contributorVar = "company"`',
+P(caption = '**Table 8**: Output from `SuppressDominantCells`  with `n = 1:2` and <br> `k = c(80, 99)` and with `contributorVar = "company"`',
   data=dataset, 
   numVar = "value", 
   formula = ~sector2*geo + sector4*eu,
