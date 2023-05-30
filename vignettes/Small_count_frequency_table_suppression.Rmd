@@ -297,8 +297,9 @@ P(data = dataset_b, # caption = "Table 7",
 \
 
 
-The reason is that it is easy to reveal the zeros if *young:Spain* is not suppressed. 
-Then the sum of *young:Iceland* and *young:Portugal* can easily be calculated to be zero. 
+The reason for the Spain suppressions is to prevent the disclosure of zeros, 
+which would be easily revealed if *young:Spain* is not suppressed. 
+In that case the sum of *young:Iceland* and *young:Portugal* can easily be calculated to be zero. 
 Since negative frequencies are not possible, the only possibility is two zeros. 
 
 The handling of this problem is standard, but it can be turned off by `singletonMethod = "none"`.
