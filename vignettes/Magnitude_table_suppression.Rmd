@@ -50,6 +50,7 @@ We can imagine the figures in the variable `"value"` represent sales value to di
 In the first examples, we will not use the `"company"` variable, 
 but instead assume that each row represents the contribution of a unique company.
 Our input data can then be illustrated like this:
+
 \
 ```{r echo=FALSE}
 M(caption = '**Table 1**: Input data with the 20 "value" contributions.',
@@ -76,6 +77,7 @@ The two columns are equal under normal usage.
 
 A formatted version of this output is given in Table 2 below.
 Primary suppressed cells are underlined and labeled in red, while the secondary suppressed cells are labeled in purple.
+
 \
 ```{r echo=FALSE}
 P(caption = '**Table 2**: Output from `SuppressFewContributors` with `maxN = 1` (number contributors in parenthesis)',
@@ -103,6 +105,7 @@ SuppressDominantCells(data=dataset,
 
 To see the percentage from the two largest contributions, `allDominance = TRUE` was used.
 A formatted version of this output is given in Table 3 below.
+
 \
 ```{r echo=FALSE}
 P(caption = '**Table 3**: Output from `SuppressDominantCells`  with `n = 1` and `k = 80` (percentage from largest contribution in parenthesis)',
@@ -133,7 +136,6 @@ output <- SuppressDominantCells(data=dataset,
 head(output)
 ```
 
-Formatted version:
 \
 ```{r echo=FALSE}
 P(caption = '**Table 4**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)`',
@@ -182,6 +184,7 @@ tail(output)
 ```
 
 In the formatted version of this output, blank cells indicate that they are not included in the output. 
+
 \
 ```{r echo=FALSE}
 P(caption = '**Table 5**: Output from `SuppressFewContributors` with `maxN = 2` (number contributors in parenthesis)',
@@ -207,6 +210,7 @@ there are only four contribution companies (A, B, C and D).
 When this is taken into account, the primary suppression rules will be applied to data that, 
 within each cell, is aggregated within each contributor.
 Our example data aggregated in this way is shown below.
+
 \
 ```{r echo=FALSE}
 M(caption = '**Table 6**: The "value" data aggregated according to hierarchy and contributor',
@@ -225,7 +229,7 @@ output <- SuppressFewContributors(data=dataset,
 head(output)
 ```
 
-Formatted version: 
+
 \
 ```{r echo=FALSE}
 P(caption = '**Table 7**: Output from `SuppressFewContributors` with `maxN = 2` and with `contributorVar = "company"` (number contributors in parenthesis)',
@@ -250,7 +254,7 @@ output <- SuppressDominantCells(data=dataset,
 head(output)
 ```
 
-Formatted version: 
+
 \
 ```{r echo=FALSE}
 P(caption = '**Table 8**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)` and with `contributorVar = "company"`',
@@ -279,9 +283,8 @@ output <- SuppressDominantCells(data=dataset,
                                 n = 1:2, k = c(80, 99))
 head(output)
 ```
-\
 
-Formatted version:
+
 \
 ```{r echo=FALSE}
 P(caption = '**Table 9**: Output from `SuppressDominantCells`  with `n = 1:2` and `k = c(80, 99)` and with `contributorVar = "company"`',
