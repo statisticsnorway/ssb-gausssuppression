@@ -355,7 +355,7 @@ Looking at the output data above Table 13, you will see that row 9 is duplicated
 ## Tabulating continuous variables 
 In addition to defining the dimensions of the output tables, we need to decide whether they should be frequency tables (where we count contributing records) or magnititude tables (where we add contributing records' numerical values for a given variable). All of the above examples have been frequency tables. However, the process is exactly the same if one wishes to construct magnititude tables; the only difference is that one must specify the numerical variable with the help of the parameter `numVar`.
 
-Since most magnitude table suppression methods are based on comparing units' contributions, input the data will most likely be supplied as microdata. Therefore, let us add a fake numerical variable to our microdata:
+Since most magnitude table suppression methods are based on comparing units' contributions, the input data will most likely be supplied as microdata. Therefore, let us add a fake numerical variable to our microdata:
 ```{r}
 set.seed(12345)
 microdata$num <- sample(0:1000, nrow(microdata), replace = TRUE) 
