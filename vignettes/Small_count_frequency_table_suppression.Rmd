@@ -79,6 +79,7 @@ output <- SuppressSmallCounts(data = microdata_a,
 ```
 
 A related point is that the third row of the table can be omitted (`data = dataset_a[-3, ]`) since the frequency is zero. 
+When the frequency is zero, there is no underlying microdata. 
 Later in this vignette, we address scenarios where the inclusion of zeros may be important.
 
 ##  An hierarchical table
@@ -104,7 +105,7 @@ P(data = dataset_a, # caption = "Table 2",
 ```
 \
 
-As described in the define-tables vignette hierarchies are here treated automatically.
+As described in the define-tables vignette hierarchies are here detected automatically.
 The same output is obtained if we first generate hierarchies by: 
 
 ```{r}
@@ -149,7 +150,8 @@ P(data = dataset_a, # caption = "Table 3",
 ## About suppression of zeros
 
 By default, zeros are suppressed in order to protect against attribute disclosure in frequency tables. 
-However, there are exceptions.  
+However, there are exceptions.
+Below are several options for handling exceptions.
 
 ### Zeros not suppressed
 
@@ -186,7 +188,7 @@ output <- SuppressSmallCounts(data = dataset_a[-3, ],
                               structuralEmpty = TRUE)
 ```
 
-Here the zero-frequency row is omitted in input. 
+Here the zero-frequency row is omitted in the input. 
 By default, the table is automatically extended so that the Gauss algorithm handles zeros correctly. 
 When this is turned off (`extend0 = FALSE`), a warning with the following text will appear: 
 "*Suppressed cells with empty input will not be protected. Extend input data with zeros?*".
@@ -229,8 +231,10 @@ The example below uses `dataset_b`, which has two zeros.
   dataset_b
 ```
 
-Now we omit one of the zeros and keep the other.
-In general, we will omit all structural zeros.
+Let's assume that the first zero is considered as a structural zero. 
+In order to account for this characteristic, we will exclude this particular zero and retain the other. 
+As a general rule, we will exclude all structural zeros.
+
 
 ```{r}
 SuppressSmallCounts(data = dataset_b[-2,  ], 
@@ -331,9 +335,11 @@ P(data = dataset, # caption = "Table 8",
 ```
 \
 
-By using `singletonMethod = "none"` in this case, *young:2016:Spain* will not be suppressed.
-Then the sum of *young:2016:Iceland* and *young:2016:Portugal* can easily be calculated to be two.
-Since zeros are never suppressed, the only possibility is two ones. 
+In this output, *young:2016:Spain* is suppressed due to the standard handling of the singleton problem.
 
-However, in our output, *young:2016:Spain* is suppressed due to the standard handling of this problem.
+However, by using `singletonMethod = "none"` in this case, *young:2016:Spain* will not be suppressed.
+Then the sum of *young:2016:Iceland* and *young:2016:Portugal* can easily be calculated to be two.
+Since zeros are never suppressed, the only possible values for these two cells are two ones.
+
+
 
