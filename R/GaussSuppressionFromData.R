@@ -343,7 +343,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         flush.console()
       }
     } else {
-      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
+      ### START ### preliminary hack to include sWeightVar in SuppressDominantCells
+      MoreVars = function(sWeightVar = character(0), ...){
+        sWeightVar
+      }
+      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, MoreVars(...)))]
+      ### END ###  preliminary hack
+      # data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
   }
   
@@ -472,9 +478,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     } else {
       xExtra <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, ...)
     }
+    if (printInc) {
+      cat("Checking .")
+      flush.console()
+    }
     if (length(uniqueCharVar)) {
       if (printInc) {
-        cat("Checking dim-variables ..")
+        cat(".")
         flush.console()
       }
       if (!isTRUE(all.equal(data[unique(dVar)], charData[unique(dVar)]))) {
@@ -485,7 +495,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       data[uniqueCharVar][data[[nUniqueVar]] > 1, ] <- NA  # uniqueCharVar created as the first row is ok when the first row is the only row
     }
     if (printInc) {
-      cat("Checking crossTables ..")
+      cat(".")
       flush.console()
     }
     if(!isTRUE(all.equal(crossTable, as.data.frame(xExtra$crossTable)))){
@@ -510,7 +520,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   if(extraAggregate){
     if (printInc) {
-      cat(". Checking (freq, num, weight) ..")
+      cat(".")
       flush.console()
     }
     if(!isTRUE(all.equal(

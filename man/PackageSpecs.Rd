@@ -26,14 +26,15 @@ The following table summarizes the built-in specs. Columns represent
 different specs, and rows represent the parameter settings.\tabular{lllll}{
     \tab \strong{smallCountSpec} \tab \strong{dominanceSpec} \tab \strong{fewContributorsSpec} \tab \strong{kDisclosureSpec} \cr
    \strong{primary} \tab PrimaryDefault \tab DominanceRule \tab NContributorsRule \tab KDisclosurePrimary \cr
-   \strong{protectZeros} \tab TRUE \tab  \tab FALSE \tab FALSE \cr
+   \strong{protectZeros} \tab TRUE \tab FALSE \tab FALSE \tab FALSE \cr
    \strong{candidates} \tab CandidatesDefault \tab CandidatesNum \tab CandidatesNum \tab DirectDisclosureCandidates \cr
-   \strong{singleton} \tab SingletonDefault \tab SingletonUniqueContributor \tab SingletonUniqueContributor \tab  \cr
-   \strong{extend0} \tab TRUE \tab  \tab FALSE \tab TRUE \cr
-   \strong{preAggregate} \tab  \tab !is.null(charVar) \tab !is.null(charVar) \tab  \cr
+   \strong{singleton} \tab SingletonDefault \tab SingletonUniqueContributor \tab SingletonUniqueContributor \tab SingletonDefault \cr
+   \strong{extend0} \tab TRUE \tab FALSE \tab FALSE \tab TRUE \cr
+   \strong{preAggregate} \tab is.null(freqVar) \tab !is.null(charVar) \tab !is.null(charVar) \tab is.null(freqVar) \cr
+   \strong{extraAggregate} \tab FALSE \tab TRUE \tab TRUE \tab FALSE \cr
+   \strong{secondaryZeros} \tab FALSE \tab FALSE \tab FALSE \tab 1 \cr
    \strong{domWeightMethod} \tab  \tab "default" \tab  \tab  \cr
    \strong{singletonMethod} \tab  \tab "numttH" \tab "numttH" \tab "anySumNOTprimary" \cr
-   \strong{secondaryZeros} \tab  \tab  \tab  \tab 1 \cr
 }
 }
 \examples{
