@@ -49,11 +49,11 @@ dataset
 We can imagine the figures in the variable `"value"` represent sales value to different sectors from different companies. 
 In the first examples, we will not use the `"company"` variable, 
 but instead assume that each row represents the contribution of a unique company.
-Our input data can then be illustrated like this:
+Our input data can then be reformatted and illustrated like this:
 
 \
 ```{r echo=FALSE}
-M(caption = '**Table 1**: Input data with the 20 "value" contributions.',
+M(caption = '**Table 1**: Input data with the 20 contributions.',
   dataset, formula = ~sector4:geo-1)
 ```
 \
@@ -80,7 +80,7 @@ Primary suppressed cells are underlined and labeled in red, while the secondary 
 
 \
 ```{r echo=FALSE}
-P(caption = '**Table 2**: Output from `SuppressFewContributors` with `maxN = 1` (number contributors in parenthesis)',
+P(caption = '**Table 2**: Output from `SuppressFewContributors` with `maxN = 1` (number of contributors in parenthesis)',
   data=dataset, 
   numVar = "value", 
   dimVar= c("sector4", "geo"), 
@@ -103,7 +103,7 @@ SuppressDominantCells(data=dataset,
                       n = 1, k = 80, allDominance = TRUE)
 ```
 
-To see the percentage from the two largest contributions, `allDominance = TRUE` was used.
+To incorporate the percentage of the two largest contributions in the output, the parameter `allDominance = TRUE` was utilized.
 A formatted version of this output is given in Table 3 below.
 
 \
@@ -148,7 +148,7 @@ P(caption = '**Table 4**: Output from `SuppressDominantCells` <br> with `n = 1:2
 ```
 \
 
-As described in the define-tables vignette hierarchies are here treated automatically.
+As described in the define-tables vignette hierarchies are here detected automatically.
 The same output is obtained if we first generate hierarchies by: 
 
 ```{r}
@@ -187,7 +187,7 @@ In the formatted version of this output, blank cells indicate that they are not 
 
 \
 ```{r echo=FALSE}
-P(caption = '**Table 5**: Output from `SuppressFewContributors` with `maxN = 2` <br> (number contributors in parenthesis)',
+P(caption = '**Table 5**: Output from `SuppressFewContributors` with `maxN = 2` <br> (number of contributors in parenthesis)',
                                   data=dataset, 
                                   numVar = "value", 
                                   formula = ~sector2*geo + sector4*eu, 
@@ -207,6 +207,8 @@ the `removeEmpty` parameter was set to `FALSE`. By default, this parameter is se
 
 According to the `"company"` variable in the data set, 
 there are only four contribution companies (A, B, C and D).
+We specify this using the `contributorVar` parameter, which corresponds to a variable within the dataset, in this case, `"company"`.
+In general, this variable refers to the holding information to be used by the suppression method.
 When this is taken into account, the primary suppression rules will be applied to data that, 
 within each cell, is aggregated within each contributor.
 Our example data aggregated in this way is shown below.
