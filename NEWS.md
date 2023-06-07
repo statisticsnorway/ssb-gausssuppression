@@ -1,6 +1,6 @@
 
 
-## GaussSuppression	X.X.X
+## GaussSuppression	0.7.0
 * More vignettes are included.
 * Better singleton handling for magnitude tables when using `SuppressDominantCells()` and `SuppressFewContributors()`. 
   - Due to improvements in the SSBtools package (version 1.4.6).
