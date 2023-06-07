@@ -3,7 +3,7 @@ title: "Magnitude table suppression"
 author: ""
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{table suppression}
+  %\VignetteIndexEntry{Magnitude table suppression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

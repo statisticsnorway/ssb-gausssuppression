@@ -3,7 +3,7 @@ title: "Defining Tables for GaussSuppression"
 author: ""
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Defining Tables for GaussSuppression}
+  %\VignetteIndexEntry{Defining tables for GaussSuppression}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

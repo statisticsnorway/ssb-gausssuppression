@@ -1,12 +1,13 @@
 Package: GaussSuppression
 Type: Package
 Title: Tabular Data Suppression using Gaussian Elimination
-Version: 0.6.1
-Date: 2023-05-05
+Version: 0.7.0
+Date: 2023-06-07
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
                     email = "oyl@ssb.no"),
              person("Daniel", "Lupp", role = c("aut")),        
-             person("Hege", "Bøvelstad", role = c("ctb")))
+             person("Hege", "Bøvelstad", role = c("ctb")),
+             person("Statistics Norway", role = "cph"))
 Maintainer: Øyvind Langsrud <oyl@ssb.no>
 Depends: Matrix
 Imports: SSBtools (>= 1.4.5), RegSDC (>= 0.7.0), stats, methods
@@ -20,7 +21,7 @@ Description: A statistical disclosure control tool to protect tables by suppress
     horse function, GaussSuppressionFromData(). Suppressed frequencies can be 
     replaced by synthetic decimal numbers as described in 
     Langsrud (2019) <doi:10.1007/s11222-018-9848-9>.
-License: Apache License 2.0
+License: MIT + file LICENSE
 URL: https://github.com/statisticsnorway/GaussSuppression
 BugReports: https://github.com/statisticsnorway/GaussSuppression/issues
 Encoding: UTF-8

@@ -1,3 +1,14 @@
+
+
+## GaussSuppression	0.7.0
+* More vignettes are included.
+* Better singleton handling for magnitude tables when using `SuppressDominantCells()` and `SuppressFewContributors()`. 
+  - Due to improvements in the SSBtools package (version 1.4.6).
+  - Due to new default `extraAggregate = TRUE` in the specs, `dominanceSpec` and `fewContributorsSpec`.
+* More default values are explicitly included in the in specs so that they are easier seen.
+  - See `PackageSpecs()`.
+  
+
 ## GaussSuppression	0.6.0
 * A vignette entitled _"Defining Tables for GaussSuppression"_ is now included.
 * Now, easy-to-use wrapper functions are included.
