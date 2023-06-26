@@ -105,6 +105,7 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups) {
     rows <- !is.na(groups)
     groups <- groups[rows]
     x <- x[rows, , drop = FALSE]
+    y <- y[rows]
   }
   
   groups <- as.integer(factor(groups))
