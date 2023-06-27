@@ -1,8 +1,8 @@
-#' Find major contributors to aggregates 
+#' Find major contributions to aggregates 
 #' 
 #' Assuming aggregates are calculated via a dummy matrix by 
 #' \code{z = t(x) \%*\% y}, 
-#' the \code{n} largest contributors are found (value or index) for each aggregate. 
+#' the \code{n} largest contributions are found (value or index) for each aggregate. 
 #'
 #' @param x A (sparse) dummy matrix
 #' @param y Vector of input values (contributors)
@@ -13,7 +13,7 @@
 #'               Cannot be combined with `index = TRUE`. 
 #'               The missing group category is excluded.
 #'
-#' @return Matrix with lagest contributors in first column, second largest in second column and so on.  
+#' @return Matrix with lagest contributions in first column, second largest in second column and so on.  
 #' @export
 #' @importFrom SSBtools SortRows As_TsparseMatrix
 #' @importFrom Matrix drop0

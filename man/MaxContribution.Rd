@@ -2,7 +2,7 @@
 % Please edit documentation in R/MaxContribution.R
 \name{MaxContribution}
 \alias{MaxContribution}
-\title{Find major contributors to aggregates}
+\title{Find major contributions to aggregates}
 \usage{
 MaxContribution(x, y, n = 1, decreasing = TRUE, index = FALSE, groups = NULL)
 }
@@ -22,12 +22,12 @@ Cannot be combined with \code{index = TRUE}.
 The missing group category is excluded.}
 }
 \value{
-Matrix with lagest contributors in first column, second largest in second column and so on.
+Matrix with lagest contributions in first column, second largest in second column and so on.
 }
 \description{
 Assuming aggregates are calculated via a dummy matrix by
 \code{z = t(x) \%*\% y},
-the \code{n} largest contributors are found (value or index) for each aggregate.
+the \code{n} largest contributions are found (value or index) for each aggregate.
 }
 \examples{
 library(SSBtools)
