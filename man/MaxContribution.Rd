@@ -4,7 +4,15 @@
 \alias{MaxContribution}
 \title{Find major contributions to aggregates}
 \usage{
-MaxContribution(x, y, n = 1, decreasing = TRUE, index = FALSE, groups = NULL)
+MaxContribution(
+  x,
+  y,
+  n = 1,
+  decreasing = TRUE,
+  index = FALSE,
+  groups = NULL,
+  return2 = FALSE
+)
 }
 \arguments{
 \item{x}{A (sparse) dummy matrix}
@@ -20,9 +28,13 @@ MaxContribution(x, y, n = 1, decreasing = TRUE, index = FALSE, groups = NULL)
 \item{groups}{When non-NULL, major contributions after aggregation within groups.
 Cannot be combined with \code{index = TRUE}.
 The missing group category is excluded.}
+
+\item{return2}{When \code{TRUE}, two matrices are returned, \code{value} and \code{id}.
+The latter contains indices when \code{group} is \code{NULL} and otherwise a character matrix of groups.}
 }
 \value{
 Matrix with lagest contributions in first column, second largest in second column and so on.
+Alternative output when using parameters \code{index} or \code{return2}.
 }
 \description{
 Assuming aggregates are calculated via a dummy matrix by
@@ -42,6 +54,11 @@ cbind(as.data.frame(a$crossTable), MaxContribution(a$modelMatrix, z$ths_per, 1))
 cbind(a$crossTable, MaxContribution(a$modelMatrix, z$ths_per, 10))
 cbind(a$crossTable, MaxContribution(a$modelMatrix, z$ths_per, 10, index = TRUE))
 
+# Both types of output can be achieved with return2 = TRUE)
+identical(MaxContribution(a$modelMatrix, z$ths_per, 10, return2 = TRUE),
+          list(value =  MaxContribution(a$modelMatrix, z$ths_per, 10), 
+               id =  MaxContribution(a$modelMatrix, z$ths_per, 10, index = TRUE)))
+
 b <- ModelMatrix(z[, -4], crossTable = TRUE, inputInOutput = c(TRUE, FALSE, TRUE))
 
 k <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10))
@@ -55,6 +72,20 @@ k9 <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10, groups =
 
 k18[c(4, 13, 17, 33), ]
 k9[c(4, 13, 17, 33), ]
+
+# Group info obtained with return2 = TRUE
+k9_id <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10, groups = gr9, 
+                                             return2 = TRUE)$id)
+k9_id[c(4, 13, 17, 33), ]
+
+
+# Verify similarity
+z$y <- z$ths_per + (1:nrow(z))/100  # to avoid equal values
+id1 <- MaxContribution(b$modelMatrix, z$y, 10, index = TRUE)
+id1[!is.na(id1)] <- paste0("g", id1[!is.na(id1)])
+mc2 <- MaxContribution(b$modelMatrix, z$y, 10, groups = gr18, return2 = TRUE)
+id2 <- mc2$id
+identical(id1, id2)
 
 }
 \seealso{

@@ -12,8 +12,11 @@
 #' @param groups When non-NULL, major contributions after aggregation within groups.
 #'               Cannot be combined with `index = TRUE`. 
 #'               The missing group category is excluded.
+#' @param return2 When `TRUE`, two matrices are returned, `value` and `id`.
+#'        The latter contains indices when `group` is `NULL` and otherwise a character matrix of groups. 
 #'
 #' @return Matrix with lagest contributions in first column, second largest in second column and so on.  
+#'         Alternative output when using parameters `index` or `return2`.
 #' @export
 #' @importFrom SSBtools SortRows As_TsparseMatrix
 #' @importFrom Matrix drop0
@@ -35,6 +38,11 @@
 #' cbind(a$crossTable, MaxContribution(a$modelMatrix, z$ths_per, 10))
 #' cbind(a$crossTable, MaxContribution(a$modelMatrix, z$ths_per, 10, index = TRUE))
 #' 
+#' # Both types of output can be achieved with return2 = TRUE)
+#' identical(MaxContribution(a$modelMatrix, z$ths_per, 10, return2 = TRUE),
+#'           list(value =  MaxContribution(a$modelMatrix, z$ths_per, 10), 
+#'                id =  MaxContribution(a$modelMatrix, z$ths_per, 10, index = TRUE)))
+#' 
 #' b <- ModelMatrix(z[, -4], crossTable = TRUE, inputInOutput = c(TRUE, FALSE, TRUE))
 #' 
 #' k <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10))
@@ -49,13 +57,29 @@
 #' k18[c(4, 13, 17, 33), ]
 #' k9[c(4, 13, 17, 33), ]
 #' 
-MaxContribution <- function(x, y, n = 1, decreasing = TRUE, index = FALSE, groups = NULL) {
+#' # Group info obtained with return2 = TRUE
+#' k9_id <- cbind(b$crossTable, MaxContribution(b$modelMatrix, z$ths_per, 10, groups = gr9, 
+#'                                              return2 = TRUE)$id)
+#' k9_id[c(4, 13, 17, 33), ]
+#' 
+#' 
+#' # Verify similarity
+#' z$y <- z$ths_per + (1:nrow(z))/100  # to avoid equal values
+#' id1 <- MaxContribution(b$modelMatrix, z$y, 10, index = TRUE)
+#' id1[!is.na(id1)] <- paste0("g", id1[!is.na(id1)])
+#' mc2 <- MaxContribution(b$modelMatrix, z$y, 10, groups = gr18, return2 = TRUE)
+#' id2 <- mc2$id
+#' identical(id1, id2)
+#' 
+MaxContribution <- function(x, y, n = 1, decreasing = TRUE, 
+                            index = FALSE, groups = NULL,
+                            return2 = FALSE) {
   
   if (!is.null(groups)) {
     if (index) {
       stop("index when groups is not implemented")
     }
-    return(MaxContributionGroups(x = x, y = y, n = n, decreasing = decreasing, groups = groups))
+    return(MaxContributionGroups(x = x, y = y, n = n, decreasing = decreasing, groups = groups, return2 = return2))
   }
   
   ordy <- order(y, decreasing = decreasing)
@@ -85,6 +109,13 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE, index = FALSE, group
     ma <- match(seqCol, xM[, 1])
     maxC[, i] <- ordy[xM[ma, 2]]
   }
+  
+  if (return2) {
+    id <- maxC
+    maxC[] <- y[maxC]
+    return(list(value = maxC, id = id))
+  }
+  
   if (index) 
     return(maxC)
   
@@ -95,7 +126,7 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE, index = FALSE, group
 
 
 
-MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups) {
+MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups, return2) {
   
   if (length(groups) != nrow(x)) {
     stop("Incorrect length of groups")
@@ -108,7 +139,13 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups) {
     y <- y[rows]
   }
   
-  groups <- as.integer(factor(groups))
+  if (return2) {
+    fgroups <- factor(groups)
+    groups <- as.integer(fgroups)
+    fgroups <- levels(fgroups)
+  } else {
+    groups <- as.integer(factor(groups))
+  }
   
   xT <- As_TsparseMatrix(x) # xT <- as(drop0(x), "dgTMatrix")
   
@@ -138,6 +175,9 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups) {
   seqCol <- seq_len(ncol(x))
   
   maxC <- matrix(NA_integer_, ncol(x), n)
+  if (return2) {
+    id <- matrix(NA_character_, ncol(x), n)
+  }
   
   for (i in seq_len(n)) {
     if (i > 1) {
@@ -145,6 +185,13 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups) {
     }
     ma <- match(seqCol, xM[, "col"])
     maxC[, i] <- xM[ma, "y"]
+    if (return2) {
+      id[, i] <- fgroups[xM[ma, "gr"]]
+    }
+  }
+  
+  if (return2) {
+    return(list(value = maxC, id = id))
   }
   
   maxC
