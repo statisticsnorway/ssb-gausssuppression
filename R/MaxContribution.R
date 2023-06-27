@@ -20,6 +20,7 @@
 #' @export
 #' @importFrom SSBtools SortRows As_TsparseMatrix
 #' @importFrom Matrix drop0
+#' @importFrom methods new
 #' 
 #' @seealso \code{\link{ModelMatrix}}
 #' 
