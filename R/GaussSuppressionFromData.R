@@ -560,8 +560,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   if(!is.null(forced)){
     if (!is.logical(forced)) {   # logical allowed in  SSBtools::GaussSuppression
-      if(min(forced) < 0 | max(forced) > m){
-        stop("forced input outside range")
+      if (length(forced)) {
+        if (min(forced) < 0 | max(forced) > m) {
+          stop("forced input outside range")
+        }
       }
       forcedA <- rep(FALSE, m)
       forcedA[forced] <- TRUE
