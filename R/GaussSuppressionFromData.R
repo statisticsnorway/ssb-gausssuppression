@@ -36,7 +36,15 @@
 #' Then, negative indices from \code{\link{GaussSuppression}} using 
 #' `unsafeAsNegative = TRUE` will be included in the output. 
 #' Singleton problems may, however, be present even if it cannot be seen as warning/output. 
-#' In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}.  
+#' In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}. 
+#' 
+#' In some cases, cells that are forced, hidden, or primary suppressed can overlap.
+#' For these situations, forced has precedence over hidden and primary. 
+#' That is, if a cell is both forced and hidden, it will be treated as a forced cell and thus published.
+#' Similarly, any primary suppression of a forced cell will be ignored 
+#' (see parameter `whenPrimaryForced` to \code{\link{GaussSuppression}}).
+#' It is, however, meaningful to combine primary and hidden. 
+#' Such cells will be protected while also being assigned the `NA` value in the `suppressed` output variable.
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
