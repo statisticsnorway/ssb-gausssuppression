@@ -39,9 +39,12 @@
 #' In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}. 
 #' 
 #' In some cases, cells that are forced, hidden, or primary suppressed can overlap.
-#' For these situations, the following order of precedence is implemented: forced > hidden > primary.
-#' For example, if a cell is both forced and hidden, it will be treated as a forced
-#' cell and thus published. 
+#' For these situations, forced has precedence over hidden and primary. 
+#' That is, if a cell is both forced and hidden, it will be treated as a forced cell and thus published.
+#' Similarly, any primary suppression of a forced cell will be ignored 
+#' (see parameter `whenPrimaryForced` to \code{\link{GaussSuppression}}).
+#' It is, however, meaningful to combine primary and hidden. 
+#' Such cells will be protected while also being assigned the `NA` value in the `suppressed` output variable.
 #'
 #' @param data 	  Input data as a data frame
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
