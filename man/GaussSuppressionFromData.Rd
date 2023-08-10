@@ -188,6 +188,11 @@ Then, negative indices from \code{\link{GaussSuppression}} using
 \code{unsafeAsNegative = TRUE} will be included in the output.
 Singleton problems may, however, be present even if it cannot be seen as warning/output.
 In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}.
+
+In some cases, cells that are forced, hidden, or primary suppressed can overlap.
+For these situations, the following order of precedence is implemented: forced > hidden > primary.
+For example, if a cell is both forced and hidden, it will be treated as a forced
+cell and thus published.
 }
 \examples{
 
