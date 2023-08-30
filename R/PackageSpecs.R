@@ -17,7 +17,7 @@
 #'  |\strong{extraAggregate}  |FALSE                   |TRUE                       |TRUE                         |FALSE                      |
 #'  |\strong{secondaryZeros}  |FALSE                   |FALSE                      |FALSE                        |1                          |
 #'  |\strong{domWeightMethod} |                        |"default"                  |                             |                           |
-#'  |\strong{singletonMethod} |                        |"numttH"                   |"numttH"                     |"anySumNOTprimary"         |
+#'  |\strong{singletonMethod} |                        |"numttHT"                  |"numttHT"                    |"anySumNOTprimary"         |
 #'  
 #' @param x the character name or index of the spec to be returned. If `NULL` (default),
 #' returns list of all specs
@@ -54,7 +54,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
       preAggregate = !is.null(charVar),
       extraAggregate=TRUE,
       domWeightMethod = "default",
-      singletonMethod = "numttH",
+      singletonMethod = "numttHT",
       protectZeros = FALSE,
       extend0 = FALSE,
       secondaryZeros = FALSE 
@@ -69,7 +69,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         extraAggregate=TRUE,
         candidates = CandidatesNum,  
         singleton = SingletonUniqueContributor,
-        singletonMethod = "numttH",
+        singletonMethod = "numttHT",
         secondaryZeros = FALSE 
       )),
     
