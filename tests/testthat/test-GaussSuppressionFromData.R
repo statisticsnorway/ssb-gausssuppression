@@ -257,7 +257,8 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
     sum_suppressed <- integer(0)
     zz = z[sample.int(nrow(z), 100, replace = TRUE), ]
     for (c2 in c("F", "T")) 
-      for (c3 in c("F", "T", "H")) {
+      for (c3 in c("F", "T", "H"))
+       for (c4 in c("F", "T")) {
         b <- GaussSuppressionFromData(zz, 
                                       dimVar = c("region", "fylke", "kostragr", "hovedint"), 
                                       numVar = "value", charVar = "char", 
@@ -265,10 +266,10 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
                                       candidates = CandidatesNum, 
                                       primary = NcontributorsRule,  
                                       singleton = SingletonUniqueContributor, 
-                                      singletonMethod = paste0("numF", c2, c3))
+                                      singletonMethod = paste0("numF", c2, c3, c4))
         sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
       }
-    expect_equal(sum_suppressed, c(49, 51, 53, 49, 52, 55))
+    expect_equal(sum_suppressed, c(49, 55, 51, 57, 53, 57, 49, 55, 52, 57, 55, 57))
     # Why extra primary needed for 5:Total when "numFTH"
     # can be seen by looking at 
     # b[b$region == 5, ]
@@ -277,7 +278,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
     # zz[zz$fylke == 5 & zz$hovedint == "soshjelp", ]  
     
     sum_suppressed <- integer(0)
-    for (singletonMethod  in c("numFFF", "numtFF","numTFF", "numtTT", "numtTH")) {
+    for (singletonMethod  in c("numFFF", "numtFF","numTFF", "numtTT", "numtTH", "numtTFT", "numtTHT")) {
         b <- GaussSuppressionFromData(zz, 
                                       dimVar = c("region", "fylke", "kostragr", "hovedint"), 
                                       numVar = "value", charVar = "char", 
@@ -289,7 +290,8 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
           inputInOutput = c(FALSE, TRUE)) # singleton not in publish and therefore not primary suppressed  
         sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
       }
-    expect_equal(sum_suppressed, c(17, 18, 18, 19, 19))
+    expect_equal(sum_suppressed, c(17, 18, 18, 19, 19, 22, 23))
+    
     
     # To make non-suppressed singletons
     SUC <- function(..., removeCodes, primary) SingletonUniqueContributor(..., removeCodes = character(0), primary = integer(0))
@@ -307,6 +309,16 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
       sum_suppressed <- c(sum_suppressed, c(59, 59, 67))
     }
     
+    zz$char[1:15] <- "char5"
+    expect_warning({b <- GaussSuppressionFromData(zz, 
+                                  dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                  numVar = "value", charVar = "char", 
+                                  maxN = 2, printInc = printInc, 
+                                  candidates = CandidatesNum, 
+                                  primary = NcontributorsRule,  
+                                  singleton = SingletonUniqueContributor, 
+                                  singletonMethod = "numFTFW")})
+    expect_equal(sum(b$suppressed), 50)  # Here "if (s_unique == primarySingletonNum[i])" in SSBtools::GaussSuppression matters. 
   }
 })
 
