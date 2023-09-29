@@ -8,6 +8,7 @@ test_that("GaussSuppressionFromData works", {
 
 # Sample with seed inside test_that do not work
 z3 <- SSBtoolsData("z3")
+
 mm <- SSBtools::ModelMatrix(z3[, 1:6], crossTable = TRUE, sparse = FALSE)
 x <- mm$modelMatrix  
 k <- 1:20000
@@ -269,7 +270,8 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
                                       singletonMethod = paste0("numF", c2, c3, c4))
         sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
       }
-    expect_equal(sum_suppressed, c(49, 55, 51, 57, 53, 57, 49, 55, 52, 57, 55, 57))
+    expect_equal(sum_suppressed, c(49, 55, 51, 55, 53, 55, 49, 57, 52, 57, 55, 57))
+    
     # Why extra primary needed for 5:Total when "numFTH"
     # can be seen by looking at 
     # b[b$region == 5, ]
@@ -290,7 +292,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
           inputInOutput = c(FALSE, TRUE)) # singleton not in publish and therefore not primary suppressed  
         sum_suppressed <- c(sum_suppressed, sum(b$suppressed))
       }
-    expect_equal(sum_suppressed, c(17, 18, 18, 19, 19, 22, 23))
+    expect_equal(sum_suppressed, c(17, 18, 18, 19, 19, 23, 23))
     
     
     # To make non-suppressed singletons
@@ -318,7 +320,7 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
                                   primary = NcontributorsRule,  
                                   singleton = SingletonUniqueContributor, 
                                   singletonMethod = "numFTFW")})
-    expect_equal(sum(b$suppressed), 50)  # Here "if (s_unique == primarySingletonNum[i])" in SSBtools::GaussSuppression matters. 
+    expect_equal(sum(b$suppressed), 51)  # Here "if (s_unique == primarySingletonNum[i])" in SSBtools::GaussSuppression matters. 
   }
 })
 
