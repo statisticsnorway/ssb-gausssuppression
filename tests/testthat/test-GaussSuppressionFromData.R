@@ -8,6 +8,9 @@ test_that("GaussSuppressionFromData works", {
 
 # Sample with seed inside test_that do not work
 z3 <- SSBtoolsData("z3")
+upper <- z3$region %in% LETTERS
+z3$region[upper] <- paste0(z3$region[upper], 2)
+z3$region[!upper] <- paste0(toupper(z3$region[!upper]), 1)
 
 mm <- SSBtools::ModelMatrix(z3[, 1:6], crossTable = TRUE, sparse = FALSE)
 x <- mm$modelMatrix  
@@ -18,7 +21,8 @@ x[k] <- x[sample_k]
 
 
 test_that("Advanced with integer overflow", {
-  skip("Strange behaviour. Test works, but not when run inside Check package")
+  #skip("Strange behaviour. Test works, but not when run inside Check package")
+  skip_on_cran()  # The above problem was caused by different character sorting in different systems
   
   a <- GaussSuppressionFromData(z3, c(1:6), 7, x = mm$modelMatrix , crossTable = mm$crossTable, maxN = 5, printInc = printInc)
   expect_identical(sum(which(a$suppressed)), 599685L)
