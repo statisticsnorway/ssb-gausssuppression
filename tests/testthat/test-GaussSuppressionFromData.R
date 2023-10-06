@@ -391,3 +391,37 @@ test_that("Interpret primary output correctly", {
 })
 
 
+test_that("More NumSingleton", {
+  
+  sum_suppressed <- integer(0)
+  for (seed in c(116162, 643426)) {
+    set.seed(seed)
+    z <- SSBtoolsData("magnitude1")
+    set.seed(seed)
+    z$company <- z$company[sample.int(20)]
+    z$value <- z$value[sample.int(20)]
+    dataset <- SSBtools::SortRows(aggregate(z["value"], z[1:5], sum))
+    for (c3 in c("F", "T", "H")) for (c4 in c("F", "t", "T")) for (c5 in c("F", "t", "T")) {
+      if (!(c4 == "F" & c5 != "F")) {
+        singletonMethod <- paste0("numTt", c3, c4, c5)
+        output <- SuppressDominantCells(data = dataset, numVar = "value", dimVar = c("sector4", "geo"), contributorVar = "company", n = 1, k = 80, singletonMethod = singletonMethod,
+                                        printInc = FALSE)
+        sum_suppressed <- c(sum_suppressed, sum(output$suppressed))
+      }
+    }
+    
+  }
+  
+  expect_equal(sum_suppressed, c(8, 11, 13, 13, 11, 13, 13, 10, 11, 13, 13, 11, 13, 13, 10, 
+                                 11, 13, 13, 11, 13, 13, 7, 9, 10, 12, 10, 11, 12, 8, 10, 10, 
+                                 12, 11, 11, 12, 8, 10, 10, 12, 11, 11, 12))  
+  
+})
+
+
+
+
+
+
+
+
