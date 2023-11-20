@@ -105,6 +105,9 @@ PrimaryFromSuppressedData <- function(x, crossTable, suppressedData, forcedData 
   }
   
   if ("suppressed" %in% names(suppressedData)) {
+    if (anyNA(suppressedData$suppressed)) {
+      suppressedData <- suppressedData[!is.na(suppressedData$suppressed), , drop = FALSE]
+    }
     suppressedDataFALSE <- suppressedData[!suppressedData$suppressed, namesIn, drop = FALSE]
     suppressedData <- suppressedData[suppressedData$suppressed, namesIn, drop = FALSE]
     ma <- Match(suppressedData, suppressedDataFALSE)
