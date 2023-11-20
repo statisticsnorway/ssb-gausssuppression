@@ -15,6 +15,8 @@
 #'
 #' @param data Input data as a data frame
 #' @param ... Further parameters to \code{\link{GaussSuppressionFromData}}
+#' @param fun A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
+#'              \code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.
 #' @param primary As input to \code{\link{GaussSuppressionFromData}} before possible extension caused by `suppressedData`.
 #'                Supply `NULL` if all primary suppressions are retrieved form `suppressedData`.
 #' @param suppressedData A data frame or a list of data frames as output from \code{\link{GaussSuppressionFromData}}. 
@@ -81,8 +83,14 @@
 #'                             primary = NULL, singleton = NULL)
 #' d5[d5$suppressed, ]
 #' 
-AdditionalSuppression = function(data,  ..., primary = PrimaryDefault, suppressedData = NULL, makePrimary = TRUE, makeForced = TRUE, forceNotPrimary = TRUE){
-
+AdditionalSuppression = function(data, ..., 
+                                 fun = GaussSuppressionFromData,  
+                                 primary = GetDefault(fun, "primary"), 
+                                 suppressedData = NULL, 
+                                 makePrimary = TRUE, 
+                                 makeForced = TRUE, 
+                                 forceNotPrimary = TRUE){
+  
   
   if (!is.data.frame(suppressedData)) {  # empty list as NULL
     if (is.list(suppressedData))
@@ -93,7 +101,7 @@ AdditionalSuppression = function(data,  ..., primary = PrimaryDefault, suppresse
   
   
   if(is.null(suppressedData)){
-    return(GaussSuppressionFromData(data = data, ..., primary = primary))
+    return(fun(data = data, ..., primary = primary))
   }
   
   if(makePrimary){
@@ -106,9 +114,9 @@ AdditionalSuppression = function(data,  ..., primary = PrimaryDefault, suppresse
   
   
   if(!makeForced){
-    return(GaussSuppressionFromData(data = data, ..., primary = primary, suppressedData = suppressedData))
+    return(fun(data = data, ..., primary = primary, suppressedData = suppressedData))
   }
   
-  GaussSuppressionFromData(data = data, ..., primary = primary, forced = ForcedFromSuppressedData, suppressedData = suppressedData)
+  fun(data = data, ..., primary = primary, forced = ForcedFromSuppressedData, suppressedData = suppressedData)
   
 } 
