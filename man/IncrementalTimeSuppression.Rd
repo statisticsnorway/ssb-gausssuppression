@@ -48,8 +48,8 @@ Suppression function useful for sequential calculations over successive time per
 # Generating a dataset spanning four quarters 
 d2s <- SSBtoolsData("d2s")
 d <- rbind(d2s, d2s, d2s, d2s)
-set.seed(123)
-d$freq[25:96] <- round(d$freq[25:96] + 5 * rnorm(72))
+set.seed(10)
+d$freq[25:96] <- round(d$freq[25:96] + 9 * rnorm(72))
 d$freq[d$freq < 0] <- 0
 d$quarter <- rep(c("Q1", "Q2", "Q3", "Q4"), each = 24)
 
@@ -60,7 +60,7 @@ STS <- function(data, ...) {
           fun = SuppressSmallCounts, 
           timeVar = "quarter", 
           formula = ~main_income * size, 
-          maxN = 7, freqVar = "freq", ...)}
+          maxN = 15, freqVar = "freq", ...)}
           
           
 # Default settings without suppressedData as input
@@ -86,7 +86,7 @@ b4 <- STS(d, finalTotal = TRUE, suppressedData = b3)
 # algorithm, it may be important to use suppressedData 
 identical(a2$suppressed, b2$suppressed)
 identical(a3$suppressed, b3$suppressed)
-identical(a4$suppressed, b4$suppressed)
+identical(a4$suppressed, b4$suppressed) # totalPriority here, since finalTotal 
 
 # With totalPriority and  all the subtotals 
 # Note: subtotals are not prioritized
@@ -103,18 +103,22 @@ unique(c4$quarter)
 a2[a2$suppressed | c2$suppressed, ]
 c2[a2$suppressed | c2$suppressed, ]
 c3[SSBtools::Match( c2[a2$suppressed | c2$suppressed, 1:4], c3[1:4]), ]
-c3[c3$suppressed, ]
-c4[c4$suppressed, ]
+c4[SSBtools::Match( c2[a2$suppressed | c2$suppressed, 1:4], c4[1:4]), ]
+
 
 # Here we take into account previously published results.
 d2 <- STS(d[1:48, ], subTotals = TRUE, totalPriority = TRUE, suppressedData = a1)
 d3 <- STS(d[1:72, ], subTotals = TRUE, totalPriority = TRUE, suppressedData = d2)
 d4 <- STS(d, subTotals = TRUE, finalTotal = TRUE, suppressedData = d3)
 
-d2[d2$suppressed, ]
-d3[d3$suppressed, ]
-d4[d4$suppressed, ]  # With such a method, some annual totals must be suppressed
+SSBtools::SortRows(d2[d2$suppressed, ])
+SSBtools::SortRows(d3[d3$suppressed, ])
 
+# With such a method, some annual totals must be suppressed
+SSBtools::SortRows(d4[d4$suppressed, ]) 
+
+# If necessary, several suppressed data sets can be taken into account
+e4 <- STS(d, finalTotal = TRUE, suppressedData = list(a1, a2))
 
 }
 \seealso{
