@@ -44,6 +44,9 @@ A data.frame
 \description{
 Suppression function useful for sequential calculations over successive time periods.
 }
+\note{
+This function has been made internal since it is new and future non-backward compatible changes may occur.
+}
 \examples{
 # Generating a dataset spanning four quarters 
 d2s <- SSBtoolsData("d2s")
@@ -124,3 +127,4 @@ e4 <- STS(d, finalTotal = TRUE, suppressedData = list(a1, a2))
 \seealso{
 \code{\link{AdditionalSuppression}}
 }
+\keyword{internal}

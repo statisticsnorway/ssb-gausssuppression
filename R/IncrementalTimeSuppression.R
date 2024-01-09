@@ -12,7 +12,10 @@
 #'       for publication. In other words, these totals are preferred for secondary suppression.
 #'
 #' @return A data.frame 
+#' @keywords internal
 #' @export
+#' 
+#' @note This function has been made internal since it is new and future non-backward compatible changes may occur.
 #' 
 #' @seealso \code{\link{AdditionalSuppression}}
 #'
