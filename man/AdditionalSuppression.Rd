@@ -7,7 +7,8 @@
 AdditionalSuppression(
   data,
   ...,
-  primary = PrimaryDefault,
+  fun = GaussSuppressionFromData,
+  primary = GetDefault(fun, "primary"),
   suppressedData = NULL,
   makePrimary = TRUE,
   makeForced = TRUE,
@@ -18,6 +19,9 @@ AdditionalSuppression(
 \item{data}{Input data as a data frame}
 
 \item{...}{Further parameters to \code{\link{GaussSuppressionFromData}}}
+
+\item{fun}{A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
+\code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.}
 
 \item{primary}{As input to \code{\link{GaussSuppressionFromData}} before possible extension caused by \code{suppressedData}.
 Supply \code{NULL} if all primary suppressions are retrieved form \code{suppressedData}.}

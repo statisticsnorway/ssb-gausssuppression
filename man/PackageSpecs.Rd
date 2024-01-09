@@ -34,7 +34,7 @@ different specs, and rows represent the parameter settings.\tabular{lllll}{
    \strong{extraAggregate} \tab FALSE \tab TRUE \tab TRUE \tab FALSE \cr
    \strong{secondaryZeros} \tab FALSE \tab FALSE \tab FALSE \tab 1 \cr
    \strong{domWeightMethod} \tab  \tab "default" \tab  \tab  \cr
-   \strong{singletonMethod} \tab  \tab "numttH" \tab "numttH" \tab "anySumNOTprimary" \cr
+   \strong{singletonMethod} \tab  \tab "numttHTT" \tab "numttHTT" \tab "anySumNOTprimary" \cr
 }
 }
 \examples{

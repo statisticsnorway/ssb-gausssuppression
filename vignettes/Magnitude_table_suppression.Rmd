@@ -23,7 +23,7 @@ if (htmltables) {
     source("GaussKable.R")
     source("KableMagnitudeTable.R")
     P <- function(...) G(timevar = "geo", ...)
-    M <- function(...) KableMagnitudeTable(..., numVar = "value", timevar = "geo")
+    M <- function(...) KableMagnitudeTable(..., numVar = "value", timevar = "geo", singletonMethod = "none")
 } else {
     P <- function(...) cat("Formatted table not avalable")
     M <- P
@@ -116,6 +116,7 @@ P(caption = '**Table 3**: Output from `SuppressDominantCells` <br> with `n = 1` 
   fun = SuppressDominantCells,
   print_expr = 'paste0(value, " (",round(100*`primary.1:80`) ,"%) ")')
 ```
+Note that this table, as well as Table 2, is discussed below in the section on the singleton problem.
 \
 \
 
@@ -304,14 +305,21 @@ By using `singletonMethod = "none"` in this case, *Entertainment:Spain* will not
 This cell is suppressed due to the default handling of the singleton problem. 
 The reason is that *Entertainment:Iceland* has a single contributor. This contributor can reveal *Entertainment:Portugal* if *Entertainment:Spain* is not suppressed.
 
-Note that a similar unsolved problem occurs, *Entertainment:Iceland* can reveal *Industry:Iceland*.
-The reason why this problem is not solved is that *Industry:Iceland* is secondary suppressed. 
-The implemented singleton methods for magnitude tables add virtual primary suppressed 
-cells prior to the secondary suppression algorithm. 
-The sum of *Entertainment:Iceland* and *Entertainment:Portugal* is therefore primary suppressed, 
-but not the sum of *Entertainment:Iceland* and *Industry:Iceland*. 
-This may change in future versions.
+Here it might appear that the table contains another issue, *Entertainment:Iceland* can reveal *Industry:Iceland*.
+However, this can be considered ok in this case.
+*Industry:Iceland* is secondary suppressed and the only reason for this is to protect *Entertainment:Iceland*.  
 
+Nevertheless, in most cases, secondary suppressed cells introduce further complexity to the handling of singletons. 
+A part of the singleton handling of magnitude tables is to add virtual primary suppressed cells prior to the secondary suppression algorithm. 
+Secondary suppressed cells cannot, therefore, be treated in this way.
+However, another part of the singleton handling solves many of the remaining problems.
+This is done within the suppression algorithm.
+
+Here we can observe the effect of this in Tables 2 and 3.
+By using `singletonMethod = "none"` in Table 2, *Industry:Portugal* will not be suppressed.
+In that case, *Industry:Spain* can reveal *Industry:Iceland* and consequently *Entertainment:Iceland*.
+In Table 3, *Governmental:Total* and  *Industry:Total* are suppressed due to advanced singleton handling. 
+In fact, by using `singletonMethod = "none"`, all tables above will be suppressed differently.
 
 
 
