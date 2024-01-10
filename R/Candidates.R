@@ -49,16 +49,29 @@ CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
 
 
 #' @rdname CandidatesDefault
-#' @param num Data frame of output aggregates calculated from `numVar`. When several variables, only first is used. 
+#' @param num Data frame of output aggregates calculated from `numVar`. When several variables, 
+#'            and without specifying `candidatesVar`,  only first is used. 
+#' @param candidatesVar One of the variable names from `numVar` to be used in the calculations. 
+#'                       Specifying `candidatesVar` helps avoid warnings when multiple `numVar` variables are present.
 #' @export
-CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, x,  ...) {
-  if (ncol(num) > 1){
-    warning("Multiple numVar were supplied, only the first is used in candidates function.")
+CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, x, candidatesVar = NULL,  ...) {
+  if (length(candidatesVar)) {
+    numidx <- match(candidatesVar, names(num))
+    numidx <- numidx[!is.na(numidx)]
+    if (length(numidx) != 1) {
+      stop("candidatesVar must match a single numVar")
+    }
+  } else {
+    if (ncol(num) > 1) {
+      warning("Multiple numVar were supplied, only the first is used in candidates function.")
+    }
+    numidx <- 1
   }
+  
   if (!length(freq)) {
     freq <- colSums(x)
   }
-  newWeight <- abs(num[[1]]/FreqPlus1(freq))
+  newWeight <- abs(num[[numidx]]/FreqPlus1(freq))
   if (!is.null(weight)) {
     newWeight <- newWeight * weight
   }

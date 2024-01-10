@@ -7,7 +7,15 @@
 \usage{
 CandidatesDefault(freq, x, secondaryZeros = FALSE, weight, ...)
 
-CandidatesNum(secondaryZeros = FALSE, freq = NULL, num, weight, x, ...)
+CandidatesNum(
+  secondaryZeros = FALSE,
+  freq = NULL,
+  num,
+  weight,
+  x,
+  candidatesVar = NULL,
+  ...
+)
 }
 \arguments{
 \item{freq}{Vector of output frequencies}
@@ -22,7 +30,11 @@ This is achieved by this function by having the zero frequency indices first in 
 
 \item{...}{Unused parameters}
 
-\item{num}{Data frame of output aggregates calculated from \code{numVar}. When several variables, only first is used.}
+\item{num}{Data frame of output aggregates calculated from \code{numVar}. When several variables,
+and without specifying \code{candidatesVar},  only first is used.}
+
+\item{candidatesVar}{One of the variable names from \code{numVar} to be used in the calculations.
+Specifying \code{candidatesVar} helps avoid warnings when multiple \code{numVar} variables are present.}
 }
 \value{
 candidates, \code{\link{GaussSuppression}} input
