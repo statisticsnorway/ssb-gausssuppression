@@ -28,7 +28,9 @@ Using the default \code{primary} function, \code{maxN} is by default set to \cod
 \item{numVar}{Numerical variable to be aggregated.
 Any \code{candidatesVar} that is specified and
 not included in \code{numVar} will be aggregated accordingly.
-Also see patameter \code{remove0} below.}
+Additionally, if \code{remove0} is specified as a variable name and it is
+not included in \code{numVar}, it will also be aggregated accordingly.
+See parameters \code{candidatesVar} and \code{remove0} below.}
 
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
@@ -44,7 +46,13 @@ Typically, the variable contains the contributor IDs.}
 With empty \code{contributorVar} row indices are assumed
 and conversion to integer is performed.}
 
-\item{remove0}{When \code{FALSE} (default), data rows where \code{numVar} (if any) is zero are omitted when counting contributors.}
+\item{remove0}{When set to \code{TRUE} (default), data rows in which the first \code{numVar} (if any) is zero
+are excluded from the count of contributors.
+Alternatively, \code{remove0} can be specified as one or more variable names.
+In this case, all data rows with a zero in any of the specified variables
+are omitted from the contributor count.
+Specifying \code{remove0} as variable name(s) is useful for avoiding warning when there
+are multiple \code{numVar} variables.}
 
 \item{candidatesVar}{Variable to be used in the candidate function to prioritize cells for
 publication and thus not suppression.

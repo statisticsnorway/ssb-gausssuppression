@@ -7,7 +7,9 @@
 #' @param numVar Numerical variable to be aggregated.
 #'           Any `candidatesVar` that is specified and 
 #'           not included in `numVar` will be aggregated accordingly.
-#'           Also see patameter `remove0` below.  
+#'           Additionally, if `remove0` is specified as a variable name and it is 
+#'           not included in `numVar`, it will also be aggregated accordingly.
+#'           See parameters `candidatesVar` and `remove0` below.  
 #' @param contributorVar Extra variables to be used as grouping elements when counting contributors. 
 #'                       Typically, the variable contains the contributor IDs.
 #' @param removeCodes Vector of codes to be omitted when counting contributors.
@@ -79,6 +81,9 @@ SuppressFewContributors <- function(data,
                                   spec = PackageSpecs("fewContributorsSpec")) {
   if (length(candidatesVar)) {
     numVar <- unique(c(numVar, candidatesVar))
+  }
+  if (is.character(remove0)) {
+    numVar <- unique(c(numVar, remove0))
   }
   GaussSuppressionFromData(
     data,

@@ -37,7 +37,13 @@ When empty, unique contributor in each row is assumed.}
 With empty \code{charVar} row indices are assumed
 and conversion to integer is performed.}
 
-\item{remove0}{When \code{FALSE} (default), data rows where \code{numVar} (if any) is zero are omitted when counting contributors.}
+\item{remove0}{When set to \code{TRUE} (default), data rows in which the first \code{numVar} (if any) is zero
+are excluded from the count of contributors.
+Alternatively, \code{remove0} can be specified as one or more variable names.
+In this case, all data rows with a zero in any of the specified variables
+are omitted from the contributor count.
+Specifying \code{remove0} as variable name(s) is useful for avoiding warning when there
+are multiple \code{numVar} variables.}
 
 \item{...}{unused parameters}
 }

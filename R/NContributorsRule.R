@@ -15,7 +15,13 @@
 #' @param removeCodes Vector of codes to be omitted when counting contributors.
 #'                With empty `charVar` row indices are assumed
 #'                and conversion to integer is performed.
-#' @param remove0 When `FALSE` (default), data rows where `numVar` (if any) is zero are omitted when counting contributors.
+#' @param remove0 When set to `TRUE` (default), data rows in which the first `numVar` (if any) is zero 
+#'               are excluded from the count of contributors. 
+#'               Alternatively, `remove0` can be specified as one or more variable names. 
+#'               In this case, all data rows with a zero in any of the specified variables 
+#'               are omitted from the contributor count. 
+#'               Specifying `remove0` as variable name(s) is useful for avoiding warning when there 
+#'               are multiple `numVar` variables.
 #' @param ... unused parameters
 #'
 #' @return List where first element is logical vector defining primary suppressions.
@@ -33,10 +39,24 @@ NContributorsRule <- function(data, freq, numVar, x,
   if (length(charVar)>1) {
     stop("Only single charVar implemented in suppression rule")
   }
-  if (length(numVar) > 1){
-    warning("Multiple numVar were supplied, only the first is used in suppression rule.")
-    numVar <- numVar[1]
+  
+  if (is.character(remove0)) {
+    ma <- match(remove0, names(data))
+    if (anyNA(ma)) {
+      stop("remove0 as character must be variable name(s) in data")
+    }
+  } else {
+    if (remove0) {
+      if (length(numVar) > 1) {
+        warning("Multiple numVar were supplied, only the first is used. Specify remove0 as variable name(s)?")
+        remove0 <- numVar[1]
+      }
+      if (!length(numVar)) {
+        remove0 <- NULL
+      }
+    }
   }
+
   if (protectZeros) {
     stop("TRUE protectZeros not implemented")
   }
@@ -46,8 +66,10 @@ NContributorsRule <- function(data, freq, numVar, x,
     y <- seq_len(nrow(data))
     removeCodes <- as.integer(removeCodes)
   }
-  if (remove0 & length(numVar) > 0) {
-    y[data[[numVar]] == 0] <- NA
+  if (length(remove0)) {
+    for (i in seq_along(remove0)) {
+      y[data[[remove0[i]]] == 0] <- NA
+    }
   }
   
   nAll <- Ncontributors(x, y)
