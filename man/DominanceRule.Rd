@@ -16,6 +16,7 @@ DominanceRule(
   domWeightMethod = "default",
   allDominance = FALSE,
   outputWeightedNum = !is.null(sWeightVar),
+  dominanceVar = NULL,
   ...
 )
 }
@@ -46,6 +47,11 @@ pair of parameters n,k in the dominance rules}
 
 \item{outputWeightedNum}{logical value to determine whether weighted numerical
 value should be included in output. Default is \code{TRUE} if \code{sWeightVar} is provided.}
+
+\item{dominanceVar}{When specified, \code{dominanceVar} is used in place of \code{numVar}.
+Specifying \code{dominanceVar} is beneficial for avoiding warnings when there
+are multiple \code{numVar} variables. Typically, \code{dominanceVar} will be one
+of the variables already included in \code{numVar}.}
 
 \item{...}{unused parameters}
 }

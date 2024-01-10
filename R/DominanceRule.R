@@ -28,6 +28,10 @@
 #' pair of parameters n,k in the dominance rules
 #' @param outputWeightedNum logical value to determine whether weighted numerical
 #' value should be included in output. Default is `TRUE` if `sWeightVar` is provided.
+#' @param dominanceVar When specified, `dominanceVar` is used in place of `numVar`. 
+#'          Specifying `dominanceVar` is beneficial for avoiding warnings when there 
+#'          are multiple `numVar` variables. Typically, `dominanceVar` will be one 
+#'          of the variables already included in `numVar`.
 #' @param ... unused parameters
 #'
 #' @return logical vector that is `TRUE` in positions corresponding to cells
@@ -89,9 +93,19 @@ DominanceRule <- function(data,
                           domWeightMethod = "default",
                           allDominance = FALSE,
                           outputWeightedNum = !is.null(sWeightVar),
+                          dominanceVar = NULL,
                           ...) {
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
+  
+  if(length(dominanceVar)){
+    if(length(dominanceVar) != 1){
+      stop("dominanceVar must be a single variable")
+    }
+    numVar <- dominanceVar
+  }
+  
+  
   if (is.null(numVar))
     stop("You must provide a numeric variable numVar to use the dominance rule.")
   
