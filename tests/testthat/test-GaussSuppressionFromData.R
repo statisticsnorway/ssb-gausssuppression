@@ -145,6 +145,19 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
   expect_identical(as.numeric(which(b$primary)), c(8, 18, 23, 53, 63, 78, 83, 87, 90, 97, 98))
   
   
+  z$seq2 <- (1:nrow(z))^2 
+  
+  aseq2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                    numVar = c("seq2", "value"), 
+                                    candidatesVar = "value",
+                                    dominanceVar = "value",
+                                    charVar = "char", candidates = CandidatesNum, 
+                                    primary = DominanceRule, singletonMethod = "sub2Sum",
+                                    n = c(1, 2), k = c(65, 85), printInc = printInc)
+  
+  expect_identical(a[names(a)], aseq2[names(a)])
+  
+  
   z$char <- paste0("char", 1:nrow(z))
   d1 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
                                 candidates = CandidatesNum, primary = NcontributorsRule, singletonMethod = "none",
