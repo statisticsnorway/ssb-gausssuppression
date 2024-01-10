@@ -4,11 +4,19 @@
 #'
 #' @inheritParams GaussSuppressionFromData
 #' @inheritParams DominanceRule
-#' @param numVar numerical variable to be aggregated and used in dominance rule
+#' @param dominanceVar Numerical variable to be used in dominance rule. 
+#'           The first `numVar` variable will be used if it is not specified.
+#' @param numVar Numerical variable to be aggregated.
+#'           Any `dominanceVar` and `candidatesVar` that are specified and 
+#'           not included in `numVar` will be aggregated accordingly. 
 #' @param contributorVar Extra variables to be used as grouping elements in the dominance rule.
 #'                  Typically, the variable contains the contributor IDs.
 #' @param sWeightVar Name of variable which represents sampling weights to be used
 #' in dominance rule
+#' @param candidatesVar Variable to be used in the candidate function to prioritize cells for 
+#'           publication and thus not suppression. If not specified, the same variable that is 
+#'           used for the dominance rule will be applied (see `dominanceVar` and `numVar`).
+#'           
 #'
 #' @return data frame containing aggregated data and suppression information.
 #' @export
@@ -68,26 +76,42 @@ SuppressDominantCells <- function(data,
                                   n,
                                   k,
                                   allDominance = FALSE,
+                                  dominanceVar = NULL,
                                   numVar = NULL,
                                   dimVar = NULL,
                                   hierarchies = NULL,
                                   formula = NULL,
                                   contributorVar = NULL,
                                   sWeightVar = NULL,
+                                  candidatesVar = NULL,
                                   ...,
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
+  
+  if (length(dominanceVar)) {
+    numVar <- unique(c(numVar, dominanceVar))
+  }
+  if (length(candidatesVar)) {
+    numVar <- unique(c(numVar, candidatesVar))
+  } else {
+    if (length(dominanceVar)) {
+      candidatesVar <- dominanceVar
+    }
+  }
+  
   GaussSuppressionFromData(
     data = data,
     n = n,
     k = k,
     allDominance = allDominance,
+    dominanceVar = dominanceVar, 
     numVar = numVar,
     dimVar = dimVar,
     hierarchies = hierarchies,
     formula = formula,
     charVar = contributorVar,
     sWeightVar = sWeightVar,
+    candidatesVar = candidatesVar, 
     spec = spec,
     ...
   )

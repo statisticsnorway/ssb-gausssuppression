@@ -14,6 +14,7 @@ SuppressFewContributors(
   contributorVar = NULL,
   removeCodes = character(0),
   remove0 = TRUE,
+  candidatesVar = NULL,
   ...,
   spec = PackageSpecs("fewContributorsSpec")
 )
@@ -24,7 +25,10 @@ SuppressFewContributors(
 \item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
 Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
 
-\item{numVar}{numerical variable to be aggregated. Also see patameter \code{remove0} below.}
+\item{numVar}{Numerical variable to be aggregated.
+Any \code{candidatesVar} that is specified and
+not included in \code{numVar} will be aggregated accordingly.
+Also see patameter \code{remove0} below.}
 
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
@@ -41,6 +45,10 @@ With empty \code{contributorVar} row indices are assumed
 and conversion to integer is performed.}
 
 \item{remove0}{When \code{FALSE} (default), data rows where \code{numVar} (if any) is zero are omitted when counting contributors.}
+
+\item{candidatesVar}{Variable to be used in the candidate function to prioritize cells for
+publication and thus not suppression.
+The first \code{numVar} variable will be used if it is not specified.}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
