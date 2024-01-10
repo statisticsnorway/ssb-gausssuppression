@@ -61,7 +61,6 @@
 #'                       
 SuppressFewContributors <- function(data,
                                   maxN,
-                                  freqVar = NULL,
                                   numVar = NULL,
                                   dimVar = NULL,
                                   hierarchies = NULL,
@@ -74,7 +73,6 @@ SuppressFewContributors <- function(data,
   GaussSuppressionFromData(
     data,
     maxN = maxN,
-    freqVar = freqVar,
     numVar = numVar,
     dimVar = dimVar,
     hierarchies = hierarchies,

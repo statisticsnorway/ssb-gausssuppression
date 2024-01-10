@@ -7,7 +7,6 @@
 SuppressFewContributors(
   data,
   maxN,
-  freqVar = NULL,
   numVar = NULL,
   dimVar = NULL,
   hierarchies = NULL,
@@ -24,8 +23,6 @@ SuppressFewContributors(
 
 \item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
 Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
-
-\item{freqVar}{A single variable holding counts (name or number).}
 
 \item{numVar}{numerical variable to be aggregated. Also see patameter \code{remove0} below.}
 

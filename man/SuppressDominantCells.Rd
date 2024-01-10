@@ -9,7 +9,6 @@ SuppressDominantCells(
   n,
   k,
   allDominance = FALSE,
-  freqVar = NULL,
   numVar = NULL,
   dimVar = NULL,
   hierarchies = NULL,
@@ -29,8 +28,6 @@ SuppressDominantCells(
 
 \item{allDominance}{Logical parameter. If \code{TRUE}, adds primary columns for each
 pair of parameters n,k in the dominance rules}
-
-\item{freqVar}{A single variable holding counts (name or number).}
 
 \item{numVar}{numerical variable to be aggregated and used in dominance rule}
 
