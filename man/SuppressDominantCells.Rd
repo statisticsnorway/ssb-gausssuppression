@@ -16,8 +16,8 @@ SuppressDominantCells(
   formula = NULL,
   contributorVar = NULL,
   sWeightVar = NULL,
-  candidatesVar = NULL,
   ...,
+  candidatesVar = NULL,
   spec = PackageSpecs("dominanceSpec")
 )
 }
@@ -51,11 +51,11 @@ Typically, the variable contains the contributor IDs.}
 \item{sWeightVar}{Name of variable which represents sampling weights to be used
 in dominance rule}
 
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+
 \item{candidatesVar}{Variable to be used in the candidate function to prioritize cells for
 publication and thus not suppression. If not specified, the same variable that is
 used for the dominance rule will be applied (see \code{dominanceVar} and \code{numVar}).}
-
-\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
 \item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 }

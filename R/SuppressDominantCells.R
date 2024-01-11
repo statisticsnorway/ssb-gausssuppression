@@ -83,8 +83,8 @@ SuppressDominantCells <- function(data,
                                   formula = NULL,
                                   contributorVar = NULL,
                                   sWeightVar = NULL,
-                                  candidatesVar = NULL,
                                   ...,
+                                  candidatesVar = NULL,
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
   
