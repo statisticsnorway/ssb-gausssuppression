@@ -30,8 +30,9 @@ NContributorsRule(
 
 \item{protectZeros}{Suppression parameter. Only TRUE (default) is used implemented.}
 
-\item{charVar}{Variable with contributor codes.
-When empty, unique contributor in each row is assumed.}
+\item{charVar}{Variable(s) with contributor codes.
+When empty, unique contributor in each row is assumed.
+When several variables, see details.}
 
 \item{removeCodes}{Vector of codes to be omitted when counting contributors.
 With empty \code{charVar} row indices are assumed
@@ -54,4 +55,10 @@ in rule and where \code{nAll} is similar, but without omitting codes in \code{re
 }
 \description{
 The number of contributors is the number unique contributing 'charVar' codes.
+}
+\details{
+When several \code{charVar} variables, the rule is applied independently to each variable.
+Primary suppression in at least one case results in  primary suppression in the output.
+It is possible to specify \code{maxN} and \code{removeCodes} independently for each \code{charVar} by using a
+named list as input with \code{charVar} as names. E.g. \code{maxN = list(char1 = 3, char2 = 2)}.
 }
