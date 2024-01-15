@@ -142,8 +142,8 @@ SingletonUniqueContributor <- function(data,
       }
       if (is.list(removeCodes)) {
         if (is.data.frame(removeCodes)) {
-          ma <- Match(removeCodes, data[charVar])
-          singleton[ma] <- FALSE
+          ma <- Match(data[charVar], removeCodes)
+          singleton[!is.na(ma)] <- FALSE
         } else {
           for (i in seq_along(charVar)) {
             singleton[data[[charVar[i]]] %in% removeCodes[[charVar[i]]]] <- FALSE  # Ordinary when single charVar 
