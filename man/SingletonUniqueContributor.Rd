@@ -15,6 +15,7 @@ SingletonUniqueContributor(
   primary = integer(0),
   whenPrimaryMatters = warning,
   whenNoVar = TRUE,
+  specialMultiple = TRUE,
   ...
 )
 }
