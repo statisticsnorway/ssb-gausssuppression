@@ -58,7 +58,13 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #'                It will be ensured that any non-suppressed inner cell is not considered a singleton.
 #' @param whenPrimaryMatters Function to be called when `primary` caused non-singleton. Supply `NULL` to do nothing.
 #' @param whenNoVar When `TRUE`, and without `nUniqueVar` and `freqVar` in input, 
-#'                all cells will be marked as singletons.                
+#'                all cells will be marked as singletons.     
+#' @param specialMultiple When `TRUE`, and when `integerSingleton &` `length(charVar) > 1` `& length(nUniqueVar)`,
+#'                a special method is used. 
+#'                By re-coding to single `charVar` and by re-calculating `nUnique`.
+#'                To be unique (`nUnique=1`), uniqueness is only required for a single `charvar`.
+#'                Otherwise, the `charvar` combination must be unique.   
+#'                                     
 #' @param ... Unused parameters
 #'
 #' @return logical or integer vector
