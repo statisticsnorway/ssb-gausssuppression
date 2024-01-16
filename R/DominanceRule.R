@@ -227,7 +227,13 @@ FindDominantCells <- function(x,
     max_cont <-
       MaxContribution(x, inputnum, n = n, groups = charVar_groups)
     max_cont[is.na(max_cont)] <- 0
-    return(as.vector(num > 0 & rowSums(max_cont) > num * k / 100))
+    if (returnContrib) {
+      out <- as.vector(rowSums(max_cont)/unlist(num))
+      out[is.nan(out)] <- 0
+      return(out)
+    } else {
+      return(as.vector(num > 0 & rowSums(max_cont) > num * k / 100))
+    }
   } else {
     # with sampling weights, need to weight the numerical values
     max_cont_index <-
