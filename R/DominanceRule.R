@@ -32,6 +32,11 @@
 #'          Specifying `dominanceVar` is beneficial for avoiding warnings when there 
 #'          are multiple `numVar` variables. Typically, `dominanceVar` will be one 
 #'          of the variables already included in `numVar`.
+#' @param pPercent Parameter in the p%-rule, when non-NULL.  
+#'                 Parameters `n` and  `k` will then be ignored.
+#'                 Technically, calculations are performed internally as if 
+#'                 `n = 1:2`. The results of these intermediate calculations can 
+#'                 be viewed by setting `allDominance = TRUE`.
 #' @param ... unused parameters
 #'
 #' @return logical vector that is `TRUE` in positions corresponding to cells
@@ -94,7 +99,13 @@ DominanceRule <- function(data,
                           allDominance = FALSE,
                           outputWeightedNum = !is.null(sWeightVar),
                           dominanceVar = NULL,
+                          pPercent = NULL,
                           ...) {
+  if (!is.null(pPercent)) {
+    n <- 1:2
+    k <- c(0, 0)
+  }
+  
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
   
@@ -159,10 +170,13 @@ DominanceRule <- function(data,
       n,
       k
     )
-  primary <- sapply(seq_len(ncol(prim)), function(x) prim[,x] >= k[x]/100)
-  dominant <- apply(primary, 1, function (x)
-    Reduce(`|`, x))
-  colnames(primary) <- colnames(prim) <- paste0("primary.", paste(n, k, sep = ":"))
+  if (is.null(pPercent)) {
+    primary <- sapply(seq_len(ncol(prim)), function(x) prim[, x] >= k[x]/100)
+    dominant <- apply(primary, 1, function(x) Reduce(`|`, x))
+  } else {
+    dominant <- abs(1 - prim[, 2]) < abs(pPercent/100 * prim[, 1])
+  }
+  colnames(prim) <- paste0("primary.", paste(n, k, sep = ":"))
   if (!protectZeros)
     output <- list(primary = dominant)
   else

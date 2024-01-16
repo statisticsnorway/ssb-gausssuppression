@@ -17,6 +17,7 @@ DominanceRule(
   allDominance = FALSE,
   outputWeightedNum = !is.null(sWeightVar),
   dominanceVar = NULL,
+  pPercent = NULL,
   ...
 )
 }
@@ -52,6 +53,12 @@ value should be included in output. Default is \code{TRUE} if \code{sWeightVar} 
 Specifying \code{dominanceVar} is beneficial for avoiding warnings when there
 are multiple \code{numVar} variables. Typically, \code{dominanceVar} will be one
 of the variables already included in \code{numVar}.}
+
+\item{pPercent}{Parameter in the p\%-rule, when non-NULL.
+Parameters \code{n} and  \code{k} will then be ignored.
+Technically, calculations are performed internally as if
+\code{n = 1:2}. The results of these intermediate calculations can
+be viewed by setting \code{allDominance = TRUE}.}
 
 \item{...}{unused parameters}
 }
