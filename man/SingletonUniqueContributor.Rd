@@ -15,6 +15,7 @@ SingletonUniqueContributor(
   primary = integer(0),
   whenPrimaryMatters = warning,
   whenNoVar = TRUE,
+  specialMultiple = TRUE,
   ...
 )
 }
@@ -44,6 +45,12 @@ It will be ensured that any non-suppressed inner cell is not considered a single
 
 \item{whenNoVar}{When \code{TRUE}, and without \code{nUniqueVar} and \code{freqVar} in input,
 all cells will be marked as singletons.}
+
+\item{specialMultiple}{When \code{TRUE}, and when \verb{integerSingleton &} \code{length(charVar) > 1} \verb{& length(nUniqueVar)},
+a special method is used.
+By re-coding to single \code{charVar} and by re-calculating \code{nUnique}.
+To be unique (\code{nUnique=1}), uniqueness is only required for a single \code{charvar}.
+Otherwise, the \code{charvar} combination must be unique.}
 
 \item{...}{Unused parameters}
 }

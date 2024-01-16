@@ -30,8 +30,9 @@ NcontributorsRule(
 
 \item{protectZeros}{Suppression parameter. Only TRUE (default) is used implemented.}
 
-\item{charVar}{Variable with contributor codes.
-When empty, unique contributor in each row is assumed.}
+\item{charVar}{Variable(s) with contributor codes.
+When empty, unique contributor in each row is assumed.
+When several variables, see details.}
 
 \item{removeCodes}{Vector of codes to be omitted when counting contributors.
 With empty \code{charVar} row indices are assumed

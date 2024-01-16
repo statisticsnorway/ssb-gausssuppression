@@ -466,7 +466,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
     uniqueCharVar <- charVar[!(charVar %in% dVar)]
     if (length(uniqueCharVar)) {
-      charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
+      if (length(uniqueCharVar) == 1) {
+        charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
+      } else {
+        charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) {
+          if (all(x == x[1])) {
+            return(x[1])
+          }
+          NA_character_
+        })
+      }
     }
     data[[nUniqueVar]] <- 1L
     data <- aggregate(data[unique(c(freqVar, numVar, weightVar, nUniqueVar))], data[unique(dVar)], sum) 
@@ -500,7 +509,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       }
       data[uniqueCharVar] <- charData[uniqueCharVar]
       rm(charData)
-      data[uniqueCharVar][data[[nUniqueVar]] > 1, ] <- NA  # uniqueCharVar created as the first row is ok when the first row is the only row
+      if (length(uniqueCharVar) == 1) {    # already NA when length(uniqueCharVar) > 1
+        data[uniqueCharVar][data[[nUniqueVar]] > 1, ] <- NA  # uniqueCharVar created as the first row is ok when the first row is the only row
+      }
     }
     if (printInc) {
       cat(".")
