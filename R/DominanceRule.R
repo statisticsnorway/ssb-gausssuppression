@@ -132,11 +132,8 @@ DominanceRule <- function(data,
     if (any(data[[sWeightVar]] < 1))
       warning("Some sample weights are < 1. Consider using other weighted domininace method.")
   }
-  abs_num <-
-    as.data.frame(as.matrix(crossprod(x, as.matrix(abs(
-      data[, numVar, drop = FALSE]
-    )))))
-  abs_inputnum <- abs(data[[numVar]])
+  
+  abs_inputnum <- abs(data[, numVar, drop = FALSE])
   
   if (length(charVar)) {
     if (length(charVar) == 1) {
@@ -152,6 +149,9 @@ DominanceRule <- function(data,
     else
       sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
   }
+  
+  abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum))))
+  abs_inputnum <- abs_inputnum[[numVar]]
 
   prim <-
     mapply(
