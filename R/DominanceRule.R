@@ -21,6 +21,11 @@
 #'  be suppressed.
 #' @param charVar Variable in data holding grouping information. Dominance will
 #'  be calculated after aggregation within these groups.
+#' @param removeCodes A vector of `charVar` codes that are to be excluded when 
+#'     calculating dominance percentages. Essentially, the corresponding numeric 
+#'     values from `dominanceVar` or `numVar` are set to zero before proceeding 
+#'     with the dominance calculations. With empty `charVar` row indices are 
+#'     assumed and conversion to integer is performed.
 #' @param sWeightVar variable with sampling weights to be used in dominance rule
 #' @param domWeightMethod character representing how weights should be treated
 #' in the dominance rule. See Details.
@@ -94,6 +99,7 @@ DominanceRule <- function(data,
                           k,
                           protectZeros = FALSE,
                           charVar = NULL,
+                          removeCodes = character(0), 
                           sWeightVar = NULL,
                           domWeightMethod = "default",
                           allDominance = FALSE,
@@ -148,6 +154,14 @@ DominanceRule <- function(data,
       sweight <- as.matrix(rep(1, nrow(data)))
     else
       sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
+  }
+  
+  if (length(removeCodes)) {
+    if (length(charVar)) {
+      abs_inputnum[charVar_groups %in% removeCodes, ] <- 0
+    } else {
+      abs_inputnum[as.integer(removeCodes), ] <- 0
+    }
   }
   
   abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum))))

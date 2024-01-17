@@ -12,6 +12,7 @@ DominanceRule(
   k,
   protectZeros = FALSE,
   charVar = NULL,
+  removeCodes = character(0),
   sWeightVar = NULL,
   domWeightMethod = "default",
   allDominance = FALSE,
@@ -37,6 +38,12 @@ be suppressed.}
 
 \item{charVar}{Variable in data holding grouping information. Dominance will
 be calculated after aggregation within these groups.}
+
+\item{removeCodes}{A vector of \code{charVar} codes that are to be excluded when
+calculating dominance percentages. Essentially, the corresponding numeric
+values from \code{dominanceVar} or \code{numVar} are set to zero before proceeding
+with the dominance calculations. With empty \code{charVar} row indices are
+assumed and conversion to integer is performed.}
 
 \item{sWeightVar}{variable with sampling weights to be used in dominance rule}
 
