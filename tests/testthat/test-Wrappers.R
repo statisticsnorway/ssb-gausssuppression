@@ -74,4 +74,22 @@ test_that("Wrappers", {
                               printInc = printInc)
   
   expect_false(all(b1$suppressed == b3$suppressed))
+  
+  
+  dataset$value2 <- dataset$value
+  dataset$value2[dataset$sector4 == "Governmental"] <- 0
+  dataset$value2[dataset$sector4 == "Agriculture"] <- 0
+  b4 <- SuppressDominantCells(data=dataset, 
+                              numVar = "value2", 
+                              dimVar= c("sector4", "geo"), 
+                              n = 1, k = 70, allDominance = TRUE,
+                              singletonZeros = TRUE,
+                              printInc = printInc)
+  expect_true(b4[b4$sector4 == "Governmental" & b4$geo == "Total", "suppressed"])
+  # With singletonZeros = FALSE, the result is FALSE 
+  # and revealing suppressed 0 cells is easy since Total=0  
+  
+  
+  
+  
 })

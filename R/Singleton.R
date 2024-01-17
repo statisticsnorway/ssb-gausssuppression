@@ -198,6 +198,20 @@ SingletonUniqueContributor <- function(data,
 
 
 
+#' @rdname SingletonUniqueContributor
+#' @note   `SingletonUniqueContributor0` is a special version that produces singleton as 
+#'         a two-element list. 
+#'         See \code{\link{GaussSuppression}} and \code{\link{SuppressDominantCells}}.
+#'         
+#' @export
+SingletonUniqueContributor0 <- function(data, numVar, dominanceVar = NULL, ...) {
+  if (is.null(dominanceVar)) {
+    dominanceVar <- numVar[1]
+  }
+  list(freq = data[[dominanceVar]] == 0, num = SingletonUniqueContributor(data = data, ...))
+}
+
+
 SingletonSpecialMultipleData <- function(data, charVar, nUniqueVar, removeCodes) {
   charN <- matrix(0L, nrow(data), length(charVar))
   for (i in seq_along(charVar)) {

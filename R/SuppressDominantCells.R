@@ -85,6 +85,7 @@ SuppressDominantCells <- function(data,
                                   sWeightVar = NULL,
                                   ...,
                                   candidatesVar = NULL,
+                                  singletonZeros = FALSE,
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
   
@@ -109,12 +110,22 @@ SuppressDominantCells <- function(data,
   }
   singletonHere <- GetSingleton(...)
   
-  GaussSuppressionFromDataHere <- function(..., 
-                                           singletonMethod = singletonMethodHere, 
-                                           singleton = singletonHere) {
+  if (singletonZeros & !inherits(singletonHere, "function")) {
+    singletonZeros <- FALSE
+    warning("singletonZeros ignored when singleton input is not a function")
+  }
+  
+  if (singletonZeros) {
+    if (length(singletonMethodHere) == 1) {
+      singletonMethodHere <- c(freq = "anySumNOTprimary", num = singletonMethodHere)
+    }
+    singletonHere <- SingletonUniqueContributor0
+  }
+  
+  GaussSuppressionFromDataHere <- function(..., singletonMethod, singleton) {
     GaussSuppressionFromData(..., 
-                             singletonMethod = singletonMethod, 
-                             singleton = singleton)
+                             singletonMethod = singletonMethodHere, 
+                             singleton = singletonHere)
   }
   
   

@@ -18,6 +18,7 @@ SuppressDominantCells(
   sWeightVar = NULL,
   ...,
   candidatesVar = NULL,
+  singletonZeros = FALSE,
   spec = PackageSpecs("dominanceSpec")
 )
 }

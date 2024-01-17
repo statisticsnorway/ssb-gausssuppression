@@ -2,6 +2,7 @@
 % Please edit documentation in R/Singleton.R
 \name{SingletonUniqueContributor}
 \alias{SingletonUniqueContributor}
+\alias{SingletonUniqueContributor0}
 \title{Unique contributor singleton function}
 \usage{
 SingletonUniqueContributor(
@@ -18,6 +19,8 @@ SingletonUniqueContributor(
   specialMultiple = TRUE,
   ...
 )
+
+SingletonUniqueContributor0(data, numVar, dominanceVar = NULL, ...)
 }
 \arguments{
 \item{data}{Input data, possibly pre-aggregated within \code{GaussSuppressionFromData}}
@@ -53,6 +56,13 @@ To be unique (\code{nUnique=1}), uniqueness is only required for a single \code{
 Otherwise, the \code{charvar} combination must be unique.}
 
 \item{...}{Unused parameters}
+
+\item{numVar}{vector containing numeric values in the data set}
+
+\item{dominanceVar}{When specified, \code{dominanceVar} is used in place of \code{numVar}.
+Specifying \code{dominanceVar} is beneficial for avoiding warnings when there
+are multiple \code{numVar} variables. Typically, \code{dominanceVar} will be one
+of the variables already included in \code{numVar}.}
 }
 \value{
 logical or integer vector
@@ -65,6 +75,11 @@ This function marks input cells as singletons according to ones in
 \code{data[[nUniqueVar]]}, if available, and otherwise according to \code{data[[freqVar]]}.
 The output vector can be logical or integer. When, integer, singletons are given as positive values.
 Their unique values represent the unique values/combinations of \code{data[[charVar]]}.
+}
+\note{
+\code{SingletonUniqueContributor0} is a special version that produces singleton as
+a two-element list.
+See \code{\link{GaussSuppression}} and \code{\link{SuppressDominantCells}}.
 }
 \examples{
 S <- function(data, ...) {
