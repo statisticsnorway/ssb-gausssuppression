@@ -99,7 +99,26 @@ SuppressDominantCells <- function(data,
     }
   }
   
-  GaussSuppressionFromData(
+  
+  GetSingletonMethod <- function(..., singletonMethod = eval(spec$singletonMethod)) {
+    singletonMethod
+  }
+  singletonMethodHere <- GetSingletonMethod(...)
+  GetSingleton <- function(..., singleton = eval(spec$singleton)) {
+    singleton
+  }
+  singletonHere <- GetSingleton(...)
+  
+  GaussSuppressionFromDataHere <- function(..., 
+                                           singletonMethod = singletonMethodHere, 
+                                           singleton = singletonHere) {
+    GaussSuppressionFromData(..., 
+                             singletonMethod = singletonMethod, 
+                             singleton = singleton)
+  }
+  
+  
+  GaussSuppressionFromDataHere(
     data = data,
     n = n,
     k = k,
@@ -116,3 +135,7 @@ SuppressDominantCells <- function(data,
     ...
   )
 }
+
+
+
+
