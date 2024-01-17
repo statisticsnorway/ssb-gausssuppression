@@ -58,6 +58,14 @@ in dominance rule}
 publication and thus not suppression. If not specified, the same variable that is
 used for the dominance rule will be applied (see \code{dominanceVar} and \code{numVar}).}
 
+\item{singletonZeros}{When negative values cannot occur, one can determine from a
+non-suppressed marginal cell with the value 0 that all underlying cells also have the
+value 0. The use of \code{singletonZeros = TRUE} is intended to prevent this phenomenon from
+causing suppressed cells to be revealable. It is the zeros in the \code{dominanceVar} variable
+that are examined. Specifically, the ordinary singleton method is combined with a method
+that is actually designed for frequency tables. This approach also works for volume
+tables when \code{\link{SingletonUniqueContributor0}} is utilized.}
+
 \item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 }
 \value{
