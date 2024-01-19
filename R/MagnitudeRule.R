@@ -17,6 +17,11 @@
 #' @param numVar vector containing numeric values in the data set
 #' @param n parameter `n` in dominance rule.
 #' @param k parameter `k` in dominance rule.
+#' @param pPercent Parameter in the p% rule, when non-NULL.  
+#'                 Parameters `n` and  `k` will then be ignored.
+#'                 Technically, calculations are performed internally as if 
+#'                 `n = 1:2`. The results of these intermediate calculations can 
+#'                 be viewed by setting `allDominance = TRUE`.
 #' @param protectZeros parameter determining whether cells with value 0 should
 #'  be suppressed.
 #' @param charVar Variable in data holding grouping information. Dominance will
@@ -37,11 +42,6 @@
 #'          Specifying `dominanceVar` is beneficial for avoiding warnings when there 
 #'          are multiple `numVar` variables. Typically, `dominanceVar` will be one 
 #'          of the variables already included in `numVar`.
-#' @param pPercent Parameter in the p% rule, when non-NULL.  
-#'                 Parameters `n` and  `k` will then be ignored.
-#'                 Technically, calculations are performed internally as if 
-#'                 `n = 1:2`. The results of these intermediate calculations can 
-#'                 be viewed by setting `allDominance = TRUE`.
 #' @param ... unused parameters
 #'
 #' @return logical vector that is `TRUE` in positions corresponding to cells
@@ -97,6 +97,7 @@ MagnitudeRule <- function(data,
                           numVar,
                           n,
                           k,
+                          pPercent = NULL,
                           protectZeros = FALSE,
                           charVar = NULL,
                           removeCodes = character(0), 
@@ -105,7 +106,6 @@ MagnitudeRule <- function(data,
                           allDominance = FALSE,
                           outputWeightedNum = !is.null(sWeightVar),
                           dominanceVar = NULL,
-                          pPercent = NULL,
                           ...) {
   if (!is.null(pPercent)) {
     n <- 1:2
