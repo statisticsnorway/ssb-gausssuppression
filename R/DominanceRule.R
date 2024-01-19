@@ -1,4 +1,4 @@
-#' Dominance `(n,k)` rule for magnitude tables
+#' Dominance `(n,k)` or p% rule for magnitude tables
 #'
 #' Supports application of multiple values for `n` and `k`. The function works
 #' on magnitude tables containing negative cell values by calculating
@@ -37,7 +37,7 @@
 #'          Specifying `dominanceVar` is beneficial for avoiding warnings when there 
 #'          are multiple `numVar` variables. Typically, `dominanceVar` will be one 
 #'          of the variables already included in `numVar`.
-#' @param pPercent Parameter in the p%-rule, when non-NULL.  
+#' @param pPercent Parameter in the p% rule, when non-NULL.  
 #'                 Parameters `n` and  `k` will then be ignored.
 #'                 Technically, calculations are performed internally as if 
 #'                 `n = 1:2`. The results of these intermediate calculations can 
@@ -92,7 +92,7 @@
 #'
 #' @author Daniel Lupp
 #'
-DominanceRule <- function(data,
+MagnitudeRule <- function(data,
                           x,
                           numVar,
                           n,
@@ -211,6 +211,28 @@ DominanceRule <- function(data,
     output <- unlist(output)
   output
 }
+
+
+#' @rdname MagnitudeRule
+#' @note Explicit  `protectZeros` in wrappers 
+#'       since default needed by \code{\link{GaussSuppressionFromData}}
+#' @export
+DominanceRule <- function(data, n, k, pPercent = NULL,
+                          protectZeros = FALSE, ...) {
+  MagnitudeRule(data = data, n = n, k = k, pPercent = pPercent,
+                protectZeros = protectZeros, ...) 
+}
+
+
+#' @rdname MagnitudeRule
+#' @export
+PPercentRule <- function(data, pPercent, n = NULL, k = NULL, 
+                         protectZeros = FALSE, ...) {
+  MagnitudeRule(data = data, n = n, k = k, pPercent = pPercent,
+                protectZeros = protectZeros, ...)
+}
+
+
 
 #' Method for finding dominant cells according to (possibly multiple) n,k
 #' dominance rules.
