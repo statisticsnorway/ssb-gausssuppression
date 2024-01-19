@@ -47,6 +47,23 @@ test_that("Wrappers", {
   expect_identical(a1[c("primary", "suppressed")], a4[c("primary", "suppressed")])
   
   
+  # A test of removeCodes in CandidatesNum with multiple charVar
+  dataset$char2 <- dataset$company
+  dataset$char2[7:15] <- "a"
+  a5 <- SuppressFewContributors(data=dataset, 
+                                dimVar = c("sector4", "geo"), 
+                                maxN=1,
+                                numVar = "value",
+                                contributorVar = c("company", "char2"),
+                                removeCodes = list(company = c("B"), 
+                                                   char2 = c("B","a")),
+                                printInc = printInc)
+  
+  # FALSE when removeCodesForCandidates = FALSE
+  expect_false(a5[a5$sector4 == "Entertainment" & a5$geo == "Iceland", "suppressed"])
+  
+  
+  
   # Table 3 in vignette  
   b1 <- SuppressDominantCells(data=dataset, 
                         numVar = "value", 

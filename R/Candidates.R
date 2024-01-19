@@ -53,8 +53,19 @@ CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {
 #'            and without specifying `candidatesVar`,  only first is used. 
 #' @param candidatesVar One of the variable names from `numVar` to be used in the calculations. 
 #'                       Specifying `candidatesVar` helps avoid warnings when multiple `numVar` variables are present.
+#' @param removeCodes Same parameter as used in suppression rules, e.g. \code{\link{NContributorsRule}}.
+#'         It is often assumed that cells where all contributors (`charVar`)  are present in 
+#'         `removeCodes` should be published. Here, such cells will be prioritized to achieve 
+#'         this. Note that this functionality is redundant if the same cells are specified by `forced`.
+#' @param removeCodesForCandidates `removeCodes` ignored when set to `FALSE`.                                
+#' @param data Input data as a data frame (needed for `removeCodes` calculations)   
+#' @param charVar Variable(s) with contributor codes (needed for `removeCodes` calculations)            
+#'                       
 #' @export
-CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, x, candidatesVar = NULL,  ...) {
+CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, x, candidatesVar = NULL,
+                          removeCodes = character(0), 
+                          removeCodesForCandidates = TRUE, 
+                          data, charVar, ...) {
   if (length(candidatesVar)) {
     numidx <- match(candidatesVar, names(num))
     numidx <- numidx[!is.na(numidx)]
@@ -75,7 +86,22 @@ CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, x, c
   if (!is.null(weight)) {
     newWeight <- newWeight * weight
   }
-  CandidatesDefault(weight = newWeight, freq = freq, secondaryZeros = secondaryZeros, x = x, ...)
+  candidates <- CandidatesDefault(weight = newWeight, freq = freq, 
+                                  secondaryZeros = secondaryZeros, x = x, ...)
+  if (removeCodesForCandidates & length(removeCodes)) {
+    numExtra <- NContributorsRule(data = data, freq = freq, numVar = names(num), 
+                  x = x, maxN = 1, # Here it does not matter what maxN is set to
+                  charVar = charVar, removeCodes = removeCodes)$numExtra
+    idxRule <- grep("nRule", names(numExtra))
+    idxAll <- grep("nAll", names(numExtra))
+    zeroByRemove <- rep(TRUE, nrow(numExtra))
+    for (i in seq_along(idxRule)) {
+      zeroByRemove <- zeroByRemove & (numExtra[[idxRule[i]]] == 0 & numExtra[[idxAll[i]]] > 0)
+    }
+    is_zeroByRemove <- candidates %in% which(zeroByRemove)
+    candidates <- c(candidates[is_zeroByRemove], candidates[!is_zeroByRemove])
+  }
+  candidates
 }
 
 

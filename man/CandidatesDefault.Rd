@@ -14,6 +14,10 @@ CandidatesNum(
   weight,
   x,
   candidatesVar = NULL,
+  removeCodes = character(0),
+  removeCodesForCandidates = TRUE,
+  data,
+  charVar,
   ...
 )
 }
@@ -35,6 +39,17 @@ and without specifying \code{candidatesVar},  only first is used.}
 
 \item{candidatesVar}{One of the variable names from \code{numVar} to be used in the calculations.
 Specifying \code{candidatesVar} helps avoid warnings when multiple \code{numVar} variables are present.}
+
+\item{removeCodes}{Same parameter as used in suppression rules, e.g. \code{\link{NContributorsRule}}.
+It is often assumed that cells where all contributors (\code{charVar})  are present in
+\code{removeCodes} should be published. Here, such cells will be prioritized to achieve
+this. Note that this functionality is redundant if the same cells are specified by \code{forced}.}
+
+\item{removeCodesForCandidates}{\code{removeCodes} ignored when set to \code{FALSE}.}
+
+\item{data}{Input data as a data frame (needed for \code{removeCodes} calculations)}
+
+\item{charVar}{Variable(s) with contributor codes (needed for \code{removeCodes} calculations)}
 }
 \value{
 candidates, \code{\link{GaussSuppression}} input
