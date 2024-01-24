@@ -217,18 +217,18 @@ MagnitudeRule <- function(data,
 #' @note Explicit  `protectZeros` in wrappers 
 #'       since default needed by \code{\link{GaussSuppressionFromData}}
 #' @export
-DominanceRule <- function(data, n, k, pPercent = NULL,
+DominanceRule <- function(data, n, k, 
                           protectZeros = FALSE, ...) {
-  MagnitudeRule(data = data, n = n, k = k, pPercent = pPercent,
+  MagnitudeRule(data = data, n = n, k = k, 
                 protectZeros = protectZeros, ...) 
 }
 
 
 #' @rdname MagnitudeRule
 #' @export
-PPercentRule <- function(data, pPercent, n = NULL, k = NULL, 
+PPercentRule <- function(data, pPercent,  
                          protectZeros = FALSE, ...) {
-  MagnitudeRule(data = data, n = n, k = k, pPercent = pPercent,
+  MagnitudeRule(data = data, pPercent = pPercent,
                 protectZeros = protectZeros, ...)
 }
 

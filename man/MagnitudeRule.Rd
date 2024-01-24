@@ -24,9 +24,9 @@ MagnitudeRule(
   ...
 )
 
-DominanceRule(data, n, k, pPercent = NULL, protectZeros = FALSE, ...)
+DominanceRule(data, n, k, protectZeros = FALSE, ...)
 
-PPercentRule(data, pPercent, n = NULL, k = NULL, protectZeros = FALSE, ...)
+PPercentRule(data, pPercent, protectZeros = FALSE, ...)
 }
 \arguments{
 \item{data}{the dataset}
