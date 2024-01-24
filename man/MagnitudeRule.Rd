@@ -141,5 +141,5 @@ GaussSuppressionFromData(d, formula = ~v1 - 1,
 
 }
 \author{
-Daniel Lupp
+Daniel Lupp and Øyvind Langsrud
 }

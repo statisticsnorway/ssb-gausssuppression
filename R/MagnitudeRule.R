@@ -90,7 +90,7 @@
 #'  preAggregate = FALSE, allDominance = TRUE, candidates = CandidatesNum,
 #'  primary = DominanceRule, domWeightMethod = "tauargus")
 #'
-#' @author Daniel Lupp
+#' @author Daniel Lupp and Øyvind Langsrud
 #'
 MagnitudeRule <- function(data,
                           x,
