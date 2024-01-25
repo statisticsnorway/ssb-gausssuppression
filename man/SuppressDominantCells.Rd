@@ -9,7 +9,7 @@ SuppressDominantCells(
   n,
   k,
   allDominance = FALSE,
-  freqVar = NULL,
+  dominanceVar = NULL,
   numVar = NULL,
   dimVar = NULL,
   hierarchies = NULL,
@@ -17,6 +17,8 @@ SuppressDominantCells(
   contributorVar = NULL,
   sWeightVar = NULL,
   ...,
+  candidatesVar = NULL,
+  singletonZeros = FALSE,
   spec = PackageSpecs("dominanceSpec")
 )
 }
@@ -30,9 +32,12 @@ SuppressDominantCells(
 \item{allDominance}{Logical parameter. If \code{TRUE}, adds primary columns for each
 pair of parameters n,k in the dominance rules}
 
-\item{freqVar}{A single variable holding counts (name or number).}
+\item{dominanceVar}{Numerical variable to be used in dominance rule.
+The first \code{numVar} variable will be used if it is not specified.}
 
-\item{numVar}{numerical variable to be aggregated and used in dominance rule}
+\item{numVar}{Numerical variable to be aggregated.
+Any \code{dominanceVar} and \code{candidatesVar} that are specified and
+not included in \code{numVar} will be aggregated accordingly.}
 
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
@@ -48,6 +53,18 @@ Typically, the variable contains the contributor IDs.}
 in dominance rule}
 
 \item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+
+\item{candidatesVar}{Variable to be used in the candidate function to prioritize cells for
+publication and thus not suppression. If not specified, the same variable that is
+used for the dominance rule will be applied (see \code{dominanceVar} and \code{numVar}).}
+
+\item{singletonZeros}{When negative values cannot occur, one can determine from a
+non-suppressed marginal cell with the value 0 that all underlying cells also have the
+value 0. The use of \code{singletonZeros = TRUE} is intended to prevent this phenomenon from
+causing suppressed cells to be revealable. It is the zeros in the \code{dominanceVar} variable
+that are examined. Specifically, the ordinary singleton method is combined with a method
+that is actually designed for frequency tables. This approach also works for volume
+tables when \code{\link{SingletonUniqueContributor0}} is utilized.}
 
 \item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 }

@@ -4,13 +4,21 @@
 #' the few contributors rule (\code{\link{NContributorsRule}}).
 #'
 #' @inheritParams GaussSuppressionFromData
-#' @param numVar numerical variable to be aggregated. Also see patameter `remove0` below.  
+#' @param numVar Numerical variable to be aggregated.
+#'           Any `candidatesVar` that is specified and 
+#'           not included in `numVar` will be aggregated accordingly.
+#'           Additionally, if `remove0` is specified as a variable name and it is 
+#'           not included in `numVar`, it will also be aggregated accordingly.
+#'           See parameters `candidatesVar` and `remove0` below.  
 #' @param contributorVar Extra variables to be used as grouping elements when counting contributors. 
 #'                       Typically, the variable contains the contributor IDs.
 #' @param removeCodes Vector of codes to be omitted when counting contributors.
 #'                With empty `contributorVar` row indices are assumed
 #'                and conversion to integer is performed.
 #' @inheritParams NContributorsRule                 
+#' @param candidatesVar Variable to be used in the candidate function to prioritize cells for 
+#'           publication and thus not suppression. 
+#'           The first `numVar` variable will be used if it is not specified.
 #'
 #' @return data.frame containing aggregated data and supppression information.
 #'         Columns `nRule` and `nAll` contain the number of contributors.
@@ -61,7 +69,6 @@
 #'                       
 SuppressFewContributors <- function(data,
                                   maxN,
-                                  freqVar = NULL,
                                   numVar = NULL,
                                   dimVar = NULL,
                                   hierarchies = NULL,
@@ -69,12 +76,18 @@ SuppressFewContributors <- function(data,
                                   contributorVar = NULL,
                                   removeCodes = character(0), 
                                   remove0 = TRUE,
+                                  candidatesVar = NULL,
                                   ...,
                                   spec = PackageSpecs("fewContributorsSpec")) {
+  if (length(candidatesVar)) {
+    numVar <- unique(c(numVar, candidatesVar))
+  }
+  if (is.character(remove0)) {
+    numVar <- unique(c(numVar, remove0))
+  }
   GaussSuppressionFromData(
     data,
     maxN = maxN,
-    freqVar = freqVar,
     numVar = numVar,
     dimVar = dimVar,
     hierarchies = hierarchies,
@@ -82,6 +95,7 @@ SuppressFewContributors <- function(data,
     charVar = contributorVar,
     removeCodes = removeCodes,
     remove0 = remove0,
+    candidatesVar = candidatesVar,
     spec = spec,
     ...
   )

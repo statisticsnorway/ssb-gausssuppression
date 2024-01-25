@@ -1,4 +1,4 @@
-#' Dominance `(n,k)` rule for magnitude tables
+#' Dominance `(n,k)` or p% rule for magnitude tables
 #'
 #' Supports application of multiple values for `n` and `k`. The function works
 #' on magnitude tables containing negative cell values by calculating
@@ -17,10 +17,20 @@
 #' @param numVar vector containing numeric values in the data set
 #' @param n parameter `n` in dominance rule.
 #' @param k parameter `k` in dominance rule.
+#' @param pPercent Parameter in the p% rule, when non-NULL.  
+#'                 Parameters `n` and  `k` will then be ignored.
+#'                 Technically, calculations are performed internally as if 
+#'                 `n = 1:2`. The results of these intermediate calculations can 
+#'                 be viewed by setting `allDominance = TRUE`.
 #' @param protectZeros parameter determining whether cells with value 0 should
 #'  be suppressed.
 #' @param charVar Variable in data holding grouping information. Dominance will
 #'  be calculated after aggregation within these groups.
+#' @param removeCodes A vector of `charVar` codes that are to be excluded when 
+#'     calculating dominance percentages. Essentially, the corresponding numeric 
+#'     values from `dominanceVar` or `numVar` are set to zero before proceeding 
+#'     with the dominance calculations. With empty `charVar` row indices are 
+#'     assumed and conversion to integer is performed.
 #' @param sWeightVar variable with sampling weights to be used in dominance rule
 #' @param domWeightMethod character representing how weights should be treated
 #' in the dominance rule. See Details.
@@ -28,6 +38,10 @@
 #' pair of parameters n,k in the dominance rules
 #' @param outputWeightedNum logical value to determine whether weighted numerical
 #' value should be included in output. Default is `TRUE` if `sWeightVar` is provided.
+#' @param dominanceVar When specified, `dominanceVar` is used in place of `numVar`. 
+#'          Specifying `dominanceVar` is beneficial for avoiding warnings when there 
+#'          are multiple `numVar` variables. Typically, `dominanceVar` will be one 
+#'          of the variables already included in `numVar`.
 #' @param ... unused parameters
 #'
 #' @return logical vector that is `TRUE` in positions corresponding to cells
@@ -76,22 +90,39 @@
 #'  preAggregate = FALSE, allDominance = TRUE, candidates = CandidatesNum,
 #'  primary = DominanceRule, domWeightMethod = "tauargus")
 #'
-#' @author Daniel Lupp
+#' @author Daniel Lupp and Øyvind Langsrud
 #'
-DominanceRule <- function(data,
+MagnitudeRule <- function(data,
                           x,
                           numVar,
-                          n,
-                          k,
+                          n = NULL,
+                          k = NULL,
+                          pPercent = NULL,
                           protectZeros = FALSE,
                           charVar = NULL,
+                          removeCodes = character(0), 
                           sWeightVar = NULL,
                           domWeightMethod = "default",
                           allDominance = FALSE,
                           outputWeightedNum = !is.null(sWeightVar),
+                          dominanceVar = NULL,
                           ...) {
+  if (!is.null(pPercent)) {
+    n <- 1:2
+    k <- c(0, 0)
+  }
+  
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
+  
+  if(length(dominanceVar)){
+    if(length(dominanceVar) != 1){
+      stop("dominanceVar must be a single variable")
+    }
+    numVar <- dominanceVar
+  }
+  
+  
   if (is.null(numVar))
     stop("You must provide a numeric variable numVar to use the dominance rule.")
   
@@ -107,11 +138,8 @@ DominanceRule <- function(data,
     if (any(data[[sWeightVar]] < 1))
       warning("Some sample weights are < 1. Consider using other weighted domininace method.")
   }
-  abs_num <-
-    as.data.frame(as.matrix(crossprod(x, as.matrix(abs(
-      data[, numVar, drop = FALSE]
-    )))))
-  abs_inputnum <- abs(data[[numVar]])
+  
+  abs_inputnum <- abs(data[, numVar, drop = FALSE])
   
   if (length(charVar)) {
     if (length(charVar) == 1) {
@@ -127,6 +155,17 @@ DominanceRule <- function(data,
     else
       sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
   }
+  
+  if (length(removeCodes)) {
+    if (length(charVar)) {
+      abs_inputnum[charVar_groups %in% removeCodes, ] <- 0
+    } else {
+      abs_inputnum[as.integer(removeCodes), ] <- 0
+    }
+  }
+  
+  abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum))))
+  abs_inputnum <- abs_inputnum[[numVar]]
 
   prim <-
     mapply(
@@ -145,10 +184,13 @@ DominanceRule <- function(data,
       n,
       k
     )
-  primary <- sapply(seq_len(ncol(prim)), function(x) prim[,x] >= k[x]/100)
-  dominant <- apply(primary, 1, function (x)
-    Reduce(`|`, x))
-  colnames(primary) <- colnames(prim) <- paste0("primary.", paste(n, k, sep = ":"))
+  if (is.null(pPercent)) {
+    primary <- sapply(seq_len(ncol(prim)), function(x) prim[, x] >= k[x]/100)
+    dominant <- apply(primary, 1, function(x) Reduce(`|`, x))
+  } else {
+    dominant <- abs(1 - prim[, 2]) < abs(pPercent/100 * prim[, 1])
+  }
+  colnames(prim) <- paste0("primary.", paste(n, k, sep = ":"))
   if (!protectZeros)
     output <- list(primary = dominant)
   else
@@ -169,6 +211,28 @@ DominanceRule <- function(data,
     output <- unlist(output)
   output
 }
+
+
+#' @rdname MagnitudeRule
+#' @note Explicit  `protectZeros` in wrappers 
+#'       since default needed by \code{\link{GaussSuppressionFromData}}
+#' @export
+DominanceRule <- function(data, n, k, 
+                          protectZeros = FALSE, ...) {
+  MagnitudeRule(data = data, n = n, k = k, 
+                protectZeros = protectZeros, ...) 
+}
+
+
+#' @rdname MagnitudeRule
+#' @export
+PPercentRule <- function(data, pPercent,  
+                         protectZeros = FALSE, ...) {
+  MagnitudeRule(data = data, pPercent = pPercent,
+                protectZeros = protectZeros, ...)
+}
+
+
 
 #' Method for finding dominant cells according to (possibly multiple) n,k
 #' dominance rules.
@@ -213,7 +277,13 @@ FindDominantCells <- function(x,
     max_cont <-
       MaxContribution(x, inputnum, n = n, groups = charVar_groups)
     max_cont[is.na(max_cont)] <- 0
-    return(as.vector(num > 0 & rowSums(max_cont) > num * k / 100))
+    if (returnContrib) {
+      out <- as.vector(rowSums(max_cont)/unlist(num))
+      out[is.nan(out)] <- 0
+      return(out)
+    } else {
+      return(as.vector(num > 0 & rowSums(max_cont) > num * k / 100))
+    }
   } else {
     # with sampling weights, need to weight the numerical values
     max_cont_index <-

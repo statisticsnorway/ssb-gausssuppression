@@ -60,7 +60,8 @@ Ncontributors <- function(x, groups) {
   groups <- as.integer(factor(groups))
   
   if (max(groups) == 1) {
-    return(rep(1L, ncol(x)))
+    # return(rep(1L, ncol(x)))   # But must take empty into account 
+    return(as.integer(colSums(abs(x)) > 0))
   }
   
   ordgroups <- order(groups)

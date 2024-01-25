@@ -145,6 +145,19 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
   expect_identical(as.numeric(which(b$primary)), c(8, 18, 23, 53, 63, 78, 83, 87, 90, 97, 98))
   
   
+  z$seq2 <- (1:nrow(z))^2 
+  
+  aseq2 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                    numVar = c("seq2", "value"), 
+                                    candidatesVar = "value",
+                                    dominanceVar = "value",
+                                    charVar = "char", candidates = CandidatesNum, 
+                                    primary = DominanceRule, singletonMethod = "sub2Sum",
+                                    n = c(1, 2), k = c(65, 85), printInc = printInc)
+  
+  expect_identical(a[names(a)], aseq2[names(a)])
+  
+  
   z$char <- paste0("char", 1:nrow(z))
   d1 <- GaussSuppressionFromData(z, dimVar = c("region", "fylke", "kostragr", "hovedint"), numVar = "value", charVar = "char", 
                                 candidates = CandidatesNum, primary = NcontributorsRule, singletonMethod = "none",
@@ -325,8 +338,33 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
                                   singleton = SingletonUniqueContributor, 
                                   singletonMethod = "numFTFW")})
     expect_equal(sum(b$suppressed), 51)  # Here "if (s_unique == primarySingletonNum[i])" in SSBtools::GaussSuppression matters. 
+    
+    
+    set.seed(193)
+    zz$A <- sample(paste0("A", c(1, 1, 1, 1, 1, 2, 2, 2, 3, 4)), nrow(zz), replace = TRUE)
+    zz$B <- sample(paste0("B", c(1, 1, 1, 1, 1, 2, 2, 2, 3, 4)), nrow(zz), replace = TRUE)
+    rcd <- data.frame(char = "char2", A = c("A1", "A2"), B = "B1")
+    removeCodes <- list(NULL, rcd, as.list(rcd))
+    k <- integer(0)
+    for (specialMultiple in c(FALSE, TRUE)) for (i in 1:3) {
+      b <- GaussSuppressionFromData(zz, 
+                                    dimVar = c("region", "fylke", "kostragr", "hovedint"), 
+                                    numVar = "value", charVar = c("char","A","B"), 
+                                    maxN = 2, printInc = printInc, 
+                                    candidates = CandidatesNum, 
+                                    primary = NcontributorsRule,  
+                                    singleton = SingletonUniqueContributor, 
+                                    singletonMethod = "numTTTTT", output = "inputGaussSuppression",
+                                    specialMultiple = specialMultiple,
+                                    removeCodes = removeCodes[[i]])
+      k <- c(k, 0L, as.vector(table(b$singleton)[as.character(unique(b$singleton))]))
+    }
+    expect_equal(k, c(0, 1, 1, 1, 1, 1, 2, 19, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 
+                      2, 20, 1, 1, 1, 0, 1, 29, 0, 2, 6, 3, 9, 9, 1, 0, 2, 
+                      5, 3, 9, 10, 1, 0, 2, 5, 1, 1, 2, 17, 2))
   }
 })
+
 
 
 test_that("Interpret primary output correctly", {

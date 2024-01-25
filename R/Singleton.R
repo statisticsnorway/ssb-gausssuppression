@@ -58,7 +58,13 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #'                It will be ensured that any non-suppressed inner cell is not considered a singleton.
 #' @param whenPrimaryMatters Function to be called when `primary` caused non-singleton. Supply `NULL` to do nothing.
 #' @param whenNoVar When `TRUE`, and without `nUniqueVar` and `freqVar` in input, 
-#'                all cells will be marked as singletons.                
+#'                all cells will be marked as singletons.     
+#' @param specialMultiple When `TRUE`, and when `integerSingleton &` `length(charVar) > 1` `& length(nUniqueVar)`,
+#'                a special method is used. 
+#'                By re-coding to single `charVar` and by re-calculating `nUnique`.
+#'                To be unique (`nUnique=1`), uniqueness is only required for a single `charvar`.
+#'                Otherwise, the `charvar` combination must be unique.   
+#'                                     
 #' @param ... Unused parameters
 #'
 #' @return logical or integer vector
@@ -108,12 +114,21 @@ SingletonUniqueContributor <- function(data,
                                        primary = integer(0),
                                        whenPrimaryMatters = warning,
                                        whenNoVar = TRUE,
+                                       specialMultiple = TRUE,
                                        ...) {
   
   if (length(nUniqueVar)) {
     if (is.null(data[[nUniqueVar]])) {
       nUniqueVar <- NULL
     }
+  }
+  
+  if (specialMultiple & integerSingleton & length(charVar) > 1L & length(nUniqueVar)) {
+    ssmd <- SingletonSpecialMultipleData(data, charVar, nUniqueVar, removeCodes)
+    data <- ssmd$data
+    charVar <- names(data)[1]
+    nUniqueVar <- names(data)[2]
+    removeCodes <- ssmd$removeCodes
   }
   
   if (length(nUniqueVar)) {
@@ -133,8 +148,8 @@ SingletonUniqueContributor <- function(data,
       }
       if (is.list(removeCodes)) {
         if (is.data.frame(removeCodes)) {
-          ma <- Match(removeCodes, data[charVar])
-          singleton[ma] <- FALSE
+          ma <- Match(data[charVar], removeCodes)
+          singleton[!is.na(ma)] <- FALSE
         } else {
           for (i in seq_along(charVar)) {
             singleton[data[[charVar[i]]] %in% removeCodes[[charVar[i]]]] <- FALSE  # Ordinary when single charVar 
@@ -183,7 +198,60 @@ SingletonUniqueContributor <- function(data,
 
 
 
+#' @rdname SingletonUniqueContributor
+#' @note   `SingletonUniqueContributor0` is a special version that produces singleton as 
+#'         a two-element list. 
+#'         See \code{\link{GaussSuppression}} and \code{\link{SuppressDominantCells}}.
+#'         
+#' @export
+SingletonUniqueContributor0 <- function(data, numVar, dominanceVar = NULL, ...) {
+  if (is.null(dominanceVar)) {
+    dominanceVar <- numVar[1]
+  }
+  list(freq = data[[dominanceVar]] == 0, num = SingletonUniqueContributor(data = data, ...))
+}
 
+
+SingletonSpecialMultipleData <- function(data, charVar, nUniqueVar, removeCodes) {
+  charN <- matrix(0L, nrow(data), length(charVar))
+  for (i in seq_along(charVar)) {
+    tabi <- table(data[[charVar[i]]])
+    charN[, i] <- tabi[data[[charVar[i]]]]
+    charN[is.na(charN)] <- 0L
+  }
+  charN <- 2L * charN  # trick so that 1L can be used for removeCodes
+  if (length(removeCodes)) {
+    if (!is.list(removeCodes)) {
+      for (i in seq_along(charVar)) {
+        ma <- match(data[[charVar[i]]], removeCodes)
+        charN[!is.na(ma), i] <- 1L
+      }
+    } else {
+      if (is.data.frame(removeCodes)) {
+        ma <- Match(data[charVar], removeCodes)
+        charN[!is.na(ma), ] <- 1L
+      } else {
+        for (i in seq_along(charVar)) {
+          ma <- match(data[[charVar[i]]], removeCodes[[charVar[i]]])
+          charN[!is.na(ma), i] <- 1L
+        }
+      }
+    }
+    
+  }
+  charNA <- rowSums(charN) == 0
+  charNok <- charN[!charNA, , drop = FALSE]
+  wmax <- apply(charNok, 1, which.max)
+  char <- rep(NA_character_, nrow(data))
+  wmaxInd <- cbind(seq_len(length(wmax)), wmax)
+  char[!charNA] <- data[!charNA, charVar, drop = FALSE][wmaxInd]
+  charNmax <- charNok[wmaxInd]
+  char[!charNA] <- paste(charVar[wmax], char[!charNA], sep = "_")
+  removeCodes <- unique(char[!charNA][charNmax == 1L])
+  nUnique <- rep(Inf, nrow(data))
+  nUnique[!charNA] <- 1L
+  list(data = data.frame(charVar = char, nUniqueVar = nUnique), removeCodes = removeCodes)
+}
 
 
 
