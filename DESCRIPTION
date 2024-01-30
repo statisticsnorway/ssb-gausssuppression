@@ -32,6 +32,8 @@ Suggests:
     kableExtra,
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    lpSolve,
+    Rsymphony
 Config/testthat/edition: 3
 VignetteBuilder: knitr

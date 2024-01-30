@@ -168,14 +168,14 @@ ComputeIntervals <- function(x, z, primary, suppressed, minVal = NULL, lpPackage
 }
 # lp wrapper
 
-#' @importFrom lpSolve lp
+
 LpVal <- function(...) {
-  lpobj <- lp(...)
+  lpobj <- lpSolve::lp(...)
   c(lpobj$objval, NA, NaN, -Inf)[lpobj$status + 1]
 }
 
-#' @importFrom Rsymphony Rsymphony_solve_LP
+
 RsymphVal <- function(...) {
-  lpobj <- Rsymphony_solve_LP(...)
+  lpobj <- Rsymphony::Rsymphony_solve_LP(...)
   c(lpobj$objval, NA)[lpobj$status + 1]
 }
