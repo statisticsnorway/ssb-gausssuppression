@@ -87,9 +87,16 @@ OutputIntervals <- function(...,
 # Can be useful inside a `output`-function. See ToyOutputFunction.
 TailGaussSuppressionFromData = function(...){
   
+  
   unsafePrimary <- -secondary[secondary < 0]
   secondary <- secondary[secondary > 0]
   
+  if(output=="outputGaussSuppression_x"){
+    return(list(secondary = secondary, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, x = x))
+  }
+  if(output=="outputGaussSuppression"){
+    return(list(secondary = secondary, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary))
+  }
   
   suppressed <- rep(FALSE, m)
   suppressed[primary] <- TRUE
@@ -190,6 +197,33 @@ TailGaussSuppressionFromData = function(...){
   
   attr(publish, "totCode") <- FindTotCode2(x, crossTable)
   
+  
+  if(output == "all"){
+    if( length(unsafePrimary) > 0){
+      unsafe = x[, unsafePrimary[unsafePrimary <= m], drop = FALSE] # reuse object name unsafe here
+      if(any(unsafePrimary > m) & !is.null(xExtraPrimary)){
+        unsafePxEx = unsafePrimary[unsafePrimary > m] - m
+        unsafePxEx = unsafePxEx[unsafePxEx <= ncol(xExtraPrimary)]
+        unsafe = cbind(unsafe, xExtraPrimary[, unsafePxEx, drop = FALSE])
+      }
+      
+    } else {
+      unsafe = NULL
+    }
+    return(list(publish = publish, inner = data, x = x, xExtraPrimary = xExtraPrimary, unsafe = unsafe))
+  }
+  
+  if (output == "publish_inner_x") {
+    return(list(publish = publish, inner = data, x = x))
+  }
+  
+  if (output == "publish_inner") {
+    return(list(publish = publish, inner = data))
+  }
+  
+  if (output == "publish_x") {
+    return(list(publish = publish, x = x))
+  }
   
   publish
 }
