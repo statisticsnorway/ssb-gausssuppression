@@ -8,7 +8,7 @@
 #' This function is still experimental.
 #'
 #' @param x ModelMatrix, as output from SSBtools::ModelMatrix
-#' @param z numerical vector with length nrow(x). Corresponds to table cell values
+#' @param z numerical vector with length ncol(x). Corresponds to table cell values
 #' @param primary Vector indicating primary suppressed cells. Can be logical or
 #' integer. If integer vector, indicates the columns of x which are considered
 #' primary suppressed.
