@@ -23,6 +23,65 @@ ToyOutputFunction <- function(..., words = c("Yes", "No")) {
 
 
 
+# Output function using ComputeIntervals 
+# 
+# By using special temporary feature.
+#
+#
+#  SuppressDominantCells(data = SSBtoolsData("magnitude1"), 
+#                        numVar = "value", 
+#                        formula = ~sector2 * geo + sector4 * eu, 
+#                        contributorVar = "company", 
+#                        n = 1:2, k = c(80, 99), 
+#                        output = GaussSuppression:::OutputIntervals, # This line can be dropped 
+#                        lpPackage = "Rsymphony")
+
+OutputIntervals <- function(..., 
+                            minVal = 0, 
+                            gaussI = TRUE,
+                            dominanceVar = NULL,
+                            intervalVar = NULL) {
+  
+  if (is.null(lpPackage)) {
+    lpPackage <- "lpSolve"
+  }
+  
+  if (identical(intervalVar, freqVar) | ncol(num) == 0) {
+    z <- freq
+  } else {
+    if (is.null(intervalVar)) {
+      if (is.null(dominanceVar)) {
+        intervalVar <- names(num)[1]
+      } else {
+        intervalVar <- dominanceVar
+      }
+    }
+    z <- num[[intervalVar]]
+  }
+  
+  suppressed__ <- rep(FALSE, m)
+  suppressed__[primary] <- TRUE
+  suppressed__[secondary] <- TRUE
+  suppressed__[hidden] <- NA
+  suppressed__[forced] <- FALSE
+  
+  gauss_intervals <- ComputeIntervals(
+    x = x,
+    z = z,
+    primary = primary,
+    suppressed = suppressed__,
+    minVal = minVal,
+    lpPackage = lpPackage,
+    gaussI = gaussI
+  )
+  
+  num <- cbind(num, as.data.frame(gauss_intervals))
+  
+  environment(TailGaussSuppressionFromData) <- environment()
+  return(TailGaussSuppressionFromData(...))
+}
+
+
 
 # Copy of bottom code of GaussSuppressionFromData
 # Can be useful inside a `output`-function. See ToyOutputFunction.

@@ -124,6 +124,12 @@
 #'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.
 #'               see details. 
 #'               
+#' @param  lpPackage When non-NULL, intervals by \code{\link{ComputeIntervals}} 
+#'                   will be included in the output.
+#'                   See its documentation for valid parameter values for 'lpPackage'.
+#'                   Please note that interval calculations may have a 
+#'                   different interface in future versions.
+#'                                 
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
@@ -207,7 +213,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
                            forcedInOutput = "ifNonNULL",
-                           unsafeInOutput = "ifForcedInOutput"){ 
+                           unsafeInOutput = "ifForcedInOutput",
+                           lpPackage = NULL){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
       spec <- eval(spec)
@@ -241,7 +248,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     OutputFunction <- output
     output <- "publish"
   } else {
-    OutputFunction <- NULL
+    if (!is.null(lpPackage)) {
+      OutputFunction <- OutputIntervals
+    } else {
+      OutputFunction <- NULL
+    }
   }
   
   
