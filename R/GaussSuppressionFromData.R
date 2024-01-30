@@ -234,6 +234,17 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     stop("spec must be a properly named list")
   }
   
+  
+  # Possible development function as input
+  # Special temporary feature 
+  if (is.function(output)) {
+    OutputFunction <- output
+    output <- "publish"
+  } else {
+    OutputFunction <- NULL
+  }
+  
+  
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
                      "primary", "secondary", "all")))
@@ -618,6 +629,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
                                   unsafeAsNegative = TRUE, ...)
   }
+  
+  # Use of special temporary feature
+  if (!is.null(OutputFunction)) {
+    environment(OutputFunction) <- environment()
+    return(OutputFunction(...))
+  }
+  
   
   if (output == "secondary") {
     if (unsafeInOutput %in% c("ifany", "always")) {
