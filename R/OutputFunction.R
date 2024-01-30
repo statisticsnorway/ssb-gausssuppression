@@ -82,7 +82,13 @@ OutputIntervals <- function(...,
 }
 
 
-
+# To avoid check problems
+utils::globalVariables(c("candidates", "crossTable", "data", "forced", 
+                         "forcedInOutput", "freq", "freqVar", "hidden",
+                         "m", "output", "primary", "printInc", "secondary", 
+                         "singleton", "singletonMethod", "unsafeInOutput",
+                         "weightVar", "x", "xExtraPrimary"))
+                         
 # Copy of bottom code of GaussSuppressionFromData
 # Can be useful inside a `output`-function. See ToyOutputFunction.
 TailGaussSuppressionFromData = function(...){
