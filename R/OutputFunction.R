@@ -37,7 +37,7 @@ ToyOutputFunction <- function(..., words = c("Yes", "No")) {
 #                        lpPackage = "Rsymphony")
 
 OutputIntervals <- function(..., 
-                            minVal = 0, 
+                            minVal = NULL, 
                             gaussI = TRUE,
                             dominanceVar = NULL,
                             intervalVar = NULL) {

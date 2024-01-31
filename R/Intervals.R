@@ -6,6 +6,10 @@
 #' for suppressed cells.
 #'
 #' This function is still experimental.
+#' 
+#' Default in for `bounds` parameter in `Rsymphony_solve_LP`: 
+#' _The default for each variable is a bound between 0 and `Inf`._
+#' Details in `lpSolve`: _Note that every variable is assumed to be `>= 0`!_
 #'
 #' @param x ModelMatrix, as output from SSBtools::ModelMatrix
 #' @param z numerical vector with length ncol(x). Corresponds to table cell values
@@ -16,6 +20,9 @@
 #' integer. If integer vector, indicates the columns of x which are considered
 #' suppressed.
 #' @param minVal a known minimum value for table cells. Default NULL.
+#' Note that 'minVal' is interpreted as the limiting value for all suppressed cells. 
+#' Specifying 'minVal=0' would be redundant, as a minimum value of 0 is anyway 
+#' assumed for inner cells (see details).
 #' @param lpPackage The name of the package used to solve linear programs. Currently, only
 #' 'lpSolve' (default) and 'Rsymphony' are supported.
 #' @param gaussI Boolean vector. If TRUE (default), GaussIndependent is used to
@@ -54,7 +61,15 @@ ComputeIntervals <-
       primary <- which(primary)
     if (is.logical(suppressed))
       suppressed <- which(suppressed)
-    secondary <- suppressed[!(suppressed %in% primary)]
+    
+    if (is.null(minVal)) {     # secondary not needed
+      secondary <- integer(0)  # removing is more efficient 
+    } else {
+      secondary <- suppressed[!(suppressed %in% primary)]
+    }
+    
+    input_ncol_x <- ncol(x)
+    
     published <- seq_len(ncol(x))
     published <- published[!(published %in% suppressed)]
     
@@ -159,6 +174,7 @@ ComputeIntervals <-
       i <- primary3[j]
       flush.console()
       f.obj <- as.vector(x[!a$yKnown, i])
+
       # x is before Reduce0exact
       # adapted to Reduce0exact solution by !a$yKnown
       if (lpPackage == "lpSolve") {
@@ -195,15 +211,26 @@ ComputeIntervals <-
     lo <- lo[ma]
     up <- up[ma]
     
+    
+    # Make sure lo and up long enough since secondary2
+    # was set to integer(0)
+    if (is.null(minVal)) {
+      lo_output <- rep(NA_integer_, input_ncol_x)
+      up_output <- lo_output
+    } else {
+      lo_output <- lo
+      up_output <- up
+    }
+    
     # Transfer to before "Reorder since ..."
-    lo[c(published, primary, secondary)] <-
+    lo_output[c(published, primary, secondary)] <-
       lo[c(published2, primary2, secondary2)]
-    up[c(published, primary, secondary)] <-
+    up_output[c(published, primary, secondary)] <-
       up[c(published2, primary2, secondary2)]
     
     cat("\n")
     
-    cbind(lo = lo, up = up)
+    cbind(lo = lo_output, up = up_output)
   }
 # lp wrapper
 
