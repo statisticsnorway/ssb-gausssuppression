@@ -215,6 +215,6 @@ LpVal <- function(...) {
 
 
 RsymphVal <- function(...) {
-  lpobj <- RsymphonyQQ::Rsymphony_solve_LP(...)
+  lpobj <- Rsymphony::Rsymphony_solve_LP(...)
   c(lpobj$objval, NA)[lpobj$status + 1]
 }
