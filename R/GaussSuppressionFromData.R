@@ -249,6 +249,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     output <- "publish"
   } else {
     if (!is.null(lpPackage)) {
+      if (!require(lpPackage, character.only = TRUE, quietly = TRUE)) {
+        stop(paste0("Package '", lpPackage, "' is not available."))
+      }
       OutputFunction <- OutputIntervals
     } else {
       OutputFunction <- NULL

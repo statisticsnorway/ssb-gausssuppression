@@ -39,7 +39,10 @@ ComputeIntervals <-
            gaussI = TRUE) {
     if (!lpPackage %in% c("lpSolve", "Rsymphony"))
       stop("Only 'lpSolve' and 'Rsymphony' solvers are supported.")
-    require(lpPackage, character.only = TRUE)
+    
+    if (!require(lpPackage, character.only = TRUE,  quietly = TRUE)) {
+      stop(paste0("Package '", lpPackage, "' is not available."))
+    }
     
     if (lpPackage == "lpSolve") {
       AsMatrix <- as.matrix
@@ -212,6 +215,6 @@ LpVal <- function(...) {
 
 
 RsymphVal <- function(...) {
-  lpobj <- Rsymphony::Rsymphony_solve_LP(...)
+  lpobj <- RsymphonyQQ::Rsymphony_solve_LP(...)
   c(lpobj$objval, NA)[lpobj$status + 1]
 }
