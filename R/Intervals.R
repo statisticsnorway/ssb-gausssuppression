@@ -40,6 +40,13 @@ ComputeIntervals <-
     if (!lpPackage %in% c("lpSolve", "Rsymphony"))
       stop("Only 'lpSolve' and 'Rsymphony' solvers are supported.")
     require(lpPackage, character.only = TRUE)
+    
+    if (lpPackage == "lpSolve") {
+      AsMatrix <- as.matrix
+    } else {
+      AsMatrix <- function(x) x
+    }
+    
     if (is.logical(primary))
       primary <- which(primary)
     if (is.logical(suppressed))
@@ -118,7 +125,7 @@ ComputeIntervals <-
     cat(")\n")
     
     # Make lp-input from Reduce0exact solution
-    f.con <- as.matrix(t(a$x))
+    f.con <- AsMatrix(t(a$x))
     if (lpPackage == "lpSolve")
       f.dir <- rep("=", nrow(f.con))
     else
@@ -127,7 +134,7 @@ ComputeIntervals <-
     
     if (!is.null(minVal)) {
       f.con <-
-        rbind(f.con, as.matrix(t(x[!a$yKnown, c(primary3, secondary3), drop = FALSE])))
+        rbind(f.con, AsMatrix(t(x[!a$yKnown, c(primary3, secondary3), drop = FALSE])))
       f.dir <-
         c(f.dir, rep(">=", length(primary3) + length(secondary3)))
       f.rhs <-
