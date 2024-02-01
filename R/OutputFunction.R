@@ -40,6 +40,7 @@ OutputIntervals <- function(...,
                             minVal = NULL, 
                             gaussI = TRUE,
                             allInt = FALSE,
+                            sparseConstraints = TRUE,
                             dominanceVar = NULL,
                             intervalVar = NULL) {
   
@@ -73,6 +74,7 @@ OutputIntervals <- function(...,
     suppressed = suppressed__,
     minVal = minVal,
     allInt = allInt,
+    sparseConstraints = sparseConstraints,
     lpPackage = lpPackage,
     gaussI = gaussI
   )

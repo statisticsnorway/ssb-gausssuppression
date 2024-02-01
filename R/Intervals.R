@@ -29,6 +29,9 @@
 #' reduce size of linear program.
 #' @param  allInt Integer variables when TRUE. 
 #' See `all.int` parameter in `lpSolve` and `types` parameter in `Rsymphony`
+#' @param  sparseConstraints When TRUE, a sparse constraint matrix will be input to the 
+#' solver. In the case of `lpSolve`, the sparse matrix is represented in triplet form 
+#' as a dense matrix with three columns, and the `dense.const` parameter is utilized.
 #'
 #' @importFrom stats na.omit runif
 #' @importFrom utils flush.console
@@ -46,7 +49,8 @@ ComputeIntervals <-
            minVal = NULL,
            lpPackage = "lpSolve",
            gaussI = TRUE,
-           allInt = FALSE) {
+           allInt = FALSE,
+           sparseConstraints = TRUE) {
     if (!lpPackage %in% c("lpSolve", "Rsymphony"))
       stop("Only 'lpSolve' and 'Rsymphony' solvers are supported.")
     
@@ -54,7 +58,7 @@ ComputeIntervals <-
       stop(paste0("Package '", lpPackage, "' is not available."))
     }
     
-    if (lpPackage == "lpSolve") {
+    if (!sparseConstraints) {
       AsMatrix <- as.matrix
     } else {
       AsMatrix <- function(x) x
@@ -165,6 +169,10 @@ ComputeIntervals <-
     cat("\n")
     
     if (lpPackage == "lpSolve") {
+      if (sparseConstraints) {
+        f.con <- As_TsparseMatrix(t(f.con)) # With t() result identical to lpSolve example   
+        f.con <- cbind(f.con@j + 1, f.con@i + 1, f.con@x)
+      }
       cat("Using lpSolve for intervals...\n")
     } else
       cat("Using Rsymphony for intervals...\n")
@@ -181,9 +189,15 @@ ComputeIntervals <-
       # x is before Reduce0exact
       # adapted to Reduce0exact solution by !a$yKnown
       if (lpPackage == "lpSolve") {
-        lo[i] <- LpVal("min", f.obj, f.con, f.dir, f.rhs, all.int = allInt)
-        up[i] <-
-          LpVal("max", f.obj, f.con, f.dir, f.rhs, all.int = allInt)
+        if (sparseConstraints) {
+          lo[i] <- LpVal("min", f.obj, , # missing argument as in lpSolve example  
+                         f.dir, f.rhs, dense.const= f.con, all.int = allInt)
+          up[i] <- LpVal("max", f.obj, , 
+                         f.dir, f.rhs, dense.const= f.con, all.int = allInt) 
+        } else {
+          lo[i] <- LpVal("min", f.obj, f.con, f.dir, f.rhs, all.int = allInt)
+          up[i] <-LpVal("max", f.obj, f.con, f.dir, f.rhs, all.int = allInt)         
+        }
       } else {
         lo[i] <- RsymphVal(
           max = FALSE,
