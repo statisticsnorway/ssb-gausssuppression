@@ -39,6 +39,8 @@ ToyOutputFunction <- function(..., words = c("Yes", "No")) {
 OutputIntervals <- function(..., 
                             minVal = NULL, 
                             gaussI = TRUE,
+                            allInt = FALSE,
+                            sparseConstraints = TRUE,
                             dominanceVar = NULL,
                             intervalVar = NULL) {
   
@@ -71,6 +73,8 @@ OutputIntervals <- function(...,
     primary = primary,
     suppressed = suppressed__,
     minVal = minVal,
+    allInt = allInt,
+    sparseConstraints = sparseConstraints,
     lpPackage = lpPackage,
     gaussI = gaussI
   )
