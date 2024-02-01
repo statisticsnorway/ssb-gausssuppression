@@ -27,6 +27,8 @@
 #' 'lpSolve' (default) and 'Rsymphony' are supported.
 #' @param gaussI Boolean vector. If TRUE (default), GaussIndependent is used to
 #' reduce size of linear program.
+#' @param  allInt Integer variables when TRUE. 
+#' See `all.int` parameter in `lpSolve` and `types` parameter in `Rsymphony`
 #'
 #' @importFrom stats na.omit runif
 #' @importFrom utils flush.console
@@ -43,7 +45,8 @@ ComputeIntervals <-
            suppressed,
            minVal = NULL,
            lpPackage = "lpSolve",
-           gaussI = TRUE) {
+           gaussI = TRUE,
+           allInt = FALSE) {
     if (!lpPackage %in% c("lpSolve", "Rsymphony"))
       stop("Only 'lpSolve' and 'Rsymphony' solvers are supported.")
     
@@ -178,9 +181,9 @@ ComputeIntervals <-
       # x is before Reduce0exact
       # adapted to Reduce0exact solution by !a$yKnown
       if (lpPackage == "lpSolve") {
-        lo[i] <- LpVal("min", f.obj, f.con, f.dir, f.rhs, all.int = TRUE)
+        lo[i] <- LpVal("min", f.obj, f.con, f.dir, f.rhs, all.int = allInt)
         up[i] <-
-          LpVal("max", f.obj, f.con, f.dir, f.rhs, all.int = TRUE)
+          LpVal("max", f.obj, f.con, f.dir, f.rhs, all.int = allInt)
       } else {
         lo[i] <- RsymphVal(
           max = FALSE,
@@ -188,7 +191,7 @@ ComputeIntervals <-
           mat = f.con,
           dir = f.dir,
           rhs = f.rhs,
-          types = "C"
+          types = c("C", "I")[1 + allInt]
         )
         up[i] <- RsymphVal(
           max = TRUE,
@@ -196,7 +199,7 @@ ComputeIntervals <-
           mat = f.con,
           dir = f.dir,
           rhs = f.rhs,
-          types = "C"
+          types = c("C", "I")[1 + allInt]
         )
       }
     }
