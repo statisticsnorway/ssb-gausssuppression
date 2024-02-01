@@ -55,6 +55,10 @@ PrimaryFromRiskyDefault <- function(x, y, risky, candidates) {
   
   pc2 <- FindParentChildInd(x, candidates, parentCandidates)
   
+  if (!nrow(pc2)) {
+    return(parentCandidates)  # no children 
+  }
+  
   pc2 <- cbind(y = y[pc2$child], pc2)
   pc2 <- SortRows(pc2)
   
