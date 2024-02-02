@@ -18,6 +18,8 @@
   -  Improved support for handling multiple numerical variables, introducing new parameters: `dominanceVar` and `candidatesVar`.
   - The `removeCodes` parameter is now also available in the `DominanceRule()` and `SuppressDominantCells()` functions.
   - Support for multiple `contributorVar` (`charVar`) in the  `SuppressFewContributors()` and `NContributorsRule()` functions.
+  - Now, `SuppressDominantCells()` includes special functionality to prevent zero cells, which have been suppressed, 
+    from being revealable in cases where negative values cannot occur. See the parameter `singletonZeros`.
   - The update described below enables the specification of the `pPercent` parameter directly through `SuppressDominantCells()`.
 * The p% rule for magnitude tables has been implemented through the introduction of a 
   new primary suppression function, `PPercentRule()`.
@@ -29,7 +31,7 @@
 * Experimental functionality for interval calculations has been included
   - Intervals can now be calculated using the new function `ComputeIntervals()`.
   - When the `lpPackage` parameter is specified in `GaussSuppressionFromData()` or in any of its wrappers, 
-    intervals for primary suppressed cells will be computed and included in the output."
+    intervals for primary suppressed cells will be computed and included in the output.
     
 
 ## GaussSuppression	0.7.0
