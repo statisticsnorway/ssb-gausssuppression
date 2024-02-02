@@ -124,6 +124,12 @@
 #'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.
 #'               see details. 
 #'               
+#' @param  lpPackage When non-NULL, intervals by \code{\link{ComputeIntervals}} 
+#'                   will be included in the output.
+#'                   See its documentation for valid parameter values for 'lpPackage'.
+#'                   Please note that interval calculations may have a 
+#'                   different interface in future versions.
+#'                                 
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
@@ -207,7 +213,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
                            forcedInOutput = "ifNonNULL",
-                           unsafeInOutput = "ifForcedInOutput"){ 
+                           unsafeInOutput = "ifForcedInOutput",
+                           lpPackage = NULL){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
       spec <- eval(spec)
@@ -233,6 +240,24 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
     stop("spec must be a properly named list")
   }
+  
+  
+  # Possible development function as input
+  # Special temporary feature 
+  if (is.function(output)) {
+    OutputFunction <- output
+    output <- "publish"
+  } else {
+    if (!is.null(lpPackage)) {
+      if (!require(lpPackage, character.only = TRUE, quietly = TRUE)) {
+        stop(paste0("Package '", lpPackage, "' is not available."))
+      }
+      OutputFunction <- OutputIntervals
+    } else {
+      OutputFunction <- NULL
+    }
+  }
+  
   
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
@@ -618,6 +643,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
                                   unsafeAsNegative = TRUE, ...)
   }
+  
+  # Use of special temporary feature
+  if (!is.null(OutputFunction)) {
+    environment(OutputFunction) <- environment()
+    return(OutputFunction(...))
+  }
+  
   
   if (output == "secondary") {
     if (unsafeInOutput %in% c("ifany", "always")) {

@@ -1,4 +1,36 @@
 
+## GaussSuppression	0.8.0
+* Improved singleton methods for magnitude tables
+  - A new default setting, `singletonMethod = "numttHTT"`, has been introduced in the 
+   wrappers `SuppressDominantCells()` and `SuppressFewContribitors()`. 
+   This setting represents the method that offers the highest level of protection. 
+   However, it should be noted that with this setting, the computational load of 
+   the suppression algorithm may double, which could potentially lead to a doubling of the 
+   execution time as well. During these computations, ":::"  will be displayed instead of "....".
+    * To prevent this doubling, set `singletonMethod = "numttHtT"`.
+    * The behavior of version 0.7.0 can be restored by setting `singletonMethod = "numttH"`.
+    * A simpler and faster method is achievable with `singletonMethod = "numttT"`.
+    * As in previous versions, singleton handling can be disabled by setting `singletonMethod = "none"`.
+  - Additional information can be found by `?SSBtools::NumSingleton`.
+  - Some explanation is provided at the bottom of the magnitude vignette.
+  - This will later be documented in a more comprehensive manner (paper).
+* Improved functionality of the `SuppressDominantCells()` and `SuppressFewContributors()` wrappers.
+  -  Improved support for handling multiple numerical variables, introducing new parameters: `dominanceVar` and `candidatesVar`.
+  - The `removeCodes` parameter is now also available in the `DominanceRule()` and `SuppressDominantCells()` functions.
+  - Support for multiple `contributorVar` (`charVar`) in the  `SuppressFewContributors()` and `NContributorsRule()` functions.
+  - The update described below enables the specification of the `pPercent` parameter directly through `SuppressDominantCells()`.
+* The p% rule for magnitude tables has been implemented through the introduction of a 
+  new primary suppression function, `PPercentRule()`.
+  - Technically, `PPercentRule()` and `DominanceRule()` now serve as wrappers for the newly introduced. 
+    general function `MagnitudeRule()`.
+* `AdditionalSuppression()` generalized to take a wrappers as input.
+* New special functions for the avoidance of suppression
+  - `PrimaryRemoveWg()`, `CandidatesNumWg()` and `ForcedWg()`
+* Experimental functionality for interval calculations has been included
+  - Intervals can now be calculated using the new function `ComputeIntervals()`.
+  - When the `lpPackage` parameter is specified in `GaussSuppressionFromData()` or in any of its wrappers, 
+    intervals for primary suppressed cells will be computed and included in the output."
+    
 
 ## GaussSuppression	0.7.0
 * More vignettes are included.
