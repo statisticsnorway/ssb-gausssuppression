@@ -80,6 +80,15 @@ ComputeIntervals <-
     published <- seq_len(ncol(x))
     published <- published[!(published %in% suppressed)]
     
+    if (!length(published)) {
+      cat("Infinity intervals without using a solver ...\n")
+      lo <- rep(NA_integer_, input_ncol_x)
+      up <- lo
+      lo[primary] <- c(minVal, 0)[1]
+      up[primary] <- Inf
+      return(cbind(lo = lo, up = up))
+    }
+    
     # Reorder since first match important in DummyDuplicated
     x <- x[, c(published, primary, secondary), drop = FALSE]
     z <- z[c(published, primary, secondary)]
