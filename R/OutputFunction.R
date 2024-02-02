@@ -64,7 +64,7 @@ OutputIntervals <- function(...,
   suppressed__ <- rep(FALSE, m)
   suppressed__[primary] <- TRUE
   suppressed__[secondary] <- TRUE
-  suppressed__[hidden] <- NA
+  suppressed__[hidden] <- TRUE     # in interval computation, hidden similar to secondary
   suppressed__[forced] <- FALSE
   
   gauss_intervals <- ComputeIntervals(
