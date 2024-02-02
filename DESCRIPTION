@@ -34,6 +34,8 @@ Suggests:
     rmarkdown,
     testthat (>= 3.0.0),
     lpSolve,
-    Rsymphony
+    Rsymphony,
+    Rglpk,
+    slam
 Config/testthat/edition: 3
 VignetteBuilder: knitr
