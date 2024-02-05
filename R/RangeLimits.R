@@ -65,7 +65,7 @@ RangeLimitsDefault <- function(...,
   colnames(rangeLimits) <- intervalVar
   
   for (i in seq_along(intervalVar)) {
-    if (intervalVar[i] == freqVar) {
+    if (intervalVar[i] == c(freqVar, "")[1]) { # since freqVar may be NULL
       z <- freq
     } else {
       z <- num[[intervalVar[i]]]
