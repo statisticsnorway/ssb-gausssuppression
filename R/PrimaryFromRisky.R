@@ -10,6 +10,8 @@
 #' @param candidates Indices to columns in `x` that are candidates for becoming 
 #'                   additional primary cells. Higher order cells must be included 
 #'                   so that parent-child relationships are seen.
+#' @param allDims When TRUE, a primary cell is added for each dimension.  
+#'                can be specified as a vector of length  `length(risky)`               
 #'
 #' @details
 #' 
@@ -46,7 +48,9 @@
 #' # The last solution (39) is not included in the first (28, 35). 
 #' # This is because 39 is not needed when 35 is already included.
 #' 
-PrimaryFromRiskyDefault <- function(x, y, risky, candidates) {
+PrimaryFromRiskyDefault <- function(x, y, risky, candidates, allDims = FALSE) {
+  
+  allDims = rep_len(allDims, length(risky))
   
   pc1 <- FindParentChildInd(x, risky, candidates)
   pc1 <- SortRows(pc1)
@@ -64,8 +68,9 @@ PrimaryFromRiskyDefault <- function(x, y, risky, candidates) {
   
   newPrimary <- integer(0)
   for (i in seq_along(risky)) {
-    newPrimary <- c(newPrimary, 
-                    SingleNewPrimary(pc2[pc2$parent %in% pc1$parent[pc1$child %in% risky[i]], , drop = FALSE]))
+    newPrimary <- c(newPrimary,    # rev to keep just the one with larges y. Only used to order  
+                    rev(SingleNewPrimary(pc2[pc2$parent %in% pc1$parent[pc1$child %in% risky[i]], , drop = FALSE],
+                                         allDims = allDims[i]))[1])
   }
   
   # reorder risky
@@ -79,7 +84,7 @@ PrimaryFromRiskyDefault <- function(x, y, risky, candidates) {
   for (i in seq_along(risky)) {
     newPrimary <- c(newPrimary, 
                     SingleNewPrimary(pc2[pc2$parent %in% pc1$parent[pc1$child %in% risky[i]], , drop = FALSE], 
-                                     previously = newPrimary))
+                                     previously = newPrimary, allDims = allDims[i]))
   }
   
   if (anyDuplicated(newPrimary)) {
@@ -91,7 +96,15 @@ PrimaryFromRiskyDefault <- function(x, y, risky, candidates) {
 
 
 
-SingleNewPrimary <- function(pc2, previously = integer(0)) {
+SingleNewPrimary <- function(..., allDims = FALSE) {
+  if(allDims){
+    return(SingleNewPrimaryAllDims(...))
+  } 
+  SingleNewPrimarySingleDim(...)
+}
+
+
+SingleNewPrimarySingleDim <- function(pc2, previously = integer(0)) {
   child_in_parent <- pc2$child[pc2$child %in% pc2$parent]
   grandparent <- unique(pc2$parent[pc2$child %in% child_in_parent])
   pc2 <- pc2[!(pc2$parent %in% grandparent), , drop = FALSE]
@@ -100,6 +113,27 @@ SingleNewPrimary <- function(pc2, previously = integer(0)) {
   }
   pc2$child[1]
 }
+
+
+
+SingleNewPrimaryAllDims <- function(pc2, previously = integer(0)) {
+  child_in_parent <- pc2$child[pc2$child %in% pc2$parent]
+  grandparent <- unique(pc2$parent[pc2$child %in% child_in_parent])
+  pc2 <- pc2[!(pc2$parent %in% grandparent), , drop = FALSE]
+  child_in_previously <- pc2$child %in% previously
+  if (any(child_in_previously)) {
+    parent_in_previously <- unique(pc2$parent[child_in_previously])
+    pc2 <- pc2[!(pc2$parent %in% parent_in_previously), , drop = FALSE]
+    # cat('\n pc2: \n') print(pc2)
+    if (!nrow(pc2)) {
+      return(integer(0))
+    }
+  }
+  ma <- match(unique(pc2$parent), pc2$parent)
+  pc2 <- pc2[ma, , drop = FALSE]
+  unique(pc2$child)
+}
+
 
 
 # Similar to part of GaussSuppression:::FindDifferenceCells
