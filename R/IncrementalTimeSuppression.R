@@ -122,7 +122,10 @@ IncrementalTimeSuppression <- function(data, fun, timeVar, formula,
     return(out)
   } else {
     
-    Candidates <- GetDefault(fun, "candidates")
+    GetCandidates = function(..., candidates = GetDefault(fun, "candidates")){
+      candidates
+    }
+    Candidates <- GetCandidates(...)  
     
     if (totalPriority) {
       notPriority <- subNames
@@ -141,17 +144,17 @@ IncrementalTimeSuppression <- function(data, fun, timeVar, formula,
     formula_as_character <- rev(as.character(formula))[1]
     formula_with_time <- as.formula(paste("~", timeVarS, "*(", formula_as_character, ")"))
     if (subTotals) {
-      out <- AdditionalSuppression(data, 
+      out <- AdditionalSuppressionHere(data, 
                                    fun = fun, 
                                    formula = formula_with_time, 
-                                   candidates = CandidatesTime, 
+                                   candidatesTime = CandidatesTime, 
                                    suppressedData = suppressedData, 
                                    hidden = Hidden, ...)
     } else {
-      out <- AdditionalSuppression(data, 
+      out <- AdditionalSuppressionHere(data, 
                                    fun = fun, 
                                    formula = formula_with_time, 
-                                   candidates = CandidatesTime, 
+                                   candidatesTime = CandidatesTime, 
                                    suppressedData = suppressedData, ...)
     }
     time_names <- incremental_time_names(data, timeVar)
@@ -168,8 +171,9 @@ IncrementalTimeSuppression <- function(data, fun, timeVar, formula,
   out
 }
 
-
-
+AdditionalSuppressionHere <- function(..., candidates, candidatesTime){
+  AdditionalSuppression(..., candidates = candidatesTime)
+}
 
 
 #  Example: incremental_time(d,"quarter")
