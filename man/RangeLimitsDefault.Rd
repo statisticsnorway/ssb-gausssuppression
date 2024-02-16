@@ -27,6 +27,10 @@ RangeLimitsDefault(
 
 \item{num}{num}
 
+\item{freq}{freq}
+
+\item{freqVar}{freqVar}
+
 \item{dominanceVar}{dominanceVar}
 
 \item{intervalVar}{intervalVar}
