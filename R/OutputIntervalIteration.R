@@ -6,7 +6,8 @@ OutputIntervalIteration <- function(...,
                             minVal = NULL, 
                             allInt = FALSE,
                             maxIterInterval = 50,
-                            allIntervals = TRUE) {
+                            allIntervals = TRUE,
+                            allDims) {
   
   if (is.null(lpPackage)) {
     lpPackage <- "lpSolve"
@@ -88,7 +89,7 @@ OutputIntervalIteration <- function(...,
       break
     }
     
-    primary_from_risky <- PrimaryFromRiskyDefault(x = x, y = z, risky = which(risky), candidates[candidates %in% which(!suppressed)])
+    primary_from_risky <- PrimaryFromRiskyDefault(x = x, y = z, risky = which(risky), candidates[candidates %in% which(!suppressed)],  allDims =  allDims)
     
     cat("\n risky: \n")
     o <- order(z[risky])
