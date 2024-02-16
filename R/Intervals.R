@@ -24,7 +24,7 @@
 #' Specifying 'minVal=0' would be redundant, as a minimum value of 0 is anyway 
 #' assumed for inner cells (see details).
 #' @param lpPackage The name of the package used to solve linear programs. Currently, 
-#' 'lpSolve' (default), 'Rsymphony' and 'Rglpk' are supported.
+#' 'lpSolve' (default), 'Rsymphony',  'Rglpk' and 'highs'  are supported.
 #' @param gaussI Boolean vector. If TRUE (default), GaussIndependent is used to
 #' reduce size of linear program.
 #' @param  allInt Integer variables when TRUE. 
@@ -37,6 +37,7 @@
 #' @importFrom utils flush.console
 #' @importFrom Matrix colSums t crossprod
 #' @importFrom SSBtools DummyDuplicated GaussIndependent Reduce0exact As_TsparseMatrix
+#' @importFrom methods as
 #'
 #' @export
 #'
@@ -52,7 +53,7 @@ ComputeIntervals <-
            allInt = FALSE,
            sparseConstraints = TRUE) {
     
-    if (!lpPackage %in% c("lpSolve", "Rsymphony", "Rglpk"))
+    if (!lpPackage %in% c("lpSolve", "Rsymphony", "Rglpk", "highs"))
       stop("Only 'lpSolve', 'Rsymphony' and 'Rglpk' solvers are supported.")
     
     if (!require(lpPackage, character.only = TRUE,  quietly = TRUE)) {
@@ -127,10 +128,6 @@ ComputeIntervals <-
       cat("-DDrow->", dim(x)[1], "*", length(published3), "->", sep = "")
     }
     
-    # Vectors of limits to be filled inn
-    lo <- rep(NA_integer_, ncol(x))
-    up <- lo
-    
     
     # Reduce problem by Reduce0exact
     a <-
@@ -159,116 +156,21 @@ ComputeIntervals <-
     
     cat(")\n")
     
-    # Make lp-input from Reduce0exact solution
-    f.con <- AsMatrix(t(a$x))
-    if (lpPackage == "lpSolve")
-      f.dir <- rep("=", nrow(f.con))
-    else
-      f.dir <- rep("==", nrow(f.con))
-    f.rhs <- as.vector((as.matrix(a$z)))
+    intervals1 = ComputeIntervals1(a, 
+                                 x, 
+                                 primary3, 
+                                 secondary3, 
+                                 minVal, 
+                                 allInt,
+                                 lpPackage,
+                                 sparseConstraints,
+                                 AsMatrix) 
     
-    if (!is.null(minVal)) {
-      f.con <-
-        rbind(f.con, AsMatrix(t(x[!a$yKnown, c(primary3, secondary3), drop = FALSE])))
-      f.dir <-
-        c(f.dir, rep(">=", length(primary3) + length(secondary3)))
-      f.rhs <-
-        c(f.rhs, rep(minVal, length(primary3) + length(secondary3)))
-    }
-    
-    cat("\n")
-    
-    if (lpPackage == "lpSolve") {
-      if (sparseConstraints) {
-        f.con <- As_TsparseMatrix(t(f.con)) # With t() result identical to lpSolve example   
-        f.con <- cbind(f.con@j + 1, f.con@i + 1, f.con@x)
-      }
-      cat("Using lpSolve for intervals...\n")
-    } 
-    if (lpPackage == "Rsymphony") {
-      cat("Using Rsymphony for intervals...\n")
-    }
-    
-    if (lpPackage == "Rglpk") {
-      if (sparseConstraints) {
-        f.con <- As_TsparseMatrix(f.con)  
-        f.con <-  slam::simple_triplet_matrix(   # Rglpk depends on slam
-          f.con@i + 1L, f.con@j + 1L, f.con@x, nrow = nrow(f.con), ncol = ncol(f.con))
-      }
-      cat("Using Rglpk for intervals...\n")
-    }
-    
-    
-    for (j in seq_along(primary3)) {
-      if (j %% max(1, length(primary3) %/% 50) == 0) {
-        cat("-")
-        flush.console()
-      }
-      i <- primary3[j]
-      flush.console()
-      f.obj <- as.vector(x[!a$yKnown, i])
-
-      # x is before Reduce0exact
-      # adapted to Reduce0exact solution by !a$yKnown
-      if (lpPackage == "lpSolve") {
-        if (sparseConstraints) {
-          lo[i] <- LpVal("min", f.obj, , # missing argument as in lpSolve example  
-                         f.dir, f.rhs, dense.const= f.con, all.int = allInt)
-          up[i] <- LpVal("max", f.obj, , 
-                         f.dir, f.rhs, dense.const= f.con, all.int = allInt) 
-        } else {
-          lo[i] <- LpVal("min", f.obj, f.con, f.dir, f.rhs, all.int = allInt)
-          up[i] <-LpVal("max", f.obj, f.con, f.dir, f.rhs, all.int = allInt)         
-        }
-      }
-      if (lpPackage == "Rsymphony") {
-        lo[i] <- RsymphVal(
-          max = FALSE,
-          obj = f.obj,
-          mat = f.con,
-          dir = f.dir,
-          rhs = f.rhs,
-          types = c("C", "I")[1 + allInt]
-        )
-        up[i] <- RsymphVal(
-          max = TRUE,
-          obj = f.obj,
-          mat = f.con,
-          dir = f.dir,
-          rhs = f.rhs,
-          types = c("C", "I")[1 + allInt]
-        )
-      }
-      if (lpPackage == "Rglpk") {      # Just copy from  if (lpPackage == "Rsymphony") rewrite?
-        lo[i] <- RglpkVal(
-          max = FALSE,
-          obj = f.obj,
-          mat = f.con,
-          dir = f.dir,
-          rhs = f.rhs,
-          types = c("C", "I")[1 + allInt]
-        )
-        up[i] <- RglpkVal(
-          max = TRUE,
-          obj = f.obj,
-          mat = f.con,
-          dir = f.dir,
-          rhs = f.rhs,
-          types = c("C", "I")[1 + allInt]
-        )
-      }
-    }
-      
-    # Add values "removed" by Reduce0exact
-    # a$y: A version of y (freq here) with known values correct and others zero
-    addKnown <- as.vector(Matrix::crossprod(x, a$y))
-    lo <- lo + addKnown
-    up <- up + addKnown
-    
+  
     # Transfer to before  "Reduce problem by duplicated columns"
     ma <- match(idxDD, idxDDunique)
-    lo <- lo[ma]
-    up <- up[ma]
+    lo <- intervals1$lo[ma]
+    up <- intervals1$up[ma]
     
     
     # Make sure lo and up long enough since secondary2
@@ -290,12 +192,136 @@ ComputeIntervals <-
     cat("\n")
     
     cbind(lo = lo_output, up = up_output)
-  }
+}
 # lp wrapper
 
 
-LpVal <- function(...) {
-  lpobj <- lpSolve::lp(...)
+
+
+
+
+ComputeIntervals1 <- function(a, 
+                             x, 
+                             primary3, 
+                             secondary3, 
+                             minVal, 
+                             allInt,
+                             lpPackage,
+                             sparseConstraints,
+                             AsMatrix,
+                             check = rep(TRUE, length(primary3)),
+                             verbose = TRUE) {
+  # Vectors of limits to be filled inn
+  lo <- rep(NA_integer_, ncol(x))
+  up <- lo
+  
+  # Make lp-input from Reduce0exact solution
+  f.con <- AsMatrix(t(a$x))
+  if (lpPackage == "lpSolve")
+    f.dir <- rep("=", nrow(f.con))
+  else
+    f.dir <- rep("==", nrow(f.con))
+  f.rhs <- as.vector((as.matrix(a$z)))
+  
+  if (!is.null(minVal)) {
+    f.con <-
+      rbind(f.con, AsMatrix(t(x[!a$yKnown, c(primary3, secondary3), drop = FALSE])))
+    f.dir <-
+      c(f.dir, rep(">=", length(primary3) + length(secondary3)))
+    f.rhs <-
+      c(f.rhs, rep(minVal, length(primary3) + length(secondary3)))
+  }
+  
+  if (verbose) cat("\n")
+  
+  if (lpPackage == "lpSolve") {
+    if (sparseConstraints) {
+      f.con <- As_TsparseMatrix(t(f.con)) # With t() result identical to lpSolve example   
+      f.con <- cbind(f.con@j + 1, f.con@i + 1, f.con@x)
+    }
+    if (verbose) cat("Using lpSolve for intervals...\n")
+  } 
+  if (lpPackage == "Rsymphony" | lpPackage == "highs") {
+    if (sparseConstraints) {
+      f.con <- As_dgCMatrix(f.con) 
+    }
+    if (verbose) cat("Using", lpPackage ,"for intervals...\n")
+  }
+  
+  if (lpPackage == "Rglpk") {
+    if (sparseConstraints) {
+      f.con <- As_TsparseMatrix(f.con)  
+      f.con <-  slam::simple_triplet_matrix(   # Rglpk depends on slam
+        f.con@i + 1L, f.con@j + 1L, f.con@x, nrow = nrow(f.con), ncol = ncol(f.con))
+    }
+    if (verbose) cat("Using Rglpk for intervals...\n")
+  }
+  
+  if (lpPackage == "lpSolve") {
+    if (!sparseConstraints) PackageVal = LpVal
+    if (sparseConstraints) PackageVal = LpVal_sparse
+  } 
+  if (lpPackage == "Rsymphony") PackageVal = RsymphVal
+  if (lpPackage == "Rglpk") PackageVal = RglpkVal
+  if (lpPackage == "highs") PackageVal = highsVal
+  
+  
+  for (j in which(check)) {  # for (j in seq_along(primary3)) {
+    if (verbose) if (j %% max(1, length(primary3) %/% 50) == 0) {
+      cat("-")
+      flush.console()
+    }
+    i <- primary3[j]
+    flush.console()
+    f.obj <- as.vector(x[!a$yKnown, i])
+    
+    lo[i] <- PackageVal(
+      max = FALSE,
+      obj = f.obj,
+      mat = f.con,
+      dir = f.dir,
+      rhs = f.rhs,
+      types = c("C", "I")[1 + allInt]
+    )
+    up[i] <- PackageVal(
+      max = TRUE,
+      obj = f.obj,
+      mat = f.con,
+      dir = f.dir,
+      rhs = f.rhs,
+      types = c("C", "I")[1 + allInt]
+    )
+    
+}
+
+# Add values "removed" by Reduce0exact
+# a$y: A version of y (freq here) with known values correct and others zero
+addKnown <- as.vector(Matrix::crossprod(x, a$y))
+lo <- lo + addKnown
+up <- up + addKnown
+
+list(lo = lo, up = up)
+}
+
+
+LpVal <- function(max, obj, mat, dir, rhs, types) {
+    lpobj <- lpSolve::lp(direction = c("min", "max")[1 + max],
+                         objective.in = obj,
+                         const.mat = mat,
+                         const.dir = dir,
+                         const.rhs = rhs,
+                         all.int = types == "I")  
+  c(lpobj$objval, NA, NaN,-Inf)[lpobj$status + 1]
+}
+
+
+LpVal_sparse <- function(max, obj, mat, dir, rhs, types) {
+  lpobj <- lpSolve::lp(direction = c("min", "max")[1 + max],
+                       objective.in = obj,
+                       dense.const = mat,
+                       const.dir = dir,
+                       const.rhs = rhs,
+                       all.int = types == "I")  
   c(lpobj$objval, NA, NaN,-Inf)[lpobj$status + 1]
 }
 
@@ -323,8 +349,47 @@ RglpkVal <- function(...) {
 }
 
 
+highsVal <- function(max, obj, mat, dir, rhs, types) {
+
+  L <- obj
+  
+  lower <- rep(0, length(L))  
+  upper <- rep(Inf, length(L))  
+  
+  A <- mat
+  
+  rhs <- rhs            
+  lhs <- rhs
+  rhs[dir == ">="] = Inf
+  lhs[dir == "<="] = -Inf
+  
+  maximum <- max
+  
+  solution <- highs::highs_solve(
+    Q = NULL,  
+    L = L,
+    lower = lower,
+    upper = upper,
+    A = A,
+    lhs = lhs,
+    rhs = rhs,
+    types = types,
+    maximum = maximum
+  )
+  
+  if(solution$status_message == "Optimal") {  
+    output <- solution$objective_value  
+  } else {
+    output <- NA  
+  }
+  output
+}
 
 
-
+# As_dgCMatrix(matrix(c(1, 2, 2, 1), nrow = 2))
+# As_dgCMatrix(Matrix(c(1, 2, 2, 1), nrow = 2))
+As_dgCMatrix = function(x){
+  as(drop0(x),  "generalMatrix")
+}
 
 
