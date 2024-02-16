@@ -19,7 +19,7 @@ OutputIntervalIteration <- function(...,
   rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
   
   if (ncol(rangeLimits) != 1) {
-    Stop("Only single intervalVar implemented")
+    stop("Only single intervalVar implemented")
   }
   
   intervalVar <- colnames(rangeLimits)
