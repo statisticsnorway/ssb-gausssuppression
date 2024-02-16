@@ -8,6 +8,8 @@
 #' @param rangeMin rangeMin 
 #' @param primary primary 
 #' @param num num 
+#' @param freq freq
+#' @param freqVar freqVar
 #' @param dominanceVar dominanceVar
 #' @param intervalVar intervalVar
 #'
