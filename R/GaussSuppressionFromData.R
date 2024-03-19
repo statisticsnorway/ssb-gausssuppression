@@ -124,9 +124,16 @@
 #'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.
 #'               see details. 
 #'               
-#' @param  lpPackage When non-NULL, intervals by \code{\link{ComputeIntervals}} 
+#' @param  lpPackage 
+#'  * **`lpPackage`:**
+#'                   When non-NULL, intervals by \code{\link{ComputeIntervals}} 
 #'                   will be included in the output.
 #'                   See its documentation for valid parameter values for 'lpPackage'.
+#'                   If, additionally, at least one of the two \code{\link{RangeLimitsDefault}} parameters below is specified, 
+#'                   further suppression will be performed to satisfy the interval width requirements.
+#'    * **`rangePercent`:** Required interval width expressed as a percentage
+#'    * **`rangeMin`:** Minimum required width of the interval
+#'    
 #'                   Please note that interval calculations may have a 
 #'                   different interface in future versions.
 #'                                 
@@ -252,7 +259,14 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       if (!require(lpPackage, character.only = TRUE, quietly = TRUE)) {
         stop(paste0("Package '", lpPackage, "' is not available."))
       }
-      OutputFunction <- OutputIntervals
+      if (hasArg(rangePercent) | hasArg(rangeMin)) {
+        # if (!(hasArg(rangePercent) & hasArg(rangeMin))) {
+        #   stop("Both rangePercent and rangeMin must be specified, not just one of them.")
+        # }
+        OutputFunction <- OutputFixRiskyIntervals
+      } else {
+        OutputFunction <- OutputIntervals
+      }
     } else {
       OutputFunction <- NULL
     }

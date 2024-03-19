@@ -19,9 +19,9 @@ RangeLimitsDefault(
 \arguments{
 \item{...}{Unused parameters}
 
-\item{rangePercent}{rangePercent}
+\item{rangePercent}{Required interval width expressed as a percentage}
 
-\item{rangeMin}{rangeMin}
+\item{rangeMin}{Minimum required width of the interval}
 
 \item{primary}{primary}
 
@@ -33,7 +33,8 @@ RangeLimitsDefault(
 
 \item{dominanceVar}{dominanceVar}
 
-\item{intervalVar}{intervalVar}
+\item{intervalVar}{Numerical variable(s) for interval calculations.
+When \code{NULL}, \code{dominanceVar}, first \code{numVar} or \code{freqVar} will be used.}
 }
 \value{
 matrix with named columns

@@ -4,14 +4,15 @@
 #' Preliminary function
 #' 
 #' @param ... Unused parameters 
-#' @param rangePercent rangePercent
-#' @param rangeMin rangeMin 
+#' @param rangePercent  Required interval width expressed as a percentage
+#' @param rangeMin Minimum required width of the interval
 #' @param primary primary 
 #' @param num num 
 #' @param freq freq
 #' @param freqVar freqVar
 #' @param dominanceVar dominanceVar
-#' @param intervalVar intervalVar
+#' @param intervalVar Numerical variable(s) for interval calculations. 
+#'    When `NULL`, `dominanceVar`, first `numVar` or `freqVar` will be used.  
 #'
 #' @return matrix with named columns  
 #' 

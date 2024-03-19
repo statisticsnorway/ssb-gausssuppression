@@ -150,11 +150,22 @@ One of \code{"ifForcedInOutput"} (default), \code{"always"}, \code{"ifany"} and 
 In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{"always"} and \code{"no"}.
 see details.}
 
-\item{lpPackage}{When non-NULL, intervals by \code{\link{ComputeIntervals}}
+\item{lpPackage}{\itemize{
+\item \strong{\code{lpPackage}:}
+When non-NULL, intervals by \code{\link{ComputeIntervals}}
 will be included in the output.
 See its documentation for valid parameter values for 'lpPackage'.
-Please note that interval calculations may have a
-different interface in future versions.}
+If, additionally, at least one of the two \code{\link{RangeLimitsDefault}} parameters below is specified,
+further suppression will be performed to satisfy the interval width requirements.
+\itemize{
+\item \strong{\code{rangePercent}:} Required interval width expressed as a percentage
+\item \strong{\code{rangeMin}:} Minimum required width of the interval
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{         Please note that interval calculations may have a 
+         different interface in future versions.
+}\if{html}{\out{</div>}}
+}
+}}
 }
 \value{
 Aggregated data with suppression information

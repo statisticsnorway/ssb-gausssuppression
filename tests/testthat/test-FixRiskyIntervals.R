@@ -16,7 +16,6 @@ if (require(lpPackage, character.only = TRUE, quietly = TRUE)) {
     f <- ~(region + fylke) * mnd2 + kostragr * hovedint * mnd
     b <- SuppressDominantCells(z3[s, ], numVar = "value", n = 1:2, k = c(70, 95), 
                                formula = f, lpPackage =  lpPackage , 
-                               output = GaussSuppression:::OutputFixRiskyIntervals,
                                rangePercent = 200,  
                                rangeMin = 1)
     expect_equal(as.vector(table(b$suppressed_integer)), c(130L, 39L, 33L, 37L))
