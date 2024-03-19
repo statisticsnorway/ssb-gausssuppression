@@ -36,6 +36,7 @@ Suggests:
     lpSolve,
     Rsymphony,
     Rglpk,
-    slam
+    slam, 
+    highs
 Config/testthat/edition: 3
 VignetteBuilder: knitr

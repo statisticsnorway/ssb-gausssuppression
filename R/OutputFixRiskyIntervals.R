@@ -145,7 +145,7 @@ OutputFixRiskyIntervals <- function(...,
 
 
 # To avoid check problems
-utils::globalVariables(c("structuralEmpty"))
+utils::globalVariables(c("structuralEmpty", "rangeMin", "rangePercent"))
 
 
 
