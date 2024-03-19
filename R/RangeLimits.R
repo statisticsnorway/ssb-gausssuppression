@@ -21,8 +21,6 @@
 #' dat <- SSBtoolsData("magnitude1")
 #' dat["num2"] <- 1:nrow(dat)
 #' 
-#' RangeOutputFunction <- GaussSuppression:::RangeOutputFunction
-#' 
 #' SuppressDominantCells(data = dat, 
 #'     numVar = "value", 
 #'     formula = ~sector2 * geo + sector4 * eu, 
@@ -40,8 +38,8 @@
 #'     rangePercent = c(10, 10, 30), rangeMin = c(1, 0.2222, 2.222))
 #' 
 RangeLimitsDefault <- function(..., 
-                                  rangePercent,
-                                  rangeMin,
+                                  rangePercent = 0,
+                                  rangeMin = 0,
                                   primary, 
                                   num, 
                                   freq,
@@ -80,6 +78,14 @@ RangeLimitsDefault <- function(...,
 }
 
 
+#' Function used in RangeLimitsDefault example  
+#'
+#' @param ... parameters 
+#'
+#' @return Aggregated data with suppression information
+#' @export
+#' @keywords internal
+#'
 RangeOutputFunction <- function(...) {
   rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
   colnames(rangeLimits) <- paste("rlim", colnames(rangeLimits), sep = "_")

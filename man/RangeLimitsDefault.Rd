@@ -6,8 +6,8 @@
 \usage{
 RangeLimitsDefault(
   ...,
-  rangePercent,
-  rangeMin,
+  rangePercent = 0,
+  rangeMin = 0,
   primary,
   num,
   freq,
@@ -44,8 +44,6 @@ Preliminary function
 \examples{
 dat <- SSBtoolsData("magnitude1")
 dat["num2"] <- 1:nrow(dat)
-
-RangeOutputFunction <- GaussSuppression:::RangeOutputFunction
 
 SuppressDominantCells(data = dat, 
     numVar = "value", 
