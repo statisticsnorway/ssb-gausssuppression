@@ -14,9 +14,7 @@
 OutputFixRiskyIntervals <- function(..., 
                             minVal = NULL, 
                             allInt = FALSE,
-                            gaussIFix = FALSE, # = gaussI-input to FixRiskyIntervals
-                            maxIterInterval = 50,
-                            allIntervals = TRUE) {
+                            gaussIFix = FALSE) {   # = gaussI-input to FixRiskyIntervals
   
   if (is.null(lpPackage)) {
     lpPackage <- "lpSolve"
