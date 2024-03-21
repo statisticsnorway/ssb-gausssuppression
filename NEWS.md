@@ -1,4 +1,12 @@
 
+## GaussSuppression	X.X.X
+* Experimental functionality to meet interval width requirements have been incorporated
+  - If at least one of the two parameters below is specified, in addition to the
+    `lpPackage` parameter, further suppression will be performed to satisfy the interval width requirements.
+    * `rangePercent`: Required interval width expressed as a percentage
+    * `rangeMin`: Minimum required width of the interval
+
+
 ## GaussSuppression	0.8.0
 * Improved singleton methods for magnitude tables
   - A new default setting, `singletonMethod = "numttHTT"`, has been introduced in the 
