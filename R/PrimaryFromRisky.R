@@ -26,6 +26,8 @@
 #' @return Additional primary cells as indices to columns in `x`.
 #' @export
 #' 
+#' @keywords internal
+#' 
 #' @examples
 #' 
 #' # Example inspired by suppression with maxN = 5
