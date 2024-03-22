@@ -1,0 +1,207 @@
+---
+title: "Customizing Cell Suppression with Functions"
+author: "Daniel P. Lupp"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Customizing Cell Suppression with Functions}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r include = FALSE}
+htmltables <- TRUE
+if(htmltables){
+  source("GaussKable.R")
+  P <- function(..., timevar = 2) G(fun = GaussSuppressionFromData, timevar = timevar, 
+                       freqVar = "freq", primary = FALSE, protectZeros = FALSE,
+                         s = c(LETTERS, "county-1", "county-2", "county-3", "small", "BIG",
+                               "other", "wages", "assistance", "pensions"), 
+                       ...) 
+} else { 
+  P <- function(...) cat("Formatted table not avalable")
+}
+```
+
+
+## Introduction
+
+The `GaussSuppression` package provides multiple parameters for customizing cell suppression. This vignette gives an introduction on how to customize suppression by supplying functions to the following parameters: `primary`, `forced`, `hidden`, and `candidates`. In general, these parameters can be supplied with different types of input:
+
+* `primary`, `forced`, and `hidden`: These parameters can be supplied with integer vectors, logical vectors, or functions. If the supplied input is an integer vector, the output's rows corresponding to the supplied integers are respectively primary suppressed, forced to be published, or cells that will not be visible to users, but must be taken into account in the suppression algorithm. Similarly, if the input is logical, those cells marked with TRUE are considered primary suppressed, forced to be published, or not visible to users. Finally, they can be functions that calculate the respective results given other input parameters.
+* `candidates`: This parameter can be an integer vector or a function. If it is an integer vector, then it specifies the order in which cells are considered during the secondary suppression algorithm. If it is a function, it calculates the order based on other input parameters.
+
+Though the parameters serve different purposes, each can be supplied with functions sharing the same function interface. The focus of this vignette is to provide an introduction to this interface. This will allow you to start customizing your cell suppression method by defining your own `primary`, `forced`, `hidden`, and `candidates` functions.
+
+We begin by importing the necessary dependencies as well as loading a test data set provided in the SSBtools package.
+
+```{r setup}
+library(SSBtools)
+library(GaussSuppression)
+
+dataset <- SSBtools::SSBtoolsData("d2s")
+
+microdata <- SSBtools::MakeMicro(dataset, "freq")
+
+head(microdata)
+nrow(microdata)
+```
+
+## Getting started
+
+First, we define a standard suppression setup as a sort of baseline, using the built-in wrappers in `GaussSuppression`.
+```{r}
+basic_output <- SuppressSmallCounts(data = microdata,
+                                    formula = ~(region + county)*main_income,
+                                    freqVar = "freq",
+                                    maxN = 3,
+                                    extend0 = FALSE)
+tail(basic_output)
+```
+We will customize this suppression throughout the vignette. Before we can do that, however, we must first have a look at the parameters the `primary`, `hidden`, `forced`, and `candidates` functions can take.
+
+## Function parameters
+### Parameters supplied by GaussSuppression
+By specifying `output = "input2functions"`, we can see what parameters these functions are supplied with, as well as the associated values.
+
+```{r}
+params <- SuppressSmallCounts(data = microdata,
+                    formula = ~(region + county)*main_income,
+                    freqVar = "freq",
+                    maxN = 3,
+                    extend0 = FALSE,
+                    output = "input2functions")
+
+names(params)
+head(params$crossTable)
+params$protectZeros
+params$dimVar
+```
+Here we see just some of the values that are passed to custom functions. For example, we see that many of the parameters specified by the user are passed on to the underlying functions (e.g., `data`, `freqVar`, `numVar`, `charVar`, `protectZeros` among others). In addition to these, the following input parameters are constructed and passed to the functions:
+
+* `crossTable`: This is a data.frame containing the categorical spanning variables of our output table. 
+```{r}
+head(params$crossTable)
+tail(params$crossTable)
+```
+* `x`: the *model matrix*, which connects the input data to the output. It represents all aggregations needed to produce the output table. It has one row per row in the input data, and one column per row in the output data. The matrix is a sparse matrix of the class "dgCMatrix", and has a 1 in entry `i,j` if and only if row `i` of the input data contributes to row `j` of the output data.
+```{r}
+head(params$x)
+dim(params$x)
+```
+* `freq`: the vector of frequency values in the output table. This can be calculated using the model matrix using the formula `freq = t(x) %*% data[[freqVar]]` as seen below.
+```{r}
+# params$freq is the same as the freq column in the output
+all(params$freq == basic_output$freq)
+
+# if freqVar is specified by the user, freq is calculated as follows:
+all(basic_output$freq == as.vector(Matrix::crossprod(params$x, microdata$freq)))
+
+# if freqVar is not specified by the user, each row contributes 1 to the output:
+all(basic_output$freq == as.vector(Matrix::crossprod(params$x, rep(1, nrow(microdata)))))
+
+# since our freqVar only contains 1's, both assertions result in TRUE.
+```
+* `num`: this contains the values of the numerical response variables in the output value. If the user specifies a single `numVar`, then `num` is a vector, if a user specifies multiple values for `numVar`, the result is a matrix. The values are calculated exactly as with `freq` using the equation `num = t(x) %*% data[,numVar]`. In our example, we have not specified any `numVar`, therefore it is NULL.
+```{r}
+params$num
+```
+* `weight`: this contains the weights used for prioritizing order of secondary suppressions for the table cells. Similarly to `freq` and `num`, this is calculated by `weight = t(x) %*% data[,weightVar]`. Since we did not supply `weightVar`, this is `NULL`.
+```{r}
+params$weight
+```
+
+### Adding own parameters
+All functions for `primary`, `forced`, `hidden`, and `candidates` are supplied with the ellipses parameter `...` which allows us to pass custom arguments in addition to the ones generated internally in `GaussSuppression`. We shall use this functionality later in the next section.
+
+## Custom functions for `primary`, `forced`, and `hidden`
+
+In this section, we will see how we can customize the cell suppression method using the `primary`, `forced`, and `hidden` parameters.
+
+Let us apply what we have learned in the previous section by defining our first custom primary function. To begin, let us 
+try to primary suppress those cells that have an even cell count.
+```{r}
+my_function <- function(freq, ...) {
+  freq %% 2 == 0
+}
+
+custom_out <- SuppressSmallCounts(data = microdata,
+                    formula = ~(region + county)*main_income,
+                    freqVar = "freq",
+                    maxN = 3,
+                    extend0 = FALSE,
+                    primary = my_function)
+tail(custom_out)
+```
+Here we see that rows 45 and 48, being even, are primary suppressed, whereas rows 43, 44, 46, and 47 are not, as they contain odd counts. We also see that the `maxN` parameter is not considered; it is overwritten by out custom primary function.
+However, the function `SuppressSmallCounts` requires users to provide a value for `maxN`, so from now on we shall supply `maxN = NULL` when we supply a custom `primary` function to avoid confusion.
+
+We can also use the other parameters discussed earlier. The following example suppresses all even values that are not in `county-3`:
+
+```{r}
+my_function <- function(freq, crossTable, ...) {
+  even <- freq %% 2 == 0
+  not_county3 <- crossTable[["region"]] != "county-3"
+  even & not_county3
+}
+
+custom_out <- SuppressSmallCounts(data = microdata,
+                    formula = ~(region + county)*main_income,
+                    freqVar = "freq",
+                    maxN = NULL,
+                    extend0 = FALSE,
+                    primary = my_function)
+tail(custom_out)
+```
+Here we see that row 48 is no longer primary suppressed (though it is secondary suppressed).
+
+As mentioned previously, we can also supply our own parameters to such functions. To illustrate this, we define our own parameter `single_var_filter` within `my_function`, and pass it through `SuppressSmallCounts`. The following function allows a user to specify which values for a single given variable should not be primary suppressed.
+
+```{r}
+my_function <- function(freq, crossTable, single_var_filter, ...) {
+  even <- freq %% 2 == 0
+  filtered <- crossTable[[names(single_var_filter)]] %in% single_var_filter[[1]]
+  even & !filtered
+}
+
+custom_out <- SuppressSmallCounts(data = microdata,
+                    formula = ~(region + county)*main_income,
+                    freqVar = "freq",
+                    maxN = NULL,
+                    extend0 = FALSE,
+                    primary = my_function,
+                    single_var_filter = list(region = "county-3"))
+tail(custom_out)
+```
+We could supply the function as the `forced` parameter instead:
+```{r}
+my_function <- function(freq, crossTable, single_var_filter, ...) {
+  even <- freq %% 2 == 0
+  filtered <- crossTable[[names(single_var_filter)]] %in% single_var_filter[[1]]
+  even & !filtered
+}
+
+custom_out <- SuppressSmallCounts(data = microdata,
+                    formula = ~(region + county)*main_income,
+                    freqVar = "freq",
+                    maxN = 3,
+                    extend0 = FALSE,
+                    forced = my_function,
+                    single_var_filter = list(region = "county-3"))
+custom_out[33:39,]
+```
+Now, all even values not in `county-3` are forced to be published. Consider row 36 in the above output: the cell is marked as a primary unsafe cell, however is still published. This is due to us defining that all cells with even count, where region is not `county-3`, must be published. Thus we see that `forced` has precedence over `primary`. The parameter `forced` is a useful tool when suppressing tables with respect to already published tables or other publicly available information. Therefore, it makes sense for `forced` to have precedence over `primary`: if a cell is publicly available, it makes no sense to primary suppress it.
+
+### Custom functions for `candidates`
+Functions for `candidates` calculate an order in which cells are considered during the Gauss algorithm. In order to write such functions, a basic understanding of the Gauss algorithm is highly beneficial. Therefore, we will briefly discuss what `candidates` means (avoiding as many technical details as possible), before illustrating its effect on the secondary suppression.
+
+After having identified which cells are primary suppressed, GaussSuppression must detect which secondary cells can lead to a recalculation of any primary cells. This is done using a greedy approach: We begin by looking at the first element in the candidates, and seeing whether this element can lead to the recalculation of any primary cells. If it can, it must be secondary suppressed. If it cannot, we add the next candidate and perform the same check: can any primary cells be recalculated with the new candidate in addition to all the previously published candidates? This process continues until there are no more candidates left to consider.
+
+Due to this process, the order in which candidates are added has a considerable effect on the secondary suppression. As a rule of thumb, cells that occur early in the list of candidates are more likely to be published, whereas cells occurring towards the end of the candidates list are more likely to be suppressed. This we can use to specify a preference for which cells we prefer to publish.
