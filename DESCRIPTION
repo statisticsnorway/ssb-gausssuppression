@@ -1,8 +1,8 @@
 Package: GaussSuppression
 Type: Package
 Title: Tabular Data Suppression using Gaussian Elimination
-Version: 0.8.0
-Date: 2024-02-02
+Version: 0.8.3
+Date: 2024-03-22
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
                     email = "oyl@ssb.no"),
              person("Daniel", "Lupp", role = c("aut")),        

@@ -1,5 +1,5 @@
 
-## GaussSuppression	X.X.X
+## GaussSuppression	0.8.3
 * Experimental functionality to meet interval width requirements has been incorporated
   - If at least one of the two parameters below is specified, in addition to the
     `lpPackage` parameter, further suppression will be performed to satisfy the interval width requirements.
