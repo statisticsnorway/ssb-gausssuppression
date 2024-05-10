@@ -10,7 +10,7 @@ Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
              person("Statistics Norway", role = "cph"))
 Maintainer: Øyvind Langsrud <oyl@ssb.no>
 Depends: Matrix
-Imports: SSBtools (>= 1.5.0), RegSDC (>= 0.7.0), stats, methods, utils
+Imports: SSBtools (>= 1.5.1), RegSDC (>= 0.7.0), stats, methods, utils
 Description: A statistical disclosure control tool to protect tables by suppression 
     using the Gaussian elimination secondary suppression algorithm. A suggestion is 
     to start by working with functions SuppressSmallCounts() and 
