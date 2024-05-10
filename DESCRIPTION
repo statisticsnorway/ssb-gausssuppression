@@ -1,8 +1,8 @@
 Package: GaussSuppression
 Type: Package
 Title: Tabular Data Suppression using Gaussian Elimination
-Version: 0.8.3
-Date: 2024-03-22
+Version: 0.8.4
+Date: 2024-05-10
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
                     email = "oyl@ssb.no"),
              person("Daniel", "Lupp", role = c("aut")),        
@@ -22,11 +22,11 @@ Description: A statistical disclosure control tool to protect tables by suppress
     replaced by synthetic decimal numbers as described in 
     Langsrud (2019) <doi:10.1007/s11222-018-9848-9>.
 License: MIT + file LICENSE
-URL: https://github.com/statisticsnorway/GaussSuppression
-BugReports: https://github.com/statisticsnorway/GaussSuppression/issues
+URL: https://github.com/statisticsnorway/ssb-gausssuppression
+BugReports: https://github.com/statisticsnorway/ssb-gausssuppression/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Suggests: 
     formattable,
     kableExtra,
