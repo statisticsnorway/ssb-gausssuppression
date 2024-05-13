@@ -149,11 +149,24 @@ FixRiskyIntervals <-
     up <- lo
     
     
-    # Reduce problem by Reduce0exact       ###############   cannot use reduceByColSums now. Also with Reduce0exact zeros cannot be extra primary.   
-    a <-
-      Reduce0exact(x[, published3, drop = FALSE], matrix(z[published3]))  ###### , reduceByColSums = TRUE)
+    ## 
+    ## # Reduce problem by Reduce0exact       ###############   cannot use reduceByColSums now. Also with Reduce0exact zeros cannot be extra primary.   
+    ## a <-
+    ##   Reduce0exact(x[, published3, drop = FALSE], matrix(z[published3]))  ###### , reduceByColSums = TRUE)
+    ## 
+    ## cat("-0exact->", dim(a$x)[1], "*", dim(a$x)[2], sep = "")
+    ## 
     
-    cat("-0exact->", dim(a$x)[1], "*", dim(a$x)[2], sep = "")
+    # A function as Reduce0exact, but nothing done
+    # Just to get output on same form so that old code works 
+    ReduceNothing <- function(x, z) {
+      list(x = x, 
+           z = z, 
+           yKnown = rep(FALSE, nrow(x)), 
+           y = matrix(0, nrow(x), 1), 
+           zSkipped = rep(FALSE, ncol(x)))
+    }
+    a <- ReduceNothing(x[, published3, drop = FALSE], matrix(z[published3]))  
     
     
     candidates_published4 <- candidates_published3[!a$zSkipped]
