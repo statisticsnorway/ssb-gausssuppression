@@ -25,7 +25,7 @@ numerical indices or by specifying the spec name, see Details.
 The following table summarizes the built-in specs. Columns represent
 different specs, and rows represent the parameter settings.\tabular{lllll}{
     \tab \strong{smallCountSpec} \tab \strong{dominanceSpec} \tab \strong{fewContributorsSpec} \tab \strong{kDisclosureSpec} \cr
-   \strong{primary} \tab PrimaryDefault \tab DominanceRule \tab NContributorsRule \tab KDisclosurePrimary \cr
+   \strong{primary} \tab PrimaryDefault \tab MagnitudeRule \tab NContributorsRule \tab KDisclosurePrimary \cr
    \strong{protectZeros} \tab TRUE \tab FALSE \tab FALSE \tab FALSE \cr
    \strong{candidates} \tab CandidatesDefault \tab CandidatesNum \tab CandidatesNum \tab DirectDisclosureCandidates \cr
    \strong{singleton} \tab SingletonDefault \tab SingletonUniqueContributor \tab SingletonUniqueContributor \tab SingletonDefault \cr

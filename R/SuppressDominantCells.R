@@ -1,9 +1,9 @@
 
 
-#' Suppress volume tables using dominant cell primary suppression.
+#' Suppress magnitude tables using dominance `(n,k)` or p% rule for primary suppression.
 #'
 #' @inheritParams GaussSuppressionFromData
-#' @inheritParams DominanceRule
+#' @inheritParams MagnitudeRule
 #' @param dominanceVar Numerical variable to be used in dominance rule. 
 #'           The first `numVar` variable will be used if it is not specified.
 #' @param numVar Numerical variable to be aggregated.
@@ -45,6 +45,7 @@
 #' 
 #' # basic use
 #' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1)
+#' SuppressDominantCells(d, pPercent = 7, numVar = "num", formula = ~v1 -1) 
 #' 
 #' # with weights
 #' SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num",
@@ -80,8 +81,9 @@
 #' SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
 #'                       hierarchies = list(main_income = ml, k_group = "Total_Norway"))
 SuppressDominantCells <- function(data,
-                                  n,
-                                  k,
+                                  n = NULL,
+                                  k = NULL,
+                                  pPercent = NULL, 
                                   allDominance = FALSE,
                                   dominanceVar = NULL,
                                   numVar = NULL,
@@ -140,6 +142,7 @@ SuppressDominantCells <- function(data,
     data = data,
     n = n,
     k = k,
+    pPercent =  pPercent,
     allDominance = allDominance,
     dominanceVar = dominanceVar, 
     numVar = numVar,
