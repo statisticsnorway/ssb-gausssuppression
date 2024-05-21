@@ -27,6 +27,7 @@ vignettes/*.pdf
 # R Environment Variables
 .Renviron
 GaussSuppression.Rproj
+ssb-gausssuppression.Rproj
 .gitignore
 bibucket_push.bat
 git_branch_-d.bat
