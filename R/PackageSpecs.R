@@ -8,7 +8,7 @@
 #'
 #'  |                         |\strong{smallCountSpec} |\strong{dominanceSpec}     |\strong{fewContributorsSpec} |\strong{kDisclosureSpec}   |
 #'  |:------------------------|:-----------------------|:--------------------------|:----------------------------|:--------------------------|
-#'  |\strong{primary}         |PrimaryDefault          |DominanceRule              |NContributorsRule            |KDisclosurePrimary         |
+#'  |\strong{primary}         |PrimaryDefault          |MagnitudeRule              |NContributorsRule            |KDisclosurePrimary         |
 #'  |\strong{protectZeros}    |TRUE                    |FALSE                      |FALSE                        |FALSE                      |
 #'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum              |CandidatesNum                |DirectDisclosureCandidates |
 #'  |\strong{singleton}       |SingletonDefault        |SingletonUniqueContributor |SingletonUniqueContributor   |SingletonDefault           |
@@ -48,7 +48,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
     
     dominanceSpec =       
       quote(list(
-      primary = DominanceRule,
+      primary = MagnitudeRule,
       candidates = CandidatesNum,  
       singleton = SingletonUniqueContributor,
       preAggregate = !is.null(charVar),

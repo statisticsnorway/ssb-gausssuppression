@@ -2,12 +2,13 @@
 % Please edit documentation in R/SuppressDominantCells.R
 \name{SuppressDominantCells}
 \alias{SuppressDominantCells}
-\title{Suppress volume tables using dominant cell primary suppression.}
+\title{Suppress magnitude tables using dominance \verb{(n,k)} or p\% rule for primary suppression.}
 \usage{
 SuppressDominantCells(
   data,
-  n,
-  k,
+  n = 1:length(k),
+  k = NULL,
+  pPercent = NULL,
   allDominance = FALSE,
   dominanceVar = NULL,
   numVar = NULL,
@@ -25,9 +26,15 @@ SuppressDominantCells(
 \arguments{
 \item{data}{Input data as a data frame}
 
-\item{n}{parameter \code{n} in dominance rule.}
+\item{n}{Parameter \code{n} in dominance rule. Default is \code{1:length(k)}.}
 
-\item{k}{parameter \code{k} in dominance rule.}
+\item{k}{Parameter \code{k} in dominance rule.}
+
+\item{pPercent}{Parameter in the p\% rule, when non-NULL.
+Parameters \code{n} and  \code{k} will then be ignored.
+Technically, calculations are performed internally as if
+\code{n = 1:2}. The results of these intermediate calculations can
+be viewed by setting \code{allDominance = TRUE}.}
 
 \item{allDominance}{Logical parameter. If \code{TRUE}, adds primary columns for each
 pair of parameters n,k in the dominance rules}
@@ -72,7 +79,7 @@ tables when \code{\link{SingletonUniqueContributor0}} is utilized.}
 data frame containing aggregated data and suppression information.
 }
 \description{
-Suppress volume tables using dominant cell primary suppression.
+Suppress magnitude tables using dominance \verb{(n,k)} or p\% rule for primary suppression.
 }
 \examples{
 num <- c(100,
@@ -91,6 +98,8 @@ d <- data.frame(v1 = v1, num = num, sweight = sweight)
 
 # basic use
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1)
+SuppressDominantCells(d, k = c(80,70), numVar = "num", formula = ~v1 -1) # same as above
+SuppressDominantCells(d, pPercent = 7, numVar = "num", formula = ~v1 -1) 
 
 # with weights
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num",

@@ -35,9 +35,9 @@ PPercentRule(data, pPercent, protectZeros = FALSE, ...)
 
 \item{numVar}{vector containing numeric values in the data set}
 
-\item{n}{parameter \code{n} in dominance rule.}
+\item{n}{Parameter \code{n} in dominance rule.}
 
-\item{k}{parameter \code{k} in dominance rule.}
+\item{k}{Parameter \code{k} in dominance rule.}
 
 \item{pPercent}{Parameter in the p\% rule, when non-NULL.
 Parameters \code{n} and  \code{k} will then be ignored.
