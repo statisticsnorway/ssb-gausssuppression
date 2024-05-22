@@ -28,7 +28,7 @@ SuppressDominantCells(
 
 \item{n}{Parameter \code{n} in dominance rule. Default is \code{1:length(k)}.}
 
-\item{k}{parameter \code{k} in dominance rule.}
+\item{k}{Parameter \code{k} in dominance rule.}
 
 \item{pPercent}{Parameter in the p\% rule, when non-NULL.
 Parameters \code{n} and  \code{k} will then be ignored.
