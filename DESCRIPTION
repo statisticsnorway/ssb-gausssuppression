@@ -7,6 +7,7 @@ Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
                     email = "oyl@ssb.no"),
              person("Daniel", "Lupp", role = c("aut")),        
              person("Hege", "Bøvelstad", role = c("ctb")),
+             person("Vidar Norstein", "Klungre", role = "rev"),
              person("Statistics Norway", role = "cph"))
 Maintainer: Øyvind Langsrud <oyl@ssb.no>
 Depends: Matrix
