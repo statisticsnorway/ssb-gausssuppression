@@ -1,5 +1,11 @@
 
 ## GaussSuppression	0.8.5
+* `SuppressDominantCells()` is now considered a common function for both the nk-dominance rule and the p-percent rule.
+  - The `pPercent` parameter is now exposed in the `SuppressDominantCells()` documentation.
+* The `n` parameter in `SuppressDominantCells()` now defaults to `1:length(k)`.
+  - To simplify common use.
+* A problem in experimental interval suppression is now fixed. 
+  - It was a bug occurring in cases where a response value of zero was secondary suppressed.
 * Improvements due to updates in  [the SSBtools package](https://CRAN.R-project.org/package=SSBtools) (version 1.5.2).
   - Fix for a rare problem in `GaussSuppression()`, 
     * Could happen with parallel eliminations combined with integer overflow.
