@@ -1,4 +1,15 @@
 
+## GaussSuppression	0.8.5
+* Improvements due to updates in  [the SSBtools package](https://CRAN.R-project.org/package=SSBtools) (version 1.5.2).
+  - Fix for a rare problem in `GaussSuppression()`, 
+    * Could happen with parallel eliminations combined with integer overflow.
+    Then warning message:  *longer object length is not a multiple of shorter object length*
+  - Minor change to the singleton method `"anySum"` in `GaussSuppression()` to align with best theory.
+    * In practice, this rarely makes a difference.
+    * The previous behavior can be ensured by setting `singletonMethod` to either `"anySumOld"` or `"anySumNOTprimaryOld"`.
+
+
+
 ## GaussSuppression	0.8.3
 * Experimental functionality to meet interval width requirements has been incorporated
   - If at least one of the two parameters below is specified, in addition to the
