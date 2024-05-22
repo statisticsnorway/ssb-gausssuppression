@@ -6,7 +6,7 @@
 \usage{
 SuppressDominantCells(
   data,
-  n = NULL,
+  n = 1:length(k),
   k = NULL,
   pPercent = NULL,
   allDominance = FALSE,
@@ -26,7 +26,7 @@ SuppressDominantCells(
 \arguments{
 \item{data}{Input data as a data frame}
 
-\item{n}{parameter \code{n} in dominance rule.}
+\item{n}{Parameter \code{n} in dominance rule. Default is \code{1:length(k)}.}
 
 \item{k}{parameter \code{k} in dominance rule.}
 
@@ -98,6 +98,7 @@ d <- data.frame(v1 = v1, num = num, sweight = sweight)
 
 # basic use
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1)
+SuppressDominantCells(d, k = c(80,70), numVar = "num", formula = ~v1 -1) # same as above
 SuppressDominantCells(d, pPercent = 7, numVar = "num", formula = ~v1 -1) 
 
 # with weights
