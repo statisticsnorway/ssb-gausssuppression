@@ -1,11 +1,13 @@
 Package: GaussSuppression
 Type: Package
 Title: Tabular Data Suppression using Gaussian Elimination
-Version: 0.8.5
-Date: 2024-05-22
+Version: 0.8.6
+Date: 2024-06-25
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
-                    email = "oyl@ssb.no"),
-             person("Daniel", "Lupp", role = c("aut")),        
+                    email = "oyl@ssb.no",
+                    comment = c(ORCID = "0000-0002-1380-4396")),
+             person("Daniel", "Lupp", role = c("aut"),
+                    comment = c(ORCID = "0000-0003-3575-1691")),        
              person("Hege", "Bøvelstad", role = c("ctb")),
              person("Vidar Norstein", "Klungre", role = "rev"),
              person("Statistics Norway", role = "cph"))
