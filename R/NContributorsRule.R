@@ -62,11 +62,14 @@ NContributorsRule <- function(data, freq, numVar, x,
     if (remove0) {
       if (length(numVar) > 1) {
         warning("Multiple numVar were supplied, only the first is used. Specify remove0 as variable name(s)?")
-        remove0 <- numVar[1]
       }
       if (!length(numVar)) {
         remove0 <- NULL
+      } else {
+        remove0 <- numVar[1]
       }
+    } else {
+      remove0 <- NULL
     }
   }
 
