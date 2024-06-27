@@ -1,3 +1,8 @@
+## GaussSuppression	0.8.6
+* A bug related to the remove0 parameter is now fixed
+  - There was a bug related to the `remove0` parameter in `SuppressFewContributors/NContributorsRule` introduced in version 0.8.0. 
+    When a single `numVar` was used as input, the `remove0` functionality failed.
+
 
 ## GaussSuppression	0.8.5
 * `SuppressDominantCells()` is now considered a common function for both the nk-dominance rule and the p-percent rule.
