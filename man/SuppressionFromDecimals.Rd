@@ -35,7 +35,7 @@ Aggregated data with suppression information
 \description{
 Decimal numbers, as calculated by \code{\link{GaussSuppressDec}}, are used to decide suppression (whole numbers or not).
 Technically, the calculations are done via \code{\link{GaussSuppressionFromData}},
-but without running \code{\link{GaussSuppression}}.
+but without running \code{\link[SSBtools]{GaussSuppression}}.
 All suppressed cells are primary suppressed.
 }
 \details{

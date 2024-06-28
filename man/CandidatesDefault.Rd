@@ -52,7 +52,7 @@ this. Note that this functionality is redundant if the same cells are specified 
 \item{charVar}{Variable(s) with contributor codes (needed for \code{removeCodes} calculations)}
 }
 \value{
-candidates, \code{\link{GaussSuppression}} input
+candidates, \code{\link[SSBtools]{GaussSuppression}} input
 }
 \description{
 Function for \code{\link{GaussSuppressionFromData}}

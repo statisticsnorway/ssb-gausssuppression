@@ -8,13 +8,13 @@
 #' 
 #' With two-way iterations, larger data can be handled, but there is a residual risk.
 #' The method is a special form of linked-table iteration. 
-#' Separately, the rows and columns are protected by \code{\link{GaussSuppression}} and they have common suppressed cells.
+#' Separately, the rows and columns are protected by \code{\link[SSBtools]{GaussSuppression}} and they have common suppressed cells.
 #' 
 #' @details
-#' The supplied functions for generating \code{\link{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
+#' The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
 #' When `candidatesFromTotal` is `TRUE` (default) the candidate function will be run locally once for rows and once for columns. Each time based on column or row totals.
 #' The global x-matrix will only be generated if one of the functions supplied needs it.
-#' Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link{GaussSuppression}}.  
+#' Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link[SSBtools]{GaussSuppression}}.  
 #' 
 #' Note that a difference from `GaussSuppressionFromData` is that parameter `removeEmpty` is set to `TRUE` by default.
 #' 
@@ -38,8 +38,8 @@
 #' @param forced     GaussSuppression input or a function generating it (see details)
 #' @param hidden     GaussSuppression input or a function generating it (see details)
 #' @param singleton  NULL or a function generating GaussSuppression input (logical vector not possible) Default: \code{\link{SingletonDefault}}
-#' @param singletonMethod \code{\link{GaussSuppression}} input
-#' @param printInc        \code{\link{GaussSuppression}} input
+#' @param singletonMethod \code{\link[SSBtools]{GaussSuppression}} input
+#' @param printInc        \code{\link[SSBtools]{GaussSuppression}} input
 #' @param output One of `"publish"` (default), `"inner"`.
 #'               Here "inner" means input data (possibly pre-aggregated). 
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 

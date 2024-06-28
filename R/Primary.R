@@ -99,7 +99,7 @@ Primary <- function(primary, crossTable, x, eachPrimary = FALSE, ...) {
 #' @param protectZeros When `TRUE`, cells with zero frequency are set as primary suppressed. 
 #' @param ... Unused parameters 
 #'
-#' @return primary, \code{\link{GaussSuppression}} input 
+#' @return primary, \code{\link[SSBtools]{GaussSuppression}} input 
 #' @export
 PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
   

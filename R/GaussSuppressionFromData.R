@@ -5,9 +5,9 @@
 #' 
 #' Aggregates are generated followed by 
 #' primary suppression followed by 
-#' secondary suppression by Gaussian elimination by \code{\link{GaussSuppression}} 
+#' secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSuppression}} 
 #' 
-#' The supplied functions for generating \code{\link{GaussSuppression}} input takes the following arguments: 
+#' The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments: 
 #' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` and `...`. 
 #' where the two first are  \code{\link{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
 #' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
@@ -33,7 +33,7 @@
 #' Some information can be seen from warnings. 
 #' This can also be seen by choosing `output = "secondary"` together 
 #' with `unsafeInOutput = "ifany"` or `unsafeInOutput = "always"`. 
-#' Then, negative indices from \code{\link{GaussSuppression}} using 
+#' Then, negative indices from \code{\link[SSBtools]{GaussSuppression}} using 
 #' `unsafeAsNegative = TRUE` will be included in the output. 
 #' Singleton problems may, however, be present even if it cannot be seen as warning/output. 
 #' In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}. 
@@ -42,7 +42,7 @@
 #' For these situations, forced has precedence over hidden and primary. 
 #' That is, if a cell is both forced and hidden, it will be treated as a forced cell and thus published.
 #' Similarly, any primary suppression of a forced cell will be ignored 
-#' (see parameter `whenPrimaryForced` to \code{\link{GaussSuppression}}).
+#' (see parameter `whenPrimaryForced` to \code{\link[SSBtools]{GaussSuppression}}).
 #' It is, however, meaningful to combine primary and hidden. 
 #' Such cells will be protected while also being assigned the `NA` value in the `suppressed` output variable.
 #'
@@ -69,8 +69,8 @@
 #' @param forced     GaussSuppression input or a function generating it (see details)
 #' @param hidden     GaussSuppression input or a function generating it (see details)
 #' @param singleton  GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}
-#' @param singletonMethod \code{\link{GaussSuppression}} input. The default value depends on parameter `secondaryZeros` which depends on `candidates` (see details).   
-#' @param printInc        \code{\link{GaussSuppression}} input
+#' @param singletonMethod \code{\link[SSBtools]{GaussSuppression}} input. The default value depends on parameter `secondaryZeros` which depends on `candidates` (see details).   
+#' @param printInc        \code{\link[SSBtools]{GaussSuppression}} input
 #' @param output One of `"publish"` (default), `"inner"`, `"publish_inner"`, `"publish_inner_x"`, `"publish_x"`, 
 #'                      `"inner_x"`, `"input2functions"` (input to supplied functions),
 #'                      `"inputGaussSuppression"`, `"inputGaussSuppression_x"`, 
@@ -78,7 +78,7 @@
 #'                      `"primary"`,  `"secondary"` and `"all"`.
 #'               Here "inner" means input data (possibly pre-aggregated) and 
 #'               "x" means dummy matrix (as input parameter x).   
-#'               All input to and output from \code{\link{GaussSuppression}}, except `...`, are returned when `"outputGaussSuppression_x"`. 
+#'               All input to and output from \code{\link[SSBtools]{GaussSuppression}}, except `...`, are returned when `"outputGaussSuppression_x"`. 
 #'               Excluding x and only input are also possible.
 #'               The code `"all"` means all relevant output after all the calculations.
 #'               Currently, this means the same as `"publish_inner_x"` extended with the matrices (or NULL) `xExtraPrimary`  and `unsafe`. 
@@ -93,7 +93,7 @@
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
 #' @param extraAggregate When `TRUE`, the data will be aggregated by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
 #'                       The aggregated data and the corresponding x-matrix will only be used as input to the singleton 
-#'                       function and \code{\link{GaussSuppression}}. 
+#'                       function and \code{\link[SSBtools]{GaussSuppression}}. 
 #'                       This extra aggregation is useful when parameter `charVar` is used.
 #'                       Supply `"publish_inner"`, `"publish_inner_x"`, `"publish_x"` or `"inner_x"` as `output` to obtain extra aggregated results.
 #'                       Supply `"inner"` or `"input2functions"` to obtain other results. 

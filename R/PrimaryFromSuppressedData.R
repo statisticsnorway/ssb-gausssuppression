@@ -25,7 +25,7 @@
 #' @param totCode A named list of totals codes   
 #' @param ... Unused parameters 
 #' 
-#' @return Logical vector to be used as \code{\link{GaussSuppression}} input 
+#' @return Logical vector to be used as \code{\link[SSBtools]{GaussSuppression}} input 
 #' 
 #' @export
 #' 
