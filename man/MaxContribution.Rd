@@ -89,7 +89,7 @@ identical(id1, id2)
 
 }
 \seealso{
-\code{\link{ModelMatrix}}
+\code{\link[SSBtools]{ModelMatrix}}
 }
 \author{
 Øyvind Langsrud

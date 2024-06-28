@@ -48,7 +48,7 @@ not included in \code{numVar} will be aggregated accordingly.}
 
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
-\item{hierarchies}{List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
+\item{hierarchies}{List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{formula}{A model formula}
@@ -59,7 +59,7 @@ Typically, the variable contains the contributor IDs.}
 \item{sWeightVar}{Name of variable which represents sampling weights to be used
 in dominance rule}
 
-\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
 \item{candidatesVar}{Variable to be used in the candidate function to prioritize cells for
 publication and thus not suppression. If not specified, the same variable that is

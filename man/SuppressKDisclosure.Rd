@@ -37,7 +37,7 @@ unspecified.}
 \item{formula}{A model formula}
 
 \item{hierarchies}{List of hierarchies, which can be converted by
-\code{\link{AutoHierarchies}}. Thus, the variables can also be coded by
+\code{\link[SSBtools]{AutoHierarchies}}. Thus, the variables can also be coded by
 \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{freqVar}{name of the frequency variable in \code{data}}

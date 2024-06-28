@@ -18,7 +18,7 @@
 #' @param weight Vector of output weights
 #' @param ... Unused parameters 
 #'
-#' @return candidates, \code{\link{GaussSuppression}} input 
+#' @return candidates, \code{\link[SSBtools]{GaussSuppression}} input 
 #' @export
 #' @importFrom Matrix colSums
 CandidatesDefault <- function(freq, x, secondaryZeros = FALSE, weight, ...) {

@@ -47,7 +47,7 @@ GaussSuppressionFromData(
 
 \item{freqVar}{A single variable holding counts (name or number).}
 
-\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
 \item{numVar}{Other numerical variables to be aggregated}
 
@@ -55,7 +55,7 @@ GaussSuppressionFromData(
 
 \item{charVar}{Other variables possibly to be used within the supplied functions}
 
-\item{hierarchies}{List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
+\item{hierarchies}{List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{formula}{A model formula}
@@ -82,9 +82,9 @@ See details.}
 
 \item{singleton}{GaussSuppression input or a function generating it (see details) Default: \code{\link{SingletonDefault}}}
 
-\item{singletonMethod}{\code{\link{GaussSuppression}} input. The default value depends on parameter \code{secondaryZeros} which depends on \code{candidates} (see details).}
+\item{singletonMethod}{\code{\link[SSBtools]{GaussSuppression}} input. The default value depends on parameter \code{secondaryZeros} which depends on \code{candidates} (see details).}
 
-\item{printInc}{\code{\link{GaussSuppression}} input}
+\item{printInc}{\code{\link[SSBtools]{GaussSuppression}} input}
 
 \item{output}{One of \code{"publish"} (default), \code{"inner"}, \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"},
 \code{"inner_x"}, \code{"input2functions"} (input to supplied functions),
@@ -93,7 +93,7 @@ See details.}
 \code{"primary"},  \code{"secondary"} and \code{"all"}.
 Here "inner" means input data (possibly pre-aggregated) and
 "x" means dummy matrix (as input parameter x).
-All input to and output from \code{\link{GaussSuppression}}, except \code{...}, are returned when \code{"outputGaussSuppression_x"}.
+All input to and output from \code{\link[SSBtools]{GaussSuppression}}, except \code{...}, are returned when \code{"outputGaussSuppression_x"}.
 Excluding x and only input are also possible.
 The code \code{"all"} means all relevant output after all the calculations.
 Currently, this means the same as \code{"publish_inner_x"} extended with the matrices (or NULL) \code{xExtraPrimary}  and \code{unsafe}.
@@ -102,7 +102,7 @@ This latter matrix contains the columns representing unsafe primary suppressions
 In addition to \code{x} columns corresponding to unsafe in ordinary output (see parameter \code{unsafeInOutput} below),
 possible columns from  \code{xExtraPrimary} may also be included in the unsafe matrix (see details).}
 
-\item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}}
+\item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link[SSBtools]{ModelMatrix}}}
 
 \item{crossTable}{See above.}
 
@@ -111,7 +111,7 @@ This is defined by the dimensional variables according to \code{dimVar}, \code{h
 
 \item{extraAggregate}{When \code{TRUE}, the data will be aggregated by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula}.
 The aggregated data and the corresponding x-matrix will only be used as input to the singleton
-function and \code{\link{GaussSuppression}}.
+function and \code{\link[SSBtools]{GaussSuppression}}.
 This extra aggregation is useful when parameter \code{charVar} is used.
 Supply \code{"publish_inner"}, \code{"publish_inner_x"}, \code{"publish_x"} or \code{"inner_x"} as \code{output} to obtain extra aggregated results.
 Supply \code{"inner"} or \code{"input2functions"} to obtain other results.}
@@ -180,12 +180,12 @@ Aggregated data with suppression information
 \description{
 Aggregates are generated followed by
 primary suppression followed by
-secondary suppression by Gaussian elimination by \code{\link{GaussSuppression}}
+secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSuppression}}
 }
 \details{
-The supplied functions for generating \code{\link{GaussSuppression}} input takes the following arguments:
+The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments:
 \code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
-where the two first are  \code{\link{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
+where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
 
@@ -209,7 +209,7 @@ When forced cells affect singleton problems, this is not implemented.
 Some information can be seen from warnings.
 This can also be seen by choosing \code{output = "secondary"} together
 with \code{unsafeInOutput = "ifany"} or \code{unsafeInOutput = "always"}.
-Then, negative indices from \code{\link{GaussSuppression}} using
+Then, negative indices from \code{\link[SSBtools]{GaussSuppression}} using
 \code{unsafeAsNegative = TRUE} will be included in the output.
 Singleton problems may, however, be present even if it cannot be seen as warning/output.
 In some cases, the problems can be detected by \code{\link{GaussSuppressDec}}.
@@ -218,7 +218,7 @@ In some cases, cells that are forced, hidden, or primary suppressed can overlap.
 For these situations, forced has precedence over hidden and primary.
 That is, if a cell is both forced and hidden, it will be treated as a forced cell and thus published.
 Similarly, any primary suppression of a forced cell will be ignored
-(see parameter \code{whenPrimaryForced} to \code{\link{GaussSuppression}}).
+(see parameter \code{whenPrimaryForced} to \code{\link[SSBtools]{GaussSuppression}}).
 It is, however, meaningful to combine primary and hidden.
 Such cells will be protected while also being assigned the \code{NA} value in the \code{suppressed} output variable.
 }

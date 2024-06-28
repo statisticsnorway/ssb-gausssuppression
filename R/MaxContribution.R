@@ -22,7 +22,7 @@
 #' @importFrom Matrix drop0
 #' @importFrom methods new
 #' 
-#' @seealso \code{\link{ModelMatrix}}
+#' @seealso \code{\link[SSBtools]{ModelMatrix}}
 #' 
 #' @author Øyvind Langsrud
 #'

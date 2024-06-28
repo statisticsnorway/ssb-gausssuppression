@@ -47,7 +47,7 @@ GaussSuppressionTwoWay(
 
 \item{charVar}{Other variables possibly to be used within the supplied functions}
 
-\item{hierarchies}{List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
+\item{hierarchies}{List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{formula}{A model formula}
@@ -68,9 +68,9 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{singleton}{NULL or a function generating GaussSuppression input (logical vector not possible) Default: \code{\link{SingletonDefault}}}
 
-\item{singletonMethod}{\code{\link{GaussSuppression}} input}
+\item{singletonMethod}{\code{\link[SSBtools]{GaussSuppression}} input}
 
-\item{printInc}{\code{\link{GaussSuppression}} input}
+\item{printInc}{\code{\link[SSBtools]{GaussSuppression}} input}
 
 \item{output}{One of \code{"publish"} (default), \code{"inner"}.
 Here "inner" means input data (possibly pre-aggregated).}
@@ -102,17 +102,17 @@ Aggregated data with suppression information
 Internally, data is organized in a two-way table.
 
 Use parameter \code{colVar} to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
-The algorithm utilizes \code{\link{HierarchyCompute2}}.
+The algorithm utilizes \code{\link[SSBtools]{HierarchyCompute2}}.
 
 With two-way iterations, larger data can be handled, but there is a residual risk.
 The method is a special form of linked-table iteration.
-Separately, the rows and columns are protected by \code{\link{GaussSuppression}} and they have common suppressed cells.
+Separately, the rows and columns are protected by \code{\link[SSBtools]{GaussSuppression}} and they have common suppressed cells.
 }
 \details{
-The supplied functions for generating \code{\link{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
+The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input behave as in \code{\link{GaussSuppressionFromData}} with some exceptions.
 When \code{candidatesFromTotal} is \code{TRUE} (default) the candidate function will be run locally once for rows and once for columns. Each time based on column or row totals.
 The global x-matrix will only be generated if one of the functions supplied needs it.
-Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link{GaussSuppression}}.
+Non-NULL singleton can only be supplied as a function. This function will be run locally within the algorithm before each call to \code{\link[SSBtools]{GaussSuppression}}.
 
 Note that a difference from \code{GaussSuppressionFromData} is that parameter \code{removeEmpty} is set to \code{TRUE} by default.
 

@@ -79,7 +79,7 @@ Their unique values represent the unique values/combinations of \code{data[[char
 \note{
 \code{SingletonUniqueContributor0} is a special version that produces singleton as
 a two-element list.
-See \code{\link{GaussSuppression}} and \code{\link{SuppressDominantCells}}.
+See \code{\link[SSBtools]{GaussSuppression}} and \code{\link{SuppressDominantCells}}.
 }
 \examples{
 S <- function(data, ...) {

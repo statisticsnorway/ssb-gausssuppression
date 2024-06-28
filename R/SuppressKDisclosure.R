@@ -11,7 +11,7 @@
 #' unspecified.
 #' @param formula A model formula
 #' @param hierarchies List of hierarchies, which can be converted by
-#' \code{\link{AutoHierarchies}}. Thus, the variables can also be coded by
+#' \code{\link[SSBtools]{AutoHierarchies}}. Thus, the variables can also be coded by
 #' `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param freqVar name of the frequency variable in `data`
 #' @param mc_hierarchies a hierarchy representing meaningful combinations to be

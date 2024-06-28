@@ -25,7 +25,7 @@ SuppressionFromDecimals(
 
 \item{preAggregate}{Parameter to \code{\link{GaussSuppressionFromData}}}
 
-\item{digits}{Parameter to \code{\link{RoundWhole}}. Values close to whole numbers will be rounded.}
+\item{digits}{Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.}
 
 \item{...}{Other parameters to \code{\link{GaussSuppressionFromData}}}
 }
@@ -35,7 +35,7 @@ Aggregated data with suppression information
 \description{
 Decimal numbers, as calculated by \code{\link{GaussSuppressDec}}, are used to decide suppression (whole numbers or not).
 Technically, the calculations are done via \code{\link{GaussSuppressionFromData}},
-but without running \code{\link{GaussSuppression}}.
+but without running \code{\link[SSBtools]{GaussSuppression}}.
 All suppressed cells are primary suppressed.
 }
 \details{

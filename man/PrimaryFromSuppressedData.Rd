@@ -34,7 +34,7 @@ If the variable \code{suppressed} is not included, all rows are considered suppr
 \item{...}{Unused parameters}
 }
 \value{
-Logical vector to be used as \code{\link{GaussSuppression}} input
+Logical vector to be used as \code{\link[SSBtools]{GaussSuppression}} input
 }
 \description{
 Function for \code{\link{GaussSuppressionFromData}}

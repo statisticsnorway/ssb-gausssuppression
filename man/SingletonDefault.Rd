@@ -18,7 +18,7 @@ SingletonDefault(data, freqVar, protectZeros, secondaryZeros, ...)
 \item{...}{Unused parameters}
 }
 \value{
-singleton, \code{\link{GaussSuppression}} input
+singleton, \code{\link[SSBtools]{GaussSuppression}} input
 }
 \description{
 Function for \code{\link{GaussSuppressionFromData}}

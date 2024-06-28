@@ -13,7 +13,7 @@
 #' @param secondaryZeros Suppression parameter (see `GaussSuppressionFromData`)
 #' @param ... Unused parameters 
 #'
-#' @return singleton, \code{\link{GaussSuppression}} input 
+#' @return singleton, \code{\link[SSBtools]{GaussSuppression}} input 
 #' @export
 SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
   
@@ -201,7 +201,7 @@ SingletonUniqueContributor <- function(data,
 #' @rdname SingletonUniqueContributor
 #' @note   `SingletonUniqueContributor0` is a special version that produces singleton as 
 #'         a two-element list. 
-#'         See \code{\link{GaussSuppression}} and \code{\link{SuppressDominantCells}}.
+#'         See \code{\link[SSBtools]{GaussSuppression}} and \code{\link{SuppressDominantCells}}.
 #'         
 #' @export
 SingletonUniqueContributor0 <- function(data, numVar, dominanceVar = NULL, ...) {

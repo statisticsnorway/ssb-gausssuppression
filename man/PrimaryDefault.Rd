@@ -16,7 +16,7 @@ PrimaryDefault(freq, maxN = 3, protectZeros = TRUE, ...)
 \item{...}{Unused parameters}
 }
 \value{
-primary, \code{\link{GaussSuppression}} input
+primary, \code{\link[SSBtools]{GaussSuppression}} input
 }
 \description{
 Function for \code{\link{GaussSuppressionFromData}}
