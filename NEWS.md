@@ -1,4 +1,4 @@
-## GaussSuppression	0.8.7
+## GaussSuppression	0.8.8
 * A bug related to the remove0 parameter is now fixed
   - There was a bug related to the `remove0` parameter in `SuppressFewContributors/NContributorsRule` introduced in version 0.8.0. 
     When a single `numVar` was used as input, the `remove0` functionality failed.
