@@ -4,7 +4,7 @@
 #' Cell suppression with synthetic decimal numbers
 #' 
 #' \code{\link{GaussSuppressionFromData}} is run and decimal numbers are added to output by
-#' a modified (for sparse matrix efficiency) version of \code{\link{SuppressDec}}. 
+#' a modified (for sparse matrix efficiency) version of \code{\link[RegSDC]{SuppressDec}}. 
 #'
 #' @param data Input daata as a data frame 
 #' @param ... Further parameters to \code{\link{GaussSuppressionFromData}}
