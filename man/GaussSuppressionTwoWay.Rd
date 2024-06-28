@@ -47,7 +47,7 @@ GaussSuppressionTwoWay(
 
 \item{charVar}{Other variables possibly to be used within the supplied functions}
 
-\item{hierarchies}{List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
+\item{hierarchies}{List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{formula}{A model formula}
@@ -102,7 +102,7 @@ Aggregated data with suppression information
 Internally, data is organized in a two-way table.
 
 Use parameter \code{colVar} to choose hierarchies for columns (others will be rows). Iterations start by column by column suppression.
-The algorithm utilizes \code{\link{HierarchyCompute2}}.
+The algorithm utilizes \code{\link[SSBtools]{HierarchyCompute2}}.
 
 With two-way iterations, larger data can be handled, but there is a residual risk.
 The method is a special form of linked-table iteration.

@@ -34,7 +34,7 @@ See parameters \code{candidatesVar} and \code{remove0} below.}
 
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
-\item{hierarchies}{List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
+\item{hierarchies}{List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{formula}{A model formula}
@@ -58,7 +58,7 @@ are multiple \code{numVar} variables.}
 publication and thus not suppression.
 The first \code{numVar} variable will be used if it is not specified.}
 
-\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
 \item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 }

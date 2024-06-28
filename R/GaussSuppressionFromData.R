@@ -9,7 +9,7 @@
 #' 
 #' The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments: 
 #' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` and `...`. 
-#' where the two first are  \code{\link{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
+#' where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
 #' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
 #' In addition, the supplied `singleton` function also takes `nUniqueVar` and (output from) `primary` as input.
 #' 
@@ -52,7 +52,7 @@
 #' @param numVar  Other numerical variables to be aggregated 
 #' @param weightVar weightVar Weights (costs) to be used to order candidates for secondary suppression
 #' @param charVar Other variables possibly to be used within the supplied functions
-#' @param hierarchies List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
+#' @param hierarchies List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 #'        Thus, the variables can also be coded by `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param formula A model formula
 #' @param maxN Suppression parameter. Cells with frequency `<= maxN` are set as primary suppressed.   
@@ -87,7 +87,7 @@
 #'               In addition to `x` columns corresponding to unsafe in ordinary output (see parameter `unsafeInOutput` below), 
 #'               possible columns from  `xExtraPrimary` may also be included in the unsafe matrix (see details). 
 #'               
-#' @param x `x` (`modelMatrix`) and `crossTable` can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}
+#' @param x `x` (`modelMatrix`) and `crossTable` can be supplied as input instead of generating it from  \code{\link[SSBtools]{ModelMatrix}}
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
@@ -145,7 +145,7 @@
 #'                   different interface in future versions.
 #'                                 
 #'                                                            
-#' @param ... Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
+#' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
 #' @export

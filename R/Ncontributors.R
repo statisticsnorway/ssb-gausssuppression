@@ -15,7 +15,7 @@
 #' @importFrom SSBtools SortRows As_TsparseMatrix
 #' @importFrom Matrix drop0
 #' 
-#' @seealso \code{\link{ModelMatrix}}
+#' @seealso \code{\link[SSBtools]{ModelMatrix}}
 #' 
 #' @author Øyvind Langsrud
 #'

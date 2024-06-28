@@ -14,7 +14,7 @@ ForcedWg(crossTable, wg = NULL, ...)
 }
 \arguments{
 \item{wg}{data.frame with wildcard/globbing.
-A parameter to \code{\link{WildcardGlobbing}}}
+A parameter to \code{\link[SSBtools]{WildcardGlobbing}}}
 
 \item{...}{unused parameters}
 
@@ -24,7 +24,7 @@ A parameter to \code{\link{WildcardGlobbing}}}
 logical vector or row indices
 }
 \description{
-The SSBtools function \code{\link{WildcardGlobbing}} is utilized
+The SSBtools function \code{\link[SSBtools]{WildcardGlobbing}} is utilized
 }
 \details{
 \code{CandidatesNumWg} is a generalization of \code{\link{CandidatesNumWg}}

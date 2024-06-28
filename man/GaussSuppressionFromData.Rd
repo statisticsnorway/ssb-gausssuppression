@@ -47,7 +47,7 @@ GaussSuppressionFromData(
 
 \item{freqVar}{A single variable holding counts (name or number).}
 
-\item{...}{Further arguments to be passed to the supplied functions and to \code{\link{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
+\item{...}{Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as \code{inputInOutput} and \code{removeEmpty}).}
 
 \item{numVar}{Other numerical variables to be aggregated}
 
@@ -55,7 +55,7 @@ GaussSuppressionFromData(
 
 \item{charVar}{Other variables possibly to be used within the supplied functions}
 
-\item{hierarchies}{List of hierarchies, which can be converted by \code{\link{AutoHierarchies}}.
+\item{hierarchies}{List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which correspond to using the categories in the data.}
 
 \item{formula}{A model formula}
@@ -102,7 +102,7 @@ This latter matrix contains the columns representing unsafe primary suppressions
 In addition to \code{x} columns corresponding to unsafe in ordinary output (see parameter \code{unsafeInOutput} below),
 possible columns from  \code{xExtraPrimary} may also be included in the unsafe matrix (see details).}
 
-\item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link{ModelMatrix}}}
+\item{x}{\code{x} (\code{modelMatrix}) and \code{crossTable} can be supplied as input instead of generating it from  \code{\link[SSBtools]{ModelMatrix}}}
 
 \item{crossTable}{See above.}
 
@@ -185,7 +185,7 @@ secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSupp
 \details{
 The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments:
 \code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
-where the two first are  \code{\link{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
+where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
 

@@ -25,7 +25,7 @@ SuppressionFromDecimals(
 
 \item{preAggregate}{Parameter to \code{\link{GaussSuppressionFromData}}}
 
-\item{digits}{Parameter to \code{\link{RoundWhole}}. Values close to whole numbers will be rounded.}
+\item{digits}{Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.}
 
 \item{...}{Other parameters to \code{\link{GaussSuppressionFromData}}}
 }

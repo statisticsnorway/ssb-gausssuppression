@@ -12,7 +12,7 @@
 #' @param freqVar A single variable holding counts (not needed)
 #' @param numVar Other numerical variables to be aggregated
 #' @param preAggregate  Parameter to \code{\link{GaussSuppressionFromData}}
-#' @param digits Parameter to \code{\link{RoundWhole}}. Values close to whole numbers will be rounded.
+#' @param digits Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.
 #' @param ...   Other parameters to \code{\link{GaussSuppressionFromData}}
 #'
 #' @return Aggregated data with suppression information
