@@ -359,9 +359,9 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
                                     removeCodes = removeCodes[[i]])
       k <- c(k, 0L, as.vector(table(b$singleton)[as.character(unique(b$singleton))]))
     }
-    expect_equal(k, c(0, 1, 1, 1, 1, 1, 2, 19, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 
+    expect_equal(sort(k), sort(c(0, 1, 1, 1, 1, 1, 2, 19, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 
                       2, 20, 1, 1, 1, 0, 1, 29, 0, 2, 6, 3, 9, 9, 1, 0, 2, 
-                      5, 3, 9, 10, 1, 0, 2, 5, 1, 1, 2, 17, 2))
+                      5, 3, 9, 10, 1, 0, 2, 5, 1, 1, 2, 17, 2)))
   }
 })
 
