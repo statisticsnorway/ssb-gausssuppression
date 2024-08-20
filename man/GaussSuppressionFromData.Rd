@@ -37,7 +37,10 @@ GaussSuppressionFromData(
   nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
   forcedInOutput = "ifNonNULL",
   unsafeInOutput = "ifForcedInOutput",
-  lpPackage = NULL
+  lpPackage = NULL,
+  aggregatePackage = "base",
+  aggregateNA = TRUE,
+  aggregateBaseOrder = TRUE
 )
 }
 \arguments{
@@ -173,6 +176,15 @@ Intervals, \verb{[lo_1, up_1]}, are intervals calculated prior to additional sup
 }\if{html}{\out{</div>}}
 }
 }}
+
+\item{aggregatePackage}{Package use to preAggregate/extraAggregate.
+Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
+
+\item{aggregateNA}{Whether to include NAs in the grouping variables while preAggregate/extraAggregate.
+Parameter \code{include_na} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
+
+\item{aggregateBaseOrder}{Parameter \code{base_order} to \code{\link[SSBtools]{aggregate_by_pkg}},
+used when preAggregate/extraAggregate.}
 }
 \value{
 Aggregated data with suppression information

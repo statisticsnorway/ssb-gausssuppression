@@ -144,12 +144,18 @@
 #'                   Please note that interval calculations may have a 
 #'                   different interface in future versions.
 #'                                 
+#' @param aggregatePackage Package use to preAggregate/extraAggregate. 
+#'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
+#' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate/extraAggregate. 
+#'                    Parameter `include_na` to \code{\link[SSBtools]{aggregate_by_pkg}}.
+#' @param aggregateBaseOrder Parameter `base_order` to \code{\link[SSBtools]{aggregate_by_pkg}},
+#'                           used when preAggregate/extraAggregate.
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -228,7 +234,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
                            forcedInOutput = "ifNonNULL",
                            unsafeInOutput = "ifForcedInOutput",
-                           lpPackage = NULL){ 
+                           lpPackage = NULL, 
+                           aggregatePackage = "base",
+                           aggregateNA = TRUE,
+                           aggregateBaseOrder = TRUE
+                           ){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
       spec <- eval(spec)
@@ -391,7 +401,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         freqVar <- freqVarNew
         data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
       } 
-      data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
+      # data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
+      data <- aggregate_by_pkg(
+        data = data,
+        by = unique(c(dVar, charVar)),
+        var = unique(c(freqVar, numVar, weightVar)),
+        pkg =  aggregatePackage,
+        include_na = aggregateNA,
+        fun = sum,
+        base_order = aggregateBaseOrder)
+        
       if (printInc) {
         cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
         flush.console()
@@ -512,19 +531,45 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
     uniqueCharVar <- charVar[!(charVar %in% dVar)]
     if (length(uniqueCharVar)) {
+      #if (length(uniqueCharVar) == 1) {
+      #  charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
+      #} else {
+      #  charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) {
+      #    if (all(x == x[1])) {
+      #      return(x[1])
+      #    }
+      #    NA_character_
+      #  })
+      #}
       if (length(uniqueCharVar) == 1) {
-        charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
+        funA <- function(x) x[1]
       } else {
-        charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) {
+        funA <- function(x) {
           if (all(x == x[1])) {
             return(x[1])
           }
           NA_character_
-        })
+        }
       }
+      charData <- aggregate_by_pkg(
+        data = data,
+        by = unique(dVar),
+        var = uniqueCharVar,
+        pkg =  aggregatePackage,
+        include_na = aggregateNA,
+        fun = funA,
+        base_order = aggregateBaseOrder) 
     }
     data[[nUniqueVar]] <- 1L
-    data <- aggregate(data[unique(c(freqVar, numVar, weightVar, nUniqueVar))], data[unique(dVar)], sum) 
+    #data <- aggregate(data[unique(c(freqVar, numVar, weightVar, nUniqueVar))], data[unique(dVar)], sum) 
+    data <- aggregate_by_pkg(
+      data = data,
+      by = unique(dVar),
+      var = unique(c(freqVar, numVar, weightVar, nUniqueVar)),
+      pkg =  aggregatePackage,
+      include_na = aggregateNA,
+      fun = sum,
+      base_order = aggregateBaseOrder) 
     if (printInc) {
       cat(dim(data)[1], "*", dim(data)[2], "] ", sep = "")
       flush.console()
