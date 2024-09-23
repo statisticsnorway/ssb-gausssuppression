@@ -324,7 +324,8 @@ test_that("DominanceRule and NcontributorsRule + CandidatesNum + singleton + for
                                   primary = NcontributorsRule,  
                                   removeCodes = "char1",
                                   singleton = SUC, 
-                                  singletonMethod = singletonMethod)
+                                  singletonMethod = singletonMethod,
+                                  whenEmptyUnsuppressed = NULL)
       sum_suppressed <- c(sum_suppressed, c(59, 59, 67))
     }
     
