@@ -150,7 +150,10 @@
 #' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate/extraAggregate. 
 #'                    Parameter `include_na` to \code{\link[SSBtools]{aggregate_by_pkg}}.
 #' @param aggregateBaseOrder Parameter `base_order` to \code{\link[SSBtools]{aggregate_by_pkg}},
-#'                           used when preAggregate/extraAggregate.
+#'                           used when preAggregate/extraAggregate. 
+#'                           The parameter does not affect the ordering of ordinary output. 
+#'                           Therefore, the default is set to `FALSE` to avoid unnecessary sorting operations.  
+#'                           The parameter will have impact when, e.g `output = "inner"`.
 #' @param rowGroupsPackage Parameter `pkg` to \code{\link[SSBtools]{RowGroups}}.
 #'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
 #'               via \code{\link[SSBtools]{ModelMatrix}}. 
@@ -242,7 +245,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            lpPackage = NULL, 
                            aggregatePackage = "base",
                            aggregateNA = TRUE,
-                           aggregateBaseOrder = TRUE,
+                           aggregateBaseOrder = FALSE,
                            rowGroupsPackage = aggregatePackage 
                            ){ 
   if (!is.null(spec)) {

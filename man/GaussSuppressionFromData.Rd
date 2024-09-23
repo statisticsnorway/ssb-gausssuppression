@@ -40,7 +40,7 @@ GaussSuppressionFromData(
   lpPackage = NULL,
   aggregatePackage = "base",
   aggregateNA = TRUE,
-  aggregateBaseOrder = TRUE,
+  aggregateBaseOrder = FALSE,
   rowGroupsPackage = aggregatePackage
 )
 }
@@ -185,7 +185,10 @@ Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
 Parameter \code{include_na} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
 
 \item{aggregateBaseOrder}{Parameter \code{base_order} to \code{\link[SSBtools]{aggregate_by_pkg}},
-used when preAggregate/extraAggregate.}
+used when preAggregate/extraAggregate.
+The parameter does not affect the ordering of ordinary output.
+Therefore, the default is set to \code{FALSE} to avoid unnecessary sorting operations.
+The parameter will have impact when, e.g \code{output = "inner"}.}
 
 \item{rowGroupsPackage}{Parameter \code{pkg} to \code{\link[SSBtools]{RowGroups}}.
 The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}}
