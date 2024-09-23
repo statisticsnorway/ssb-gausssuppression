@@ -459,6 +459,64 @@ test_that("More NumSingleton", {
 
 
 
+test_that("data.table and NA", {
+  if (!requireNamespace("data.table", quietly = TRUE)) {
+    skip()
+  }
+  
+  z3 <- SSBtoolsData("z3")
+  
+  set.seed(123)
+  z <- z3[sample.int(nrow(z3), 100), ]
+  z <- z3[sample.int(nrow(z), 300, replace = TRUE), ]
+  
+  z$char <- sample(paste0("char", 1:10), nrow(z), replace = TRUE)
+  z$value <- rnorm(nrow(z))^2
+  z$pop <- c("1", "2")
+  
+  z[sample.int(nrow(z), 5), 1:3] <- NA
+  z[sample.int(nrow(z), 5), 4] <- NA
+  z[sample.int(nrow(z), 5), "pop"] <- NA
+  
+  
+  f <- ~pop:(region + (fylke + kostragr) * hovedint) - 1
+  
+  a <- vector("list", 8)
+  
+  i <- 0
+  for (NAomit in c(FALSE, TRUE)) 
+    for (aggregateNA in c(FALSE, TRUE)) 
+      for (aggregatePackage in c("base", "data.table")) {
+        i <- i + 1
+        a[[i]] <- SuppressDominantCells(data = z, 
+                                        numVar = "value", 
+                                        formula = f, 
+                                        contributorVar = "char", 
+                                        k = c(80, 90),
+                                        NAomit = NAomit, 
+                                        aggregateNA = aggregateNA, 
+                                        aggregatePackage = aggregatePackage, 
+                                        printInc = printInc)
+        names(a)[i] <- paste(substr(as.character(NAomit), 1, 1), 
+                             substr(as.character(aggregateNA), 1, 1), 
+                             aggregatePackage,
+                             sep = "_")
+        
+      }
+  
+  
+  expect_equal(sum(a[["F_F_base"]]$freq), 1716)
+  expect_equal(sum(a[["F_T_base"]]$freq), 1800)
+  expect_equal(sum(a[["T_T_base"]]$freq), 1733)
+  
+  expect_equal(a[["T_F_base"]], a[["F_F_base"]])
+  
+  expect_equal(a[["F_F_base"]], a[["F_F_data.table"]])
+  expect_equal(a[["F_T_base"]], a[["F_T_data.table"]])
+  expect_equal(a[["T_F_base"]], a[["T_F_data.table"]])
+  expect_equal(a[["T_T_base"]], a[["T_T_data.table"]])
+  
+})
 
 
 
