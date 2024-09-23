@@ -40,7 +40,8 @@ GaussSuppressionFromData(
   lpPackage = NULL,
   aggregatePackage = "base",
   aggregateNA = TRUE,
-  aggregateBaseOrder = TRUE
+  aggregateBaseOrder = TRUE,
+  rowGroupsPackage = aggregatePackage
 )
 }
 \arguments{
@@ -185,6 +186,10 @@ Parameter \code{include_na} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
 
 \item{aggregateBaseOrder}{Parameter \code{base_order} to \code{\link[SSBtools]{aggregate_by_pkg}},
 used when preAggregate/extraAggregate.}
+
+\item{rowGroupsPackage}{Parameter \code{pkg} to \code{\link[SSBtools]{RowGroups}}.
+The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}}
+via \code{\link[SSBtools]{ModelMatrix}}.}
 }
 \value{
 Aggregated data with suppression information
@@ -196,7 +201,8 @@ secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSupp
 }
 \details{
 The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments:
-\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
+\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar}
+\code{aggregatePackage}, \code{aggregateNA}, \code{aggregateBaseOrder}, \code{rowGroupsPackage}, and \code{...}.
 where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
