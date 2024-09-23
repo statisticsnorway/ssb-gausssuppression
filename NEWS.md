@@ -1,3 +1,24 @@
+
+
+## GaussSuppression	X.X.X
+* The Gaussian elimination secondary suppression algorithm has now been documented in a *"Privacy in Statistical Databases 2024"* paper. 
+  - The package description has been updated with this reference [(Langsrud, 2024)](https://doi.org/10.1007/978-3-031-69651-0_6).
+* Due to updates in [the SSBtools package](https://CRAN.R-project.org/package=SSBtools) (version 1.5.4), 
+  it is now meaningful to include NA’s in the grouping variables. 
+  - Note the parameter `NAomit` to `SSBtools::Formula2ModelMatrix()`: 
+    * When `TRUE`, NAs in the grouping variables are omitted in output and not included as a separate category.
+    * This parameter can be input to `GaussSuppressionFromData()` and its wrappers.
+  - `aggregateNA` is new parameter to `GaussSuppressionFromData()`:
+    * Whether to include NAs in the grouping variables while preAggregate/extraAggregate.
+    * Needs to be `TRUE` (default) to utilize the above `NAomit` parameter.
+* Due to updates in [the SSBtools package](https://CRAN.R-project.org/package=SSBtools) (version 1.5.4), 
+  where [data.table](https://cran.r-project.org/package=data.table) is now listed under *Suggests*, 
+  some functionality can be speeded up. 
+  - Set the new parameter `aggregatePackage` to  `"data.table"` to utilize this possibility.
+    * `aggregatePackage` is parameter to `GaussSuppressionFromData()` and its wrappers.
+    * Also note the related new parameters `aggregateBaseOrder`	and `rowGroupsPackage`. 
+
+
 ## GaussSuppression	0.8.8
 * A bug related to the remove0 parameter is now fixed
   - There was a bug related to the `remove0` parameter in `SuppressFewContributors/NContributorsRule` introduced in version 0.8.0. 
