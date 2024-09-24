@@ -63,7 +63,8 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #'                a special method is used. 
 #'                By re-coding to single `charVar` and by re-calculating `nUnique`.
 #'                To be unique (`nUnique=1`), uniqueness is only required for a single `charvar`.
-#'                Otherwise, the `charvar` combination must be unique.   
+#'                Otherwise, the `charvar` combination must be unique.  
+#' @param rowGroupsPackage Parameter `pkg` to \code{\link[SSBtools]{RowGroups}}. 
 #'                                     
 #' @param ... Unused parameters
 #'
@@ -115,6 +116,7 @@ SingletonUniqueContributor <- function(data,
                                        whenPrimaryMatters = warning,
                                        whenNoVar = TRUE,
                                        specialMultiple = TRUE,
+                                       rowGroupsPackage = "base", 
                                        ...) {
   
   if (length(nUniqueVar)) {
@@ -188,7 +190,7 @@ SingletonUniqueContributor <- function(data,
     return(singleton)
   }
   if (length(charVar)) {
-    singleton_integer <- RowGroups(data[charVar])
+    singleton_integer <- RowGroups(data[charVar], pkg = rowGroupsPackage)
   } else {
     singleton_integer <- seq_len(nrow(data))
   }

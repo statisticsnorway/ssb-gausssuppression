@@ -8,7 +8,8 @@
 #' secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSuppression}} 
 #' 
 #' The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments: 
-#' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` and `...`. 
+#' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` 
+#' `aggregatePackage`, `aggregateNA`, `aggregateBaseOrder`, `rowGroupsPackage`, and `...`. 
 #' where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
 #' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
 #' In addition, the supplied `singleton` function also takes `nUniqueVar` and (output from) `primary` as input.
@@ -144,12 +145,25 @@
 #'                   Please note that interval calculations may have a 
 #'                   different interface in future versions.
 #'                                 
+#' @param aggregatePackage Package use to preAggregate/extraAggregate. 
+#'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
+#' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate/extraAggregate. 
+#'                    Parameter `include_na` to \code{\link[SSBtools]{aggregate_by_pkg}}.
+#' @param aggregateBaseOrder Parameter `base_order` to \code{\link[SSBtools]{aggregate_by_pkg}},
+#'                           used when preAggregate/extraAggregate. 
+#'                           The parameter does not affect the ordering of ordinary output. 
+#'                           Therefore, the default is set to `FALSE` to avoid unnecessary sorting operations.  
+#'                           The parameter will have impact when, e.g `output = "inner"`.
+#' @param rowGroupsPackage Parameter `pkg` to \code{\link[SSBtools]{RowGroups}}.
+#'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
+#'               via \code{\link[SSBtools]{ModelMatrix}}. 
+#'                           
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -228,7 +242,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
                            forcedInOutput = "ifNonNULL",
                            unsafeInOutput = "ifForcedInOutput",
-                           lpPackage = NULL){ 
+                           lpPackage = NULL, 
+                           aggregatePackage = "base",
+                           aggregateNA = TRUE,
+                           aggregateBaseOrder = FALSE,
+                           rowGroupsPackage = aggregatePackage 
+                           ){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
       spec <- eval(spec)
@@ -391,7 +410,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         freqVar <- freqVarNew
         data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
       } 
-      data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
+      # data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
+      data <- aggregate_by_pkg(
+        data = data,
+        by = unique(c(dVar, charVar)),
+        var = unique(c(freqVar, numVar, weightVar)),
+        pkg =  aggregatePackage,
+        include_na = aggregateNA,
+        fun = sum,
+        base_order = aggregateBaseOrder)
+        
       if (printInc) {
         cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
         flush.console()
@@ -461,9 +489,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   if (is.null(x)) {
     if (is.null(formula) & is.null(hierarchies)) {
-      x <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE, ...)
+      x <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE, rowGroupsPackage = rowGroupsPackage, ...)
     } else {
-      x <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, ...)
+      x <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, rowGroupsPackage = rowGroupsPackage, ...)
     }
     crossTable <- as.data.frame(x$crossTable)  # fix i ModelMatrix 
     x <- x$modelMatrix
@@ -492,17 +520,17 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     weight <- as.vector(as.matrix(crossprod(x, as.matrix(data[, weightVar, drop = FALSE]))))
   }
   
-  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...))
+  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, ...))
   
-  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, ...)
   
   if (is.function(primary) | is.list(primary))  
-               primary <-     Primary(primary = primary, crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+               primary <-     Primary(primary = primary, crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, ...)
                if (output == "primary") return(primary)
   
-  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, ...)
   
-  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, ...)
+  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, ...)
 
   
   if(extraAggregate){
@@ -512,19 +540,45 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
     uniqueCharVar <- charVar[!(charVar %in% dVar)]
     if (length(uniqueCharVar)) {
+      #if (length(uniqueCharVar) == 1) {
+      #  charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
+      #} else {
+      #  charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) {
+      #    if (all(x == x[1])) {
+      #      return(x[1])
+      #    }
+      #    NA_character_
+      #  })
+      #}
       if (length(uniqueCharVar) == 1) {
-        charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
+        funA <- function(x) x[1]
       } else {
-        charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) {
+        funA <- function(x) {
           if (all(x == x[1])) {
             return(x[1])
           }
           NA_character_
-        })
+        }
       }
+      charData <- aggregate_by_pkg(
+        data = data,
+        by = unique(dVar),
+        var = uniqueCharVar,
+        pkg =  aggregatePackage,
+        include_na = aggregateNA,
+        fun = funA,
+        base_order = aggregateBaseOrder) 
     }
     data[[nUniqueVar]] <- 1L
-    data <- aggregate(data[unique(c(freqVar, numVar, weightVar, nUniqueVar))], data[unique(dVar)], sum) 
+    #data <- aggregate(data[unique(c(freqVar, numVar, weightVar, nUniqueVar))], data[unique(dVar)], sum) 
+    data <- aggregate_by_pkg(
+      data = data,
+      by = unique(dVar),
+      var = unique(c(freqVar, numVar, weightVar, nUniqueVar)),
+      pkg =  aggregatePackage,
+      include_na = aggregateNA,
+      fun = sum,
+      base_order = aggregateBaseOrder) 
     if (printInc) {
       cat(dim(data)[1], "*", dim(data)[2], "] ", sep = "")
       flush.console()
@@ -537,9 +591,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   
     if (is.null(formula) & is.null(hierarchies)) {
-      xExtra <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE, ...)
+      xExtra <- SSBtools::ModelMatrix(data[, dimVar, drop = FALSE], crossTable = TRUE, rowGroupsPackage = rowGroupsPackage, ...)
     } else {
-      xExtra <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, ...)
+      xExtra <- SSBtools::ModelMatrix(data, hierarchies = hierarchies, formula = formula, crossTable = TRUE, rowGroupsPackage = rowGroupsPackage, ...)
     }
     if (printInc) {
       cat("Checking .")
@@ -620,7 +674,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                              maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, 
                              data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, 
                              charVar = charVar, dimVar = dimVar, 
-                             nUniqueVar = nUniqueVar, primary = primary, ...)
+                             nUniqueVar = nUniqueVar, primary = primary, 
+                             aggregatePackage = aggregatePackage, 
+                             aggregateNA = aggregateNA, 
+                             aggregateBaseOrder = aggregateBaseOrder, 
+                             rowGroupsPackage = rowGroupsPackage, ...)
   }
   
   if(!is.null(forced)){

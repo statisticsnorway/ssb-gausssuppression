@@ -17,6 +17,7 @@ SingletonUniqueContributor(
   whenPrimaryMatters = warning,
   whenNoVar = TRUE,
   specialMultiple = TRUE,
+  rowGroupsPackage = "base",
   ...
 )
 
@@ -54,6 +55,8 @@ a special method is used.
 By re-coding to single \code{charVar} and by re-calculating \code{nUnique}.
 To be unique (\code{nUnique=1}), uniqueness is only required for a single \code{charvar}.
 Otherwise, the \code{charvar} combination must be unique.}
+
+\item{rowGroupsPackage}{Parameter \code{pkg} to \code{\link[SSBtools]{RowGroups}}.}
 
 \item{...}{Unused parameters}
 

@@ -37,7 +37,11 @@ GaussSuppressionFromData(
   nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
   forcedInOutput = "ifNonNULL",
   unsafeInOutput = "ifForcedInOutput",
-  lpPackage = NULL
+  lpPackage = NULL,
+  aggregatePackage = "base",
+  aggregateNA = TRUE,
+  aggregateBaseOrder = FALSE,
+  rowGroupsPackage = aggregatePackage
 )
 }
 \arguments{
@@ -173,6 +177,22 @@ Intervals, \verb{[lo_1, up_1]}, are intervals calculated prior to additional sup
 }\if{html}{\out{</div>}}
 }
 }}
+
+\item{aggregatePackage}{Package use to preAggregate/extraAggregate.
+Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
+
+\item{aggregateNA}{Whether to include NAs in the grouping variables while preAggregate/extraAggregate.
+Parameter \code{include_na} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
+
+\item{aggregateBaseOrder}{Parameter \code{base_order} to \code{\link[SSBtools]{aggregate_by_pkg}},
+used when preAggregate/extraAggregate.
+The parameter does not affect the ordering of ordinary output.
+Therefore, the default is set to \code{FALSE} to avoid unnecessary sorting operations.
+The parameter will have impact when, e.g \code{output = "inner"}.}
+
+\item{rowGroupsPackage}{Parameter \code{pkg} to \code{\link[SSBtools]{RowGroups}}.
+The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}}
+via \code{\link[SSBtools]{ModelMatrix}}.}
 }
 \value{
 Aggregated data with suppression information
@@ -184,7 +204,8 @@ secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSupp
 }
 \details{
 The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments:
-\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar} and \code{...}.
+\code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar}
+\code{aggregatePackage}, \code{aggregateNA}, \code{aggregateBaseOrder}, \code{rowGroupsPackage}, and \code{...}.
 where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
