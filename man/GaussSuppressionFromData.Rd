@@ -178,7 +178,7 @@ Intervals, \verb{[lo_1, up_1]}, are intervals calculated prior to additional sup
 }
 }}
 
-\item{aggregatePackage}{Package use to preAggregate/extraAggregate.
+\item{aggregatePackage}{Package used to preAggregate/extraAggregate.
 Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
 
 \item{aggregateNA}{Whether to include NAs in the grouping variables while preAggregate/extraAggregate.
