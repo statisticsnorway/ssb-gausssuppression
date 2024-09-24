@@ -1,6 +1,6 @@
 
 
-## GaussSuppression	X.X.X
+## GaussSuppression	0.9.0
 * The Gaussian elimination secondary suppression algorithm has now been documented in a *"Privacy in Statistical Databases 2024"* paper. 
   - The package description has been updated with this reference [(Langsrud, 2024)](https://doi.org/10.1007/978-3-031-69651-0_6).
 * Due to updates in [the SSBtools package](https://CRAN.R-project.org/package=SSBtools) (version 1.5.4), 
