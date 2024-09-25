@@ -145,7 +145,7 @@
 #'                   Please note that interval calculations may have a 
 #'                   different interface in future versions.
 #'                                 
-#' @param aggregatePackage Package use to preAggregate/extraAggregate. 
+#' @param aggregatePackage Package used to preAggregate/extraAggregate. 
 #'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
 #' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate/extraAggregate. 
 #'                    Parameter `include_na` to \code{\link[SSBtools]{aggregate_by_pkg}}.
@@ -540,16 +540,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
     uniqueCharVar <- charVar[!(charVar %in% dVar)]
     if (length(uniqueCharVar)) {
-      #if (length(uniqueCharVar) == 1) {
-      #  charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) x[1])
-      #} else {
-      #  charData <- aggregate(data[uniqueCharVar], data[unique(dVar)], function(x) {
-      #    if (all(x == x[1])) {
-      #      return(x[1])
-      #    }
-      #    NA_character_
-      #  })
-      #}
       if (length(uniqueCharVar) == 1) {
         funA <- function(x) x[1]
       } else {
