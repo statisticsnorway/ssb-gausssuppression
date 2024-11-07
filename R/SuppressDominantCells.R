@@ -99,6 +99,9 @@ SuppressDominantCells <- function(data,
                                   singletonZeros = FALSE,
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
+  if (length(contributorVar) & length(sWeightVar))
+    stop("The combination of sWeightVar and contributorVar is not supported.")
+  
   if (is.null(k)) {
     n <- NULL
   }

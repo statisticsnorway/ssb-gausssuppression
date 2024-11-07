@@ -126,6 +126,9 @@ MagnitudeRule <- function(data,
   if (is.null(numVar))
     stop("You must provide a numeric variable numVar to use the dominance rule.")
   
+  if (length(charVar) & length(sWeightVar))
+    stop("The combination of sWeightVar and charVar is not supported.")
+  
   tauArgusDominance <- as.character(domWeightMethod) == "tauargus"
   
   if (length(charVar) & tauArgusDominance)
