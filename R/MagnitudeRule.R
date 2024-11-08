@@ -141,19 +141,24 @@ MagnitudeRule <- function(data,
   
   abs_inputnum <- abs(data[, numVar, drop = FALSE])
   
+  
+  if (is.null(sWeightVar)) {
+    sweight <- as.matrix(rep(1, nrow(data)))
+    sWeightVarName <- "one.weight"
+  }
+  else {
+    sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
+    sWeightVarName <- sWeightVar 
+  }
+  
   if (length(charVar)) {
     if (length(charVar) == 1) {
       charVar_groups <- data[[charVar]]
-      sweight <- NULL
     } else {
       stop("Only single charVar implemented")
     }
   } else {
     charVar_groups <- NULL
-    if (is.null(sWeightVar))
-      sweight <- as.matrix(rep(1, nrow(data)))
-    else
-      sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
   }
   
   if (length(removeCodes)) {
@@ -164,9 +169,18 @@ MagnitudeRule <- function(data,
     }
   }
   
-  abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum))))
+  sweight_original <- sweight  # For outputWeightedNum below
+  
+  # Trick to call FindDominantCells without sweight
+  if(!is.null(charVar_groups) & !tauArgusDominance){
+    abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum * as.vector(sweight)))))
+    sweight <- NULL
+  } else {
+    abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum)))) # as before 
+  }
+  
   abs_inputnum <- abs_inputnum[[numVar]]
-
+  
   prim <-
     mapply(
       function (a, b)
@@ -196,9 +210,9 @@ MagnitudeRule <- function(data,
   else
     output <- list(primary = (dominant | (abs_num == 0)))
   if (outputWeightedNum) {
-    wnum <- data.frame(v1 = as.vector(crossprod(x, sweight)),
-                       v2 = as.vector(crossprod(x, sweight * data[[numVar]])))
-    names(wnum) <- c(sWeightVar, paste0("weighted.", numVar))
+    wnum <- data.frame(v1 = as.vector(crossprod(x, sweight_original)),
+                       v2 = as.vector(crossprod(x, sweight_original * data[[numVar]])))
+    names(wnum) <- c(sWeightVarName, paste0("weighted.", numVar))
     output[["numExtra"]] <- wnum
   }
   if (allDominance) {
