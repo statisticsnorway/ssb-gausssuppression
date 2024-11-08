@@ -126,6 +126,10 @@ test_that("Unweighted dominance", {
 
 
 test_that("Default weighted dominance", {
+  
+  options(GaussSuppression.test_maxContribution = TRUE)
+  on.exit(options(GaussSuppression.test_maxContribution = NULL), add = TRUE) # option removed
+  
   p <-
     DominanceRule(
       d,
