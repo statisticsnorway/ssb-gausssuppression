@@ -20,6 +20,7 @@ SuppressDominantCells(
   ...,
   candidatesVar = NULL,
   singletonZeros = FALSE,
+  preAggregate = !is.null(contributorVar) & is.null(sWeightVar),
   spec = PackageSpecs("dominanceSpec")
 )
 }
@@ -72,6 +73,9 @@ causing suppressed cells to be revealable. It is the zeros in the \code{dominanc
 that are examined. Specifically, the ordinary singleton method is combined with a method
 that is actually designed for frequency tables. This approach also works for volume
 tables when \code{\link{SingletonUniqueContributor0}} is utilized.}
+
+\item{preAggregate}{Parameter to \code{\link{GaussSuppressionFromData}}.
+Necessary to include here since the specification in \code{spec} cannot take \code{sWeightVar} into account.}
 
 \item{spec}{\code{NULL} or a named list of arguments that will act as default values.}
 }

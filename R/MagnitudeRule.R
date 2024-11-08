@@ -141,19 +141,24 @@ MagnitudeRule <- function(data,
   
   abs_inputnum <- abs(data[, numVar, drop = FALSE])
   
+  
+  if (is.null(sWeightVar)) {
+    sweight <- as.matrix(rep(1, nrow(data)))
+    sWeightVarName <- "one.weight"
+  }
+  else {
+    sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
+    sWeightVarName <- sWeightVar 
+  }
+  
   if (length(charVar)) {
     if (length(charVar) == 1) {
       charVar_groups <- data[[charVar]]
-      sweight <- NULL
     } else {
       stop("Only single charVar implemented")
     }
   } else {
     charVar_groups <- NULL
-    if (is.null(sWeightVar))
-      sweight <- as.matrix(rep(1, nrow(data)))
-    else
-      sweight <- as.matrix(data[, sWeightVar, drop = FALSE])
   }
   
   if (length(removeCodes)) {
@@ -164,9 +169,24 @@ MagnitudeRule <- function(data,
     }
   }
   
-  abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum))))
+  sweight_original <- sweight  # For outputWeightedNum below
+  
+  # Trick to call FindDominantCells without sweight
+  if(!is.null(charVar_groups) & !tauArgusDominance){
+    abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum * as.vector(sweight)))))
+    sweight <- NULL
+  } else {
+    abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum)))) # as before 
+  }
+  
   abs_inputnum <- abs_inputnum[[numVar]]
-
+  
+  maxContribution <- MaxContribution(x,
+                                     abs_inputnum,
+                                     n = max(n),
+                                     groups = charVar_groups,
+                                     index = !is.null(sweight))
+  
   prim <-
     mapply(
       function (a, b)
@@ -179,7 +199,8 @@ MagnitudeRule <- function(data,
           charVar_groups = charVar_groups,
           samplingWeight = sweight,
           tauArgusDominance = tauArgusDominance,
-          returnContrib = TRUE
+          returnContrib = TRUE,
+          maxContribution = maxContribution
         ),
       n,
       k
@@ -196,9 +217,9 @@ MagnitudeRule <- function(data,
   else
     output <- list(primary = (dominant | (abs_num == 0)))
   if (outputWeightedNum) {
-    wnum <- data.frame(v1 = as.vector(crossprod(x, sweight)),
-                       v2 = as.vector(crossprod(x, sweight * data[[numVar]])))
-    names(wnum) <- c(sWeightVar, paste0("weighted.", numVar))
+    wnum <- data.frame(v1 = as.vector(crossprod(x, sweight_original)),
+                       v2 = as.vector(crossprod(x, sweight_original * data[[numVar]])))
+    names(wnum) <- c(sWeightVarName, paste0("weighted.", numVar))
     output[["numExtra"]] <- wnum
   }
   if (allDominance) {
@@ -260,6 +281,8 @@ PPercentRule <- function(data, pPercent,
 #' handle sampling weights in the dominance rule (see details).
 #' @param returnContrib logical value, default `FALSE`. If `TRUE` return value is 
 #' the percentage of the first n contributors
+#' @param maxContribution Possible precalculated output from `MaxContribution` as input. 
+#'                        To speed up. 
 #'
 #' @return logical vector describing which publish-cells need to be suppressed.
 #'
@@ -271,11 +294,24 @@ FindDominantCells <- function(x,
                               charVar_groups,
                               samplingWeight,
                               tauArgusDominance = FALSE,
-                              returnContrib = FALSE) {
+                              returnContrib = FALSE, 
+                              maxContribution = NULL) {
+  
+  test_maxContribution <- isTRUE(getOption("GaussSuppression.test_maxContribution"))
+  
   if (is.null(samplingWeight)) {
     # without sampling weight, calculate dominance directly from numerical values
-    max_cont <-
-      MaxContribution(x, inputnum, n = n, groups = charVar_groups)
+    if (is.null(maxContribution) | test_maxContribution) {
+      max_cont <- MaxContribution(x, inputnum, n = n, groups = charVar_groups)
+      if (test_maxContribution) {
+        if (!identical(max_cont, maxContribution[, 1:n, drop = FALSE]))
+          stop("test_maxContribution not identical")
+        message("okA")
+      }
+    } else {
+      max_cont <- maxContribution[, 1:n, drop = FALSE]
+    }
+    
     max_cont[is.na(max_cont)] <- 0
     if (returnContrib) {
       out <- as.vector(rowSums(max_cont)/unlist(num))
@@ -286,12 +322,23 @@ FindDominantCells <- function(x,
     }
   } else {
     # with sampling weights, need to weight the numerical values
-    max_cont_index <-
-      MaxContribution(x,
-                      inputnum,
-                      n = n,
-                      groups = charVar_groups,
-                      index = TRUE)
+    if (is.null(maxContribution) | test_maxContribution) {
+      max_cont_index <-
+        MaxContribution(x,
+                        inputnum,
+                        n = n,
+                        groups = charVar_groups,
+                        index = TRUE)
+      
+      if (test_maxContribution) {
+        if (!identical(max_cont_index, maxContribution[, 1:n, drop = FALSE]))
+          stop("test_maxContribution not identical")
+        message("okB")
+      }
+    } else {
+      max_cont_index <- maxContribution[, 1:n, drop = FALSE]
+    }
+    
     max_cont <-
       apply(max_cont_index, 2, function(t)
         ifelse(is.na(t), 0, inputnum[t]))

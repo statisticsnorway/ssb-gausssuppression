@@ -14,7 +14,8 @@ FindDominantCells(
   charVar_groups,
   samplingWeight,
   tauArgusDominance = FALSE,
-  returnContrib = FALSE
+  returnContrib = FALSE,
+  maxContribution = NULL
 )
 }
 \arguments{
@@ -41,6 +42,9 @@ handle sampling weights in the dominance rule (see details).}
 
 \item{returnContrib}{logical value, default \code{FALSE}. If \code{TRUE} return value is
 the percentage of the first n contributors}
+
+\item{maxContribution}{Possible precalculated output from \code{MaxContribution} as input.
+To speed up.}
 }
 \value{
 logical vector describing which publish-cells need to be suppressed.

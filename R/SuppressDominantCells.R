@@ -25,6 +25,9 @@
 #'    that are examined. Specifically, the ordinary singleton method is combined with a method 
 #'    that is actually designed for frequency tables. This approach also works for volume 
 #'    tables when \code{\link{SingletonUniqueContributor0}} is utilized.
+#'    
+#' @param preAggregate Parameter to \code{\link{GaussSuppressionFromData}}.
+#'        Necessary to include here since the specification in `spec` cannot take `sWeightVar` into account.     
 #'
 #' @return data frame containing aggregated data and suppression information.
 #' @export
@@ -97,6 +100,7 @@ SuppressDominantCells <- function(data,
                                   ...,
                                   candidatesVar = NULL,
                                   singletonZeros = FALSE,
+                                  preAggregate = !is.null(contributorVar) & is.null(sWeightVar), 
                                   spec = PackageSpecs("dominanceSpec")
                                   ) {
   if (is.null(k)) {
@@ -156,6 +160,7 @@ SuppressDominantCells <- function(data,
     charVar = contributorVar,
     sWeightVar = sWeightVar,
     candidatesVar = candidatesVar, 
+    preAggregate = preAggregate, 
     spec = spec,
     ...
   )
