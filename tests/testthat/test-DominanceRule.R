@@ -63,11 +63,13 @@ test_that("Default weighted dominance", {
       x = mm$modelMatrix,
       crossTable = mm$crossTable,
       numVar = "num",
-      n = 2,
-      k = 90,
+      n = 1:2,
+      k = c(70, 90),
       sWeightVar = "sw2",
+      allDominance = TRUE
     )
   expect_equal(p$primary, c(T, rep(F, 6)))
+  expect_equal(p$numExtra[[2]], c(100, 190, 180, 170, 180, 170, 160))
 })
 
 test_that("tauargus dominance", {
