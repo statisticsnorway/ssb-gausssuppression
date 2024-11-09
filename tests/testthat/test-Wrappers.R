@@ -107,6 +107,90 @@ test_that("Wrappers", {
   # and revealing suppressed 0 cells is easy since Total=0  
   
   
+  dataset$company2 <- dataset$company 
+  dataset$company2[2] <- "B2"
   
+  
+  SDC <- function( ...) {
+    SuppressDominantCells(data=dataset, 
+                          numVar = c("seq2", "value"), 
+                          dimVar= c("sector4", "geo"), 
+                          k = c(70, 80), allDominance = TRUE,
+                          singletonMethod = "none",
+                          candidatesVar = "value",
+                          dominanceVar = "value",
+                          printInc = printInc, 
+                          ...)
+    
+  }
+  
+  k <- SDC(contributorVar = "company")
+  
+  
+  k0 <- SDC(removeCodes = "B", 
+            contributorVar = "company")
+  
+  k1 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2")
+  
+  k2 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2",
+            removeCodesFraction = NULL)
+  
+  k3 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2",
+            removeCodesFraction = c(1, 1))
+
+  expect_identical(k0, k1)
+  expect_identical(k0, k2)
+  expect_identical(k0, k3)
+
+  
+  k4 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2",
+            removeCodesFraction = 0)
+  
+  k5 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2",
+            removeCodesFraction = c(0,0))
+  
+  expect_identical(k4,k5)
+  expect_equal(sum(abs(k4[6] - k[6])< 0.001), 11)
+  
+  
+  k6 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2",
+            removeCodesFraction = c(0,1))
+  
+  B2impact <- unique(as.vector(as.matrix(k4[which((1/k4[6]-  1/k6[6]) > 0.001), 1:2])))
+  expect_setequal(B2impact, c("Total", "Agriculture", "Portugal"))
+  
+  AgriculturePortugal <- which(k1$sector4 == "Agriculture" & k1$geo == "Portugal")
+  expect_equal(k1[AgriculturePortugal, ], k6[AgriculturePortugal, ])
+  
+  
+  k7 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2",
+            removeCodesFraction = 0.45)
+  
+  k8 <- SDC(removeCodes = c("B", "B2"), 
+            contributorVar = "company2",
+            removeCodesFraction = c(0.45,0.45))
+  
+  expect_identical(k7,k8)
+  
+  ranges <- c(range((1/k4[6]-  1/k7[6])/(1/k4[6]-  1/k1[6]), na.rm = TRUE),
+              range((1/k4[7]-  1/k7[7])/(1/k4[7]-  1/k1[7]), na.rm = TRUE))
+  
+  expect_equal(ranges, rep(0.45, 4))
+  
+  
+  k9 <- SDC(removeCodes = c(3, 10:15), 
+            removeCodesFraction = NULL)
+  
+  k10 <- SDC(removeCodes = c(3, 10:15),
+             removeCodesFraction = rep(1, 7))
+  
+  expect_identical(k9,k10)
   
 })

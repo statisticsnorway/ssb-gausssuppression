@@ -16,6 +16,7 @@ MagnitudeRule(
   protectZeros = FALSE,
   charVar = NULL,
   removeCodes = character(0),
+  removeCodesFraction = 1,
   sWeightVar = NULL,
   domWeightMethod = "default",
   allDominance = FALSE,
@@ -55,7 +56,16 @@ be calculated after aggregation within these groups.}
 calculating dominance percentages. Essentially, the corresponding numeric
 values from \code{dominanceVar} or \code{numVar} are set to zero before proceeding
 with the dominance calculations. With empty \code{charVar} row indices are
-assumed and conversion to integer is performed.}
+assumed and conversion to integer is performed.
+See also \code{removeCodesFraction} below.}
+
+\item{removeCodesFraction}{Numeric value(s) in the range \verb{[0, 1]}.
+This can be either a single value or a vector with the same length as \code{removeCodes}.
+A value of 1 represents the default behavior, as described above.
+A value of 0 indicates that dominance percentages are calculated as if \code{removeCodes}
+were not removed, but percentages associated with \code{removeCodes} are still excluded
+when identifying major contributions. Values between 0 and 1 modify the
+contributions of \code{removeCodes} proportionally in the calculation of percentages.}
 
 \item{sWeightVar}{variable with sampling weights to be used in dominance rule}
 

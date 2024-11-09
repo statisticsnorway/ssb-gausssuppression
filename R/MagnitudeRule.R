@@ -31,6 +31,14 @@
 #'     values from `dominanceVar` or `numVar` are set to zero before proceeding 
 #'     with the dominance calculations. With empty `charVar` row indices are 
 #'     assumed and conversion to integer is performed.
+#'     See also `removeCodesFraction` below.
+#' @param removeCodesFraction Numeric value(s) in the range `[0, 1]`. 
+#'    This can be either a single value or a vector with the same length as `removeCodes`. 
+#'    A value of 1 represents the default behavior, as described above. 
+#'    A value of 0 indicates that dominance percentages are calculated as if `removeCodes` 
+#'    were not removed, but percentages associated with `removeCodes` are still excluded 
+#'    when identifying major contributions. Values between 0 and 1 modify the 
+#'    contributions of `removeCodes` proportionally in the calculation of percentages.
 #' @param sWeightVar variable with sampling weights to be used in dominance rule
 #' @param domWeightMethod character representing how weights should be treated
 #' in the dominance rule. See Details.
@@ -101,6 +109,7 @@ MagnitudeRule <- function(data,
                           protectZeros = FALSE,
                           charVar = NULL,
                           removeCodes = character(0), 
+                          removeCodesFraction = 1,
                           sWeightVar = NULL,
                           domWeightMethod = "default",
                           allDominance = FALSE,
@@ -162,11 +171,46 @@ MagnitudeRule <- function(data,
   }
   
   if (length(removeCodes)) {
-    if (length(charVar)) {
-      abs_inputnum[charVar_groups %in% removeCodes, ] <- 0
+    
+    if (is.null(removeCodesFraction)) {    # NULL possible for testing 
+      set_to_NA <- FALSE  # run as in old code 
+      removeCodesFraction <- 1
     } else {
-      abs_inputnum[as.integer(removeCodes), ] <- 0
+      set_to_NA <- as.logical(length(charVar))   # set to NA is faster 
     }
+    
+    if (all(removeCodesFraction == 1)) {         # old code
+      if (length(charVar)) {
+        abs_inputnum[charVar_groups %in% removeCodes, ] <- 0
+      } else {
+        abs_inputnum[as.integer(removeCodes), ] <- 0
+      }
+    } else {
+      if (!length(charVar)) {
+        stop("removeCodesFraction is not implemented when removeCodes as indices")
+      }
+      if (min(removeCodesFraction) < 0 | max(removeCodesFraction) > 1) {
+        stop("removeCodesFraction must be within the interval [0, 1]")
+      }
+      if (length(removeCodesFraction) == 1) {    # simple change of old code
+        if(removeCodesFraction > 0) {            #  When 0, no computation needed
+                                      abs_inputnum[charVar_groups %in% removeCodes, ] <- 
+          (1 - removeCodesFraction) * abs_inputnum[charVar_groups %in% removeCodes, ]
+        }
+      } else {                                   # more advanced code
+        if(length(removeCodesFraction) != length(removeCodes)){
+          stop("length(removeCodesFraction) must be 1 or length(removeCodes)")
+        }
+        ma <- match(charVar_groups, removeCodes)
+                                                    abs_inputnum[!is.na(ma), ] <- 
+        (1 - removeCodesFraction[ma[!is.na(ma)]]) * abs_inputnum[!is.na(ma), ]
+      }
+      
+    }
+    if (set_to_NA) {
+      charVar_groups[charVar_groups %in% removeCodes] <- NA
+    }
+    
   }
   
   sweight_original <- sweight  # For outputWeightedNum below
