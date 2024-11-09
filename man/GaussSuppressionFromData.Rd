@@ -205,7 +205,7 @@ secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSupp
 \details{
 The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments:
 \code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar}
-\code{aggregatePackage}, \code{aggregateNA}, \code{aggregateBaseOrder}, \code{rowGroupsPackage}, and \code{...}.
+\code{aggregatePackage}, \code{aggregateNA}, \code{aggregateBaseOrder}, \code{rowGroupsPackage}, \code{structuralEmpty}, and \code{...}.
 where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
