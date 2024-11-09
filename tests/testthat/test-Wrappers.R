@@ -193,4 +193,30 @@ test_that("Wrappers", {
   
   expect_identical(k9,k10)
   
+  
+  expect_warning({k11 <- SDC(contributorVar = "company", 
+                             protectZeros = TRUE, 
+                             removeCodes = c("A", "B", "C"))})
+  
+  k12 <- SDC(contributorVar = "company", 
+             protectZeros = TRUE, 
+             removeCodes = c("A", "B", "C"),
+             structuralEmpty = TRUE)
+  
+  expect_equal(sum(k11$primary), nrow(k11))
+
+  
+  expect_equal(sum(k12$primary), sum(k12[6]))
+  
+  k13 <- SDC(protectZeros = TRUE, 
+             removeCodes = 3:4)
+  
+  k14 <- SDC(protectZeros = TRUE, 
+             removeCodes = 3:4,
+             structuralEmpty = TRUE)
+
+  expect_true(all(k13$primary[k13[6]==0]))
+  expect_true(!all(k14$primary[k14[6]==0]))
+  
+  
 })
