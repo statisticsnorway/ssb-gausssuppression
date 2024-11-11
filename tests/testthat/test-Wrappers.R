@@ -208,8 +208,8 @@ test_that("Wrappers", {
   
   expect_equal(sum(k12$primary), sum(k12[6]))
   
-  k13 <- SDC(protectZeros = TRUE, 
-             removeCodes = 3:4)
+  expect_warning({k13 <- SDC(protectZeros = TRUE, 
+                  removeCodes = 3:4)})
   
   k14 <- SDC(protectZeros = TRUE, 
              removeCodes = 3:4,
