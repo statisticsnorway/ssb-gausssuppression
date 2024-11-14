@@ -254,12 +254,24 @@ MagnitudeRule <- function(data,
     charVar_groups[charVar_groups %in% removeCodes] <- NA
   }
   
+  index <- !is.null(sweight)
   
   maxContribution <- MaxContribution(x,
                                      abs_inputnum,
                                      n = max(n),
                                      groups = charVar_groups,
-                                     index = !is.null(sweight))
+                                     index = index,
+                                     return2 = allDominance)
+  
+  if (allDominance) {
+    maxContribution_id <- maxContribution$id
+    colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
+    if (index) {
+      maxContribution <- maxContribution$id
+    } else {
+      maxContribution <- maxContribution$value
+    }
+  }
   
   prim <-
     mapply(
@@ -297,10 +309,12 @@ MagnitudeRule <- function(data,
     output[["numExtra"]] <- wnum
   }
   if (allDominance) {
-    if ("numExtra" %in% names(output)) 
-      output[["numExtra"]] <- cbind(output[["numExtra"]], as.data.frame(prim))
+    numExtra <- cbind(as.data.frame(prim),
+                      as.data.frame(maxContribution_id))
+    if ("numExtra" %in% names(output))
+      output[["numExtra"]] <- cbind(output[["numExtra"]], numExtra)
     else 
-      output[["numExtra"]] <- as.data.frame(prim)
+      output[["numExtra"]] <- numExtra
   }
   if (length(names(output)) == 1)
     output <- unlist(output)

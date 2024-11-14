@@ -88,6 +88,8 @@ test_that("Unweighted dominance", {
       charVar = "char0"
     )
   
+  p1_$numExtra <-  p1_$numExtra[1:3]
+  p4$numExtra <-  p4$numExtra[1:3]
   
   expect_equal(p1_, p4)
     
@@ -104,6 +106,9 @@ test_that("Unweighted dominance", {
       outputWeightedNum = TRUE,
       charVar = "char0"
     )
+  
+  p3$numExtra <- p3$numExtra[1:3]
+  p5$numExtra <-  p5$numExtra[1:3]
   
   expect_equal(p3, p5)
   
@@ -156,6 +161,10 @@ test_that("Default weighted dominance", {
       allDominance = TRUE,
       charVar = "char0"
     )
+  
+  p$numExtra <- p$numExtra[1:4]
+  p_char0$numExtra <- p_char0$numExtra[1:4]
+  
   expect_equal(p, p_char0)
   
   
