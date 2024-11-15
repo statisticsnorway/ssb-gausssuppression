@@ -266,6 +266,8 @@ MagnitudeRule <- function(data,
   if (allDominance) {
     maxContribution_id <- maxContribution$id
     colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
+    maxContribution_n <- matrix(maxContribution$nContributors,  
+                                dimnames = list(NULL, "nContributors"))
     if (index) {
       maxContribution <- maxContribution$id
     } else {
@@ -310,7 +312,8 @@ MagnitudeRule <- function(data,
   }
   if (allDominance) {
     numExtra <- cbind(as.data.frame(prim),
-                      as.data.frame(maxContribution_id))
+                      as.data.frame(maxContribution_id),
+                      as.data.frame(maxContribution_n))
     if ("numExtra" %in% names(output))
       output[["numExtra"]] <- cbind(output[["numExtra"]], numExtra)
     else 
