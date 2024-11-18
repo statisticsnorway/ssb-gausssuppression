@@ -256,23 +256,35 @@ MagnitudeRule <- function(data,
   
   index <- !is.null(sweight)
   
-  maxContribution <- MaxContribution(x,
-                                     abs_inputnum,
-                                     n = max(n),
-                                     groups = charVar_groups,
-                                     index = index,
-                                     return2 = allDominance)
+  mc_output <- "y" 
+
+  if(index | allDominance){
+    mc_output <- c(mc_output, "id")
+  }
+  if(allDominance){
+    mc_output <- c(mc_output, "nContributors")
+  }
+    
+  
+  max_contribution_ <- max_contribution(x,
+                                        abs_inputnum,
+                                        n = max(n),
+                                        id = charVar_groups,
+                                        output = mc_output, 
+                                        drop = FALSE)
+  
+  
+  if(index) {
+    maxContribution <- max_contribution_[["id"]]
+  } else {
+    maxContribution <- max_contribution_[["y"]]
+  }
   
   if (allDominance) {
-    maxContribution_id <- maxContribution$id
+    maxContribution_id <- max_contribution_[["id"]]
     colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
-    maxContribution_n <- matrix(maxContribution$nContributors,  
+    maxContribution_n <- matrix(max_contribution_[["nContributors"]],  
                                 dimnames = list(NULL, "nContributors"))
-    if (index) {
-      maxContribution <- maxContribution$id
-    } else {
-      maxContribution <- maxContribution$value
-    }
   }
   
   prim <-

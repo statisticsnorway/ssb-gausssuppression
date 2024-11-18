@@ -1,27 +1,50 @@
-max_contribution <- function(x, y, n = 1, decreasing = TRUE, groups, return2) {
+
+
+
+max_contribution <- function(x, 
+                             y, 
+                             n = 1, 
+                             id = NULL, 
+                             output = "y", 
+                             drop = TRUE,
+                             decreasing = TRUE) {
   
-  if (length(groups) != nrow(x)) {
-    stop("Incorrect length of groups")
-  }
+  out <- vector("list", 3)
+  names(out) <- c("y", "id", "nContributors")
   
-  if (anyNA(groups)) {
-    rows <- !is.na(groups)
-    groups <- groups[rows]
-    x <- x[rows, , drop = FALSE]
-    y <- y[rows]
-  }
+  output <- names(out) %in% output
+  names(output) <- names(out)
   
-  if (return2) {
-    fgroups <- factor(groups)
-    groups <- as.integer(fgroups)
-    fgroups <- levels(fgroups)
+  if (is.null(id)) {
+    id <- seq_len(nrow(x))
+    fid <- id
+    id_input <- FALSE
   } else {
-    groups <- as.integer(factor(groups))
+    id_input <- TRUE
+    
+    if (length(id) != nrow(x)) {
+      stop("Incorrect length of id")
+    }
+    
+    if (anyNA(id)) {
+      rows <- !is.na(id)
+      id <- id[rows]
+      x <- x[rows, , drop = FALSE]
+      y <- y[rows]
+    }
+    
+    if (output[["id"]]) {
+      fid <- factor(id)
+      id <- as.integer(fid)
+      fid <- levels(fid)
+    } else {
+      id <- as.integer(factor(id))
+    }
   }
   
   xT <- As_TsparseMatrix(x) 
   
-  gT <- new("dgTMatrix", i = 0:(nrow(x) - 1L), j = groups - 1L, x = -as.numeric(decreasing) * y, Dim = c(nrow(xT), max(groups)))
+  gT <- new("dgTMatrix", i = 0:(nrow(x) - 1L), j = id - 1L, x = -as.numeric(decreasing) * y, Dim = c(nrow(xT), max(id)))
   gT <- As_TsparseMatrix(crossprod(gT, xT))
   xM <- data.frame(y = gT@x, col = gT@j + 1, gr = gT@i + 1)
   
@@ -33,13 +56,14 @@ max_contribution <- function(x, y, n = 1, decreasing = TRUE, groups, return2) {
   
   seqCol <- seq_len(ncol(x))
   
-  if (return2) {
-    nContributors <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
+  if (output[["nContributors"]]) {
+    out$nContributors <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
   }
   
-  maxC <- matrix(NA_integer_, ncol(x), n)
-  if (return2) {
-    id <- matrix(NA_character_, ncol(x), n)
+  out$y <- matrix(NA_integer_, ncol(x), n)
+  
+  if (output[["id"]]) {
+    out$id <- matrix(ifelse(id_input, NA_character_, NA_integer_), ncol(x), n)
   }
   
   for (i in seq_len(n)) {
@@ -47,17 +71,17 @@ max_contribution <- function(x, y, n = 1, decreasing = TRUE, groups, return2) {
       xM[ma, "col"] <- 0
     }
     ma <- match(seqCol, xM[, "col"])
-    maxC[, i] <- xM[ma, "y"]
-    if (return2) {
-      id[, i] <- fgroups[xM[ma, "gr"]]
+    out$y[, i] <- xM[ma, "y"]
+    if (output[["id"]]) {
+      out$id[, i] <- fid[xM[ma, "gr"]]
     }
   }
   
-  if (return2) {
-    return(list(value = maxC, id = id, nContributors = nContributors))
+  if (drop & sum(output) == 1) {
+    return(out[[which(output)]])
   }
   
-  maxC
+  out
 }
 
 
