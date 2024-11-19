@@ -400,6 +400,8 @@ FindDominantCells <- function(x,
                               returnContrib = FALSE, 
                               maxContribution = NULL) {
   
+  # NOTE: Test may fail when 0s
+  # Whether 0 counts as a contribution is different
   test_maxContribution <- isTRUE(getOption("GaussSuppression.test_maxContribution"))
   
   if (is.null(samplingWeight)) {

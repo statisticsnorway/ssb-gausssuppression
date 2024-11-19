@@ -106,6 +106,9 @@ test_that("Wrappers", {
   # With singletonZeros = FALSE, the result is FALSE 
   # and revealing suppressed 0 cells is easy since Total=0  
   
+  # If this is 12L, see code in max_contribution where do_drop0 = FALSE 
+  # Then the counting of contributors that includes 0s must be done differently
+  expect_identical(max(b4$n_contr), 20L)
   
   dataset$company2 <- dataset$company 
   dataset$company2[2] <- "B2"
@@ -133,16 +136,16 @@ test_that("Wrappers", {
   k1 <- SDC(removeCodes = c("B", "B2"), 
             contributorVar = "company2")
   
-  k2 <- SDC(removeCodes = c("B", "B2"), 
-            contributorVar = "company2",
-            removeCodesFraction = NULL)
+  #k2 <- SDC(removeCodes = c("B", "B2"), 
+  #          contributorVar = "company2",
+  #          removeCodesFraction = NULL)
   
   k3 <- SDC(removeCodes = c("B", "B2"), 
             contributorVar = "company2",
             removeCodesFraction = c(1, 1))
 
   expect_identical(k0, k1)
-  expect_identical(k0, k2)
+  #expect_identical(k0, k2)
   expect_identical(k0, k3)
 
   

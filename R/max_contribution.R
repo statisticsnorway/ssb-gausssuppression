@@ -45,7 +45,7 @@ max_contribution <- function(x,
   xT <- As_TsparseMatrix(x) 
   
   gT <- new("dgTMatrix", i = 0:(nrow(x) - 1L), j = id - 1L, x = -as.numeric(decreasing) * y, Dim = c(nrow(xT), max(id)))
-  gT <- As_TsparseMatrix(crossprod(gT, xT))
+  gT <- As_TsparseMatrix(crossprod(gT, xT),  do_drop0 = FALSE)
   xM <- data.frame(y = gT@x, col = gT@j + 1, gr = gT@i + 1)
   
   xM <- as.matrix(xM)  # Needed since empty index below 
