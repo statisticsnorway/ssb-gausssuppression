@@ -9,8 +9,9 @@ max_contribution <- function(x,
                              drop = TRUE,
                              decreasing = TRUE) {
   
-  out <- vector("list", 3)
-  names(out) <- c("y", "id", "n_contr")
+  out_names <- c("y", "id", "n_contr", "n_0_contr", "n_non0_contr")
+  out <- vector("list", length( out_names))
+  names(out) <-  out_names
   
   output <- names(out) %in% output
   names(output) <- names(out)
@@ -62,6 +63,12 @@ max_contribution <- function(x,
   
   if (output[["n_contr"]]) {
     out$n_contr <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
+  }
+  if (output[["n_0_contr"]]) {
+    out$n_0_contr <- as.vector(table_all_integers(xM[, "col"][xM[, "y"]==0], ncol(x)))
+  }
+  if (output[["n_non0_contr"]]) {
+    out$n_non0_contr <- as.vector(table_all_integers(xM[, "col"][xM[, "y"]!=0], ncol(x)))
   }
   
   out$y <- matrix(NA_integer_, ncol(x), n)
