@@ -73,16 +73,16 @@ max_contribution <- function(x,
   xT <- As_TsparseMatrix(x) 
   
   if (id_input) {
-    gT <- new("dgTMatrix", i = 0:(nrow(x) - 1L), j = id - 1L, x = -as.numeric(decreasing) * y, Dim = c(nrow(xT), max(id)))
+    gT <- new("dgTMatrix", i = 0:(nrow(x) - 1L), j = id - 1L, x = y, Dim = c(nrow(xT), max(id)))
     gT <- As_TsparseMatrix(crossprod(gT, xT),  do_drop0 = FALSE)
     xM <- data.frame(y = gT@x, col = gT@j + 1, gr = gT@i + 1)
   } else {  # same but simpler calculation
-    xM <- data.frame(y = -as.numeric(decreasing) * y[xT@i + 1], col = xT@j + 1, gr = id[xT@i + 1])
+    xM <- data.frame(y = y[xT@i + 1], col = xT@j + 1, gr = id[xT@i + 1])
   }
   
   if (output[["sums_unremoved"]] | (output[["sums"]] & is.null(remove_fraction))) {
     if (id_input) {
-      out$sums_unremoved <- -colSums(gT)
+      out$sums_unremoved <- colSums(gT)
     } else {
       out$sums_unremoved <- as.matrix(crossprod(xT, y))[, 1]
     }
@@ -94,7 +94,7 @@ max_contribution <- function(x,
   if (!is.null(remove_fraction) & output[["sums"]]) {
     if (id_input) {
       gT <- Diagonal(x = 1-remove_fraction)  %*% gT
-      out$sums <- -colSums(gT) 
+      out$sums <- colSums(gT) 
     }
     else {
       out$sums <- as.matrix(crossprod(xT, y * 1-remove_fraction))[, 1]
@@ -116,8 +116,8 @@ max_contribution <- function(x,
   
   xM <- as.matrix(xM)  # Needed since empty index below
   
+  xM[, "y"] <- -decreasing * xM[, "y"]
   xM <- SortRows(xM) 
-  
   xM[, "y"] <- -decreasing * xM[, "y"]
   
   seqCol <- seq_len(ncol(x))
