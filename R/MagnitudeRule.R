@@ -262,7 +262,7 @@ MagnitudeRule <- function(data,
     mc_output <- c(mc_output, "id")
   }
   if(allDominance){
-    mc_output <- c(mc_output, "nContributors")
+    mc_output <- c(mc_output, "n_contr")
   }
     
   
@@ -283,8 +283,8 @@ MagnitudeRule <- function(data,
   if (allDominance) {
     maxContribution_id <- max_contribution_[["id"]]
     colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
-    maxContribution_n <- matrix(max_contribution_[["nContributors"]],  
-                                dimnames = list(NULL, "nContributors"))
+    maxContribution_n <- matrix(max_contribution_[["n_contr"]],  
+                                dimnames = list(NULL, "n_contr"))
   }
   
   prim <-

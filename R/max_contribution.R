@@ -10,7 +10,7 @@ max_contribution <- function(x,
                              decreasing = TRUE) {
   
   out <- vector("list", 3)
-  names(out) <- c("y", "id", "nContributors")
+  names(out) <- c("y", "id", "n_contr")
   
   output <- names(out) %in% output
   names(output) <- names(out)
@@ -56,8 +56,8 @@ max_contribution <- function(x,
   
   seqCol <- seq_len(ncol(x))
   
-  if (output[["nContributors"]]) {
-    out$nContributors <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
+  if (output[["n_contr"]]) {
+    out$n_contr <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
   }
   
   out$y <- matrix(NA_integer_, ncol(x), n)
