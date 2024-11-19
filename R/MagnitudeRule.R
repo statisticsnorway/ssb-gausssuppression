@@ -179,6 +179,21 @@ MagnitudeRule <- function(data,
     charVar_groups <- NULL
   }
   
+  removeCodesFraction_in_max_contribution <- TRUE
+  if (removeCodesFraction_in_max_contribution & length(removeCodes)) {
+    if (length(charVar)) {
+      remove_fraction <- rep_len(removeCodesFraction, length(removeCodes))
+      names(remove_fraction) <- removeCodes
+    } else {
+      removeCodesFraction <- rep_len(removeCodesFraction, length(removeCodes))
+      remove_fraction <- rep_len(NA_integer_, nrow(x))
+      remove_fraction[removeCodes] <- removeCodesFraction
+    }
+    removeCodes <- character(0)
+  } else {
+    remove_fraction <- NULL
+  }
+  
   
   set_to_NA <- FALSE 
   if (length(removeCodes)) {
@@ -222,6 +237,9 @@ MagnitudeRule <- function(data,
   
   sweight_original <- sweight  # For outputWeightedNum below
   
+  
+  #
+  # Now changed below, but sweight <- NULL is important 
   # Trick to call FindDominantCells without sweight
   if(!is.null(charVar_groups) & !tauArgusDominance){
     abs_num <- as.data.frame(as.matrix(crossprod(x, as.matrix(abs_inputnum * as.vector(sweight)))))
@@ -256,7 +274,7 @@ MagnitudeRule <- function(data,
   
   index <- !is.null(sweight)
   
-  mc_output <- "y" 
+  mc_output <- c("y", "sums") 
 
   if(index | allDominance){
     mc_output <- c(mc_output, "id")
@@ -271,7 +289,8 @@ MagnitudeRule <- function(data,
                                         n = max(n),
                                         id = charVar_groups,
                                         output = mc_output, 
-                                        drop = FALSE)
+                                        drop = FALSE, 
+                                        remove_fraction = remove_fraction)
   
   
   if(index) {
@@ -285,6 +304,24 @@ MagnitudeRule <- function(data,
     colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
     maxContribution_n <- matrix(max_contribution_[["n_contr"]],  
                                 dimnames = list(NULL, "n_contr"))
+  }
+  
+  if (removeCodesFraction_in_max_contribution) {
+    if(!is.null(charVar_groups) & !tauArgusDominance & !is.null(sWeightVar)) {
+      abs_num <- max_contribution(x,
+                       abs_inputnum * as.vector(sweight_original),
+                       n = max(n),
+                       id = charVar_groups,
+                       output = "sums", 
+                       drop = TRUE, 
+                       remove_fraction = remove_fraction)
+    } else {
+      abs_num <- max_contribution_[["sums"]]
+    }
+    abs_num <- as.data.frame(matrix(abs_num,  dimnames = list(NULL, numVar)))
+    if(!is.null(charVar_groups) & !tauArgusDominance) {
+      sweight <- NULL
+    }
   }
   
   prim <-

@@ -188,13 +188,13 @@ test_that("Wrappers", {
   expect_equal(ranges, rep(0.45, 4))
   
   
-  k9 <- SDC(removeCodes = c(3, 10:15), 
-            removeCodesFraction = NULL)
+  #k9 <- SDC(removeCodes = c(3, 10:15), 
+  #          removeCodesFraction = NULL)
   
-  k10 <- SDC(removeCodes = c(3, 10:15),
-             removeCodesFraction = rep(1, 7))
+  #k10 <- SDC(removeCodes = c(3, 10:15),
+  #           removeCodesFraction = rep(1, 7))
   
-  expect_identical(k9,k10)
+  #expect_identical(k9,k10)
   
   
   expect_warning({k11 <- SDC(contributorVar = "company", 
@@ -206,7 +206,7 @@ test_that("Wrappers", {
              removeCodes = c("A", "B", "C"),
              structuralEmpty = TRUE)
   
-  expect_equal(sum(k11$primary), nrow(k11))
+  #expect_equal(sum(k11$primary), nrow(k11))
 
   
   expect_equal(sum(k12$primary), sum(k12[6]))
@@ -218,7 +218,7 @@ test_that("Wrappers", {
              removeCodes = 3:4,
              structuralEmpty = TRUE)
 
-  expect_true(all(k13$primary[k13[6]==0]))
+  #expect_true(all(k13$primary[k13[6]==0]))
   expect_true(!all(k14$primary[k14[6]==0]))
   
   

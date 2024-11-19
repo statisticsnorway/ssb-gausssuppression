@@ -7,9 +7,11 @@ max_contribution <- function(x,
                              id = NULL, 
                              output = "y", 
                              drop = TRUE,
-                             decreasing = TRUE) {
+                             decreasing = TRUE,
+                             remove_fraction = NULL) {
   
-  out_names <- c("y", "id", "n_contr", "n_0_contr", "n_non0_contr")
+  
+  out_names <- c("y", "id", "n_contr", "n_0_contr", "n_non0_contr", "sums", "sums_unremoved")
   out <- vector("list", length( out_names))
   names(out) <-  out_names
   
@@ -20,9 +22,24 @@ max_contribution <- function(x,
     id <- seq_len(nrow(x))
     fid <- id
     id_input <- FALSE
+    if (!is.null(remove_fraction)) {
+      if (length(remove_fraction) != nrow(x)) {
+        stop("wrong length of remove_fraction")
+      }
+    }
   } else {
     id_input <- TRUE
-    
+    if (!is.null(remove_fraction)) {
+      if (!length(names(remove_fraction))) {
+        stop("remove_fraction must be named")
+      }
+      if (any(duplicated(names(remove_fraction)))) {
+        stop("duplicated remove_fraction names")
+      }
+      if (!all(names(remove_fraction) %in% unique(id))) {
+        warning("remove_fraction names not in id")
+      }
+    }
     if (length(id) != nrow(x)) {
       stop("Incorrect length of id")
     }
@@ -34,14 +51,24 @@ max_contribution <- function(x,
       y <- y[rows]
     }
     
-    if (output[["id"]]) {
-      fid <- factor(id)
-      id <- as.integer(fid)
-      fid <- levels(fid)
-    } else {
-      id <- as.integer(factor(id))
+    fid <- factor(id)
+    id <- as.integer(fid)
+    fid <- levels(fid)
+    
+    if (!is.null(remove_fraction)) {
+      remove_fraction_input <- remove_fraction
+      remove_fraction <- rep(NA_real_, max(id))
+      ma <- match(fid, names(remove_fraction_input))
+      remove_fraction[!is.na(ma)] <- remove_fraction_input[ma[!is.na(ma)]]
     }
+    
   }
+  
+  if (!is.null(remove_fraction)) {
+    keep <- is.na(remove_fraction)
+    remove_fraction[keep] <- 0
+  }
+  
   
   xT <- As_TsparseMatrix(x) 
   
@@ -53,7 +80,41 @@ max_contribution <- function(x,
     xM <- data.frame(y = -as.numeric(decreasing) * y[xT@i + 1], col = xT@j + 1, gr = id[xT@i + 1])
   }
   
-  xM <- as.matrix(xM)  # Needed since empty index below 
+  if (output[["sums_unremoved"]] | (output[["sums"]] & is.null(remove_fraction))) {
+    if (id_input) {
+      out$sums_unremoved <- -colSums(gT)
+    } else {
+      out$sums_unremoved <- as.matrix(crossprod(xT, y))[, 1]
+    }
+    if (output[["sums"]] & is.null(remove_fraction)) {
+      out$sums <- out$sums_unremoved
+    }
+  }
+  
+  if (!is.null(remove_fraction) & output[["sums"]]) {
+    if (id_input) {
+      gT <- Diagonal(x = 1-remove_fraction)  %*% gT
+      out$sums <- -colSums(gT) 
+    }
+    else {
+      out$sums <- as.matrix(crossprod(xT, y * 1-remove_fraction))[, 1]
+    }
+  }
+  
+  if (output[["sums_unremoved"]] | (output[["sums"]] ) ) {
+    if (drop & sum(output) == 1) {
+      return(out[[which(output)]])
+    }  
+  }
+  
+  
+  if (!is.null(remove_fraction)) {
+    xM <- xM[keep[xM[, "gr"]], , drop = FALSE] 
+  }
+  
+
+  
+  xM <- as.matrix(xM)  # Needed since empty index below
   
   xM <- SortRows(xM) 
   
