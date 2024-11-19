@@ -24,6 +24,7 @@ MagnitudeRule(
   dominanceVar = NULL,
   structuralEmpty = FALSE,
   num,
+  apply_abs_directly = FALSE,
   ...
 )
 

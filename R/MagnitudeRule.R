@@ -124,6 +124,7 @@ MagnitudeRule <- function(data,
                           dominanceVar = NULL,
                           structuralEmpty = FALSE,
                           num, 
+                          apply_abs_directly = FALSE,  
                           ...) {
   if (!is.null(pPercent)) {
     n <- 1:2
@@ -157,8 +158,11 @@ MagnitudeRule <- function(data,
       warning("Some sample weights are < 1. Consider using other weighted domininace method.")
   }
   
-  abs_inputnum <- abs(data[, numVar, drop = FALSE])
   
+  abs_inputnum <- data[, numVar, drop = FALSE]
+  if (apply_abs_directly) {
+    abs_inputnum <- abs(abs_inputnum)
+  } 
   
   if (is.null(sWeightVar)) {
     sweight <- as.matrix(rep(1, nrow(data)))

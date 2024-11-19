@@ -8,7 +8,8 @@ max_contribution <- function(x,
                              output = "y", 
                              drop = TRUE,
                              decreasing = TRUE,
-                             remove_fraction = NULL) {
+                             remove_fraction = NULL,
+                             do_abs = TRUE) {
   
   
   out_names <- c("y", "id", "n_contr", "n_0_contr", "n_non0_contr", "sums", "sums_unremoved")
@@ -75,8 +76,14 @@ max_contribution <- function(x,
   if (id_input) {
     gT <- new("dgTMatrix", i = 0:(nrow(x) - 1L), j = id - 1L, x = y, Dim = c(nrow(xT), max(id)))
     gT <- As_TsparseMatrix(crossprod(gT, xT),  do_drop0 = FALSE)
+    if(do_abs) {
+      gT <- abs(gT)
+    }
     xM <- data.frame(y = gT@x, col = gT@j + 1, gr = gT@i + 1)
   } else {  # same but simpler calculation
+    if(do_abs) {
+      y <- abs(y)
+    }
     xM <- data.frame(y = y[xT@i + 1], col = xT@j + 1, gr = id[xT@i + 1])
   }
   
