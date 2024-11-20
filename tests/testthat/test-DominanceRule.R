@@ -125,7 +125,7 @@ test_that("Unweighted dominance", {
       allDominance = TRUE,
       outputWeightedNum = TRUE
     )
-  expect_equal(p6$numExtra[["primary.2:98"]], c(1, 1, 1, 1, 0.9, 1, 0.9))
+  expect_equal(p6$numExtra[["dominant2"]], c(1, 1, 1, 1, 0.9, 1, 0.9))
 })
 
 

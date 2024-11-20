@@ -360,7 +360,7 @@ MagnitudeRule <- function(data,
   } else {
     dominant <- abs(1 - prim[, 2]) < abs(pPercent/100 * prim[, 1])
   }
-  colnames(prim) <- paste0("primary.", paste(n, k, sep = ":"))
+  colnames(prim) <- paste0("dominant", paste(n, sep = ""))
   if (!protectZeros)
     output <- list(primary = dominant)
   else
