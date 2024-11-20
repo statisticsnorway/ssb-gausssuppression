@@ -104,7 +104,7 @@ max_contribution <- function(x,
       out$sums <- colSums(gT) 
     }
     else {
-      out$sums <- as.matrix(crossprod(xT, y * 1-remove_fraction))[, 1]
+      out$sums <- as.matrix(crossprod(xT, y * (1-remove_fraction)))[, 1]
     }
   }
   
@@ -114,12 +114,9 @@ max_contribution <- function(x,
     }  
   }
   
-  
   if (!is.null(remove_fraction)) {
     xM <- xM[keep[xM[, "gr"]], , drop = FALSE] 
   }
-  
-
   
   xM <- as.matrix(xM)  # Needed since empty index below
   
