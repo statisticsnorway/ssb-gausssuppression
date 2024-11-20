@@ -206,7 +206,7 @@ test_that("Wrappers", {
              removeCodes = c("A", "B", "C"),
              structuralEmpty = TRUE)
   
-  #expect_equal(sum(k11$primary), nrow(k11))
+  expect_equal(sum(k11$primary), nrow(k11))
 
   
   expect_equal(sum(k12$primary), sum(k12[6]))
@@ -218,7 +218,7 @@ test_that("Wrappers", {
              removeCodes = 3:4,
              structuralEmpty = TRUE)
 
-  #expect_true(all(k13$primary[k13[6]==0]))
+  expect_true(all(k13$primary[k13[6]==0]))
   expect_true(!all(k14$primary[k14[6]==0]))
   
   

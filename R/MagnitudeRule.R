@@ -284,7 +284,7 @@ MagnitudeRule <- function(data,
     mc_output <- c(mc_output, "id")
   }
   if(allDominance){
-    mc_output <- c(mc_output, "n_contr")
+    mc_output <- c(mc_output, "n_contr", "n_non0_contr")
   }
     
   
@@ -306,8 +306,9 @@ MagnitudeRule <- function(data,
   if (allDominance) {
     maxContribution_id <- max_contribution_[["id"]]
     colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
-    maxContribution_n <- matrix(max_contribution_[["n_contr"]],  
-                                dimnames = list(NULL, "n_contr"))
+    maxContribution_info <- cbind(as.data.frame(maxContribution_id),
+                                  as.data.frame(max_contribution_[c("n_contr", "n_non0_contr")]))
+                                  
   }
   
   if (removeCodesFraction_in_max_contribution) {
@@ -325,6 +326,13 @@ MagnitudeRule <- function(data,
     abs_num <- as.data.frame(matrix(abs_num,  dimnames = list(NULL, numVar)))
     if(!is.null(charVar_groups) & !tauArgusDominance) {
       sweight <- NULL
+    }
+    
+    if (protectZeros) {
+      zeros_to_be_protected <- max_contribution_[["sums"]] == 0    
+      if (structuralEmpty) {
+        zeros_to_be_protected[max_contribution_[["n_contr"]] == 0] <- FALSE
+      }
     }
   }
   
@@ -365,8 +373,7 @@ MagnitudeRule <- function(data,
   }
   if (allDominance) {
     numExtra <- cbind(as.data.frame(prim),
-                      as.data.frame(maxContribution_id),
-                      as.data.frame(maxContribution_n))
+                      maxContribution_info)
     if ("numExtra" %in% names(output))
       output[["numExtra"]] <- cbind(output[["numExtra"]], numExtra)
     else 
