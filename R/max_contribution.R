@@ -19,6 +19,15 @@ max_contribution <- function(x,
   output <- names(out) %in% output
   names(output) <- names(out)
   
+  if (!is.null(remove_fraction)) {
+    if (length(remove_fraction[!is.na(remove_fraction)])) {
+      if (min(remove_fraction, na.rm = TRUE) < 0 | max(remove_fraction, na.rm = TRUE) >
+          1) {
+        stop("remove_fraction must be within the interval [0, 1]")
+      }
+    }
+  }
+  
   if (is.null(id)) {
     id <- seq_len(nrow(x))
     fid <- id
