@@ -12,7 +12,7 @@ max_contribution <- function(x,
                              do_abs = TRUE) {
   
   
-  out_names <- c("y", "id", "n_contr", "n_0_contr", "n_non0_contr", "sums", "sums_unremoved")
+  out_names <- c("y", "id", "n_contr", "n_0_contr", "n_non0_contr", "sums", "sums_all")
   out <- vector("list", length( out_names))
   names(out) <-  out_names
   
@@ -96,14 +96,14 @@ max_contribution <- function(x,
     xM <- data.frame(y = y[xT@i + 1], col = xT@j + 1, gr = id[xT@i + 1])
   }
   
-  if (output[["sums_unremoved"]] | (output[["sums"]] & is.null(remove_fraction))) {
+  if (output[["sums_all"]] | (output[["sums"]] & is.null(remove_fraction))) {
     if (id_input) {
-      out$sums_unremoved <- colSums(gT)
+      out$sums_all <- colSums(gT)
     } else {
-      out$sums_unremoved <- as.matrix(crossprod(xT, y))[, 1]
+      out$sums_all <- as.matrix(crossprod(xT, y))[, 1]
     }
     if (output[["sums"]] & is.null(remove_fraction)) {
-      out$sums <- out$sums_unremoved
+      out$sums <- out$sums_all
     }
   }
   
@@ -117,7 +117,7 @@ max_contribution <- function(x,
     }
   }
   
-  if (output[["sums_unremoved"]] | (output[["sums"]] ) ) {
+  if (output[["sums_all"]] | (output[["sums"]] ) ) {
     if (drop & sum(output) == 1) {
       return(out[[which(output)]])
     }  
