@@ -229,11 +229,15 @@ MagnitudeRule <- function(data,
   if(index | allDominance){
     mc_output <- c(mc_output, "id")
   }
-  if(allDominance){
-    mc_output <- c(mc_output, "n_contr", "n_non0_contr")
+  if (allDominance) {
+    if (is.null(remove_fraction)) {
+      max_contribution_ouput <- c("n_contr", "n_non0_contr")
+    } else {
+      max_contribution_ouput <- c("n_contr", "n_non0_contr", "n_contr_all", "n_non0_contr_all")
+    }
+    mc_output <- unique(c(mc_output, max_contribution_ouput))
   }
     
-  
   max_contribution_ <- max_contribution(x,
                                         abs_inputnum,
                                         n = max(n),
@@ -253,7 +257,7 @@ MagnitudeRule <- function(data,
     maxContribution_id <- max_contribution_[["id"]]
     colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
     maxContribution_info <- cbind(as.data.frame(maxContribution_id),
-                                  as.data.frame(max_contribution_[c("n_contr", "n_non0_contr")]))
+                                  as.data.frame(max_contribution_[max_contribution_ouput]))
                                   
   }
   

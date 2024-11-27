@@ -140,8 +140,8 @@ test_that("Wrappers", {
             contributorVar = "company2",
             removeCodesFraction = c(1, 1))
 
-  expect_identical(k0, k1)
-  expect_identical(k0, k3)
+  expect_identical(k0[-(12:13)], k1[-(12:13)])
+  expect_identical(k1, k3)
 
   
   k4 <- SDC(removeCodes = c("B", "B2"), 
@@ -256,7 +256,9 @@ test_that("Wrappers", {
        max1r = c(a[which.max(abs(a2na)),1], NA)[1],
        max2r = c(a[which.max2(abs(a2na)),1], NA)[1],
        n  =  sum(!is.na(a2na)),  
-       n0 =  sum(!is.na(a2na)  & a[,2] == 0)
+       n0 =  sum(!is.na(a2na)  & a[,2] == 0),
+       nall  =  nrow(a),  
+       n0all =  sum(a[,2] == 0)
        )
   }
 
@@ -264,7 +266,7 @@ test_that("Wrappers", {
   # Calculate everything in a different way via model_aggregate()
   k <- SSBtools::model_aggregate(dataset, 
                                  formula = ~sector4 * eu + geo * sector2, 
-      fun_vars = list(`sum1,sum2,sum1r,sum2r,sum,wsum,sumr,wsumr,fsum,fwsum,max1,max2,max1r,max2r,n,n0` = list(f = c("i_company2", "y", "w"))),
+      fun_vars = list(`sum1,sum2,sum1r,sum2r,sum,wsum,sumr,wsumr,fsum,fwsum,max1,max2,max1r,max2r,n,n0,nall,n0all` = list(f = c("i_company2", "y", "w"))),
       fun = c(f = f)
       )
   
@@ -326,5 +328,19 @@ test_that("Wrappers", {
   expect_equal(g4[["n_non0_contr"]], k[["n"]] - k[["n0"]])
   expect_equal(g5[["n_contr"]], k[["n"]])
   expect_equal(g5[["n_non0_contr"]], k[["n"]] - k[["n0"]])
+  
+  expect_equal(g0[["n_contr"]], k[["nall"]])
+  expect_equal(g0[["n_non0_contr"]], k[["nall"]] - k[["n0all"]])
+  expect_equal(g1[["n_contr"]], k[["nall"]])
+  expect_equal(g1[["n_non0_contr"]], k[["nall"]] - k[["n0all"]])
+  expect_equal(g2[["n_contr_all"]], k[["nall"]])
+  expect_equal(g2[["n_non0_contr_all"]], k[["nall"]] - k[["n0all"]])
+  expect_equal(g3[["n_contr_all"]], k[["nall"]])
+  expect_equal(g3[["n_non0_contr_all"]], k[["nall"]] - k[["n0all"]])
+  expect_equal(g4[["n_contr_all"]], k[["nall"]])
+  expect_equal(g4[["n_non0_contr_all"]], k[["nall"]] - k[["n0all"]])
+  expect_equal(g5[["n_contr_all"]], k[["nall"]])
+  expect_equal(g5[["n_non0_contr_all"]], k[["nall"]] - k[["n0all"]])
+  
   
 })

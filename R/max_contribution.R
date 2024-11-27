@@ -12,7 +12,9 @@ max_contribution <- function(x,
                              do_abs = TRUE) {
   
   
-  out_names <- c("y", "id", "n_contr", "n_0_contr", "n_non0_contr", "sums", "sums_all")
+  out_names <- c("y", "id", 
+                 "n_contr",     "n_0_contr",     "n_non0_contr",     "sums", 
+                 "n_contr_all", "n_0_contr_all", "n_non0_contr_all", "sums_all")
   out <- vector("list", length( out_names))
   names(out) <-  out_names
   
@@ -131,6 +133,20 @@ max_contribution <- function(x,
   
   if (!is.null(tr <- try_return())) return(tr)
   
+  
+  if (output[["n_contr_all"]]) {
+    out$n_contr_all <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
+  }
+  if (output[["n_0_contr_all"]]) {
+    out$n_0_contr_all <- as.vector(table_all_integers(xM[, "col"][xM[, "y"]==0], ncol(x)))
+  }
+  if (output[["n_non0_contr_all"]]) {
+    out$n_non0_contr_all <- as.vector(table_all_integers(xM[, "col"][xM[, "y"]!=0], ncol(x)))
+  }
+  
+  if (!is.null(tr <- try_return())) return(tr)
+  
+  
   if (!is.null(remove_fraction)) {
     xM <- xM[keep[xM[, "gr"]], , drop = FALSE] 
   }
@@ -152,6 +168,9 @@ max_contribution <- function(x,
   if (output[["n_non0_contr"]]) {
     out$n_non0_contr <- as.vector(table_all_integers(xM[, "col"][xM[, "y"]!=0], ncol(x)))
   }
+  
+  if (!is.null(tr <- try_return())) return(tr)
+  
   
   out$y <- matrix(NA_integer_, ncol(x), n)
   
