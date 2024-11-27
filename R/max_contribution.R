@@ -1,6 +1,44 @@
-
-
-
+#' Find major contributions to aggregates
+#'
+#' This function identifies the largest contributions to aggregates. Aggregates are 
+#' assumed to be calculated using a dummy matrix with the formula:
+#' \code{z = t(x) \%*\% y}. 
+#' For each aggregate, the `n` largest contributions are identified.
+#'
+#' @param x A (sparse) dummy matrix 
+#' @param y A numeric vector of input values (contributions).
+#' @param n Integer. The number of largest contributors to identify for each aggregate.
+#'          Default is 1.
+#' @param id An optional vector for grouping. When non-NULL, major contributions are 
+#'           found after aggregation within each group specified by `id`. 
+#'           Aggregates with missing `id` values are excluded.
+#' @param output A character vector specifying the desired output. Possible values:
+#'   - `"y"`: A matrix with the largest contributions in the first column, the second largest in the second column, and so on.
+#'   - `"id"`: A matrix of IDs associated with the largest contributions. If an `id` vector is provided, it returns these IDs; otherwise, it returns indices.
+#'   - `"n_contr"`: An integer vector indicating the number of contributors to each aggregate.
+#'   - `"n_0_contr"`: An integer vector indicating the number of contributors that contribute a value of 0 to each aggregate.
+#'   - `"n_non0_contr"`: An integer vector indicating the number of contributors that contribute a nonzero value to each aggregate.
+#'   - `"sums"`: A numeric vector containing the aggregate sums of `y`.
+#'   - `"n_contr_all"`, `"n_0_contr_all"`, `"n_non0_contr_all"`, `"sums_all"`: 
+#'         Same as the corresponding outputs above, but without applying the `remove_fraction` parameter.
+#' @param drop Logical. If TRUE (default) and `output` has length 1, 
+#'   the function returns the single list element directly instead of a list containing one element. 
+#' @param decreasing Logical. If TRUE (default), finds the largest contributors. 
+#'                   If FALSE, finds the smallest contributors.
+#' @param remove_fraction A numeric vector containing values in the interval `[0, 1]`, specifying contributors to be removed when identifying the largest contributions. 
+#'   - If an `id` vector is provided, `remove_fraction` must be named according to the IDs of the contributors to be removed.
+#'   - If no `id` vector is provided, the length of `remove_fraction` must match the length of `y`. In this case, contributors not to be removed should have a value of `NA` in `remove_fraction`.
+#'   - The actual values in `remove_fraction` are used for calculating `"sums"` (see description above).
+#' @param do_abs Logical. If TRUE (default), uses the absolute values of the summed contributions. 
+#'   The summation is performed for all contributions from the same contributor, 
+#'   within each aggregate being computed.
+#'
+#' @return A list or a single element, depending on the values of the `output` and `drop` parameters.
+#' 
+#' @export
+#' @importFrom Matrix Diagonal
+#' 
+#' 
 max_contribution <- function(x, 
                              y, 
                              n = 1, 
