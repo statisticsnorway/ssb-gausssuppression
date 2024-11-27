@@ -19,6 +19,18 @@ max_contribution <- function(x,
   output <- names(out) %in% output
   names(output) <- names(out)
   
+  try_return <- function() {
+    ok_out <- !sapply(out, is.null)
+    if (all(ok_out[output])) {
+      if (drop & sum(output) == 1) {
+        return(out[[which(output)]])
+      }
+      return(out[which(output)])
+    }
+    NULL
+  }
+  
+  
   if (!is.null(remove_fraction)) {
     if (length(remove_fraction[!is.na(remove_fraction)])) {
       if (min(remove_fraction, na.rm = TRUE) < 0 | max(remove_fraction, na.rm = TRUE) >
@@ -117,11 +129,7 @@ max_contribution <- function(x,
     }
   }
   
-  if (output[["sums_all"]] | (output[["sums"]] ) ) {
-    if (drop & sum(output) == 1) {
-      return(out[[which(output)]])
-    }  
-  }
+  if (!is.null(tr <- try_return())) return(tr)
   
   if (!is.null(remove_fraction)) {
     xM <- xM[keep[xM[, "gr"]], , drop = FALSE] 
@@ -162,9 +170,9 @@ max_contribution <- function(x,
     }
   }
   
-  if (drop & sum(output) == 1) {
-    return(out[[which(output)]])
-  }
+  if (!is.null(tr <- try_return())) return(tr)
+  
+  warning("Something went wrong while generating output.")
   
   out
 }
