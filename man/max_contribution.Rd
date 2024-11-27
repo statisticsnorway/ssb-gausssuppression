@@ -66,3 +66,33 @@ assumed to be calculated using a dummy matrix with the formula:
 \code{z = t(x) \%*\% y}.
 For each aggregate, the \code{n} largest contributions are identified.
 }
+\examples{
+
+library(SSBtools)
+
+z <- SSBtoolsData("magnitude1")
+a <- ModelMatrix(z, formula = ~sector4 + geo, crossTable = TRUE)
+
+cbind(a$crossTable, 
+      y = max_contribution(x = a$modelMatrix, y = z$value, n = 2), 
+      id = max_contribution(x = a$modelMatrix, y = z$value, n = 2, output = "id"))
+
+cbind(a$crossTable, 
+      y = max_contribution(x = a$modelMatrix, y = z$value, n = 3, id = z$company), 
+      id = max_contribution(a$modelMatrix, z$value, 3, id = z$company, output = "id"))
+
+max_contribution(x = a$modelMatrix, 
+                 y = z$value, 
+                 n = 3, 
+                 id = z$company, 
+                 output = c("y", "id", "n_contr", "sums"))
+
+as.data.frame(
+  max_contribution(x = a$modelMatrix, 
+                   y = z$value, 
+                   n = 3, 
+                   id = z$company, 
+                   output = c("y", "id", "n_contr", "sums", "n_contr_all", "sums_all"), 
+                   remove_fraction = c(B = 1)))
+
+}
