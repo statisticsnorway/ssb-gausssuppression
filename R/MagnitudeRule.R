@@ -183,8 +183,7 @@ MagnitudeRule <- function(data,
     charVar_groups <- NULL
   }
   
-  removeCodesFraction_in_max_contribution <- TRUE
-  if (removeCodesFraction_in_max_contribution & length(removeCodes)) {
+  if (length(removeCodes)) {
     if (length(charVar)) {
       remove_fraction <- rep_len(removeCodesFraction, length(removeCodes))
       names(remove_fraction) <- removeCodes
@@ -193,51 +192,10 @@ MagnitudeRule <- function(data,
       remove_fraction <- rep_len(NA_integer_, nrow(x))
       remove_fraction[removeCodes] <- removeCodesFraction
     }
-    removeCodes <- character(0)
   } else {
     remove_fraction <- NULL
   }
-  
-  
-  set_to_NA <- FALSE 
-  if (length(removeCodes)) {
-    
-    if (is.null(removeCodesFraction)) {    # NULL possible for testing 
-      removeCodesFraction <- 1  # run as in old code,  set_to_NA is FALSE
-    } else {
-      set_to_NA <- as.logical(length(charVar))   # set to NA is faster 
-    }
-    
-    if (all(removeCodesFraction == 1)) {         # old code
-      if (length(charVar)) {
-        abs_inputnum[charVar_groups %in% removeCodes, ] <- 0
-      } else {
-        abs_inputnum[as.integer(removeCodes), ] <- 0
-      }
-    } else {
-      if (!length(charVar)) {
-        stop("removeCodesFraction is not implemented when removeCodes as indices")
-      }
-      if (min(removeCodesFraction) < 0 | max(removeCodesFraction) > 1) {
-        stop("removeCodesFraction must be within the interval [0, 1]")
-      }
-      if (length(removeCodesFraction) == 1) {    # simple change of old code
-        if(removeCodesFraction > 0) {            #  When 0, no computation needed
-                                      abs_inputnum[charVar_groups %in% removeCodes, ] <- 
-          (1 - removeCodesFraction) * abs_inputnum[charVar_groups %in% removeCodes, ]
-        }
-      } else {                                   # more advanced code
-        if(length(removeCodesFraction) != length(removeCodes)){
-          stop("length(removeCodesFraction) must be 1 or length(removeCodes)")
-        }
-        ma <- match(charVar_groups, removeCodes)
-                                                    abs_inputnum[!is.na(ma), ] <- 
-        (1 - removeCodesFraction[ma[!is.na(ma)]]) * abs_inputnum[!is.na(ma), ]
-      }
-      
-    }
-    
-  }
+
   
   sweight_original <- sweight  # For outputWeightedNum below
   
@@ -260,20 +218,8 @@ MagnitudeRule <- function(data,
     zeros_to_be_protected <- num[[numVar]] == 0    # ordinary zeros
     zeros_to_be_protected[abs_num == 0] <- TRUE    # possible extra zeros after removeCodes 
     if (structuralEmpty) {
-      if (length(removeCodes)) {
-        if (length(charVar)) {
-          zeros_to_be_protected[colSums(x[!(charVar_groups %in% removeCodes), , drop = FALSE]) == 0] <- FALSE
-        } else {
-          zeros_to_be_protected[colSums(x[-as.integer(removeCodes), , drop = FALSE]) == 0] <- FALSE
-        }
-      } else {
         zeros_to_be_protected[colSums(x) == 0] <- FALSE
-      }
     } 
-  }
-  
-  if (set_to_NA) {
-    charVar_groups[charVar_groups %in% removeCodes] <- NA
   }
   
   index <- !is.null(sweight)
@@ -311,7 +257,6 @@ MagnitudeRule <- function(data,
                                   
   }
   
-  if (removeCodesFraction_in_max_contribution) {
     if(!is.null(charVar_groups) & !tauArgusDominance & !is.null(sWeightVar)) {
       abs_num <- max_contribution(x,
                        abs_inputnum * as.vector(sweight_original),
@@ -334,7 +279,6 @@ MagnitudeRule <- function(data,
         zeros_to_be_protected[max_contribution_[["n_contr"]] == 0] <- FALSE
       }
     }
-  }
   
   prim <-
     mapply(
@@ -448,19 +392,10 @@ FindDominantCells <- function(x,
                               returnContrib = FALSE, 
                               maxContribution = NULL) {
   
-  # NOTE: Test may fail when 0s
-  # Whether 0 counts as a contribution is different
-  test_maxContribution <- isTRUE(getOption("GaussSuppression.test_maxContribution"))
-  
   if (is.null(samplingWeight)) {
     # without sampling weight, calculate dominance directly from numerical values
-    if (is.null(maxContribution) | test_maxContribution) {
+    if (is.null(maxContribution)) {
       max_cont <- MaxContribution(x, inputnum, n = n, groups = charVar_groups)
-      if (test_maxContribution) {
-        if (!identical(max_cont, maxContribution[, 1:n, drop = FALSE]))
-          stop("test_maxContribution not identical")
-        message("okA")
-      }
     } else {
       max_cont <- maxContribution[, 1:n, drop = FALSE]
     }
@@ -475,19 +410,13 @@ FindDominantCells <- function(x,
     }
   } else {
     # with sampling weights, need to weight the numerical values
-    if (is.null(maxContribution) | test_maxContribution) {
+    if (is.null(maxContribution)) {
       max_cont_index <-
         MaxContribution(x,
                         inputnum,
                         n = n,
                         groups = charVar_groups,
                         index = TRUE)
-      
-      if (test_maxContribution) {
-        if (!identical(max_cont_index, maxContribution[, 1:n, drop = FALSE]))
-          stop("test_maxContribution not identical")
-        message("okB")
-      }
     } else {
       max_cont_index <- maxContribution[, 1:n, drop = FALSE]
     }

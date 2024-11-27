@@ -136,16 +136,11 @@ test_that("Wrappers", {
   k1 <- SDC(removeCodes = c("B", "B2"), 
             contributorVar = "company2")
   
-  #k2 <- SDC(removeCodes = c("B", "B2"), 
-  #          contributorVar = "company2",
-  #          removeCodesFraction = NULL)
-  
   k3 <- SDC(removeCodes = c("B", "B2"), 
             contributorVar = "company2",
             removeCodesFraction = c(1, 1))
 
   expect_identical(k0, k1)
-  #expect_identical(k0, k2)
   expect_identical(k0, k3)
 
   
@@ -186,15 +181,6 @@ test_that("Wrappers", {
               range((1/k4[7]-  1/k7[7])/(1/k4[7]-  1/k1[7]), na.rm = TRUE))
   
   expect_equal(ranges, rep(0.45, 4))
-  
-  
-  #k9 <- SDC(removeCodes = c(3, 10:15), 
-  #          removeCodesFraction = NULL)
-  
-  #k10 <- SDC(removeCodes = c(3, 10:15),
-  #           removeCodesFraction = rep(1, 7))
-  
-  #expect_identical(k9,k10)
   
   
   expect_warning({k11 <- SDC(contributorVar = "company", 
