@@ -62,6 +62,7 @@
 #' @return logical vector that is `TRUE` in positions corresponding to cells
 #' breaching the dominance rules.
 #' @export
+#' @importFrom SSBtools max_contribution
 #' 
 #' @examples
 #'   set.seed(123)

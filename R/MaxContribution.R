@@ -18,7 +18,7 @@
 #' @return Matrix with lagest contributions in first column, second largest in second column and so on.  
 #'         Alternative output when using parameters `index` or `return2`.
 #' @export
-#' @importFrom SSBtools SortRows As_TsparseMatrix
+#' @importFrom SSBtools SortRows As_TsparseMatrix table_all_integers
 #' @importFrom Matrix drop0
 #' @importFrom methods new
 #' 
@@ -206,14 +206,5 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups, return
   maxC
 }
 
-
-
-table_all_integers <- function(x, n) {
-  a <- table(c(x, seq_len(n))) - 1L
-  if (min(diff(as.integer(names(a)))) != 1) {
-    stop("Unexpected table sorting problem")
-  }
-  a
-} 
 
 
