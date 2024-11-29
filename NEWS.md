@@ -1,4 +1,23 @@
 
+## GaussSuppression	x.x.x
+* `SuppressDominantCells()` and the underlying function `MagnitudeRule()` have been improved:
+  - `contributorVar` (`charVar`) can now be combined with `sWeightVar`.
+  - Improved handling of `protectZeros`. See this parameter's documentation in `?MagnitudeRule`.
+  - New parameter `removeCodesFraction` allows adjustment of the effect of the `removeCodes` parameter.
+  - New parameter `apply_abs_directly` determines how negative values are treated in the rules:
+    - When `apply_abs_directly = FALSE` (default), absolute values are taken after summing 
+      contributions, as performed by `max_contribution()` in 
+         [the SSBtools package](https://CRAN.R-project.org/package=SSBtools). 
+    - When `apply_abs_directly = TRUE`, absolute values are computed directly on the input values, 
+      prior to any summation [beyond `preAggregate`]. This corresponds to the old behavior of the function.
+  - Enhanced output when `allDominance = TRUE`:
+    - Renaming: The variable previously called `primary.2:80` (*(2,80) dominance)*) is now `dominant2`.
+    - IDs associated with the largest contributions are now included.
+    - The number of contributors is also included.
+    - Additional outputs are available. See the documentation of the `allDominance` parameter.
+  - The new functionality has been enabled by replacing `MaxContribution()` with the improved 
+    `max_contribution()` from 
+    [SSBtools](https://CRAN.R-project.org/package=SSBtools).
 
 ## GaussSuppression	0.9.0
 * The Gaussian elimination secondary suppression algorithm has now been documented in a *"Privacy in Statistical Databases 2024"* paper. 
