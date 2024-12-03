@@ -372,6 +372,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   }
   
+  if (is.null(dimVar) & is.null(hierarchies) & is.null(formula)) {
+    stop("dimVar, hierarchies or formula must be specified")
+  }
+  
   if (!(preAggregate & aggregatePackage == "data.table")) {
     data <- as.data.frame(data)
   }
