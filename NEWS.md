@@ -18,6 +18,15 @@
   - The new functionality has been enabled by replacing `MaxContribution()` with the improved 
     `max_contribution()` from 
     [SSBtools](https://CRAN.R-project.org/package=SSBtools).
+* Added a check to ensure that at least one of `dimVar`, `hierarchies`, or `formula` is specified.
+  - Previously, if all were unspecified, `dimVar` was automatically generated from the remaining columns.
+  - While this behavior was correctly implemented, it often stemmed from user input errors and could lead to unexpected behavior or crashes.
+  - This change now requires explicit input, making the function more robust and reducing the risk of user errors.
+* Improved support for `tibble` and `data.table` input (parameter `data`).
+  - Input is now explicitly coerced to a data frame using `as.data.frame()` where necessary to ensure consistent behavior.
+  - When `preAggregate` is `TRUE` and `aggregatePackage` is `"data.table"`, the use of `as.data.frame()` is skipped to avoid unnecessary back-and-forth conversion of `data.table` objects, preserving efficiency.
+  - Applies to `GaussSuppressionFromData()` and its wrappers.
+
 
 ## GaussSuppression	0.9.0
 * The Gaussian elimination secondary suppression algorithm has now been documented in a *"Privacy in Statistical Databases 2024"* paper. 
