@@ -47,7 +47,9 @@
 #' It is, however, meaningful to combine primary and hidden. 
 #' Such cells will be protected while also being assigned the `NA` value in the `suppressed` output variable.
 #'
-#' @param data 	  Input data as a data frame
+#' @param data Input data, typically a data frame, tibble, or data.table. 
+#'             If `data` is not a classic data frame, it will be coerced to one internally 
+#'             unless `preAggregate` is `TRUE` and `aggregatePackage` is `"data.table"`.
 #' @param dimVar The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified. 
 #' @param freqVar A single variable holding counts (name or number).
 #' @param numVar  Other numerical variables to be aggregated 
@@ -368,6 +370,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         stop('extend0 must be "all" when supplied as character') 
       }
     }
+  }
+  
+  if (!(preAggregate & aggregatePackage == "data.table")) {
+    data <- as.data.frame(data)
   }
   
   dimVar <- names(data[1, dimVar, drop = FALSE])

@@ -25,7 +25,9 @@ SuppressDominantCells(
 )
 }
 \arguments{
-\item{data}{Input data as a data frame}
+\item{data}{Input data, typically a data frame, tibble, or data.table.
+If \code{data} is not a classic data frame, it will be coerced to one internally
+unless \code{preAggregate} is \code{TRUE} and \code{aggregatePackage} is \code{"data.table"}.}
 
 \item{n}{Parameter \code{n} in dominance rule. Default is \code{1:length(k)}.}
 

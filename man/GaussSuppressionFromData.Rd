@@ -45,7 +45,9 @@ GaussSuppressionFromData(
 )
 }
 \arguments{
-\item{data}{Input data as a data frame}
+\item{data}{Input data, typically a data frame, tibble, or data.table.
+If \code{data} is not a classic data frame, it will be coerced to one internally
+unless \code{preAggregate} is \code{TRUE} and \code{aggregatePackage} is \code{"data.table"}.}
 
 \item{dimVar}{The main dimensional variables and additional aggregating variables. This parameter can be  useful when hierarchies and formula are unspecified.}
 
