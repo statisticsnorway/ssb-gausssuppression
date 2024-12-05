@@ -65,7 +65,16 @@
 #' # With extend0 = TRUE and structuralEmpty = TRUE 
 #' #   - As default behavior. Suppression/protection of all zeros (since nothing empty)
 #' # With formula instead of hierarchies: Extra parameter needed when extend0 = FALSE.
-#' #   - removeEmpty = FALSE,  to include empty zeros in output.                      
+#' #   - removeEmpty = FALSE,  to include empty zeros in output.       
+#' 
+#' 
+#' # Using formula followed by FormulaSelection 
+#' output <- SuppressSmallCounts(data = SSBtoolsData("example1"), 
+#'                               formula = ~age * geo * year + eu * year, 
+#'                               freqVar = "freq", 
+#'                               maxN = 1)
+#' FormulaSelection(output, ~(age + eu) * year)
+#'                
 SuppressSmallCounts <- function(data,
                                 maxN,
                                 freqVar = NULL,

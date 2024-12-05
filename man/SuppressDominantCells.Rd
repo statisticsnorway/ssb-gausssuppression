@@ -149,4 +149,13 @@ SuppressDominantCells(data= SSBtoolsData("magnitude1"),
                       pPercent = 10, 
                       allDominance = TRUE)                       
                       
+                      
+# Using formula followed by FormulaSelection                        
+output <- SuppressDominantCells(data = SSBtoolsData("magnitude1"), 
+                                numVar = "value", 
+                                formula = ~sector2 * geo + sector4 * eu, 
+                                contributorVar = "company", 
+                                k = c(80, 99))
+FormulaSelection(output, ~sector2 * geo) 
+                      
 }
