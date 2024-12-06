@@ -26,6 +26,9 @@
   - Input is now explicitly coerced to a data frame using `as.data.frame()` where necessary to ensure consistent behavior.
   - When `preAggregate` is `TRUE` and `aggregatePackage` is `"data.table"`, the use of `as.data.frame()` is skipped to avoid unnecessary back-and-forth conversion of `data.table` objects, preserving efficiency.
   - Applies to `GaussSuppressionFromData()` and its wrappers.
+* The `SSBtools` functions `FormulaSelection()` and its identical wrapper `formula_selection()` are now re-exported.  
+  - These functions are useful for extracting smaller datasets from the output.  
+  - With this change, using `library(SSBtools)` is no longer necessary to access them.  
 
 
 ## GaussSuppression	0.9.0
