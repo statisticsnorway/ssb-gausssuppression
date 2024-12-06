@@ -14,6 +14,6 @@ These objects are imported from other packages. Follow the links
 below to see their documentation.
 
 \describe{
-  \item{SSBtools}{\code{\link[SSBtools:FormulaSelection]{formula_selection}}, \code{\link[SSBtools]{FormulaSelection}}, \code{\link[SSBtools]{GaussSuppression}}, \code{\link[SSBtools]{SSBtoolsData}}}
+  \item{SSBtools}{\code{\link[SSBtools]{FormulaSelection}}, \code{\link[SSBtools]{GaussSuppression}}, \code{\link[SSBtools]{SSBtoolsData}}, \code{\link[SSBtools:FormulaSelection]{formula_selection}}}
 }}
 
