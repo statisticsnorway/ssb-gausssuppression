@@ -18,7 +18,7 @@
 #' @return Matrix with lagest contributions in first column, second largest in second column and so on.  
 #'         Alternative output when using parameters `index` or `return2`.
 #' @export
-#' @importFrom SSBtools SortRows As_TsparseMatrix
+#' @importFrom SSBtools SortRows As_TsparseMatrix table_all_integers
 #' @importFrom Matrix drop0
 #' @importFrom methods new
 #' 
@@ -99,6 +99,10 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE,
   }
   rm(diffxM1)
   
+  if (return2) {
+    nContributors <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
+  }
+  
   seqCol <- seq_len(ncol(x))
   
   maxC <- matrix(NA_integer_, ncol(x), n)
@@ -114,7 +118,7 @@ MaxContribution <- function(x, y, n = 1, decreasing = TRUE,
   if (return2) {
     id <- maxC
     maxC[] <- y[maxC]
-    return(list(value = maxC, id = id))
+    return(list(value = maxC, id = id, nContributors = nContributors))
   }
   
   if (index) 
@@ -175,6 +179,10 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups, return
   
   seqCol <- seq_len(ncol(x))
   
+  if (return2) {
+    nContributors <- as.vector(table_all_integers(xM[, "col"], ncol(x)))
+  }
+  
   maxC <- matrix(NA_integer_, ncol(x), n)
   if (return2) {
     id <- matrix(NA_character_, ncol(x), n)
@@ -192,10 +200,11 @@ MaxContributionGroups <- function(x, y, n = 1, decreasing = TRUE, groups, return
   }
   
   if (return2) {
-    return(list(value = maxC, id = id))
+    return(list(value = maxC, id = id, nContributors = nContributors))
   }
   
   maxC
 }
+
 
 

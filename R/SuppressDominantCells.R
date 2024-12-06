@@ -1,10 +1,14 @@
 
 
 #' Suppress magnitude tables using dominance `(n,k)` or p% rule for primary suppression.
+#' 
+#' This function utilizes \code{\link{MagnitudeRule}}.
 #'
 #' @inheritParams GaussSuppressionFromData
 #' @inheritParams MagnitudeRule
 #' @param n Parameter `n` in dominance rule. Default is `1:length(k)`.
+#' @param allDominance Logical. If `TRUE`, additional information is included in the output, 
+#'   as described in \code{\link{MagnitudeRule}}.
 #' @param dominanceVar Numerical variable to be used in dominance rule. 
 #'           The first `numVar` variable will be used if it is not specified.
 #' @param numVar Numerical variable to be aggregated.
@@ -85,6 +89,24 @@
 #'         codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
 #' SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
 #'                       hierarchies = list(main_income = ml, k_group = "Total_Norway"))
+#'                       
+#' # With contributorVar and p% rule    
+#' SuppressDominantCells(data= SSBtoolsData("magnitude1"), 
+#'                       numVar = "value", 
+#'                       dimVar= c("sector4", "geo"), 
+#'                       contributorVar = "company",
+#'                       pPercent = 10, 
+#'                       allDominance = TRUE)                       
+#'                       
+#'                       
+#' # Using formula followed by FormulaSelection                        
+#' output <- SuppressDominantCells(data = SSBtoolsData("magnitude1"), 
+#'                                 numVar = "value", 
+#'                                 formula = ~sector2 * geo + sector4 * eu, 
+#'                                 contributorVar = "company", 
+#'                                 k = c(80, 99))
+#' FormulaSelection(output, ~sector2 * geo) 
+#'                       
 SuppressDominantCells <- function(data,
                                   n = 1:length(k),
                                   k = NULL,

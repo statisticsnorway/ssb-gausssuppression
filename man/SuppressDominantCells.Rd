@@ -25,7 +25,9 @@ SuppressDominantCells(
 )
 }
 \arguments{
-\item{data}{Input data as a data frame}
+\item{data}{Input data, typically a data frame, tibble, or data.table.
+If \code{data} is not a classic data frame, it will be coerced to one internally
+unless \code{preAggregate} is \code{TRUE} and \code{aggregatePackage} is \code{"data.table"}.}
 
 \item{n}{Parameter \code{n} in dominance rule. Default is \code{1:length(k)}.}
 
@@ -37,8 +39,8 @@ Technically, calculations are performed internally as if
 \code{n = 1:2}. The results of these intermediate calculations can
 be viewed by setting \code{allDominance = TRUE}.}
 
-\item{allDominance}{Logical parameter. If \code{TRUE}, adds primary columns for each
-pair of parameters n,k in the dominance rules}
+\item{allDominance}{Logical. If \code{TRUE}, additional information is included in the output,
+as described in \code{\link{MagnitudeRule}}.}
 
 \item{dominanceVar}{Numerical variable to be used in dominance rule.
 The first \code{numVar} variable will be used if it is not specified.}
@@ -83,7 +85,7 @@ Necessary to include here since the specification in \code{spec} cannot take \co
 data frame containing aggregated data and suppression information.
 }
 \description{
-Suppress magnitude tables using dominance \verb{(n,k)} or p\% rule for primary suppression.
+This function utilizes \code{\link{MagnitudeRule}}.
 }
 \examples{
 num <- c(100,
@@ -138,4 +140,22 @@ ml <- data.frame(levels = c("@", "@@", "@@@", "@@@", "@@@", "@@"),
         codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
 SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
                       hierarchies = list(main_income = ml, k_group = "Total_Norway"))
+                      
+# With contributorVar and p\% rule    
+SuppressDominantCells(data= SSBtoolsData("magnitude1"), 
+                      numVar = "value", 
+                      dimVar= c("sector4", "geo"), 
+                      contributorVar = "company",
+                      pPercent = 10, 
+                      allDominance = TRUE)                       
+                      
+                      
+# Using formula followed by FormulaSelection                        
+output <- SuppressDominantCells(data = SSBtoolsData("magnitude1"), 
+                                numVar = "value", 
+                                formula = ~sector2 * geo + sector4 * eu, 
+                                contributorVar = "company", 
+                                k = c(80, 99))
+FormulaSelection(output, ~sector2 * geo) 
+                      
 }

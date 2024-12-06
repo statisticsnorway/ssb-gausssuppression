@@ -16,7 +16,9 @@ SuppressSmallCounts(
 )
 }
 \arguments{
-\item{data}{Input data as a data frame}
+\item{data}{Input data, typically a data frame, tibble, or data.table.
+If \code{data} is not a classic data frame, it will be coerced to one internally
+unless \code{preAggregate} is \code{TRUE} and \code{aggregatePackage} is \code{"data.table"}.}
 
 \item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
 Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
@@ -96,5 +98,14 @@ SuppressSmallCounts(data = d2[1:41, ], maxN = 3, freqVar = "f",
 # With extend0 = TRUE and structuralEmpty = TRUE 
 #   - As default behavior. Suppression/protection of all zeros (since nothing empty)
 # With formula instead of hierarchies: Extra parameter needed when extend0 = FALSE.
-#   - removeEmpty = FALSE,  to include empty zeros in output.                      
+#   - removeEmpty = FALSE,  to include empty zeros in output.       
+
+
+# Using formula followed by FormulaSelection 
+output <- SuppressSmallCounts(data = SSBtoolsData("example1"), 
+                              formula = ~age * geo * year + eu * year, 
+                              freqVar = "freq", 
+                              maxN = 1)
+FormulaSelection(output, ~(age + eu) * year)
+               
 }
