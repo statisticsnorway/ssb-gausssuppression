@@ -372,7 +372,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   }
   
-  if (is.null(dimVar) & is.null(hierarchies) & is.null(formula)) {
+  if (is.null(dimVar) & is.null(hierarchies) & is.null(formula) & is.null(x)) {
     stop("dimVar, hierarchies or formula must be specified")
   }
   
