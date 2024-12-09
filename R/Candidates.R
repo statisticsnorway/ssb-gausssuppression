@@ -89,7 +89,7 @@ CandidatesNum <- function(secondaryZeros = FALSE, freq = NULL, num, weight, x, c
   candidates <- CandidatesDefault(weight = newWeight, freq = freq, 
                                   secondaryZeros = secondaryZeros, x = x, ...)
   if (removeCodesForCandidates & length(removeCodes)) {
-    numExtra <- NContributorsRule(data = data, freq = freq, numVar = names(num), 
+    numExtra <- NContributorsRule(data = data, freq = freq, numVar = names(num)[numidx], 
                   x = x, maxN = 1, # Here it does not matter what maxN is set to
                   charVar = charVar, removeCodes = removeCodes)$numExtra
     idxRule <- grep("nRule", names(numExtra))

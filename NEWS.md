@@ -1,4 +1,53 @@
 
+## GaussSuppression	x.x.x
+* `SuppressDominantCells()` and the underlying function `MagnitudeRule()` have been improved:
+  - `contributorVar` (`charVar`) can now be combined with `sWeightVar`.
+  - Improved handling of `protectZeros`. See this parameter's documentation in `?MagnitudeRule`.
+  - New parameter `removeCodesFraction` allows adjustment of the effect of the `removeCodes` parameter.
+  - New parameter `apply_abs_directly` determines how negative values are treated in the rules:
+    - When `apply_abs_directly = FALSE` (default), absolute values are taken after summing 
+      contributions, as performed by `max_contribution()` in 
+         [the SSBtools package](https://CRAN.R-project.org/package=SSBtools). 
+    - When `apply_abs_directly = TRUE`, absolute values are computed directly on the input values, 
+      prior to any summation [beyond `preAggregate`]. This corresponds to the old behavior of the function.
+  - Enhanced output when `allDominance = TRUE`:
+    - Renaming: The variable previously called `primary.2:80` (*(2,80) dominance)*) is now `dominant2`.
+    - IDs associated with the largest contributions are now included.
+    - The number of contributors is also included.
+    - Additional outputs are available. See the documentation of the `allDominance` parameter.
+  - The new functionality has been enabled by replacing `MaxContribution()` with the improved 
+    `max_contribution()` from 
+    [SSBtools](https://CRAN.R-project.org/package=SSBtools).
+* Added a check to ensure that at least one of `dimVar`, `hierarchies`, or `formula` is specified.
+  - Previously, if all were unspecified, `dimVar` was automatically generated from the remaining columns.
+  - While this behavior was correctly implemented, it often stemmed from user input errors and could lead to unexpected behavior or crashes.
+  - This change now requires explicit input, making the function more robust and reducing the risk of user errors.
+* Improved support for `tibble` and `data.table` input (parameter `data`).
+  - Input is now explicitly coerced to a data frame using `as.data.frame()` where necessary to ensure consistent behavior.
+  - When `preAggregate` is `TRUE` and `aggregatePackage` is `"data.table"`, the use of `as.data.frame()` is skipped to avoid unnecessary back-and-forth conversion of `data.table` objects, preserving efficiency.
+  - Applies to `GaussSuppressionFromData()` and its wrappers.
+* The `SSBtools` functions `FormulaSelection()` and its identical wrapper `formula_selection()` are now re-exported.  
+  - These functions are useful for extracting smaller datasets from the output.  
+  - With this change, using `library(SSBtools)` is no longer necessary to access them.  
+* Note new hierarchy possibilities due to the new version of 
+     [the SSBtools package](https://CRAN.R-project.org/package=SSBtools) (version 1.6.0).
+  -  Output from functions like `get_klass()` in the 
+      [klassR package](https://cran.r-project.org/package=klassR) 
+      or `hier_create()` in the 
+      [sdcHierarchies package](https://cran.r-project.org/package=sdcHierarchies) 
+      can now be used directly as input. Example of usage:
+     ```r
+      a <- get_klass(classification = "24")
+      b <- hier_create(root = "Total", nodes = LETTERS[1:5])
+      mydata <- data.frame(tree = sample(a$code[nchar(a$code) > 1], 200, replace = TRUE), 
+                           letter = LETTERS[1:5])
+      SuppressSmallCounts(mydata, maxN = 3, hierarchies = list(tree = a, letter = b)) 
+     ```
+  - New possibilities for working with both formulas and hierarchies are now available through the `map_hierarchies_to_data()` function. 
+  - Improved functionality for combining formulas with the `Formula2ModelMatrix()` parameter `avoidHierarchical = TRUE`, 
+    thanks to the new `total_collapse()` function which can be applied to output.
+
+
 
 ## GaussSuppression	0.9.0
 * The Gaussian elimination secondary suppression algorithm has now been documented in a *"Privacy in Statistical Databases 2024"* paper. 

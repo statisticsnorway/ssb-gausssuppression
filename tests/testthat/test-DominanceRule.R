@@ -88,6 +88,8 @@ test_that("Unweighted dominance", {
       charVar = "char0"
     )
   
+  p1_$numExtra <-  p1_$numExtra[1:3]
+  p4$numExtra <-  p4$numExtra[1:3]
   
   expect_equal(p1_, p4)
     
@@ -105,6 +107,9 @@ test_that("Unweighted dominance", {
       charVar = "char0"
     )
   
+  p3$numExtra <- p3$numExtra[1:3]
+  p5$numExtra <-  p5$numExtra[1:3]
+  
   expect_equal(p3, p5)
   
   
@@ -120,15 +125,12 @@ test_that("Unweighted dominance", {
       allDominance = TRUE,
       outputWeightedNum = TRUE
     )
-  expect_equal(p6$numExtra[["primary.2:98"]], c(1, 1, 1, 1, 0.9, 1, 0.9))
+  expect_equal(p6$numExtra[["dominant2"]], c(1, 1, 1, 1, 0.9, 1, 0.9))
 })
 
 
 
 test_that("Default weighted dominance", {
-  
-  options(GaussSuppression.test_maxContribution = TRUE)
-  on.exit(options(GaussSuppression.test_maxContribution = NULL), add = TRUE) # option removed
   
   p <-
     DominanceRule(
@@ -156,6 +158,10 @@ test_that("Default weighted dominance", {
       allDominance = TRUE,
       charVar = "char0"
     )
+  
+  p$numExtra <- p$numExtra[1:4]
+  p_char0$numExtra <- p_char0$numExtra[1:4]
+  
   expect_equal(p, p_char0)
   
   
