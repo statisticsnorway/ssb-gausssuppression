@@ -1,5 +1,5 @@
 
-## GaussSuppression	x.x.x
+## GaussSuppression	0.9.2
 * Added a check to ensure that at least one of `dimVar`, `hierarchies`, or `formula` is specified.
   - This is a breaking change that may affect previous code.
   - Previously, if all were unspecified, `dimVar` was automatically generated from the remaining columns.
