@@ -227,5 +227,15 @@ GaussSuppressDec = function(data,
   a$inner$primary <- NA
   a$inner$suppressed <- NA
   
-  RbindAll(a$publish, a$inner)
+  if (!is.null(startRow)) {
+    startRow <-   c(startRow, StaRt_InneR = nrow(a$publish) + 1L)
+  }
+  
+  a <- RbindAll(a$publish, a$inner)
+  
+  if (!is.null(startRow)) {
+    attr(a, "startRow") <- startRow
+  }
+  
+  a
 }
