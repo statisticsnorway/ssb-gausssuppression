@@ -9,6 +9,7 @@ GaussSuppressDec(
   ...,
   fun = GaussSuppressionFromData,
   output = NULL,
+  use_freqVar = NA,
   digits = 9,
   nRep = NULL,
   rmse = pi/3,
@@ -31,6 +32,19 @@ GaussSuppressDec(
 \code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.}
 
 \item{output}{NULL (default), \code{"publish"}, \code{"inner"}, \code{"publish_inner"}, or \code{"publish_inner_x"} (x also).}
+
+\item{use_freqVar}{Logical (\code{TRUE}/\code{FALSE}) with a default value of \code{NA}. Determines whether the variable
+\code{freqVar} is used as the basis for generating decimal numbers.
+If \code{NA}, the parameter is set to \code{TRUE}, except in the following cases, where it is set to \code{FALSE}:
+\itemize{
+\item If \code{freqVar} is not available.
+\item If \code{runIpf} is \code{FALSE} and \code{fun} is one of the functions \code{SuppressFewContributors} or \code{SuppressDominantCells}.
+}
+
+When \code{use_freqVar} is \code{FALSE}, only zeros are used instead. This approach is more robust in practice,
+as decimal numbers can then be stored more accurately.
+The default value is chosen to ensure compatibility with existing code and to allow for the use of \code{freqVar}
+when dealing with frequency tables, which may be useful.}
 
 \item{digits}{Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.}
 

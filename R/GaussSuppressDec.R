@@ -11,6 +11,17 @@
 #' @param fun A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
 #'              \code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.
 #' @param output NULL (default), `"publish"`, `"inner"`, `"publish_inner"`, or `"publish_inner_x"` (x also).
+#' @param use_freqVar Logical (`TRUE`/`FALSE`) with a default value of `NA`. Determines whether the variable  
+#'   `freqVar` is used as the basis for generating decimal numbers. 
+#'   If `NA`, the parameter is set to `TRUE`, except in the following cases, where it is set to `FALSE`:
+#'   - If `freqVar` is not available.
+#'   - If `runIpf` is `FALSE` and `fun` is one of the functions `SuppressFewContributors` or `SuppressDominantCells`.
+#' 
+#'   When `use_freqVar` is `FALSE`, only zeros are used instead. This approach is more robust in practice, 
+#'   as decimal numbers can then be stored more accurately. 
+#'   The default value is chosen to ensure compatibility with existing code and to allow for the use of `freqVar` 
+#'   when dealing with frequency tables, which may be useful.
+
 #' @param digits Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.
 #' @param nRep NULL or an integer. When >1, several decimal numbers will be generated.
 #' @param rmse Desired root mean square error of decimal numbers. 
@@ -47,6 +58,7 @@ GaussSuppressDec = function(data,
                             ..., 
                             fun = GaussSuppressionFromData,
                             output = NULL, 
+                            use_freqVar = NA,
                             digits = 9, 
                             nRep = NULL,
                             rmse = pi/3,
@@ -96,8 +108,31 @@ GaussSuppressDec = function(data,
   dimVarPub <- dimVarPub[!(dimVarPub %in% c(freqVar, "primary", "suppressed", weightVar, numVar))]
   dimVarPub <- dimVarPub[(dimVarPub %in% colnames(a$inner))]
   
-  z <- as.matrix(a$publish[freqVar])
-  y <- as.matrix(a$inner[freqVar])
+  
+  if (is.na(use_freqVar)) {
+    use_freqVar <- TRUE
+    if (!length(freqVar)) {
+      use_freqVar <- FALSE
+    } else {
+      if (!runIpf) {
+        if (identical(fun, SuppressFewContributors))
+          use_freqVar <- FALSE
+        if (identical(fun, SuppressDominantCells))
+          use_freqVar <- FALSE
+      }
+    }
+  }
+  
+  if (use_freqVar) {
+    freq_for_dec_publish <- a$publish[[freqVar]]
+    freq_for_dec_inner <- a$inner[[freqVar]]
+  } else {
+    freq_for_dec_publish <- rep(0L, nrow(a$publish))
+    freq_for_dec_inner <- rep(0L, nrow(a$inner))
+  }
+  
+  z <- as.matrix(freq_for_dec_publish)
+  y <- as.matrix(freq_for_dec_inner)
   
   if (nRep) {
     yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
@@ -133,7 +168,7 @@ GaussSuppressDec = function(data,
     }
     
     # Re-use primary-function originally made for SuppressionFromDecimals
-    suppressionFromDecimals <- PrimaryDecimals(freq = a$publish[[freqVar]], num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
+    suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
     
     if (any(a$publish$suppressed != suppressionFromDecimals))
       warning("Mismatch between whole numbers and suppression.")
