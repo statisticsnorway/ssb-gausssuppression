@@ -42,7 +42,7 @@
 #'                                 to published cells (aggregated) and some not (not aggregated).
 #' @return A data frame where inner cells and cells to be published are combined or output according to parameter `output`. 
 #' 
-#' @importFrom SSBtools RoundWhole Match Mipf
+#' @importFrom SSBtools RoundWhole Match Mipf RbindAll
 #' @importFrom RegSDC SuppressDec
 #' @importFrom Matrix crossprod
 #' @importFrom stats runif
@@ -227,6 +227,5 @@ GaussSuppressDec = function(data,
   a$inner$primary <- NA
   a$inner$suppressed <- NA
   
-  rbind(a$publish, a$inner)
-  
+  RbindAll(a$publish, a$inner)
 }
