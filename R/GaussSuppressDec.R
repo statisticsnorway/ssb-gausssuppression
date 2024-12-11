@@ -3,11 +3,13 @@
 
 #' Cell suppression with synthetic decimal numbers
 #' 
-#' \code{\link{GaussSuppressionFromData}} is run and decimal numbers are added to output by
+#' \code{\link{GaussSuppressionFromData}}, or one of its wrappers, is run and decimal numbers are added to output by
 #' a modified (for sparse matrix efficiency) version of \code{\link[RegSDC]{SuppressDec}}. 
 #'
 #' @param data Input daata as a data frame 
 #' @param ... Further parameters to \code{\link{GaussSuppressionFromData}}
+#' @param fun A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
+#'              \code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.
 #' @param output NULL (default), `"publish"`, `"inner"`, `"publish_inner"`, or `"publish_inner_x"` (x also).
 #' @param digits Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.
 #' @param nRep NULL or an integer. When >1, several decimal numbers will be generated.
@@ -43,6 +45,7 @@
 #' GaussSuppressDec(z1, freqVar = "ant", formula = ~ region + hovedint, maxN = 10)
 GaussSuppressDec = function(data, 
                             ..., 
+                            fun = GaussSuppressionFromData,
                             output = NULL, 
                             digits = 9, 
                             nRep = NULL,
@@ -80,7 +83,7 @@ GaussSuppressDec = function(data,
     freqDecNames <- paste0("freqDec", paste(seq_len(nRep)))[seq_len(nRep)]
   }
   
-  a <- GaussSuppressionFromData(data, ..., output = "publish_inner_x")
+  a <- fun(data, ..., output = "publish_inner_x")
   
   startRow <- attr(a$publish, "startRow", exact = TRUE)
 

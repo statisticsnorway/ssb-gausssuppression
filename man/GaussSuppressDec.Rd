@@ -7,6 +7,7 @@
 GaussSuppressDec(
   data,
   ...,
+  fun = GaussSuppressionFromData,
   output = NULL,
   digits = 9,
   nRep = NULL,
@@ -25,6 +26,9 @@ GaussSuppressDec(
 \item{data}{Input daata as a data frame}
 
 \item{...}{Further parameters to \code{\link{GaussSuppressionFromData}}}
+
+\item{fun}{A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
+\code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.}
 
 \item{output}{NULL (default), \code{"publish"}, \code{"inner"}, \code{"publish_inner"}, or \code{"publish_inner_x"} (x also).}
 
@@ -61,7 +65,7 @@ to published cells (aggregated) and some not (not aggregated).}
 A data frame where inner cells and cells to be published are combined or output according to parameter \code{output}.
 }
 \description{
-\code{\link{GaussSuppressionFromData}} is run and decimal numbers are added to output by
+\code{\link{GaussSuppressionFromData}}, or one of its wrappers, is run and decimal numbers are added to output by
 a modified (for sparse matrix efficiency) version of \code{\link[RegSDC]{SuppressDec}}.
 }
 \examples{
