@@ -45,16 +45,32 @@ Several decimal number variables reduce the probability of obtaining whole numbe
 z2 <- SSBtoolsData("z2")
 
 # Find suppression and decimal numbers with "fylke" in model 
-a <- GaussSuppressDec(z2, dimVar = c("region", "fylke", "hovedint"), 
-                      freqVar = "ant", protectZeros = FALSE, maxN = 2, 
-                      output = "inner")
+a1 <- GaussSuppressDec(z2,
+                       fun = SuppressSmallCounts,   
+                       dimVar = c("region", "fylke", "hovedint"), 
+                       freqVar = "ant", protectZeros = FALSE, maxN = 2, 
+                       output = "inner")
 
 # Add decimal numbers to data 
-z2$freqDec <- a$freqDec
+z2$freqDec <- a1$freqDec
 
 # Find suppression with "kostragr" in model 
-b <- SuppressionFromDecimals(z2, dimVar = c("region", "kostragr", "hovedint"), 
-                             freqVar = "ant", decVar = "freqDec")
+a2 <- SuppressionFromDecimals(z2, dimVar = c("region", "kostragr", "hovedint"), 
+                              freqVar = "ant", decVar = "freqDec")
+tail(a2)
+
+b1 <- GaussSuppressDec(data = SSBtoolsData("magnitude1"), 
+                       fun = SuppressDominantCells, 
+                       numVar = "value", 
+                       formula = ~sector2 * geo + sector4 * eu,
+                       contributorVar = "company", k = c(80, 99))
+ 
+b2 <- SuppressionFromDecimals(b1[b1$isInner, ], 
+                              formula = ~(sector2 + sector4) * eu, 
+                              numVar = "value", 
+                              decVar = "freqDec")
+FormulaSelection(b2, ~sector2 * eu)                                 
+                              
 }
 \author{
 Øyvind Langsrud
