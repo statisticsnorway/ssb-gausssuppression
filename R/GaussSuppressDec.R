@@ -104,8 +104,7 @@ GaussSuppressDec = function(data,
   numVar <- attr(a$inner, "numVar")
   
   dimVarPub <- colnames(a$publish)
-  # dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed", "weight", numVar))]
-  dimVarPub <- dimVarPub[!(dimVarPub %in% c(freqVar, "primary", "suppressed", weightVar, numVar))]
+  dimVarPub <- dimVarPub[!(dimVarPub %in% c(freqVar, "primary", "suppressed", weightVar, numVar, MoreVars(...)))]
   dimVarPub <- dimVarPub[(dimVarPub %in% colnames(a$inner))]
   
   
