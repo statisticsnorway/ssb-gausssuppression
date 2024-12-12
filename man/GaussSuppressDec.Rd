@@ -80,7 +80,7 @@ A data frame where inner cells and cells to be published are combined or output 
 }
 \description{
 \code{\link{GaussSuppressionFromData}}, or one of its wrappers, is run and decimal numbers are added to output by
-a modified (for sparse matrix efficiency) version of \code{\link[RegSDC]{SuppressDec}}.
+executing  \code{\link[RegSDC]{SuppressDec}}.
 }
 \examples{
 z1 <- SSBtoolsData("z1")
