@@ -212,33 +212,56 @@ GaussSuppressDec = function(data,
   a$publish$isInner[ma[!is.na(ma)]] <- TRUE
   
   if (!anyNA(ma)) {
-    if(anyDuplicated_ma & !is.null(whenDuplicatedInner)){
-      whenDuplicatedInner("Duplicated inner rows aggregated.")
+    if (anyDuplicated_ma & !is.null(whenDuplicatedInner)) {
+      whenDuplicatedInner("Duplicated inner rows identified. Aggregation applied to some variables.")
     }
+  } else {
+    if (anyDuplicated_ma & !is.null(whenMixedDuplicatedInner)) {
+      whenMixedDuplicatedInner("Duplicated inner rows identified. Aggregation applied to some variables in some rows.")
+    }
+  }
+  
+  extra_inner <- which(!(names(a$inner) %in% names(a$publish)))
+  extra_inner_to_publish <- integer(0)
+  if (length(extra_inner)) {
+    ma_rows <- !is.na(ma)
+    ma_ok <- ma[ma_rows]
+    ma_unique <- unique(ma_ok)
+    n_ma_unique <- length(ma_unique)
+    if (anyDuplicated_ma) {
+      for (i in extra_inner) {  
+        if (nrow(unique(cbind(ma_ok, a$inner[ma_rows, i]))) == n_ma_unique) {
+          # Variable is ok when equal value in duplicate rows. 
+          # Only one of them will be copied to a$publish
+          extra_inner_to_publish <- c(extra_inner_to_publish, i)
+        }
+      }
+    } else {
+      extra_inner_to_publish <- extra_inner
+    }
+  }
+  extra_inner_to_remove <- extra_inner[!(extra_inner %in% extra_inner_to_publish)]
+  if (length(extra_inner_to_publish)) {
+    extra_inner_to_publish <- names(a$inner)[extra_inner_to_publish]
+    a$publish[extra_inner_to_publish] <- NA
+    if (length(ma_unique)) {
+      a$publish[ma_unique, extra_inner_to_publish] <- a$inner[match(ma_unique, ma), extra_inner_to_publish]
+    }
+  }
+  if (length(extra_inner_to_remove)) {
+    a$inner <- a$inner[-extra_inner_to_remove]
+  }
+  
+  
+  if (!anyNA(ma)) {
     return(a$publish)
   }
   
-  if(anyDuplicated_ma & !is.null(whenMixedDuplicatedInner)){
-    whenMixedDuplicatedInner("Duplicated inner rows, some aggregated.")
-  }
+  a$inner <- a$inner[is.na(ma), , drop = FALSE]
   
-  a$inner <- a$inner[is.na(ma), unique(c(dimVarPub, numVar, freqDecNames, freqVar, weightVar)), drop = FALSE]
-  
-  # rename in a way that takes into account possible overlap between freqVar, weightVar, numVar
-  #  renameIndex <- ncol(a$inner)
-  #  if (length(weightVar)) {
-  #    names(a$inner)[renameIndex] <- "weight"
-  #    renameIndex <- renameIndex - 1L
-  #  }
-  #  if (length(freqVar)) {   # but never 0 in current application
-  #    names(a$inner)[renameIndex] <- "freq"
-  #  }
-
   a$inner$isPublish <- FALSE
   a$inner$isInner <- TRUE
   
-  a$inner$primary <- NA
-  a$inner$suppressed <- NA
   
   if (!is.null(startRow)) {
     startRow <-   c(startRow, StaRt_InneR = nrow(a$publish) + 1L)
