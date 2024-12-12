@@ -51,9 +51,23 @@
 #' @author Øyvind Langrsud
 #'
 #' @examples
-#' z1 <- SSBtoolsData("z1")
-#' GaussSuppressDec(z1, 1:2, 3)
-#' GaussSuppressDec(z1, freqVar = "ant", formula = ~ region + hovedint, maxN = 10)
+#' a <- GaussSuppressDec(data = SSBtoolsData("example1"), 
+#'                       fun = SuppressSmallCounts, 
+#'                       dimVar = c("age", "geo"), 
+#'                       freqVar = "freq", maxN = 3)
+#' a                       
+#'                  
+#' 
+#' b <- GaussSuppressDec(data = SSBtoolsData("magnitude1"), 
+#'                       fun = SuppressDominantCells, 
+#'                       numVar = "value", 
+#'                       formula = ~sector2 * geo + sector4 * eu,
+#'                       contributorVar = "company", k = c(80, 99))
+#' b  
+#'  
+#' # FormulaSelection() works on this output as well 
+#' FormulaSelection(b, ~sector2 * geo)                       
+#'                       
 GaussSuppressDec = function(data, 
                             ..., 
                             fun = GaussSuppressionFromData,
