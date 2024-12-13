@@ -66,13 +66,18 @@ SuppressionFromDecimals = function(data, decVar, freqVar = NULL, numVar = NULL,
 }
                                         
                    
-PrimaryDecimals <- function(freq, num, nDec, digitsPrimary, ...) {
+PrimaryDecimals <- function(freq, num, nDec, digitsPrimary, onlyZerosRoundWhole = NA, ...) {
   
   if(nDec<ncol(num)){
     num = num[,seq_len(nDec), drop=FALSE]
   }
   
-  numRW = RoundWhole(num, digits = digitsPrimary)
+  if (is.na(onlyZerosRoundWhole)) {   # See comments below 
+    conf_int <- t.test(as.vector(as.matrix(num)))$conf.int
+    onlyZerosRoundWhole <- (max(abs(conf_int)) < 0.1) & (length(unique(sign(conf_int))) == 2)
+  }
+  
+  numRW = RoundWhole(num, digits = digitsPrimary, onlyZeros = onlyZerosRoundWhole)
   
   primary = !(rowSums(numRW == round(num)) == nDec)
   
@@ -86,4 +91,20 @@ PrimaryDecimals <- function(freq, num, nDec, digitsPrimary, ...) {
   primary
 }
 
-                     
+
+#
+# Automatic onlyZeros to minimize the probability of error
+# 
+# - When decimal numbers are generated with only 0s, 
+#   the check can focus on zeros instead of all possible whole numbers.
+# - The automation verifies whether a small confidence interval exists around 0.
+# - Failing to detect such a confidence interval is not problematic, 
+#   as it confirms the dataset is small.
+# - Special cases may occur where non-zero frequencies exist, 
+#   but the majority of frequencies are 0. Thus, the check is deliberately strict.
+#
+
+
+
+
+
