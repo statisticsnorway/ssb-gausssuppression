@@ -72,7 +72,7 @@
 #' primary = c(DominanceRule, NContributorsRule), maxN = 4, allDominance = TRUE)
 #' 
 #' 
-#' d2 <- SSBtoolsData("d2")
+#' d2 <- SSBtoolsData("d2")[1:4]   # Data considered as microdata
 #' set.seed(123)
 #' d2$v <- rnorm(nrow(d2))^2
 #' 
