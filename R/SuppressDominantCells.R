@@ -27,7 +27,7 @@
 #'    value 0. The use of `singletonZeros = TRUE` is intended to prevent this phenomenon from 
 #'    causing suppressed cells to be revealable. It is the zeros in the `dominanceVar` variable 
 #'    that are examined. Specifically, the ordinary singleton method is combined with a method 
-#'    that is actually designed for frequency tables. This approach also works for volume 
+#'    that is actually designed for frequency tables. This approach also works for magnitude 
 #'    tables when \code{\link{SingletonUniqueContributor0}} is utilized.
 #'    
 #' @param preAggregate Parameter to \code{\link{GaussSuppressionFromData}}.

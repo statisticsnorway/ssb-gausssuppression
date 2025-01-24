@@ -73,7 +73,7 @@ non-suppressed marginal cell with the value 0 that all underlying cells also hav
 value 0. The use of \code{singletonZeros = TRUE} is intended to prevent this phenomenon from
 causing suppressed cells to be revealable. It is the zeros in the \code{dominanceVar} variable
 that are examined. Specifically, the ordinary singleton method is combined with a method
-that is actually designed for frequency tables. This approach also works for volume
+that is actually designed for frequency tables. This approach also works for magnitude
 tables when \code{\link{SingletonUniqueContributor0}} is utilized.}
 
 \item{preAggregate}{Parameter to \code{\link{GaussSuppressionFromData}}.
