@@ -1,0 +1,11 @@
+pandoc: 3.1.11
+pkgdown: 2.1.1
+pkgdown_sha: ~
+articles:
+  define_tables: define_tables.html
+  Magnitude_table_suppression: Magnitude_table_suppression.html
+  Small_count_frequency_table_suppression: Small_count_frequency_table_suppression.html
+last_built: 2025-02-04T14:21Z
+urls:
+  reference: https://statisticsnorway.github.io/ssb-gausssuppression/reference
+  article: https://statisticsnorway.github.io/ssb-gausssuppression/articles
