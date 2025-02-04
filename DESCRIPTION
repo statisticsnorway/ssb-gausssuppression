@@ -28,7 +28,7 @@ Description: A statistical disclosure control tool to protect tables by suppress
     replaced by synthetic decimal numbers as described in 
     Langsrud (2019) <doi:10.1007/s11222-018-9848-9>.
 License: MIT + file LICENSE
-URL: https://github.com/statisticsnorway/ssb-gausssuppression
+URL: https://github.com/statisticsnorway/ssb-gausssuppression, https://statisticsnorway.github.io/ssb-gausssuppression/
 BugReports: https://github.com/statisticsnorway/ssb-gausssuppression/issues
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

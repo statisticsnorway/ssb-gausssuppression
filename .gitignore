@@ -35,3 +35,4 @@ git_fetch_-p_origin.bat
 ..pdf
 generatePDF.bat
 inst/doc
+docs
