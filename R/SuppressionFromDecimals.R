@@ -17,6 +17,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
+#' @importFrom stats t.test
 #' 
 #' @author Øyvind Langsrud 
 #'
