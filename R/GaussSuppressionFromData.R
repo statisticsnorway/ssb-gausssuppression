@@ -165,7 +165,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -356,22 +356,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     primary <- c(primary, function(x, ...) NA & colSums(x) == 0)
   }
   
-  extend0all <- FALSE
-  if (is.list(extend0)) {
-    varGroups <- extend0
-    extend0 <- TRUE
-  } else {
-    varGroups <- NULL
-    if (is.character(extend0)) {
-      if (extend0 == "all") {
-        extend0all <- TRUE
-        extend0 <- TRUE
-      } else {
-        stop('extend0 must be "all" when supplied as character') 
-      }
-    }
-  }
-  
   if (is.null(dimVar) & is.null(hierarchies) & is.null(formula) & is.null(x)) {
     stop("dimVar, hierarchies or formula must be specified")
   }
@@ -393,7 +377,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   }
   
-  if (extend0 | preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
+  isExtend0 <- IsExtend0(extend0)
+  
+  if (isExtend0 | preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
     if (printInc & preAggregate) {
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
@@ -442,40 +428,19 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   }
   
-  if (extend0) {
-    
+  if (isExtend0) {
     if (printInc) {
       cat("[extend0 ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
     }
     
-    # Capture possible avoidHierarchical argument to Formula2ModelMatrix
-    if (!is.null(formula) & is.null(hierarchies)) {
-      AH <- function(avoidHierarchical = FALSE, ...){avoidHierarchical}
-      avoidHierarchical <- AH(...)
-    } else {
-      avoidHierarchical <- FALSE
-    }
-    
-    
-    # To keep hierarchical = FALSE in Extend0 when !is.null(hierarchies):  AutoHierarchies needed first  when unnamed elements in hierarchies  
-    # AutoHierarchies needed also when extend0all
-    if (!is.null(hierarchies)) {
-      if (is.null(names(hierarchies))) names(hierarchies) <- rep(NA, length(hierarchies))
-      toFindDimLists <- (names(hierarchies) %in% c(NA, "")) & (sapply(hierarchies, is.character))  # toFindDimLists created exactly as in AutoHierarchies
-    } else {
-      toFindDimLists <- FALSE # sum is 0 below
-    }  
-    if (!is.null(hierarchies) & is.null(varGroups) & (sum(toFindDimLists) | extend0all)) {
-      data = Extend0fromHierarchies(data, freqName = freqVar, hierarchies = hierarchies, 
-                                    dimVar = dVar, extend0all = extend0all, ...)
-      hierarchies <- data$hierarchies
-      data <- data$data 
-    } else {
-      data <- Extend0(data, freqName = freqVar, dimVar = dVar,  varGroups = varGroups, extraVar = TRUE, 
-                      hierarchical = !avoidHierarchical & is.null(hierarchies))
-    }
-    
+    data <- Extend0fromModelMatrixInput(data = data, 
+                                        freqName = freqVar, 
+                                        hierarchies = hierarchies, 
+                                        formula = formula,
+                                        dimVar = dimVar,
+                                        extend0 = extend0, 
+                                        dVar = dVar, ...)
     if (printInc) {
       cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
       flush.console()
