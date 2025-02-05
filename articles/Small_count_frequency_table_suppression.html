@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -80,7 +80,7 @@ secondary suppression is performed using the Gauss method.</p>
 are based on <code>dataset_a</code>, which has six rows.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/statisticsnorway/ssb-gausssuppression" class="external-link">GaussSuppression</a></span><span class="op">)</span></span>
-<span><span class="va">dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"example1"</span><span class="op">)</span></span>
+<span><span class="va">dataset</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"example1"</span><span class="op">)</span></span>
 <span><span class="va">dataset_a</span> <span class="op">&lt;-</span> <span class="va">dataset</span><span class="op">[</span><span class="va">dataset</span><span class="op">$</span><span class="va">year</span> <span class="op">==</span> <span class="st">"2014"</span>, <span class="op">-</span><span class="fl">4</span><span class="op">]</span></span>
 <span><span class="va">dataset_b</span> <span class="op">&lt;-</span> <span class="va">dataset</span><span class="op">[</span><span class="va">dataset</span><span class="op">$</span><span class="va">year</span> <span class="op">==</span> <span class="st">"2015"</span>, <span class="op">-</span><span class="fl">4</span><span class="op">]</span></span>
 <span><span class="va">dataset_a</span></span>
@@ -203,7 +203,7 @@ Total
 <p>The same output is obtained if microdata is sent as input as
 illustrated by de code below.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">microdata_a</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/MakeFreq.html" class="external-link">MakeMicro</a></span><span class="op">(</span><span class="va">dataset_a</span>, <span class="st">"freq"</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span></span>
+<code class="sourceCode R"><span><span class="va">microdata_a</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/MakeFreq.html" class="external-link">MakeMicro</a></span><span class="op">(</span><span class="va">dataset_a</span>, <span class="st">"freq"</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">4</span><span class="op">]</span></span>
 <span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">microdata_a</span>, </span>
 <span>                              dimVar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"geo"</span><span class="op">)</span>, </span>
 <span>                              maxN <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
@@ -353,7 +353,7 @@ Total
 detected automatically. The same output is obtained if we first generate
 hierarchies by:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">dimlists</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/FindDimLists.html" class="external-link">FindDimLists</a></span><span class="op">(</span><span class="va">dataset_a</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"geo"</span>, <span class="st">"eu"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">dimlists</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FindDimLists.html" class="external-link">FindDimLists</a></span><span class="op">(</span><span class="va">dataset_a</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"age"</span>, <span class="st">"geo"</span>, <span class="st">"eu"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">dimlists</span></span>
 <span><span class="co">#&gt; $age</span></span>
 <span><span class="co">#&gt;   levels codes</span></span>

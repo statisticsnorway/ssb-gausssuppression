@@ -11,7 +11,7 @@ contribution based on absolute values."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,10 +156,10 @@ in the dominance rule. See Details.</p></dd>
 When <code>n = 2</code>, the following variables are added:</p><ul><li><p><code>"dominant2"</code>: The fraction associated with the dominance rule.</p></li>
 <li><p><code>"max2contributor"</code>: IDs associated with the second largest contribution. These IDs
 are taken from <code>charVar</code> if provided, or the row indices if <code>charVar</code> is not supplied.</p></li>
-<li><p><code>"n_contr"</code> and <code>"n_non0_contr"</code>: Outputs from <code><a href="https://rdrr.io/pkg/SSBtools/man/max_contribution.html" class="external-link">max_contribution</a></code>.
+<li><p><code>"n_contr"</code> and <code>"n_non0_contr"</code>: Outputs from <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/max_contribution.html" class="external-link">max_contribution</a></code>.
 If <code>removeCodes</code> is used as input, <code>"n_contr_all"</code> and <code>"n_non0_contr_all"</code> are also included.
 The parameter <code>max_contribution_output</code> can be used to specify custom outputs
-from <code><a href="https://rdrr.io/pkg/SSBtools/man/max_contribution.html" class="external-link">max_contribution</a></code>. Note that if <code>max_contribution_output</code>
+from <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/max_contribution.html" class="external-link">max_contribution</a></code>. Note that if <code>max_contribution_output</code>
 is provided, only the specified outputs will be included, and the default outputs
 (<code>"n_contr"</code> and <code>"n_non0_contr"</code>) will not be added unless explicitly listed.</p></li>
 </ul></dd>
@@ -185,7 +185,7 @@ It is needed also here to handle structural zeros caused by <code>removeCodes</c
 <dt id="arg-apply-abs-directly">apply_abs_directly<a class="anchor" aria-label="anchor" href="#arg-apply-abs-directly"></a></dt>
 <dd><p>Logical. Determines how negative values are treated in the rules.
 When <code>apply_abs_directly = FALSE</code> (default), absolute values are taken after summing
-contributions, as performed by <code><a href="https://rdrr.io/pkg/SSBtools/man/max_contribution.html" class="external-link">max_contribution</a></code>.
+contributions, as performed by <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/max_contribution.html" class="external-link">max_contribution</a></code>.
 When <code>apply_abs_directly = TRUE</code>, absolute values are computed directly on the input values,
 prior to any summation. This corresponds to the old behavior of the function.</p></dd>
 
@@ -231,7 +231,7 @@ since default needed by <code><a href="GaussSuppressionFromData.html">GaussSuppr
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/MakeFreq.html" class="external-link">MakeMicro</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"z2"</span><span class="op">)</span>, <span class="st">"ant"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">z</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/MakeFreq.html" class="external-link">MakeMicro</a></span><span class="op">(</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"z2"</span><span class="op">)</span>, <span class="st">"ant"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">z</span><span class="op">$</span><span class="va">value</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">1000</span>, <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span>, replace <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu"><a href="GaussSuppressionFromData.html">GaussSuppressionFromData</a></span><span class="op">(</span><span class="va">z</span>, dimVar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"region"</span>, <span class="st">"fylke"</span>, <span class="st">"kostragr"</span>, <span class="st">"hovedint"</span><span class="op">)</span>, </span></span>

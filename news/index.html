@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@
 <li>Improved handling of <code>protectZeros</code>. See this parameter’s documentation in <code><a href="../reference/MagnitudeRule.html">?MagnitudeRule</a></code>.</li>
 <li>New parameter <code>removeCodesFraction</code> allows adjustment of the effect of the <code>removeCodes</code> parameter.</li>
 <li>New parameter <code>apply_abs_directly</code> determines how negative values are treated in the rules:
-<ul><li>When <code>apply_abs_directly = FALSE</code> (default), absolute values are taken after summing contributions, as performed by <code><a href="https://rdrr.io/pkg/SSBtools/man/max_contribution.html" class="external-link">max_contribution()</a></code> in <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">the SSBtools package</a>.</li>
+<ul><li>When <code>apply_abs_directly = FALSE</code> (default), absolute values are taken after summing contributions, as performed by <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/max_contribution.html" class="external-link">max_contribution()</a></code> in <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">the SSBtools package</a>.</li>
 <li>When <code>apply_abs_directly = TRUE</code>, absolute values are computed directly on the input values, prior to any summation [beyond <code>preAggregate</code>]. This corresponds to the old behavior of the function.</li>
 </ul></li>
 <li>Enhanced output when <code>allDominance = TRUE</code>:
@@ -62,14 +62,14 @@
 <li>The number of contributors is also included.</li>
 <li>Additional outputs are available. See the documentation of the <code>allDominance</code> parameter.</li>
 </ul></li>
-<li>The new functionality has been enabled by replacing <code><a href="../reference/MaxContribution.html">MaxContribution()</a></code> with the improved <code><a href="https://rdrr.io/pkg/SSBtools/man/max_contribution.html" class="external-link">max_contribution()</a></code> from <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">SSBtools</a>.</li>
+<li>The new functionality has been enabled by replacing <code><a href="../reference/MaxContribution.html">MaxContribution()</a></code> with the improved <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/max_contribution.html" class="external-link">max_contribution()</a></code> from <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">SSBtools</a>.</li>
 </ul></li>
 <li>Improved support for <code>tibble</code> and <code>data.table</code> input (parameter <code>data</code>).
 <ul><li>Input is now explicitly coerced to a data frame using <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> where necessary to ensure consistent behavior.</li>
 <li>When <code>preAggregate</code> is <code>TRUE</code> and <code>aggregatePackage</code> is <code>"data.table"</code>, the use of <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> is skipped to avoid unnecessary back-and-forth conversion of <code>data.table</code> objects, preserving efficiency.</li>
 <li>Applies to <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> and its wrappers.</li>
 </ul></li>
-<li>The <code>SSBtools</code> functions <code><a href="https://rdrr.io/pkg/SSBtools/man/FormulaSelection.html" class="external-link">FormulaSelection()</a></code> and its identical wrapper <code><a href="https://rdrr.io/pkg/SSBtools/man/FormulaSelection.html" class="external-link">formula_selection()</a></code> are now re-exported.
+<li>The <code>SSBtools</code> functions <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FormulaSelection.html" class="external-link">FormulaSelection()</a></code> and its identical wrapper <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FormulaSelection.html" class="external-link">formula_selection()</a></code> are now re-exported.
 <ul><li>These functions are useful for extracting smaller datasets from the output.<br></li>
 <li>With this change, using <code><a href="https://github.com/statisticsnorway/ssb-ssbtools" class="external-link">library(SSBtools)</a></code> is no longer necessary to access them.<br></li>
 </ul></li>
@@ -83,8 +83,8 @@
 <span>                      letter <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span><span class="op">)</span></span>
 <span> <span class="fu"><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts</a></span><span class="op">(</span><span class="va">mydata</span>, maxN <span class="op">=</span> <span class="fl">3</span>, hierarchies <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>tree <span class="op">=</span> <span class="va">a</span>, letter <span class="op">=</span> <span class="va">b</span><span class="op">)</span><span class="op">)</span> </span></code></pre></div>
 </li>
-<li><p>New possibilities for working with both formulas and hierarchies are now available through the <code><a href="https://rdrr.io/pkg/SSBtools/man/map_hierarchies_to_data.html" class="external-link">map_hierarchies_to_data()</a></code> function.</p></li>
-<li><p>Improved functionality for combining formulas with the <code><a href="https://rdrr.io/pkg/SSBtools/man/FormulaSums.html" class="external-link">Formula2ModelMatrix()</a></code> parameter <code>avoidHierarchical = TRUE</code>, thanks to the new <code><a href="https://rdrr.io/pkg/SSBtools/man/total_collapse.html" class="external-link">total_collapse()</a></code> function which can be applied to output.</p></li>
+<li><p>New possibilities for working with both formulas and hierarchies are now available through the <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/map_hierarchies_to_data.html" class="external-link">map_hierarchies_to_data()</a></code> function.</p></li>
+<li><p>Improved functionality for combining formulas with the <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FormulaSums.html" class="external-link">Formula2ModelMatrix()</a></code> parameter <code>avoidHierarchical = TRUE</code>, thanks to the new <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/total_collapse.html" class="external-link">total_collapse()</a></code> function which can be applied to output.</p></li>
 </ul></li>
 </ul></div>
     <div class="section level2">
@@ -93,7 +93,7 @@
 <ul><li>The package description has been updated with this reference <a href="https://doi.org/10.1007/978-3-031-69651-0_6" class="external-link">(Langsrud, 2024)</a>.</li>
 </ul></li>
 <li>Due to updates in <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">the SSBtools package</a> (version 1.5.4), it is now meaningful to include NA’s in the grouping variables.
-<ul><li>Note the parameter <code>NAomit</code> to <code><a href="https://rdrr.io/pkg/SSBtools/man/FormulaSums.html" class="external-link">SSBtools::Formula2ModelMatrix()</a></code>:
+<ul><li>Note the parameter <code>NAomit</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FormulaSums.html" class="external-link">SSBtools::Formula2ModelMatrix()</a></code>:
 <ul><li>When <code>TRUE</code>, NAs in the grouping variables are omitted in output and not included as a separate category.</li>
 <li>This parameter can be input to <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> and its wrappers.</li>
 </ul></li>
@@ -130,11 +130,11 @@
 <ul><li>It was a bug occurring in cases where a response value of zero was secondary suppressed.</li>
 </ul></li>
 <li>Improvements due to updates in <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">the SSBtools package</a> (version 1.5.2).
-<ul><li>Fix for a rare problem in <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>,
+<ul><li>Fix for a rare problem in <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>,
 <ul><li>Could happen with parallel eliminations combined with integer overflow. Then warning message: <em>longer object length is not a multiple of shorter object length</em>
 </li>
 </ul></li>
-<li>Minor change to the singleton method <code>"anySum"</code> in <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression()</a></code> to align with best theory.
+<li>Minor change to the singleton method <code>"anySum"</code> in <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code> to align with best theory.
 <ul><li>In practice, this rarely makes a difference.</li>
 <li>The previous behavior can be ensured by setting <code>singletonMethod</code> to either <code>"anySumOld"</code> or <code>"anySumNOTprimaryOld"</code>.</li>
 </ul></li>
@@ -160,7 +160,7 @@
 <li>A simpler and faster method is achievable with <code>singletonMethod = "numttT"</code>.</li>
 <li>As in previous versions, singleton handling can be disabled by setting <code>singletonMethod = "none"</code>.</li>
 </ul></li>
-<li>Additional information can be found by <code><a href="https://rdrr.io/pkg/SSBtools/man/NumSingleton.html" class="external-link">?SSBtools::NumSingleton</a></code>.</li>
+<li>Additional information can be found by <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/NumSingleton.html" class="external-link">?SSBtools::NumSingleton</a></code>.</li>
 <li>Some explanation is provided at the bottom of the magnitude vignette.</li>
 <li>This will later be documented in a more comprehensive manner (paper).</li>
 </ul></li>
@@ -211,7 +211,7 @@
 <ul><li>See <code><a href="../reference/MagnitudeRule.html">DominanceRule()</a></code>.</li>
 </ul></li>
 <li>More advanced singleton handling that makes use of new functionality in the SSBtools package (version 1.4.4).
-<ul><li>See <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">SSBtools::GaussSuppression()</a></code>.</li>
+<ul><li>See <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">SSBtools::GaussSuppression()</a></code>.</li>
 <li>See <code><a href="../reference/SingletonUniqueContributor.html">SingletonUniqueContributor()</a></code>.</li>
 </ul></li>
 <li>Now <code>forced</code> and <code>usafe</code> are possible output columns.

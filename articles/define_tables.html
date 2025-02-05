@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,9 +87,9 @@ test data set provided in the SSBtools package.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/statisticsnorway/ssb-ssbtools" class="external-link">SSBtools</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/statisticsnorway/ssb-gausssuppression" class="external-link">GaussSuppression</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">dataset</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"d2s"</span><span class="op">)</span></span>
+<span><span class="va">dataset</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"d2s"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">microdata</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/MakeFreq.html" class="external-link">MakeMicro</a></span><span class="op">(</span><span class="va">dataset</span>, <span class="st">"freq"</span><span class="op">)</span></span>
+<span><span class="va">microdata</span> <span class="op">&lt;-</span> <span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/MakeFreq.html" class="external-link">MakeMicro</a></span><span class="op">(</span><span class="va">dataset</span>, <span class="st">"freq"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   region   county  size main_income freq</span></span>
@@ -1168,7 +1168,7 @@ hierarchies. There are multiple ways of inspecting which hierarchies can
 be found; users familiar with DimLists used in other SDC packages can
 for example use the following:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/FindDimLists.html" class="external-link">FindDimLists</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"region"</span>, <span class="st">"county"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FindDimLists.html" class="external-link">FindDimLists</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"region"</span>, <span class="st">"county"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $region</span></span>
 <span><span class="co">#&gt;    levels    codes</span></span>
 <span><span class="co">#&gt; 1       @    Total</span></span>
@@ -1181,7 +1181,7 @@ for example use the following:</p>
 <span><span class="co">#&gt; 8      @@ county-3</span></span>
 <span><span class="co">#&gt; 9     @@@        E</span></span>
 <span><span class="co">#&gt; 10    @@@        F</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/FindDimLists.html" class="external-link">FindDimLists</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"region"</span>, <span class="st">"county"</span>, <span class="st">"size"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FindDimLists.html" class="external-link">FindDimLists</a></span><span class="op">(</span><span class="va">dataset</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"region"</span>, <span class="st">"county"</span>, <span class="st">"size"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $region</span></span>
 <span><span class="co">#&gt;    levels    codes</span></span>
 <span><span class="co">#&gt; 1       @    Total</span></span>
@@ -1275,9 +1275,9 @@ defining two hierarchies by using dimlists:</p>
 <span><span class="co">#&gt; 4    @@@      other</span></span>
 <span><span class="co">#&gt; 5    @@@ assistance</span></span>
 <span><span class="co">#&gt; 6    @@@   pensions</span></span>
-<span><span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/DimList2Hrc.html" class="external-link">DimList2Hrc</a></span><span class="op">(</span><span class="va">income_dim</span><span class="op">)</span></span>
+<span><span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/DimList2Hrc.html" class="external-link">DimList2Hrc</a></span><span class="op">(</span><span class="va">income_dim</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "wages"       "not_wages"   "@other"      "@assistance" "@pensions"</span></span>
-<span><span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/DimList2Hierarchy.html" class="external-link">DimList2Hierarchy</a></span><span class="op">(</span><span class="va">income_dim</span><span class="op">)</span></span>
+<span><span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/DimList2Hierarchy.html" class="external-link">DimList2Hierarchy</a></span><span class="op">(</span><span class="va">income_dim</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     mapsFrom    mapsTo sign level</span></span>
 <span><span class="co">#&gt; 1      wages     Total    1     2</span></span>
 <span><span class="co">#&gt; 2  not_wages     Total    1     2</span></span>
@@ -3068,7 +3068,7 @@ Total
 <p>Note that there are two empty cells in the wages column. This means
 that these cells are not included in the output data. One reason is that
 the <code>removeEmpty</code> parameter to
-<code><a href="https://rdrr.io/pkg/SSBtools/man/ModelMatrix.html" class="external-link">SSBtools::ModelMatrix</a></code> has <code>TRUE</code> as default in
+<code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/ModelMatrix.html" class="external-link">SSBtools::ModelMatrix</a></code> has <code>TRUE</code> as default in
 the case of a formula interface. By including
 <code>removeEmpty = FALSE</code>, zeros will be included in the output.
 Another way to achieve this is to use <code>extend0 = TRUE</code>. By

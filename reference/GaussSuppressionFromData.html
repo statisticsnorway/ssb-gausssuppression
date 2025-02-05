@@ -11,7 +11,7 @@ secondary suppression by Gaussian elimination by GaussSuppression"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,7 +46,7 @@ secondary suppression by Gaussian elimination by GaussSuppression"></head><body>
     <div class="ref-description section level2">
     <p>Aggregates are generated followed by
 primary suppression followed by
-secondary suppression by Gaussian elimination by <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code></p>
+secondary suppression by Gaussian elimination by <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code></p>
     </div>
 
     <div class="section level2">
@@ -111,7 +111,7 @@ unless <code>preAggregate</code> is <code>TRUE</code> and <code>aggregatePackage
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Further arguments to be passed to the supplied functions and to <code><a href="https://rdrr.io/pkg/SSBtools/man/ModelMatrix.html" class="external-link">ModelMatrix</a></code> (such as <code>inputInOutput</code> and <code>removeEmpty</code>).</p></dd>
+<dd><p>Further arguments to be passed to the supplied functions and to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/ModelMatrix.html" class="external-link">ModelMatrix</a></code> (such as <code>inputInOutput</code> and <code>removeEmpty</code>).</p></dd>
 
 
 <dt id="arg-numvar">numVar<a class="anchor" aria-label="anchor" href="#arg-numvar"></a></dt>
@@ -127,7 +127,7 @@ unless <code>preAggregate</code> is <code>TRUE</code> and <code>aggregatePackage
 
 
 <dt id="arg-hierarchies">hierarchies<a class="anchor" aria-label="anchor" href="#arg-hierarchies"></a></dt>
-<dd><p>List of hierarchies, which can be converted by <code><a href="https://rdrr.io/pkg/SSBtools/man/AutoHierarchies.html" class="external-link">AutoHierarchies</a></code>.
+<dd><p>List of hierarchies, which can be converted by <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/AutoHierarchies.html" class="external-link">AutoHierarchies</a></code>.
 Thus, the variables can also be coded by <code>"rowFactor"</code> or <code>""</code>, which correspond to using the categories in the data.</p></dd>
 
 
@@ -174,11 +174,11 @@ See details.</p></dd>
 
 
 <dt id="arg-singletonmethod">singletonMethod<a class="anchor" aria-label="anchor" href="#arg-singletonmethod"></a></dt>
-<dd><p><code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code> input. The default value depends on parameter <code>secondaryZeros</code> which depends on <code>candidates</code> (see details).</p></dd>
+<dd><p><code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code> input. The default value depends on parameter <code>secondaryZeros</code> which depends on <code>candidates</code> (see details).</p></dd>
 
 
 <dt id="arg-printinc">printInc<a class="anchor" aria-label="anchor" href="#arg-printinc"></a></dt>
-<dd><p><code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code> input</p></dd>
+<dd><p><code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code> input</p></dd>
 
 
 <dt id="arg-output">output<a class="anchor" aria-label="anchor" href="#arg-output"></a></dt>
@@ -189,7 +189,7 @@ See details.</p></dd>
 <code>"primary"</code>,  <code>"secondary"</code> and <code>"all"</code>.
 Here "inner" means input data (possibly pre-aggregated) and
 "x" means dummy matrix (as input parameter x).
-All input to and output from <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code>, except <code>...</code>, are returned when <code>"outputGaussSuppression_x"</code>.
+All input to and output from <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code>, except <code>...</code>, are returned when <code>"outputGaussSuppression_x"</code>.
 Excluding x and only input are also possible.
 The code <code>"all"</code> means all relevant output after all the calculations.
 Currently, this means the same as <code>"publish_inner_x"</code> extended with the matrices (or NULL) <code>xExtraPrimary</code>  and <code>unsafe</code>.
@@ -200,7 +200,7 @@ possible columns from  <code>xExtraPrimary</code> may also be included in the un
 
 
 <dt id="arg-x">x<a class="anchor" aria-label="anchor" href="#arg-x"></a></dt>
-<dd><p><code>x</code> (<code>modelMatrix</code>) and <code>crossTable</code> can be supplied as input instead of generating it from  <code><a href="https://rdrr.io/pkg/SSBtools/man/ModelMatrix.html" class="external-link">ModelMatrix</a></code></p></dd>
+<dd><p><code>x</code> (<code>modelMatrix</code>) and <code>crossTable</code> can be supplied as input instead of generating it from  <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/ModelMatrix.html" class="external-link">ModelMatrix</a></code></p></dd>
 
 
 <dt id="arg-crosstable">crossTable<a class="anchor" aria-label="anchor" href="#arg-crosstable"></a></dt>
@@ -215,7 +215,7 @@ This is defined by the dimensional variables according to <code>dimVar</code>, <
 <dt id="arg-extraaggregate">extraAggregate<a class="anchor" aria-label="anchor" href="#arg-extraaggregate"></a></dt>
 <dd><p>When <code>TRUE</code>, the data will be aggregated by the dimensional variables according to <code>dimVar</code>, <code>hierarchies</code> or <code>formula</code>.
 The aggregated data and the corresponding x-matrix will only be used as input to the singleton
-function and <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code>.
+function and <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code>.
 This extra aggregation is useful when parameter <code>charVar</code> is used.
 Supply <code>"publish_inner"</code>, <code>"publish_inner_x"</code>, <code>"publish_x"</code> or <code>"inner_x"</code> as <code>output</code> to obtain extra aggregated results.
 Supply <code>"inner"</code> or <code>"input2functions"</code> to obtain other results.</p></dd>
@@ -294,16 +294,16 @@ Intervals, <code>[lo_1, up_1]</code>, are intervals calculated prior to addition
 
 <dt id="arg-aggregatepackage">aggregatePackage<a class="anchor" aria-label="anchor" href="#arg-aggregatepackage"></a></dt>
 <dd><p>Package used to preAggregate/extraAggregate.
-Parameter <code>pkg</code> to <code><a href="https://rdrr.io/pkg/SSBtools/man/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>.</p></dd>
+Parameter <code>pkg</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>.</p></dd>
 
 
 <dt id="arg-aggregatena">aggregateNA<a class="anchor" aria-label="anchor" href="#arg-aggregatena"></a></dt>
 <dd><p>Whether to include NAs in the grouping variables while preAggregate/extraAggregate.
-Parameter <code>include_na</code> to <code><a href="https://rdrr.io/pkg/SSBtools/man/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>.</p></dd>
+Parameter <code>include_na</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>.</p></dd>
 
 
 <dt id="arg-aggregatebaseorder">aggregateBaseOrder<a class="anchor" aria-label="anchor" href="#arg-aggregatebaseorder"></a></dt>
-<dd><p>Parameter <code>base_order</code> to <code><a href="https://rdrr.io/pkg/SSBtools/man/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>,
+<dd><p>Parameter <code>base_order</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>,
 used when preAggregate/extraAggregate.
 The parameter does not affect the ordering of ordinary output.
 Therefore, the default is set to <code>FALSE</code> to avoid unnecessary sorting operations.
@@ -311,9 +311,9 @@ The parameter will have impact when, e.g <code>output = "inner"</code>.</p></dd>
 
 
 <dt id="arg-rowgroupspackage">rowGroupsPackage<a class="anchor" aria-label="anchor" href="#arg-rowgroupspackage"></a></dt>
-<dd><p>Parameter <code>pkg</code> to <code><a href="https://rdrr.io/pkg/SSBtools/man/RowGroups.html" class="external-link">RowGroups</a></code>.
-The parameter is input to <code><a href="https://rdrr.io/pkg/SSBtools/man/FormulaSums.html" class="external-link">Formula2ModelMatrix</a></code>
-via <code><a href="https://rdrr.io/pkg/SSBtools/man/ModelMatrix.html" class="external-link">ModelMatrix</a></code>.</p></dd>
+<dd><p>Parameter <code>pkg</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/RowGroups.html" class="external-link">RowGroups</a></code>.
+The parameter is input to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FormulaSums.html" class="external-link">Formula2ModelMatrix</a></code>
+via <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/ModelMatrix.html" class="external-link">ModelMatrix</a></code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -322,10 +322,10 @@ via <code><a href="https://rdrr.io/pkg/SSBtools/man/ModelMatrix.html" class="ext
     </div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
-    <p>The supplied functions for generating <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code> input takes the following arguments:
+    <p>The supplied functions for generating <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code> input takes the following arguments:
 <code>crossTable</code>,  <code>x</code>, <code>freq</code>, <code>num</code>, <code>weight</code>, <code>maxN</code>, <code>protectZeros</code>, <code>secondaryZeros</code>, <code>data</code>, <code>freqVar</code>, <code>numVar</code>, <code>weightVar</code>, <code>charVar</code>, <code>dimVar</code>
 <code>aggregatePackage</code>, <code>aggregateNA</code>, <code>aggregateBaseOrder</code>, <code>rowGroupsPackage</code>, <code>structuralEmpty</code>, and <code>...</code>.
-where the two first are  <code><a href="https://rdrr.io/pkg/SSBtools/man/ModelMatrix.html" class="external-link">ModelMatrix</a></code> outputs (<code>modelMatrix</code> renamed to <code>x</code>).
+where the two first are  <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/ModelMatrix.html" class="external-link">ModelMatrix</a></code> outputs (<code>modelMatrix</code> renamed to <code>x</code>).
 The vector, <code>freq</code>, is aggregated counts (<code>t(x) %*% data[[freqVar]]</code>).
 In addition, the supplied <code>singleton</code> function also takes <code>nUniqueVar</code> and (output from) <code>primary</code> as input.</p>
 <p>Similarly, <code>num</code>, is a data frame of aggregated numerical variables.
@@ -345,7 +345,7 @@ When forced cells affect singleton problems, this is not implemented.
 Some information can be seen from warnings.
 This can also be seen by choosing <code>output = "secondary"</code> together
 with <code>unsafeInOutput = "ifany"</code> or <code>unsafeInOutput = "always"</code>.
-Then, negative indices from <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code> using
+Then, negative indices from <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code> using
 <code>unsafeAsNegative = TRUE</code> will be included in the output.
 Singleton problems may, however, be present even if it cannot be seen as warning/output.
 In some cases, the problems can be detected by <code><a href="GaussSuppressDec.html">GaussSuppressDec</a></code>.</p>
@@ -353,7 +353,7 @@ In some cases, the problems can be detected by <code><a href="GaussSuppressDec.h
 For these situations, forced has precedence over hidden and primary.
 That is, if a cell is both forced and hidden, it will be treated as a forced cell and thus published.
 Similarly, any primary suppression of a forced cell will be ignored
-(see parameter <code>whenPrimaryForced</code> to <code><a href="https://rdrr.io/pkg/SSBtools/man/GaussSuppression.html" class="external-link">GaussSuppression</a></code>).
+(see parameter <code>whenPrimaryForced</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code>).
 It is, however, meaningful to combine primary and hidden.
 Such cells will be protected while also being assigned the <code>NA</code> value in the <code>suppressed</code> output variable.</p>
     </div>
@@ -365,7 +365,7 @@ Such cells will be protected while also being assigned the <code>NA</code> value
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">z1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"z1"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">z1</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"z1"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">GaussSuppressionFromData</span><span class="op">(</span><span class="va">z1</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, <span class="fl">3</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ..........................................</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    region hovedint ant primary suppressed</span>
@@ -415,7 +415,7 @@ Such cells will be protected while also being assigned the <code>NA</code> value
 <span class="r-out co"><span class="r-pr">#&gt;</span> 44      H soshjelp  38   FALSE      FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 45      H    trygd  15   FALSE      FALSE</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">z2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/SSBtools/man/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"z2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">z2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"z2"</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">GaussSuppressionFromData</span><span class="op">(</span><span class="va">z2</span>, <span class="fl">1</span><span class="op">:</span><span class="fl">4</span>, <span class="fl">5</span>, protectZeros <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .............................</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     region hovedint ant primary suppressed</span>
