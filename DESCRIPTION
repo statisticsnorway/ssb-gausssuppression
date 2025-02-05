@@ -1,8 +1,8 @@
 Package: GaussSuppression
 Type: Package
 Title: Tabular Data Suppression using Gaussian Elimination
-Version: 0.9.2
-Date: 2024-12-09
+Version: 0.9.3
+Date: 2025-01-27
 Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
                     email = "oyl@ssb.no",
                     comment = c(ORCID = "0000-0002-1380-4396")),
@@ -15,7 +15,7 @@ Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
              person("Statistics Norway", role = "cph"))
 Maintainer: Øyvind Langsrud <oyl@ssb.no>
 Depends: Matrix
-Imports: SSBtools (>= 1.6.0), RegSDC (>= 0.7.0), stats, methods, utils
+Imports: SSBtools (>= 1.6.1), RegSDC (>= 0.7.0), stats, methods, utils
 Description: A statistical disclosure control tool to protect tables by suppression 
     using the Gaussian elimination secondary suppression algorithm 
     (Langsrud, 2024) <doi:10.1007/978-3-031-69651-0_6>. A suggestion is 
