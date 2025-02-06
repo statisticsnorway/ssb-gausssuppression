@@ -49,11 +49,15 @@
 #' @export
 #' 
 #' @author Øyvind Langrsud
+#' 
+#' @seealso [SuppressionFromDecimals()]
+#' 
 #'
 #' @examples
 #' a <- GaussSuppressDec(data = SSBtoolsData("example1"), 
 #'                       fun = SuppressSmallCounts, 
-#'                       dimVar = c("age", "geo"), 
+#'                       dimVar = c("age", "geo"),
+#'                       preAggregate = TRUE, 
 #'                       freqVar = "freq", maxN = 3)
 #' a                       
 #'                  

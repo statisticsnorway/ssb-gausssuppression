@@ -85,7 +85,8 @@ executing  \code{\link[RegSDC]{SuppressDec}}.
 \examples{
 a <- GaussSuppressDec(data = SSBtoolsData("example1"), 
                       fun = SuppressSmallCounts, 
-                      dimVar = c("age", "geo"), 
+                      dimVar = c("age", "geo"),
+                      preAggregate = TRUE, 
                       freqVar = "freq", maxN = 3)
 a                       
                  
@@ -100,6 +101,9 @@ b
 # FormulaSelection() works on this output as well 
 FormulaSelection(b, ~sector2 * geo)                       
                       
+}
+\seealso{
+\code{\link[=SuppressionFromDecimals]{SuppressionFromDecimals()}}
 }
 \author{
 Øyvind Langrsud
