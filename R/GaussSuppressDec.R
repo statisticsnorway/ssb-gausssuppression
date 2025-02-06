@@ -183,8 +183,15 @@ GaussSuppressDec = function(data,
     # Re-use primary-function originally made for SuppressionFromDecimals
     suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
     
-    if (any(a$publish$suppressed != suppressionFromDecimals))
-      warning("Mismatch between whole numbers and suppression.")
+    if (any(a$publish$suppressed != suppressionFromDecimals)) {
+      n_incorrectly_suppressed <- sum(!a$publish$suppressed & suppressionFromDecimals)
+      n_incorrectly_unsuppressed <- sum(a$publish$suppressed & !suppressionFromDecimals)
+      warning(paste(
+        "Mismatch between whole numbers and suppression:",
+        n_incorrectly_suppressed, "incorrectly suppressed,",
+        n_incorrectly_unsuppressed, "incorrectly unsuppressed."
+      ))
+    }
   }
   
   if (!is.null(startRow)) {
