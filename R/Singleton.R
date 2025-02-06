@@ -99,8 +99,8 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' S(d, nUniqueVar = "nUnique", integerSingleton = FALSE, removeCodes = 1:5)
 #' 
 #' x <- SSBtools::ModelMatrix(d, hierarchies = list(region = "Total"))
-#' which(colSums(x) == 1)
-#' which(rowSums(x[, colSums(x) == 1]) > 0)
+#' which(Matrix::colSums(x) == 1)
+#' which(Matrix::rowSums(x[, Matrix::colSums(x) == 1]) > 0)
 #' # columns 2, 3, 4, 5, 7 correspond to inner cells: rows 3, 4, 5, 6, 8 
 #' # with 2:4 not primary rows 3:5 are forced non-singleton
 #' S(d, freqVar = "freq", nUniqueVar = "nUnique", integerSingleton = FALSE, x = x, primary = 5:8)

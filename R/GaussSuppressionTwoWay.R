@@ -95,7 +95,7 @@
 #'                                protectZeros = FALSE, colVar = c("hovedint"),
 #'                                preAggregate = TRUE,  
 #'                                hidden = function(x, data, charVar, ...) 
-#'                                  as.vector((t(x) %*% as.numeric(data[[charVar]] == "M06M12")) == 0))                                
+#'            as.vector((Matrix::t(x) %*% as.numeric(data[[charVar]] == "M06M12")) == 0))                                
 GaussSuppressionTwoWay = function(data, dimVar = NULL, freqVar=NULL, numVar = NULL,  weightVar = NULL, charVar = NULL, #  freqVar=NULL, numVar = NULL, name
                                     hierarchies, formula = NULL,
                            maxN = suppressWarnings(formals(c(primary)[[1]])$maxN), 

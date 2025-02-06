@@ -153,5 +153,5 @@ out6 <- GaussSuppressionTwoWay(z, freqVar = "ant", charVar = "mnd2",
                                protectZeros = FALSE, colVar = c("hovedint"),
                                preAggregate = TRUE,  
                                hidden = function(x, data, charVar, ...) 
-                                 as.vector((t(x) \%*\% as.numeric(data[[charVar]] == "M06M12")) == 0))                                
+           as.vector((Matrix::t(x) \%*\% as.numeric(data[[charVar]] == "M06M12")) == 0))                                
 }
