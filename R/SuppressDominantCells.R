@@ -36,6 +36,8 @@
 #' @return data frame containing aggregated data and suppression information.
 #' @export
 #' 
+#' @seealso [SSBtools::tables_by_formulas()]
+#' 
 #' @examples 
 #' num <- c(100,
 #'          90, 10,
@@ -106,6 +108,19 @@
 #'                                 contributorVar = "company", 
 #'                                 k = c(80, 99))
 #' FormulaSelection(output, ~sector2 * geo) 
+#'                       
+#'                       
+#' # This example is similar to the one in the documentation of tables_by_formulas,  
+#' # but it uses SuppressDominantCells with the pPercent and contributorVar parameters.  
+#' tables_by_formulas(SSBtoolsData("magnitude1"),
+#'                    table_fun = SuppressDominantCells, 
+#'                    table_formulas = list(table_1 = ~region * sector2, 
+#'                                          table_2 = ~region1:sector4 - 1, 
+#'                                          table_3 = ~region + sector4 - 1), 
+#'                    substitute_vars = list(region = c("geo", "eu"), region1 = "eu"), 
+#'                    collapse_vars = list(sector = c("sector2", "sector4")), 
+#'                    dominanceVar  = "value", pPercent = 10, contributorVar = "company")                       
+#'                       
 #'                       
 SuppressDominantCells <- function(data,
                                   n = 1:length(k),

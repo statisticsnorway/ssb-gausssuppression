@@ -108,4 +108,20 @@ output <- SuppressSmallCounts(data = SSBtoolsData("example1"),
                               maxN = 1)
 FormulaSelection(output, ~(age + eu) * year)
                
+               
+# This example is similar to the one in the documentation of tables_by_formulas,  
+# but it uses SuppressSmallCounts, and the input data (SSBtoolsData("magnitude1"))  
+# is used to generate a frequency table by excluding the "value" variable. 
+tables_by_formulas(SSBtoolsData("magnitude1"), 
+                   table_fun = SuppressSmallCounts, 
+                   table_formulas = list(table_1 = ~region * sector2, 
+                                         table_2 = ~region1:sector4 - 1, 
+                                         table_3 = ~region + sector4 - 1), 
+                   substitute_vars = list(region = c("geo", "eu"), region1 = "eu"), 
+                   collapse_vars = list(sector = c("sector2", "sector4")), 
+                   maxN = 2)                 
+                   
+}
+\seealso{
+\code{\link[SSBtools:tables_by_formulas]{SSBtools::tables_by_formulas()}}
 }
