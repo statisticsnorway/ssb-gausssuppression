@@ -83,7 +83,7 @@ PrimaryDecimals <- function(freq, num, nDec, digitsPrimary, onlyZerosRoundWhole 
   primary = !(rowSums(numRW == round(num)) == nDec)
   
   
-  if (!is.null(freq)) {
+  if (!is.null(freq) & !onlyZerosRoundWhole) {
     if(any(freq[!primary] != numRW[!primary,1])){
       warning("Mismatch between aggregated frequencies and decimals aggregated to whole numbers") 
     }
