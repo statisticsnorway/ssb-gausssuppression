@@ -76,6 +76,17 @@
 #'                               freqVar = "freq", 
 #'                               maxN = 1)
 #' FormulaSelection(output, ~(age + eu) * year)
+#' 
+#' 
+#' # To illustrate hierarchical_extend0 
+#' # (parameter to underlying function, SSBtools::Extend0fromModelMatrixInput)
+#' SuppressSmallCounts(data = SSBtoolsData("example1"), 
+#'                     formula = ~age * geo * eu, freqVar = "freq", 
+#'                     maxN = 0,  avoidHierarchical = TRUE)
+#' SuppressSmallCounts(data = SSBtoolsData("example1"), 
+#'                     formula = ~age * geo * eu, freqVar = "freq", 
+#'                     maxN = 0,  avoidHierarchical = TRUE,
+#'                     hierarchical_extend0 = TRUE) 
 #'                
 #'                
 #' # This example is similar to the one in the documentation of tables_by_formulas,  
