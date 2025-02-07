@@ -147,7 +147,7 @@ non-suppressed marginal cell with the value 0 that all underlying cells also hav
 value 0. The use of <code>singletonZeros = TRUE</code> is intended to prevent this phenomenon from
 causing suppressed cells to be revealable. It is the zeros in the <code>dominanceVar</code> variable
 that are examined. Specifically, the ordinary singleton method is combined with a method
-that is actually designed for frequency tables. This approach also works for volume
+that is actually designed for frequency tables. This approach also works for magnitude
 tables when <code><a href="SingletonUniqueContributor.html">SingletonUniqueContributor0</a></code> is utilized.</p></dd>
 
 
@@ -163,6 +163,10 @@ Necessary to include here since the specification in <code>spec</code> cannot ta
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>data frame containing aggregated data and suppression information.</p>
+    </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/tables_by_formulas.html" class="external-link">SSBtools::tables_by_formulas()</a></code></p></div>
     </div>
 
     <div class="section level2">
@@ -290,7 +294,7 @@ Necessary to include here since the specification in <code>spec</code> cannot ta
 <span class="r-out co"><span class="r-pr">#&gt;</span> 7            4     4    4    TRUE       TRUE</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"d2"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"d2"</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">]</span>   <span class="co"># Data considered as microdata</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">d2</span><span class="op">$</span><span class="va">v</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">d2</span><span class="op">)</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span></span></span>
 <span class="r-in"><span></span></span>
@@ -482,6 +486,49 @@ Necessary to include here since the specification in <code>spec</code> cannot ta
 <span class="r-out co"><span class="r-pr">#&gt;</span> 15    Spain private    6 253.5   FALSE       TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 16 Portugal  public    2  23.6    TRUE       TRUE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 17    Spain  public    2   9.2    TRUE       TRUE</span>
+<span class="r-in"><span>                      </span></span>
+<span class="r-in"><span>                      </span></span>
+<span class="r-in"><span><span class="co"># This example is similar to the one in the documentation of tables_by_formulas,  </span></span></span>
+<span class="r-in"><span><span class="co"># but it uses SuppressDominantCells with the pPercent and contributorVar parameters.  </span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/tables_by_formulas.html" class="external-link">tables_by_formulas</a></span><span class="op">(</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"magnitude1"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>                   table_fun <span class="op">=</span> <span class="va">SuppressDominantCells</span>, </span></span>
+<span class="r-in"><span>                   table_formulas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>table_1 <span class="op">=</span> <span class="op">~</span><span class="va">region</span> <span class="op">*</span> <span class="va">sector2</span>, </span></span>
+<span class="r-in"><span>                                         table_2 <span class="op">=</span> <span class="op">~</span><span class="va">region1</span><span class="op">:</span><span class="va">sector4</span> <span class="op">-</span> <span class="fl">1</span>, </span></span>
+<span class="r-in"><span>                                         table_3 <span class="op">=</span> <span class="op">~</span><span class="va">region</span> <span class="op">+</span> <span class="va">sector4</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                   substitute_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo"</span>, <span class="st">"eu"</span><span class="op">)</span>, region1 <span class="op">=</span> <span class="st">"eu"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                   collapse_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sector2"</span>, <span class="st">"sector4"</span><span class="op">)</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                   dominanceVar  <span class="op">=</span> <span class="st">"value"</span>, pPercent <span class="op">=</span> <span class="fl">10</span>, contributorVar <span class="op">=</span> <span class="st">"company"</span><span class="op">)</span>                       </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 20*6-&gt;20*7]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extraAggregate 20*7-&gt;10*7] Checking .....</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_numttHTT: ........::::</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      region        sector freq value primary suppressed table_1 table_2 table_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     Total         Total   20 462.3   FALSE      FALSE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Iceland         Total    4  37.1    TRUE       TRUE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Portugal         Total    8 162.5    TRUE       TRUE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     Spain         Total    8 262.7   FALSE      FALSE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        EU         Total   16 425.2   FALSE       TRUE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     nonEU         Total    4  37.1    TRUE       TRUE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     Total       private   16 429.5   FALSE      FALSE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     Total        public    4  32.8   FALSE      FALSE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     Total   Agriculture    4 240.2    TRUE       TRUE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    Total Entertainment    6 131.5   FALSE      FALSE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11    Total  Governmental    4  32.8   FALSE      FALSE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12    Total      Industry    6  57.8   FALSE       TRUE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  Iceland       private    4  37.1    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Portugal       private    6 138.9    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 Portugal        public    2  23.6    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16    Spain       private    6 253.5   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17    Spain        public    2   9.2    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18       EU       private   12 392.4   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19       EU        public    4  32.8   FALSE      FALSE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20    nonEU       private    4  37.1    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21       EU   Agriculture    4 240.2    TRUE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22       EU Entertainment    5 114.7   FALSE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23       EU  Governmental    4  32.8   FALSE      FALSE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24       EU      Industry    3  37.5   FALSE      FALSE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25    nonEU Entertainment    1  16.8    TRUE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26    nonEU      Industry    3  20.3   FALSE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-in"><span>                      </span></span>
 <span class="r-in"><span>                      </span></span>
 </code></pre></div>
     </div>

@@ -124,6 +124,10 @@ candidates for secondary suppression) might be of interest. The examples
 below illustrate how to override parameters specified by a spec. Note
 that this is only possible if <code>specLock = FALSE</code>.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p><code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/tables_by_formulas.html" class="external-link">SSBtools::tables_by_formulas()</a></code></p></div>
+    </div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -371,7 +375,133 @@ that this is only possible if <code>specLock = FALSE</code>.</p>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 36 Total nonEU  2015    3   FALSE      FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 37 Total    EU  2016   16   FALSE      FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 38 Total nonEU  2016    5   FALSE      FALSE</span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="co"># To illustrate hierarchical_extend0 </span></span></span>
+<span class="r-in"><span><span class="co"># (parameter to underlying function, SSBtools::Extend0fromModelMatrixInput)</span></span></span>
+<span class="r-in"><span><span class="fu">SuppressSmallCounts</span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"example1"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                    formula <span class="op">=</span> <span class="op">~</span><span class="va">age</span> <span class="op">*</span> <span class="va">geo</span> <span class="op">*</span> <span class="va">eu</span>, freqVar <span class="op">=</span> <span class="st">"freq"</span>, </span></span>
+<span class="r-in"><span>                    maxN <span class="op">=</span> <span class="fl">0</span>,  avoidHierarchical <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 18*4-&gt;24*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ...........................</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      age      geo    eu freq primary suppressed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Total    Total Total   59   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    old    Total Total   38   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  young    Total Total   21   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Total  Iceland Total   13   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Total Portugal Total   12   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Total    Spain Total   34   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  Total    Total    EU   46   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  Total    Total nonEU   13   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    old  Iceland Total   10   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   old Portugal Total   11   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   old    Spain Total   17   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 young  Iceland Total    3   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 young Portugal Total    1   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 young    Spain Total   17   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15   old    Total    EU   28   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16   old    Total nonEU   10   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 young    Total    EU   18   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 young    Total nonEU    3   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 Total  Iceland    EU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 Total  Iceland nonEU   13   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Total Portugal    EU   12   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22 Total Portugal nonEU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23 Total    Spain    EU   34   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24 Total    Spain nonEU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25   old  Iceland    EU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26   old  Iceland nonEU   10   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27   old Portugal    EU   11   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28   old Portugal nonEU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29   old    Spain    EU   17   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30   old    Spain nonEU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 31 young  Iceland    EU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 32 young  Iceland nonEU    3   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 33 young Portugal    EU    1   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 34 young Portugal nonEU    0    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35 young    Spain    EU   17   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36 young    Spain nonEU    0    TRUE       TRUE</span>
+<span class="r-in"><span><span class="fu">SuppressSmallCounts</span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"example1"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                    formula <span class="op">=</span> <span class="op">~</span><span class="va">age</span> <span class="op">*</span> <span class="va">geo</span> <span class="op">*</span> <span class="va">eu</span>, freqVar <span class="op">=</span> <span class="st">"freq"</span>, </span></span>
+<span class="r-in"><span>                    maxN <span class="op">=</span> <span class="fl">0</span>,  avoidHierarchical <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
+<span class="r-in"><span>                    hierarchical_extend0 <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 18*4-&gt;18*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      age      geo    eu freq primary suppressed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Total    Total Total   59   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    old    Total Total   38   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  young    Total Total   21   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Total  Iceland Total   13   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Total Portugal Total   12   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6  Total    Spain Total   34   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  Total    Total    EU   46   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  Total    Total nonEU   13   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    old  Iceland Total   10   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   old Portugal Total   11   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   old    Spain Total   17   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 young  Iceland Total    3   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 young Portugal Total    1   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 young    Spain Total   17   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15   old    Total    EU   28   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16   old    Total nonEU   10   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17 young    Total    EU   18   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18 young    Total nonEU    3   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19 Total  Iceland nonEU   13   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20 Total Portugal    EU   12   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21 Total    Spain    EU   34   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22   old  Iceland nonEU   10   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23   old Portugal    EU   11   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24   old    Spain    EU   17   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25 young  Iceland nonEU    3   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26 young Portugal    EU    1   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27 young    Spain    EU   17   FALSE      FALSE</span>
 <span class="r-in"><span>               </span></span>
+<span class="r-in"><span>               </span></span>
+<span class="r-in"><span><span class="co"># This example is similar to the one in the documentation of tables_by_formulas,  </span></span></span>
+<span class="r-in"><span><span class="co"># but it uses SuppressSmallCounts, and the input data (SSBtoolsData("magnitude1"))  </span></span></span>
+<span class="r-in"><span><span class="co"># is used to generate a frequency table by excluding the "value" variable. </span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/tables_by_formulas.html" class="external-link">tables_by_formulas</a></span><span class="op">(</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"magnitude1"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                   table_fun <span class="op">=</span> <span class="va">SuppressSmallCounts</span>, </span></span>
+<span class="r-in"><span>                   table_formulas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>table_1 <span class="op">=</span> <span class="op">~</span><span class="va">region</span> <span class="op">*</span> <span class="va">sector2</span>, </span></span>
+<span class="r-in"><span>                                         table_2 <span class="op">=</span> <span class="op">~</span><span class="va">region1</span><span class="op">:</span><span class="va">sector4</span> <span class="op">-</span> <span class="fl">1</span>, </span></span>
+<span class="r-in"><span>                                         table_3 <span class="op">=</span> <span class="op">~</span><span class="va">region</span> <span class="op">+</span> <span class="va">sector4</span> <span class="op">-</span> <span class="fl">1</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                   substitute_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo"</span>, <span class="st">"eu"</span><span class="op">)</span>, region1 <span class="op">=</span> <span class="st">"eu"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                   collapse_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sector2"</span>, <span class="st">"sector4"</span><span class="op">)</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                   maxN <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>                 </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 20*6-&gt;10*5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 10*5-&gt;12*5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ...................</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      region        sector freq primary suppressed table_1 table_2 table_3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     Total         Total   20   FALSE      FALSE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Iceland         Total    4   FALSE      FALSE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Portugal         Total    8   FALSE      FALSE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     Spain         Total    8   FALSE      FALSE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5        EU         Total   16   FALSE      FALSE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     nonEU         Total    4   FALSE      FALSE    TRUE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     Total       private   16   FALSE      FALSE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     Total        public    4   FALSE      FALSE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     Total   Agriculture    4   FALSE      FALSE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    Total Entertainment    6   FALSE      FALSE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11    Total  Governmental    4   FALSE      FALSE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12    Total      Industry    6   FALSE      FALSE   FALSE   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  Iceland       private    4   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14  Iceland        public    0    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 Portugal       private    6   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16 Portugal        public    2    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17    Spain       private    6   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18    Spain        public    2    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19       EU       private   12   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20       EU        public    4   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21    nonEU       private    4   FALSE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22    nonEU        public    0    TRUE       TRUE    TRUE   FALSE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23       EU   Agriculture    4   FALSE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 24       EU Entertainment    5   FALSE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 25       EU  Governmental    4   FALSE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 26       EU      Industry    3   FALSE      FALSE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 27    nonEU   Agriculture    0    TRUE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 28    nonEU Entertainment    1    TRUE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 29    nonEU  Governmental    0    TRUE       TRUE   FALSE    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 30    nonEU      Industry    3   FALSE      FALSE   FALSE    TRUE   FALSE</span>
+<span class="r-in"><span>                   </span></span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
