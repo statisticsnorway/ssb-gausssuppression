@@ -188,13 +188,29 @@ GaussSuppressDec = function(data,
     suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
     
     if (any(a$publish$suppressed != suppressionFromDecimals)) {
-      n_incorrectly_suppressed <- sum(!a$publish$suppressed & suppressionFromDecimals)
-      n_incorrectly_unsuppressed <- sum(a$publish$suppressed & !suppressionFromDecimals)
-      warning(paste(
-        "Mismatch between whole numbers and suppression:",
-        n_incorrectly_suppressed, "incorrectly suppressed,",
-        n_incorrectly_unsuppressed, "incorrectly unsuppressed."
-      ))
+      incorrectly_suppressed <- !a$publish$suppressed & suppressionFromDecimals
+      incorrectly_unsuppressed <- a$publish$suppressed & !suppressionFromDecimals
+      n_incorrectly_suppressed <- sum(incorrectly_suppressed)
+      n_incorrectly_unsuppressed <- sum(incorrectly_unsuppressed)
+      if (n_incorrectly_suppressed) {
+        show_var <- c(freqVar, numVar)[1]
+        max_incorrect_value <- round(max(a$publish[[show_var]][incorrectly_suppressed]), 1)
+        parenthesis1 <- paste0(" (", max_incorrect_value, " max ", show_var, ")")
+      } else {
+        parenthesis1 <- ""
+      }
+      if (n_incorrectly_unsuppressed) {
+        n_incorrectly_primary <- sum(incorrectly_unsuppressed & a$publish$primary)
+        parenthesis2 <- paste0(" (", n_incorrectly_primary, " primary)")
+      } else {
+        parenthesis2 <- ""
+      }
+      warning(paste0(
+        "Mismatch between whole numbers and suppression: ",
+        n_incorrectly_suppressed, " incorrectly suppressed", 
+        parenthesis1, ", ",
+        n_incorrectly_unsuppressed, " incorrectly unsuppressed", 
+        parenthesis2))
     }
   }
   
