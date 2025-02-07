@@ -1,6 +1,6 @@
 #' Few contributors suppression
 #' 
-#' This function provides functionality for suppressing volume tables based on
+#' This function provides functionality for suppressing magnitude tables based on
 #' the few contributors rule (\code{\link{NContributorsRule}}).
 #'
 #' @inheritParams GaussSuppressionFromData

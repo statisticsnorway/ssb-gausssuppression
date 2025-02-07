@@ -361,7 +361,7 @@ set.seed(12345)
 microdata$num <- sample(0:1000, nrow(microdata), replace = TRUE) 
 ```
 
-Then in order to construct a volume table where records' contributions to `num` are aggregated, we supply this as a parameter to `GaussSuppressionFromData`:
+Then in order to construct a magnitude table where records' contributions to `num` are aggregated, we supply this as a parameter to `GaussSuppressionFromData`:
 ```{r}
 GaussSuppressionFromData(data = microdata,
                          formula = ~ region * income2 + (county + size) * main_income,

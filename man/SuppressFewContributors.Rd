@@ -70,7 +70,7 @@ Columns \code{nRule} and \code{nAll} contain the number of contributors.
 In the former, \code{removeCodes} is taken into account.
 }
 \description{
-This function provides functionality for suppressing volume tables based on
+This function provides functionality for suppressing magnitude tables based on
 the few contributors rule (\code{\link{NContributorsRule}}).
 }
 \examples{

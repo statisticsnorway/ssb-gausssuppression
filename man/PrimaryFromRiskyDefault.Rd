@@ -44,7 +44,7 @@ For several \code{risky} cells, coordination takes place. See the comment below 
 d1 <- SSBtoolsData("d1")
 mm <- SSBtools::ModelMatrix(d1, dimVar = 1:2, crossTable = TRUE)
 x <- mm$modelMatrix
-y <- t(x) \%*\% d1$freq
+y <- Matrix::crossprod(x, d1$freq)
 
 risky <- c(13, 15, 40, 45)
 candidates <- c(1:12, 14, 16, 17, 19, 21, 21, 24, 26:37, 39, 42, 44)

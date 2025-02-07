@@ -16,4 +16,8 @@ SSBtools::FormulaSelection
 #' @export
 SSBtools::formula_selection
 
+#' @importFrom SSBtools tables_by_formulas
+#' @export
+SSBtools::tables_by_formulas
+
 

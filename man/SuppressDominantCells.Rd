@@ -73,7 +73,7 @@ non-suppressed marginal cell with the value 0 that all underlying cells also hav
 value 0. The use of \code{singletonZeros = TRUE} is intended to prevent this phenomenon from
 causing suppressed cells to be revealable. It is the zeros in the \code{dominanceVar} variable
 that are examined. Specifically, the ordinary singleton method is combined with a method
-that is actually designed for frequency tables. This approach also works for volume
+that is actually designed for frequency tables. This approach also works for magnitude
 tables when \code{\link{SingletonUniqueContributor0}} is utilized.}
 
 \item{preAggregate}{Parameter to \code{\link{GaussSuppressionFromData}}.
@@ -123,7 +123,7 @@ SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1
 primary = c(DominanceRule, NContributorsRule), maxN = 4, allDominance = TRUE)
 
 
-d2 <- SSBtoolsData("d2")
+d2 <- SSBtoolsData("d2")[1:4]   # Data considered as microdata
 set.seed(123)
 d2$v <- rnorm(nrow(d2))^2
 
@@ -158,4 +158,20 @@ output <- SuppressDominantCells(data = SSBtoolsData("magnitude1"),
                                 k = c(80, 99))
 FormulaSelection(output, ~sector2 * geo) 
                       
+                      
+# This example is similar to the one in the documentation of tables_by_formulas,  
+# but it uses SuppressDominantCells with the pPercent and contributorVar parameters.  
+tables_by_formulas(SSBtoolsData("magnitude1"),
+                   table_fun = SuppressDominantCells, 
+                   table_formulas = list(table_1 = ~region * sector2, 
+                                         table_2 = ~region1:sector4 - 1, 
+                                         table_3 = ~region + sector4 - 1), 
+                   substitute_vars = list(region = c("geo", "eu"), region1 = "eu"), 
+                   collapse_vars = list(sector = c("sector2", "sector4")), 
+                   dominanceVar  = "value", pPercent = 10, contributorVar = "company")                       
+                      
+                      
+}
+\seealso{
+\code{\link[SSBtools:tables_by_formulas]{SSBtools::tables_by_formulas()}}
 }

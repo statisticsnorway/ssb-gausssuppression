@@ -27,7 +27,7 @@
 #'    value 0. The use of `singletonZeros = TRUE` is intended to prevent this phenomenon from 
 #'    causing suppressed cells to be revealable. It is the zeros in the `dominanceVar` variable 
 #'    that are examined. Specifically, the ordinary singleton method is combined with a method 
-#'    that is actually designed for frequency tables. This approach also works for volume 
+#'    that is actually designed for frequency tables. This approach also works for magnitude 
 #'    tables when \code{\link{SingletonUniqueContributor0}} is utilized.
 #'    
 #' @param preAggregate Parameter to \code{\link{GaussSuppressionFromData}}.
@@ -35,6 +35,8 @@
 #'
 #' @return data frame containing aggregated data and suppression information.
 #' @export
+#' 
+#' @seealso [SSBtools::tables_by_formulas()]
 #' 
 #' @examples 
 #' num <- c(100,
@@ -72,7 +74,7 @@
 #' primary = c(DominanceRule, NContributorsRule), maxN = 4, allDominance = TRUE)
 #' 
 #' 
-#' d2 <- SSBtoolsData("d2")
+#' d2 <- SSBtoolsData("d2")[1:4]   # Data considered as microdata
 #' set.seed(123)
 #' d2$v <- rnorm(nrow(d2))^2
 #' 
@@ -106,6 +108,19 @@
 #'                                 contributorVar = "company", 
 #'                                 k = c(80, 99))
 #' FormulaSelection(output, ~sector2 * geo) 
+#'                       
+#'                       
+#' # This example is similar to the one in the documentation of tables_by_formulas,  
+#' # but it uses SuppressDominantCells with the pPercent and contributorVar parameters.  
+#' tables_by_formulas(SSBtoolsData("magnitude1"),
+#'                    table_fun = SuppressDominantCells, 
+#'                    table_formulas = list(table_1 = ~region * sector2, 
+#'                                          table_2 = ~region1:sector4 - 1, 
+#'                                          table_3 = ~region + sector4 - 1), 
+#'                    substitute_vars = list(region = c("geo", "eu"), region1 = "eu"), 
+#'                    collapse_vars = list(sector = c("sector2", "sector4")), 
+#'                    dominanceVar  = "value", pPercent = 10, contributorVar = "company")                       
+#'                       
 #'                       
 SuppressDominantCells <- function(data,
                                   n = 1:length(k),
