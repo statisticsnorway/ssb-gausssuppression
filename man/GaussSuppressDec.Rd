@@ -7,7 +7,9 @@
 GaussSuppressDec(
   data,
   ...,
+  fun = GaussSuppressionFromData,
   output = NULL,
+  use_freqVar = NA,
   digits = 9,
   nRep = NULL,
   rmse = pi/3,
@@ -26,7 +28,23 @@ GaussSuppressDec(
 
 \item{...}{Further parameters to \code{\link{GaussSuppressionFromData}}}
 
+\item{fun}{A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
+\code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.}
+
 \item{output}{NULL (default), \code{"publish"}, \code{"inner"}, \code{"publish_inner"}, or \code{"publish_inner_x"} (x also).}
+
+\item{use_freqVar}{Logical (\code{TRUE}/\code{FALSE}) with a default value of \code{NA}. Determines whether the variable
+\code{freqVar} is used as the basis for generating decimal numbers.
+If \code{NA}, the parameter is set to \code{TRUE}, except in the following cases, where it is set to \code{FALSE}:
+\itemize{
+\item If \code{freqVar} is not available.
+\item If \code{runIpf} is \code{FALSE} and \code{fun} is one of the functions \code{SuppressFewContributors} or \code{SuppressDominantCells}.
+}
+
+When \code{use_freqVar} is \code{FALSE}, only zeros are used instead. This approach is more robust in practice,
+as decimal numbers can then be stored more accurately.
+The default value is chosen to ensure compatibility with existing code and to allow for the use of \code{freqVar}
+when dealing with frequency tables, which may be useful.}
 
 \item{digits}{Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.}
 
@@ -61,13 +79,31 @@ to published cells (aggregated) and some not (not aggregated).}
 A data frame where inner cells and cells to be published are combined or output according to parameter \code{output}.
 }
 \description{
-\code{\link{GaussSuppressionFromData}} is run and decimal numbers are added to output by
-a modified (for sparse matrix efficiency) version of \code{\link[RegSDC]{SuppressDec}}.
+\code{\link{GaussSuppressionFromData}}, or one of its wrappers, is run and decimal numbers are added to output by
+executing  \code{\link[RegSDC]{SuppressDec}}.
 }
 \examples{
-z1 <- SSBtoolsData("z1")
-GaussSuppressDec(z1, 1:2, 3)
-GaussSuppressDec(z1, freqVar = "ant", formula = ~ region + hovedint, maxN = 10)
+a <- GaussSuppressDec(data = SSBtoolsData("example1"), 
+                      fun = SuppressSmallCounts, 
+                      dimVar = c("age", "geo"),
+                      preAggregate = TRUE, 
+                      freqVar = "freq", maxN = 3)
+a                       
+                 
+
+b <- GaussSuppressDec(data = SSBtoolsData("magnitude1"), 
+                      fun = SuppressDominantCells, 
+                      numVar = "value", 
+                      formula = ~sector2 * geo + sector4 * eu,
+                      contributorVar = "company", k = c(80, 99))
+b  
+ 
+# FormulaSelection() works on this output as well 
+FormulaSelection(b, ~sector2 * geo)                       
+                      
+}
+\seealso{
+\code{\link[=SuppressionFromDecimals]{SuppressionFromDecimals()}}
 }
 \author{
 Øyvind Langrsud

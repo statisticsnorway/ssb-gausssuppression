@@ -3,12 +3,25 @@
 
 #' Cell suppression with synthetic decimal numbers
 #' 
-#' \code{\link{GaussSuppressionFromData}} is run and decimal numbers are added to output by
-#' a modified (for sparse matrix efficiency) version of \code{\link[RegSDC]{SuppressDec}}. 
+#' \code{\link{GaussSuppressionFromData}}, or one of its wrappers, is run and decimal numbers are added to output by
+#' executing  \code{\link[RegSDC]{SuppressDec}}. 
 #'
 #' @param data Input daata as a data frame 
 #' @param ... Further parameters to \code{\link{GaussSuppressionFromData}}
+#' @param fun A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
+#'              \code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.
 #' @param output NULL (default), `"publish"`, `"inner"`, `"publish_inner"`, or `"publish_inner_x"` (x also).
+#' @param use_freqVar Logical (`TRUE`/`FALSE`) with a default value of `NA`. Determines whether the variable  
+#'   `freqVar` is used as the basis for generating decimal numbers. 
+#'   If `NA`, the parameter is set to `TRUE`, except in the following cases, where it is set to `FALSE`:
+#'   - If `freqVar` is not available.
+#'   - If `runIpf` is `FALSE` and `fun` is one of the functions `SuppressFewContributors` or `SuppressDominantCells`.
+#' 
+#'   When `use_freqVar` is `FALSE`, only zeros are used instead. This approach is more robust in practice, 
+#'   as decimal numbers can then be stored more accurately. 
+#'   The default value is chosen to ensure compatibility with existing code and to allow for the use of `freqVar` 
+#'   when dealing with frequency tables, which may be useful.
+
 #' @param digits Parameter to \code{\link[SSBtools]{RoundWhole}}. Values close to whole numbers will be rounded.
 #' @param nRep NULL or an integer. When >1, several decimal numbers will be generated.
 #' @param rmse Desired root mean square error of decimal numbers. 
@@ -29,21 +42,41 @@
 #'                                 to published cells (aggregated) and some not (not aggregated).
 #' @return A data frame where inner cells and cells to be published are combined or output according to parameter `output`. 
 #' 
-#' @importFrom SSBtools RoundWhole Match Mipf
+#' @importFrom SSBtools RoundWhole Match Mipf RbindAll
 #' @importFrom RegSDC SuppressDec
 #' @importFrom Matrix crossprod
 #' @importFrom stats runif
 #' @export
 #' 
 #' @author Øyvind Langrsud
+#' 
+#' @seealso [SuppressionFromDecimals()]
+#' 
 #'
 #' @examples
-#' z1 <- SSBtoolsData("z1")
-#' GaussSuppressDec(z1, 1:2, 3)
-#' GaussSuppressDec(z1, freqVar = "ant", formula = ~ region + hovedint, maxN = 10)
+#' a <- GaussSuppressDec(data = SSBtoolsData("example1"), 
+#'                       fun = SuppressSmallCounts, 
+#'                       dimVar = c("age", "geo"),
+#'                       preAggregate = TRUE, 
+#'                       freqVar = "freq", maxN = 3)
+#' a                       
+#'                  
+#' 
+#' b <- GaussSuppressDec(data = SSBtoolsData("magnitude1"), 
+#'                       fun = SuppressDominantCells, 
+#'                       numVar = "value", 
+#'                       formula = ~sector2 * geo + sector4 * eu,
+#'                       contributorVar = "company", k = c(80, 99))
+#' b  
+#'  
+#' # FormulaSelection() works on this output as well 
+#' FormulaSelection(b, ~sector2 * geo)                       
+#'                       
 GaussSuppressDec = function(data, 
                             ..., 
+                            fun = GaussSuppressionFromData,
                             output = NULL, 
+                            use_freqVar = NA,
                             digits = 9, 
                             nRep = NULL,
                             rmse = pi/3,
@@ -80,7 +113,7 @@ GaussSuppressDec = function(data,
     freqDecNames <- paste0("freqDec", paste(seq_len(nRep)))[seq_len(nRep)]
   }
   
-  a <- GaussSuppressionFromData(data, ..., output = "publish_inner_x")
+  a <- fun(data, ..., output = "publish_inner_x")
   
   startRow <- attr(a$publish, "startRow", exact = TRUE)
 
@@ -89,12 +122,34 @@ GaussSuppressDec = function(data,
   numVar <- attr(a$inner, "numVar")
   
   dimVarPub <- colnames(a$publish)
-  # dimVarPub <- dimVarPub[!(dimVarPub %in% c("freq", "primary", "suppressed", "weight", numVar))]
-  dimVarPub <- dimVarPub[!(dimVarPub %in% c(freqVar, "primary", "suppressed", weightVar, numVar))]
+  dimVarPub <- dimVarPub[!(dimVarPub %in% c(freqVar, "primary", "suppressed", weightVar, numVar, MoreVars(...)))]
   dimVarPub <- dimVarPub[(dimVarPub %in% colnames(a$inner))]
   
-  z <- as.matrix(a$publish[freqVar])
-  y <- as.matrix(a$inner[freqVar])
+  
+  if (is.na(use_freqVar)) {
+    use_freqVar <- TRUE
+    if (!length(freqVar)) {
+      use_freqVar <- FALSE
+    } else {
+      if (!runIpf) {
+        if (identical(fun, SuppressFewContributors))
+          use_freqVar <- FALSE
+        if (identical(fun, SuppressDominantCells))
+          use_freqVar <- FALSE
+      }
+    }
+  }
+  
+  if (use_freqVar) {
+    freq_for_dec_publish <- a$publish[[freqVar]]
+    freq_for_dec_inner <- a$inner[[freqVar]]
+  } else {
+    freq_for_dec_publish <- rep(0L, nrow(a$publish))
+    freq_for_dec_inner <- rep(0L, nrow(a$inner))
+  }
+  
+  z <- as.matrix(freq_for_dec_publish)
+  y <- as.matrix(freq_for_dec_inner)
   
   if (nRep) {
     yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
@@ -130,10 +185,33 @@ GaussSuppressDec = function(data,
     }
     
     # Re-use primary-function originally made for SuppressionFromDecimals
-    suppressionFromDecimals <- PrimaryDecimals(freq = a$publish[[freqVar]], num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
+    suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
     
-    if (any(a$publish$suppressed != suppressionFromDecimals))
-      warning("Mismatch between whole numbers and suppression.")
+    if (any(a$publish$suppressed != suppressionFromDecimals)) {
+      incorrectly_suppressed <- !a$publish$suppressed & suppressionFromDecimals
+      incorrectly_unsuppressed <- a$publish$suppressed & !suppressionFromDecimals
+      n_incorrectly_suppressed <- sum(incorrectly_suppressed)
+      n_incorrectly_unsuppressed <- sum(incorrectly_unsuppressed)
+      if (n_incorrectly_suppressed) {
+        show_var <- c(freqVar, numVar)[1]
+        max_incorrect_value <- round(max(a$publish[[show_var]][incorrectly_suppressed]), 1)
+        parenthesis1 <- paste0(" (", max_incorrect_value, " max ", show_var, ")")
+      } else {
+        parenthesis1 <- ""
+      }
+      if (n_incorrectly_unsuppressed) {
+        n_incorrectly_primary <- sum(incorrectly_unsuppressed & a$publish$primary)
+        parenthesis2 <- paste0(" (", n_incorrectly_primary, " primary)")
+      } else {
+        parenthesis2 <- ""
+      }
+      warning(paste0(
+        "Mismatch between whole numbers and suppression: ",
+        n_incorrectly_suppressed, " incorrectly suppressed", 
+        parenthesis1, ", ",
+        n_incorrectly_unsuppressed, " incorrectly unsuppressed", 
+        parenthesis2))
+    }
   }
   
   if (!is.null(startRow)) {
@@ -161,34 +239,66 @@ GaussSuppressDec = function(data,
   a$publish$isInner[ma[!is.na(ma)]] <- TRUE
   
   if (!anyNA(ma)) {
-    if(anyDuplicated_ma & !is.null(whenDuplicatedInner)){
-      whenDuplicatedInner("Duplicated inner rows aggregated.")
+    if (anyDuplicated_ma & !is.null(whenDuplicatedInner)) {
+      whenDuplicatedInner("Duplicated inner rows identified. Aggregation applied to some variables.")
     }
+  } else {
+    if (anyDuplicated_ma & !is.null(whenMixedDuplicatedInner)) {
+      whenMixedDuplicatedInner("Duplicated inner rows identified. Aggregation applied to some variables in some rows.")
+    }
+  }
+  
+  extra_inner <- which(!(names(a$inner) %in% names(a$publish)))
+  extra_inner_to_publish <- integer(0)
+  if (length(extra_inner)) {
+    ma_rows <- !is.na(ma)
+    ma_ok <- ma[ma_rows]
+    ma_unique <- unique(ma_ok)
+    n_ma_unique <- length(ma_unique)
+    if (anyDuplicated_ma) {
+      for (i in extra_inner) {  
+        if (nrow(unique(cbind(ma_ok, a$inner[ma_rows, i]))) == n_ma_unique) {
+          # Variable is ok when equal value in duplicate rows. 
+          # Only one of them will be copied to a$publish
+          extra_inner_to_publish <- c(extra_inner_to_publish, i)
+        }
+      }
+    } else {
+      extra_inner_to_publish <- extra_inner
+    }
+  }
+  extra_inner_to_remove <- extra_inner[!(extra_inner %in% extra_inner_to_publish)]
+  if (length(extra_inner_to_publish)) {
+    extra_inner_to_publish <- names(a$inner)[extra_inner_to_publish]
+    a$publish[extra_inner_to_publish] <- NA
+    if (length(ma_unique)) {
+      a$publish[ma_unique, extra_inner_to_publish] <- a$inner[match(ma_unique, ma), extra_inner_to_publish]
+    }
+  }
+  if (length(extra_inner_to_remove)) {
+    a$inner <- a$inner[-extra_inner_to_remove]
+  }
+  
+  
+  if (!anyNA(ma)) {
     return(a$publish)
   }
   
-  if(anyDuplicated_ma & !is.null(whenMixedDuplicatedInner)){
-    whenMixedDuplicatedInner("Duplicated inner rows, some aggregated.")
-  }
+  a$inner <- a$inner[is.na(ma), , drop = FALSE]
   
-  a$inner <- a$inner[is.na(ma), unique(c(dimVarPub, numVar, freqDecNames, freqVar, weightVar)), drop = FALSE]
-  
-  # rename in a way that takes into account possible overlap between freqVar, weightVar, numVar
-  #  renameIndex <- ncol(a$inner)
-  #  if (length(weightVar)) {
-  #    names(a$inner)[renameIndex] <- "weight"
-  #    renameIndex <- renameIndex - 1L
-  #  }
-  #  if (length(freqVar)) {   # but never 0 in current application
-  #    names(a$inner)[renameIndex] <- "freq"
-  #  }
-
   a$inner$isPublish <- FALSE
   a$inner$isInner <- TRUE
   
-  a$inner$primary <- NA
-  a$inner$suppressed <- NA
   
-  rbind(a$publish, a$inner)
+  if (!is.null(startRow)) {
+    startRow <-   c(startRow, StaRt_InneR = nrow(a$publish) + 1L)
+  }
   
+  a <- RbindAll(a$publish, a$inner)
+  
+  if (!is.null(startRow)) {
+    attr(a, "startRow") <- startRow
+  }
+  
+  a
 }
