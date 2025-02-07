@@ -1,4 +1,4 @@
-## GaussSuppression	x.x.x
+## GaussSuppression	0.9.5
 * New pkgdown website for the package  
   - This package now has a documentation site at [https://statisticsnorway.github.io/ssb-gausssuppression/](https://statisticsnorway.github.io/ssb-gausssuppression/).
 * Matrix are moved from Depends to Imports  
