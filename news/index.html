@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,26 @@
       <small>Source: <a href="https://github.com/statisticsnorway/ssb-gausssuppression/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.9.5" id="gausssuppression-095">GaussSuppression 0.9.5<a class="anchor" aria-label="anchor" href="#gausssuppression-095"></a></h2><p class="text-muted">CRAN release: 2025-02-07</p>
+<ul><li>New pkgdown website for the package
+<ul><li>This package now has a documentation site at <a href="https://statisticsnorway.github.io/ssb-gausssuppression/">https://statisticsnorway.github.io/ssb-gausssuppression/</a>.</li>
+</ul></li>
+<li>Matrix are moved from Depends to Imports
+<ul><li>To follow best practices for R packages</li>
+</ul></li>
+<li>Utilizing updates in <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">the SSBtools package</a> (version 1.7.0).
+<ul><li>The new function <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/tables_by_formulas.html" class="external-link">tables_by_formulas()</a></code>, which is now reexported, is demonstrated in a <code><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts()</a></code> example and a <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code> example.<br></li>
+<li>The new function <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/Extend0fromModelMatrixInput.html" class="external-link">Extend0fromModelMatrixInput()</a></code> is now used in data pre-processing. As a result, <code>hierarchical_extend0</code> is now a possible parameter, as illustrated in a <code><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts()</a></code> example.</li>
+</ul></li>
+<li>Improvements to GaussSuppressDec() and SuppressionFromDecimals()
+<ul><li>GaussSuppressDec() now accepts wrappers as input, such as SuppressSmallCounts() and SuppressDominantCells().</li>
+<li>Added new parameter <code>use_freqVar</code> to allow decimal numbers to be generated solely from 0s, improving stability.</li>
+<li>All output variables from the underlying function are now included in the default output of GaussSuppressDec().</li>
+<li>FormulaSelection() now works correctly with output from GaussSuppressDec().</li>
+<li>SuppressionFromDecimals() has been updated accordingly. In particular, automation is now implemented to detect whether decimal numbers are generated from 0s or from frequencies.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.9.2" id="gausssuppression-092">GaussSuppression 0.9.2<a class="anchor" aria-label="anchor" href="#gausssuppression-092"></a></h2><p class="text-muted">CRAN release: 2024-12-09</p>
 <ul><li>Added a check to ensure that at least one of <code>dimVar</code>, <code>hierarchies</code>, or <code>formula</code> is specified.
