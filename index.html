@@ -55,12 +55,47 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="gausssuppression">GaussSuppression<a class="anchor" aria-label="anchor" href="#gausssuppression"></a>
+<div class="page-header"><h1 id="r-package-gausssuppression">R package GaussSuppression<a class="anchor" aria-label="anchor" href="#r-package-gausssuppression"></a>
 </h1></div>
+<table class="table">
+<colgroup>
+<col width="30%">
+<col width="4%">
+<col width="30%">
+<col width="4%">
+<col width="30%">
+</colgroup>
+<thead><tr class="header">
+<th><a href="https://cran.r-project.org/package=GaussSuppression" class="external-link">GaussSuppression on CRAN</a></th>
+<th></th>
+<th><a href="https://statisticsnorway.github.io/ssb-gausssuppression/">pkgdown website</a></th>
+<th></th>
+<th><a href="https://github.com/statisticsnorway/ssb-gausssuppression" class="external-link">GitHub Repository</a></th>
+</tr></thead>
+<tbody></tbody>
+</table>
+<hr>
 <p><a href="http://www.awesomeofficialstatistics.org" class="external-link"><img src="https://awesome.re/mentioned-badge.svg" alt="Mentioned in Awesome Official Statistics"></a></p>
-<p>R-package to protect tables by suppression using the Gaussian elimination algorithm</p>
+<div class="section level2">
+<h2 id="r-package-to-protect-tables-by-suppression-using-the-gaussian-elimination-algorithm">R-package to protect tables by suppression using the Gaussian elimination algorithm<a class="anchor" aria-label="anchor" href="#r-package-to-protect-tables-by-suppression-using-the-gaussian-elimination-algorithm"></a>
+</h2>
+<p>A statistical disclosure control tool to protect tables by suppression using the Gaussian elimination secondary suppression algorithm <a href="https://doi.org/10.1007%2F978-3-031-69651-0_6" class="external-link">(Langsrud, 2024)</a>. A suggestion is to start by working with functions <a href="https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressSmallCounts.html">SuppressSmallCounts()</a> and <a href="https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDominantCells.html">SuppressDominantCells()</a>. These functions use primary suppression functions for the minimum frequency rule and the dominance rule, respectively. Novel functionality for suppression of disclosive cells is also included. General primary suppression functions can be supplied as input to the general working horse function, <a href="https://statisticsnorway.github.io/ssb-gausssuppression/reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a>. Suppressed frequencies can be replaced by synthetic decimal numbers as described in <a href="https://doi.org/10.1007%2Fs11222-018-9848-9" class="external-link">Langsrud (2019)</a>.</p>
+<hr>
+<p>📌 See the <a href="https://statisticsnorway.github.io/ssb-gausssuppression/reference/index.html">broader list of available functions</a>.</p>
+<hr>
+<p>See the package vignettes: <a href="https://cran.r-project.org/web/packages/GaussSuppression/vignettes/Magnitude_table_suppression.html" class="external-link">Magnitude table suppression</a>, <a href="https://cran.r-project.org/web/packages/GaussSuppression/vignettes/Small_count_frequency_table_suppression.html" class="external-link">Small count frequency table suppression</a>, <a href="https://cran.r-project.org/web/packages/GaussSuppression/vignettes/define_tables.html" class="external-link">Defining tables for GaussSuppression</a>.</p>
+<hr>
+<div class="section level3">
+<h3 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h3>
+<p>You can install GaussSuppression from CRAN with</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"GaussSuppression"</span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively install from GitHub by<code>devtools::install_github("statisticsnorway/ssb-gausssuppression")</code> if you want to test the newest changes.</p>
 <hr>
 <p>Official version on CRAN: <a href="https://cran.r-project.org/package=GaussSuppression" class="external-link">https://cran.r-project.org/package=GaussSuppression</a></p>
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><div class="links">
 <h2 data-toc-skip>Links</h2>
