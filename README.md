@@ -1,5 +1,5 @@
 
-# R package GaussSuppression 
+# R package GaussSuppression <img src="man/figures/logo.png" align="right" height="150" /> 
 
 
 | [GaussSuppression on CRAN](https://cran.r-project.org/package=GaussSuppression) |  | [pkgdown website](https://statisticsnorway.github.io/ssb-gausssuppression/) |  | [GitHub Repository](https://github.com/statisticsnorway/ssb-gausssuppression) |
