@@ -1,6 +1,7 @@
 README.md
 LICENSE.md
 SECURITY.md
+cran-comments.md
 ^.*\.Rproj$
 ^\.Rproj\.user$
 .bat

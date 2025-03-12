@@ -1,0 +1,1 @@
+I consider the re-building-vignette error (r-oldrel-macos-arm64) about the missing ‘systemfonts’ package a false positive, since it is triggered by a Suggests-dependency (kableExtra), which in turn relies on svglite → systemfonts. Other packages that indirectly depend on ‘systemfonts’—via Imports—do not trigger this error (including 'kableExtra', 'svglite' and 'tidyverse').
