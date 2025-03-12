@@ -5,7 +5,7 @@ articles:
   define_tables: define_tables.html
   Magnitude_table_suppression: Magnitude_table_suppression.html
   Small_count_frequency_table_suppression: Small_count_frequency_table_suppression.html
-last_built: 2025-02-07T13:47Z
+last_built: 2025-03-12T14:31Z
 urls:
   reference: https://statisticsnorway.github.io/ssb-gausssuppression/reference
   article: https://statisticsnorway.github.io/ssb-gausssuppression/articles
