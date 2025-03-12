@@ -74,8 +74,18 @@ PrimaryDecimals <- function(freq, num, nDec, digitsPrimary, onlyZerosRoundWhole 
   }
   
   if (is.na(onlyZerosRoundWhole)) {   # See comments below 
-    conf_int <- t.test(as.vector(as.matrix(num)))$conf.int
+    t_test <- t.test(as.vector(as.matrix(num)))
+    conf_int <- t_test$conf.int
+    if (anyNA(conf_int)) {     # NA occurs when 0 variance 
+      conf_int <- range(num)
+      p_value <- as.numeric(conf_int[2] == 0)
+    } else {
+      p_value <- t_test$p.value
+    }
     onlyZerosRoundWhole <- (max(abs(conf_int)) < 0.1) & (length(unique(sign(conf_int))) == 2)
+    sureNotOnlyZeros <- p_value < 1e-12
+  } else {
+    sureNotOnlyZeros <- !onlyZerosRoundWhole
   }
   
   numRW = RoundWhole(num, digits = digitsPrimary, onlyZeros = onlyZerosRoundWhole)
@@ -83,7 +93,7 @@ PrimaryDecimals <- function(freq, num, nDec, digitsPrimary, onlyZerosRoundWhole 
   primary = !(rowSums(numRW == round(num)) == nDec)
   
   
-  if (!is.null(freq) & !onlyZerosRoundWhole) {
+  if (!is.null(freq) & sureNotOnlyZeros) {
     if(any(freq[!primary] != numRW[!primary,1])){
       warning("Mismatch between aggregated frequencies and decimals aggregated to whole numbers") 
     }

@@ -1,3 +1,17 @@
+
+## GaussSuppression	x.x.x
+* Misleading warnings in `SuppressionFromDecimals()` are now prevented.  
+  - The update to version 0.9.5 could cause the warning  
+    *"Mismatch between aggregated frequencies and decimals aggregated to whole numbers"*  
+    to appear incorrectly with small datasets. This has now been fixed.
+* Preparation for a slight improvement to a singleton method in the next version of SSBtools (> 1.7.0).  
+  - The method described as `elimination` (4th character) in `?SSBtools::NumSingleton` will be slightly improved.  
+  - Tests in the GaussSuppression package have been updated to accommodate this change.
+* A hexagon sticker logo is now visible on the 
+  [pkgdown website](https://statisticsnorway.github.io/ssb-gausssuppression/) and the 
+  [GitHub repository](https://github.com/statisticsnorway/ssb-gausssuppression).
+
+
 ## GaussSuppression	0.9.5
 * New pkgdown website for the package  
   - This package now has a documentation site at [https://statisticsnorway.github.io/ssb-gausssuppression/](https://statisticsnorway.github.io/ssb-gausssuppression/).

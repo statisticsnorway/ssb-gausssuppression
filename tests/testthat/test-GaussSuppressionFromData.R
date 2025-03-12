@@ -451,9 +451,20 @@ test_that("More NumSingleton", {
     
   }
   
-  expect_equal(sum_suppressed, c(8, 11, 13, 13, 11, 13, 13, 10, 11, 13, 13, 11, 13, 13, 10, 
-                                 11, 13, 13, 11, 13, 13, 7, 9, 10, 12, 10, 11, 12, 8, 10, 10, 
-                                 12, 11, 11, 12, 8, 10, 10, 12, 11, 11, 12))  
+  sum_suppressed_expected <- c(8, 11, 13, 13, 11, 13, 13, 10, 11, 13, 13, 11, 13, 13, 10, 
+                               11, 13, 13, 11, 13, 13, 7, 9, 10, 12, 10, 11, 12, 8, 10, 10, 
+                               12, 11, 11, 12, 8, 10, 10, 12, 11, 11, 12)
+  
+  # The examples were selected by finding a seed where the 4th character being `t` or `T` 
+  # previously made a difference, which is rare in small datasets.  However, due to the 
+  # improvement in SSBtools v1.7.3, the method using `t` looks perfect, so changing from
+  # `t` to `T` no longer affects the result.
+  if (compareVersion(as.character(packageVersion("SSBtools")), "1.7.3") >= 0) { 
+    inds <- c(23, 24, 30, 31, 37, 38)
+    sum_suppressed_expected[inds] <- sum_suppressed_expected[inds + 3]
+  }
+  
+  expect_equal(sum_suppressed, sum_suppressed_expected)  
   
 })
 
