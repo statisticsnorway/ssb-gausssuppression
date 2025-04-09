@@ -41,7 +41,8 @@ GaussSuppressionFromData(
   aggregatePackage = "base",
   aggregateNA = TRUE,
   aggregateBaseOrder = FALSE,
-  rowGroupsPackage = aggregatePackage
+  rowGroupsPackage = aggregatePackage,
+  linkedGauss = NULL
 )
 }
 \arguments{

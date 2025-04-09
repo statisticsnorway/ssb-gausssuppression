@@ -165,7 +165,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -248,7 +248,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            aggregatePackage = "base",
                            aggregateNA = TRUE,
                            aggregateBaseOrder = FALSE,
-                           rowGroupsPackage = aggregatePackage 
+                           rowGroupsPackage = aggregatePackage,
+                           linkedGauss = NULL
                            ){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
@@ -275,6 +276,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
     stop("spec must be a properly named list")
   }
+  
+  
+  CheckInput(linkedGauss, type = "character", alt = c("global", "consistent", "local"), okNULL = TRUE)
   
   
   # Possible development function as input
@@ -677,13 +681,31 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     rm(data)
   } 
   
+  table_memberships <- NULL
+  cell_grouping <- NULL
+  if (!is.null(linkedGauss)) {
+    if (linkedGauss %in% c("consistent", "local")) {
+      table_formulas <- attr(formula, "table_formulas")
+      if (is.null(table_formulas)) {
+        stop("missing formula attribute, table_formulas")
+      }
+      table_memberships <- as.data.frame(matrix(NA, ncol(x), length(table_formulas)))
+      names(table_memberships) <- names(table_formulas)
+      
+      for (i in seq_along(table_formulas)) {
+        table_memberships[[i]] <- SSBtools::formula_selection(x, table_formulas[[i]], logical = TRUE)
+      }
+      cell_grouping <- linkedGauss == "consistent"
+    }
+  }
+  
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, ...)
   }
   
   # Use of special temporary feature
