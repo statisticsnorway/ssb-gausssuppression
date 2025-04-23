@@ -52,8 +52,6 @@ This function solves linear programs to determine interval boundaries
 for suppressed cells.
 }
 \details{
-This function is still experimental.
-
 Default in for \code{bounds} parameter in \code{Rsymphony_solve_LP} and \code{Rglpk_solve_LP}:
 \emph{The default for each variable is a bound between 0 and \code{Inf}.}
 Details in \code{lpSolve}: \emph{Note that every variable is assumed to be \verb{>= 0}!}

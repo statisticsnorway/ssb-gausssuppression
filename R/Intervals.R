@@ -4,8 +4,6 @@
 #'
 #' This function solves linear programs to determine interval boundaries
 #' for suppressed cells.
-#'
-#' This function is still experimental.
 #' 
 #' Default in for `bounds` parameter in `Rsymphony_solve_LP` and `Rglpk_solve_LP`: 
 #' _The default for each variable is a bound between 0 and `Inf`._
