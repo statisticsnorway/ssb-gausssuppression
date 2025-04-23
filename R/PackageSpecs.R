@@ -88,7 +88,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
   )
   
   if (printTable) {
-    if (!require("knitr", character.only = TRUE, quietly = TRUE)) {
+    if (!requireNamespace("knitr", quietly = TRUE)) {
       message(paste0("Package '", "knitr", "' is not available."))
       return(NULL)
     }

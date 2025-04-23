@@ -281,7 +281,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     output <- "publish"
   } else {
     if (!is.null(lpPackage)) {
-      if (!require(lpPackage, character.only = TRUE, quietly = TRUE)) {
+      if (!requireNamespace(lpPackage, quietly = TRUE)) {
         stop(paste0("Package '", lpPackage, "' is not available."))
       }
       if (hasArg(rangePercent) | hasArg(rangeMin)) {

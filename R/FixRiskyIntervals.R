@@ -34,7 +34,7 @@ FixRiskyIntervals <-
     if (!lpPackage %in% c("lpSolve", "Rsymphony", "Rglpk", "highs"))
       stop("Only 'lpSolve', 'Rsymphony' and 'Rglpk' solvers are supported.")
     
-    if (!require(lpPackage, character.only = TRUE,  quietly = TRUE)) {
+    if (!requireNamespace(lpPackage,  quietly = TRUE)) {
       stop(paste0("Package '", lpPackage, "' is not available."))
     }
     
