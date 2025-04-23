@@ -365,6 +365,10 @@ highsVal <- function(max, obj, mat, dir, rhs, types) {
   
   maximum <- max
   
+  if(length(types) == 1){
+    types <- rep(types, length(L))
+  }
+  
   solution <- highs::highs_solve(
     Q = NULL,  
     L = L,
