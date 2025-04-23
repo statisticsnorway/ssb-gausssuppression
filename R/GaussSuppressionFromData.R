@@ -159,7 +159,8 @@
 #' @param rowGroupsPackage Parameter `pkg` to \code{\link[SSBtools]{RowGroups}}.
 #'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
 #'               via \code{\link[SSBtools]{ModelMatrix}}. 
-#'                           
+#'
+#' @param linkedGauss See \link{parameter_linkedGauss}.                            
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'

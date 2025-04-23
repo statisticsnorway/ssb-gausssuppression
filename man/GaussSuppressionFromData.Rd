@@ -196,6 +196,8 @@ The parameter will have impact when, e.g \code{output = "inner"}.}
 \item{rowGroupsPackage}{Parameter \code{pkg} to \code{\link[SSBtools]{RowGroups}}.
 The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}}
 via \code{\link[SSBtools]{ModelMatrix}}.}
+
+\item{linkedGauss}{See \link{parameter_linkedGauss}.}
 }
 \value{
 Aggregated data with suppression information
