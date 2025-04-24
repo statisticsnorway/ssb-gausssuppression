@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1481,6 +1481,142 @@ standard handling of the singleton problem.</p>
 be calculated to be two. Since zeros are never suppressed, the only
 possible values for these two cells are two ones.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="intervals">Intervals<a class="anchor" aria-label="anchor" href="#intervals"></a>
+</h2>
+<p>Intervals for the primarily suppressed cells are computed whenever
+the <code>lpPackage</code> parameter is specified. Additionally, if
+<code>rangePercent</code> and/or <code>rangeMin</code> are provided,
+further suppression is performed to ensure that the interval width
+requirements are met. See the documentation for the
+<code>lpPackage</code> parameter in
+<code><a href="../reference/GaussSuppressionFromData.html">?GaussSuppressionFromData</a></code> for more details.</p>
+<p>In the example below, the interval widths are 4 after applying the
+standard Gaussian suppression algorithm. Since a minimum width of 5 is
+required, the two cells for Spain are additionally suppressed.</p>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dataset</span>, </span>
+<span>                              formula <span class="op">=</span> <span class="op">~</span><span class="va">age</span><span class="op">*</span><span class="va">geo</span>,  </span>
+<span>                              freqVar <span class="op">=</span> <span class="st">"freq"</span>, </span>
+<span>                              maxN <span class="op">=</span> <span class="fl">3</span>, </span>
+<span>                              rangeMin <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>                              lpPackage <span class="op">=</span> <span class="st">"Rglpk"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [extend0 18*3-&gt;18*3]</span></span>
+<span><span class="co">#&gt; GaussSuppression_anySum: ..........</span></span>
+<span><span class="co">#&gt; (18*8-DDrow-&gt;6*8-&gt;-0exact-&gt;4*5-GaussI-&gt;4*3)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Using Rglpk for intervals...</span></span>
+<span><span class="co">#&gt; --</span></span>
+<span><span class="co">#&gt; (18*8-DDrow-&gt;6*8-&gt;)</span></span>
+<span><span class="co">#&gt; ........</span></span>
+<span><span class="co">#&gt; 5+1-4-</span></span>
+<span><span class="co">#&gt;   4: 1 new, (17.00) 2-3-</span></span>
+<span><span class="co">#&gt;   3: 2 new, (17.00) 2+1+</span></span>
+<span><span class="co">#&gt; GaussSuppression_none: ......</span></span>
+<span><span class="co">#&gt; (18*6-DDrow-&gt;6*6-&gt;-0exact-&gt;6*6-GaussI-&gt;6*4)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Using Rglpk for intervals...</span></span>
+<span><span class="co">#&gt; --</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span> </span>
+<span><span class="co">#&gt;      age      geo freq rlim_freq lo_1 up_1 lo up suppressed_integer primary</span></span>
+<span><span class="co">#&gt; 7    old  Iceland   10        NA   NA   NA NA NA                  2   FALSE</span></span>
+<span><span class="co">#&gt; 8    old Portugal   11        NA   NA   NA NA NA                  2   FALSE</span></span>
+<span><span class="co">#&gt; 9    old    Spain   17        NA   NA   NA NA NA                  3   FALSE</span></span>
+<span><span class="co">#&gt; 10 young  Iceland    3         5    0    4  0 13                  1    TRUE</span></span>
+<span><span class="co">#&gt; 11 young Portugal    1         5    0    4  0 12                  1    TRUE</span></span>
+<span><span class="co">#&gt; 12 young    Spain   17        NA   NA   NA NA NA                  3   FALSE</span></span>
+<span><span class="co">#&gt;    suppressed</span></span>
+<span><span class="co">#&gt; 7        TRUE</span></span>
+<span><span class="co">#&gt; 8        TRUE</span></span>
+<span><span class="co">#&gt; 9        TRUE</span></span>
+<span><span class="co">#&gt; 10       TRUE</span></span>
+<span><span class="co">#&gt; 11       TRUE</span></span>
+<span><span class="co">#&gt; 12       TRUE</span></span></code></pre></div>
+<p><br></p>
+<p>In the formatted output shown in Table 9 below, the final intervals
+are given in parentheses.</p>
+<br><p style="text-align: center;">
+<font size="3"> <strong>Table 9</strong>: Output from
+<code>SuppressSmallCounts</code> with <code>formula = ~age*geo</code>,
+<code>maxN = 3</code>, <code>rangeMin = 5</code>,
+<code>lpPackage = "Rglpk"</code> </font>
+</p>
+<table class="table table table-bordered" style="font-size: 14px; ">
+<thead><tr>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+age
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Iceland
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Portugal
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Spain
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Total
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:right;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+young
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">3
+[0, 13]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">1
+[0, 12]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="     color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">17</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">21</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+old
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="     color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">10</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="     color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">11</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="     color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">17</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">38</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">13</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">12</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">34</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">59</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

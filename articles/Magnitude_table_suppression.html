@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.9.8</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -1934,6 +1934,221 @@ consequently <em>Entertainment:Iceland</em>. In Table 3,
 due to advanced singleton handling. In fact, by using
 <code>singletonMethod = "none"</code>, all tables above will be
 suppressed differently.</p>
+</div>
+<div class="section level2">
+<h2 id="intervals">Intervals<a class="anchor" aria-label="anchor" href="#intervals"></a>
+</h2>
+<p>Intervals for the primarily suppressed cells are computed whenever
+the <code>lpPackage</code> parameter is specified. Additionally, if
+<code>rangePercent</code> and/or <code>rangeMin</code> are provided,
+further suppression is performed to ensure that the interval width
+requirements are met. See the documentation for the
+<code>lpPackage</code> parameter in
+<code><a href="../reference/GaussSuppressionFromData.html">?GaussSuppressionFromData</a></code> for more details.</p>
+<p>In the example below, the interval widths for output lines 12, 14,
+17, and 20 are 60.7, which is too narrow since a minimum width of 80 is
+required. Therefore, the cell on line 16 is additionally suppressed</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SuppressDominantCells.html">SuppressDominantCells</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">dataset</span>, </span>
+<span>                                numVar <span class="op">=</span> <span class="st">"value"</span>, </span>
+<span>                                dimVar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo"</span>, <span class="st">"sector2"</span>, <span class="st">"sector4"</span><span class="op">)</span>, </span>
+<span>                                pPercent <span class="op">=</span> <span class="fl">30</span>, </span>
+<span>                                rangePercent <span class="op">=</span> <span class="fl">70</span>, rangeMin <span class="op">=</span> <span class="fl">80</span>, </span>
+<span>                                lpPackage <span class="op">=</span> <span class="st">"Rglpk"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [extraAggregate 20*4-&gt;10*5] Checking ....</span></span>
+<span><span class="co">#&gt; GaussSuppression_numttHTT: ............</span></span>
+<span><span class="co">#&gt; (10*8-DDcol-&gt;10*6-0exact-&gt;10*5-GaussI-&gt;10*5)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Using Rglpk for intervals...</span></span>
+<span><span class="co">#&gt; -----------</span></span>
+<span><span class="co">#&gt; (10*8-DDcol-&gt;10*6-DDrow-&gt;9*6-&gt;)</span></span>
+<span><span class="co">#&gt; ......</span></span>
+<span><span class="co">#&gt; 4+1-3+2-</span></span>
+<span><span class="co">#&gt;   2: 1 new, (138.9) 1+</span></span>
+<span><span class="co">#&gt; GaussSuppression_none: ......</span></span>
+<span><span class="co">#&gt; (10*7-DDcol-&gt;10*5-0exact-&gt;10*4-GaussI-&gt;10*4)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Using Rglpk for intervals...</span></span>
+<span><span class="co">#&gt; -----------</span></span>
+<span><span class="va">output</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">14</span>, <span class="fl">16</span>, <span class="fl">17</span>, <span class="fl">20</span>, <span class="fl">25</span><span class="op">)</span>, <span class="op">]</span> <span class="co"># some output lines </span></span>
+<span><span class="co">#&gt;         geo       sector4 value rlim_value  lo_1  up_1   lo    up</span></span>
+<span><span class="co">#&gt; 12  Iceland Entertainment  16.8      80.00   0.0  60.7  0.0 131.5</span></span>
+<span><span class="co">#&gt; 14  Iceland      Industry  20.3      80.00   0.0  60.7  0.0  90.6</span></span>
+<span><span class="co">#&gt; 16 Portugal       private 138.9         NA    NA    NA   NA    NA</span></span>
+<span><span class="co">#&gt; 17 Portugal        public  23.6      80.00   0.0  60.7  0.0  90.6</span></span>
+<span><span class="co">#&gt; 20 Portugal  Governmental  23.6      80.00   0.0  60.7  0.0  90.6</span></span>
+<span><span class="co">#&gt; 25    Spain   Agriculture 139.8      97.86 101.3 240.2 40.6 240.2</span></span>
+<span><span class="co">#&gt;    suppressed_integer primary suppressed</span></span>
+<span><span class="co">#&gt; 12                  1    TRUE       TRUE</span></span>
+<span><span class="co">#&gt; 14                  1    TRUE       TRUE</span></span>
+<span><span class="co">#&gt; 16                  3   FALSE       TRUE</span></span>
+<span><span class="co">#&gt; 17                  1    TRUE       TRUE</span></span>
+<span><span class="co">#&gt; 20                  1    TRUE       TRUE</span></span>
+<span><span class="co">#&gt; 25                  1    TRUE       TRUE</span></span></code></pre></div>
+<p><br></p>
+<p>In the formatted output shown in Table 10 below, the final intervals
+are given in parentheses.</p>
+<br><table class="table table table-bordered" style="font-size: 14px; ">
+<caption style="font-size: initial !important;">
+<strong>Table 10</strong>: Output from
+<code>SuppressDominantCells</code> with <code>pPercent = 30</code>,
+<code>rangePercent = 70</code>, <code>rangeMin = 80</code>,
+<code>lpPackage = "Rglpk"</code>
+</caption>
+<thead><tr>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+sector4
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Iceland
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Portugal
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Spain
+</th>
+<th style="text-align:right;font-weight: bold;background-color: rgba(144, 204, 147, 255) !important;">
+Total
+</th>
+</tr></thead>
+<tbody>
+<tr>
+<td style="text-align:right;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+Agriculture
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="     ">0</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">100.4
+[0, 199.6]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">139.8
+[40.6, 240.2]</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">240.2</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+Entertainment
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">16.8
+[0, 131.5]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">9.4
+[0, 131.5]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">105.3
+[0, 131.5]</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">131.5</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+Governmental
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="     ">0</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">23.6
+[0, 90.6]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">9.2
+[0, 90.6]</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;   text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">32.8
+[0, 90.6]</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+Industry
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">20.3
+[0, 90.6]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">29.1
+[0, 90.6]</span>
+</td>
+<td style="text-align:right;border-right:1px solid LightGray;">
+<span style="    text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">8.4
+[0, 90.6]</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">57.8</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+private
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">37.1</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">138.9</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">253.5</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">429.5</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+public
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">0</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;   text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">23.6
+[0, 90.6]</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;   text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">9.2
+[0, 90.6]</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;   text-decoration: underline; color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: red !important;">32.8
+[0, 90.6]</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;background-color: rgba(227, 241, 230, 255) !important;border-left:1px solid LightGray;border-right:1px solid LightGray;">
+Total
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">37.1</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    color: white !important;border-radius: 4px; padding-right: 4px; padding-left: 4px; background-color: rgba(143, 0, 239, 255) !important;">162.5</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">262.7</span>
+</td>
+<td style="text-align:right;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;font-weight: bold;background-color: rgba(220, 241, 252, 255) !important;border-right:1px solid LightGray;">
+<span style=" font-weight: bold;    ">462.3</span>
+</td>
+</tr>
+</tbody>
+</table>
+<p><br></p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
