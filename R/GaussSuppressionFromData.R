@@ -143,9 +143,6 @@
 #'        Intervals, `[lo_1, up_1]`, are intervals calculated prior to additional suppression.         
 #'    * **`rangePercent`:** Required interval width expressed as a percentage
 #'    * **`rangeMin`:** Minimum required width of the interval
-#'    
-#'                   Please note that interval calculations may have a 
-#'                   different interface in future versions.
 #'                                 
 #' @param aggregatePackage Package used to preAggregate/extraAggregate. 
 #'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
@@ -284,7 +281,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     output <- "publish"
   } else {
     if (!is.null(lpPackage)) {
-      if (!require(lpPackage, character.only = TRUE, quietly = TRUE)) {
+      if (!requireNamespace(lpPackage, quietly = TRUE)) {
         stop(paste0("Package '", lpPackage, "' is not available."))
       }
       if (hasArg(rangePercent) | hasArg(rangeMin)) {

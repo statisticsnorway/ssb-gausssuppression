@@ -4,8 +4,6 @@
 #'
 #' This function solves linear programs to determine interval boundaries
 #' for suppressed cells.
-#'
-#' This function is still experimental.
 #' 
 #' Default in for `bounds` parameter in `Rsymphony_solve_LP` and `Rglpk_solve_LP`: 
 #' _The default for each variable is a bound between 0 and `Inf`._
@@ -56,7 +54,7 @@ ComputeIntervals <-
     if (!lpPackage %in% c("lpSolve", "Rsymphony", "Rglpk", "highs"))
       stop("Only 'lpSolve', 'Rsymphony' and 'Rglpk' solvers are supported.")
     
-    if (!require(lpPackage, character.only = TRUE,  quietly = TRUE)) {
+    if (!requireNamespace(lpPackage,  quietly = TRUE)) {
       stop(paste0("Package '", lpPackage, "' is not available."))
     }
     
@@ -364,6 +362,10 @@ highsVal <- function(max, obj, mat, dir, rhs, types) {
   lhs[dir == "<="] = -Inf
   
   maximum <- max
+  
+  if(length(types) == 1){
+    types <- rep(types, length(L))
+  }
   
   solution <- highs::highs_solve(
     Q = NULL,  

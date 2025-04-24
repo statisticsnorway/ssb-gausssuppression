@@ -173,10 +173,6 @@ Intervals, \verb{[lo_1, up_1]}, are intervals calculated prior to additional sup
 \itemize{
 \item \strong{\code{rangePercent}:} Required interval width expressed as a percentage
 \item \strong{\code{rangeMin}:} Minimum required width of the interval
-
-\if{html}{\out{<div class="sourceCode">}}\preformatted{         Please note that interval calculations may have a 
-         different interface in future versions.
-}\if{html}{\out{</div>}}
 }
 }}
 

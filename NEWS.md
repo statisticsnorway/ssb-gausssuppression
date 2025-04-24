@@ -1,3 +1,12 @@
+## GaussSuppression	1.0.0
+* The package has been stable and in practical use for a long time. The release of version 1.0.0 is therefore appropriate.
+* Interval examples are now included in the vignettes.
+* Progress information during extra suppression to meet interval width requirements now counts down instead of up, making it easier to interpret.
+* Updated to support the latest 
+  [highs](https://CRAN.R-project.org/package=highs) 
+  version (1.9.0-1) for interval computation.
+* The warning about interval calculations being experimental has been removed.
+
 
 ## GaussSuppression	0.9.6
 * Misleading warnings in `SuppressionFromDecimals()` are now prevented.  
