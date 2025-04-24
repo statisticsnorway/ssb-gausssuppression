@@ -88,6 +88,10 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
   )
   
   if (printTable) {
+    if (!requireNamespace("knitr", quietly = TRUE)) {
+      message(paste0("Package '", "knitr", "' is not available."))
+      return(NULL)
+    }
     rows <- unique(unlist(lapply(specList, names)))
     rows <- rows[rows != ""]
     pt <- NULL

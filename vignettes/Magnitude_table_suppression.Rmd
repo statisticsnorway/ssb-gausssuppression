@@ -322,9 +322,50 @@ In Table 3, *Governmental:Total* and  *Industry:Total* are suppressed due to adv
 In fact, by using `singletonMethod = "none"`, all tables above will be suppressed differently.
 
 
+## Intervals
+
+Intervals for the primarily suppressed cells are computed whenever the `lpPackage` parameter is specified. 
+Additionally, if `rangePercent` and/or `rangeMin` are provided, further suppression is performed to ensure 
+that the interval width requirements are met. 
+See the documentation for the `lpPackage` parameter in `?GaussSuppressionFromData` for more details.
+
+In the example below, the interval widths for output lines 12, 14, 17, and 20 are 60.7, 
+which is too narrow since a minimum width of 80 is required. 
+Therefore, the cell on line 16 is additionally suppressed
 
 
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (!requireNamespace("Rglpk", quietly = TRUE)) {
+  cat("Note: The final part of this vignette requires the suggested package 'Rglpk', which is not installed. That part has been skipped.\n")
+  knitr::knit_exit()
+}
+```
 
 
+```{r}
+output <- SuppressDominantCells(data = dataset, 
+                                numVar = "value", 
+                                dimVar = c("geo", "sector2", "sector4"), 
+                                pPercent = 30, 
+                                rangePercent = 70, rangeMin = 80, 
+                                lpPackage = "Rglpk")
+output[c(12, 14, 16, 17, 20, 25), ] # some output lines 
+```
+\
 
+In the formatted output shown in Table 10 below, the final intervals are given in parentheses.
+
+\
+```{r echo=FALSE}
+P(caption = '**Table 10**: Output from `SuppressDominantCells`  with `pPercent = 30`, `rangePercent = 70`, `rangeMin = 80`, `lpPackage = "Rglpk"`',
+  data=dataset, 
+  numVar = "value", 
+  dimVar = c("geo", "sector2", "sector4"), 
+  pPercent = 30, 
+  rangePercent = 70, rangeMin = 80, 
+  lpPackage = "Rglpk",
+  fun = SuppressDominantCells, 
+  print_expr = 'ifelse(is.na(lo), value, paste0(value, " [", lo, ", ", up, "]"))')
+```
+\
 

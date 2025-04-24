@@ -130,9 +130,11 @@ G <- function(data, dimVar = NULL, freqVar = NULL,
               font_size = 14,   # Codes found in s will be ordered as in s
               s = c("young", "old", "Iceland", "Portugal", "Spain", "nonEU", "EU")) {
   
-  out <- fun(data = data, 
-             hierarchies = hierarchies, formula = formula, dimVar = dimVar, 
-             freqVar = freqVar, printInc = FALSE, ...)
+  
+  capture.output({
+    out <- fun(data = data, 
+               hierarchies = hierarchies, formula = formula, dimVar = dimVar, 
+               freqVar = freqVar, printInc = FALSE, ...)})
   dimVar <- NamesFromModelMatrixInput(data = data, 
                                       hierarchies = hierarchies, formula = formula, dimVar = dimVar, ...)
   dimVar <- dimVar[dimVar %in% names(out)]

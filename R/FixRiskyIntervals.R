@@ -34,7 +34,7 @@ FixRiskyIntervals <-
     if (!lpPackage %in% c("lpSolve", "Rsymphony", "Rglpk", "highs"))
       stop("Only 'lpSolve', 'Rsymphony' and 'Rglpk' solvers are supported.")
     
-    if (!require(lpPackage, character.only = TRUE,  quietly = TRUE)) {
+    if (!requireNamespace(lpPackage,  quietly = TRUE)) {
       stop(paste0("Package '", lpPackage, "' is not available."))
     }
     
@@ -239,6 +239,8 @@ FixRiskyIntervals <-
     verboseFix <- TRUE
     nline <- 10
     
+    nz <- length(a$z)
+    
     for (k in seq_along(so)) {
       
       i <- abs(so[k])
@@ -253,7 +255,7 @@ FixRiskyIntervals <-
             nline <- 0
           }
           nline <- nline + 1
-          cat(i)
+          cat(nz + 1L - i)
         }
         # cat("----", i, "---------\n")
         
@@ -310,7 +312,7 @@ FixRiskyIntervals <-
           
           if (verboseFix) {
             # cat("\n=== ", i, " out of", length(a$z), "==  ", length(extra_suppressed), " new primary ====\n")
-            cat("\n  ",i, ": ", length(extra_suppressed), " new, ",  "(", adjust_precision(a$z[i]),  ") ",  sep ="")
+            cat("\n  ",nz + 1L - i, ": ", length(extra_suppressed), " new, ",  "(", adjust_precision(a$z[i]),  ") ",  sep ="")
             nline <- 0
           }
         }

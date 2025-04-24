@@ -1,7 +1,7 @@
 test_that("FixRiskyIntervals", {
   lpPackage <- "Rglpk"
   skip_if_not_installed(lpPackage)
-  if (require(lpPackage, character.only = TRUE, quietly = TRUE)) {
+  if (requireNamespace(lpPackage, quietly = TRUE)) {
     z3 <- SSBtoolsData("z3")
     upper <- z3$region %in% LETTERS
     z3$region[upper] <- paste0(z3$region[upper], 2)

@@ -342,4 +342,49 @@ Then the sum of *young:2016:Iceland* and *young:2016:Portugal* can easily be cal
 Since zeros are never suppressed, the only possible values for these two cells are two ones.
 
 
+## Intervals
+
+Intervals for the primarily suppressed cells are computed whenever the `lpPackage` parameter is specified. 
+Additionally, if `rangePercent` and/or `rangeMin` are provided, further suppression is performed to ensure 
+that the interval width requirements are met. 
+See the documentation for the `lpPackage` parameter in `?GaussSuppressionFromData` for more details.
+
+
+In the example below, the interval widths are 4 after applying the standard Gaussian suppression algorithm. 
+Since a minimum width of 5 is required, the two cells for Spain are additionally suppressed.
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+if (!requireNamespace("Rglpk", quietly = TRUE)) {
+  cat("Note: The final part of this vignette requires the suggested package 'Rglpk', which is not installed. That part has been skipped.\n")
+  knitr::knit_exit()
+}
+```
+
+```{r}
+output <- SuppressSmallCounts(data = dataset, 
+                              formula = ~age*geo,  
+                              freqVar = "freq", 
+                              maxN = 3, 
+                              rangeMin = 5,
+                              lpPackage = "Rglpk")
+tail(output) 
+```
+\
+
+In the formatted output shown in Table 9 below, the final intervals are given in parentheses.
+
+\
+ <p style="text-align: center;"> <font size = 3> **Table 9**: Output from `SuppressSmallCounts`  with `formula = ~age*geo`, `maxN = 3`, `rangeMin = 5`, `lpPackage = "Rglpk"` </font> </p>
+```{r echo=FALSE}
+P(data=dataset, 
+  formula = ~age*geo,  
+  freqVar = "freq", 
+  maxN = 3, 
+  rangeMin = 5,
+  lpPackage = "Rglpk",
+  print_expr = 'ifelse(is.na(lo), freq, paste0(freq, " [", lo, ", ", up, "]"))')
+```
+\
+
 
