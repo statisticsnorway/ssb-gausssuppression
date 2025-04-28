@@ -4,11 +4,13 @@
 \alias{parameter_linkedGauss}
 \title{About the linkedGauss parameter}
 \description{
-About the linkedGauss parameter
+Possible non-NULL values of \code{linkedGauss} are \code{"global"}, \code{"local"}, \code{"consistent"} and \code{"back-tracking"}.
+Associated parameters that can be set are \code{recordAware} and the two
+back-tracking parameters \code{sequential} and \code{iterBackTracking}.
 }
 \examples{
 
-for (linkedGauss in c("global", "consistent", "local")) {
+for (linkedGauss in c("global", "local", "consistent", "back-tracking")) {
    cat("\n======================  linkedGauss = ", linkedGauss, "=================\n")
    output <- tables_by_formulas(SSBtoolsData("magnitude1"),
                    table_fun = SuppressDominantCells, 

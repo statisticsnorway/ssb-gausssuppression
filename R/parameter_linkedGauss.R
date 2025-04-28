@@ -2,9 +2,15 @@
 #' 
 #' @title About the linkedGauss parameter
 #' 
+#' @description 
+#' Possible non-NULL values of `linkedGauss` are `"global"`, `"local"`, `"consistent"` and `"back-tracking"`.
+#' Associated parameters that can be set are `recordAware` and the two  
+#' back-tracking parameters `sequential` and `iterBackTracking`.
+#' 
+#' 
 #' @examples
 #' 
-#' for (linkedGauss in c("global", "consistent", "local")) {
+#' for (linkedGauss in c("global", "local", "consistent", "back-tracking")) {
 #'    cat("\n======================  linkedGauss = ", linkedGauss, "=================\n")
 #'    output <- tables_by_formulas(SSBtoolsData("magnitude1"),
 #'                    table_fun = SuppressDominantCells, 

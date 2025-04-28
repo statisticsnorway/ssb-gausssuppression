@@ -157,7 +157,8 @@
 #'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
 #'               via \code{\link[SSBtools]{ModelMatrix}}. 
 #'
-#' @param linkedGauss See \link{parameter_linkedGauss}.                            
+#' @param linkedGauss See \link{parameter_linkedGauss}. 
+#' @param recordAware Parameter associated with `linkedGauss`. See \link{parameter_linkedGauss}.  
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
@@ -247,7 +248,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            aggregateNA = TRUE,
                            aggregateBaseOrder = FALSE,
                            rowGroupsPackage = aggregatePackage,
-                           linkedGauss = NULL
+                           linkedGauss = NULL,
+                           recordAware = TRUE
                            ){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
@@ -276,7 +278,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
-  CheckInput(linkedGauss, type = "character", alt = c("global", "consistent", "local"), okNULL = TRUE)
+  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking"), okNULL = TRUE)
   
   
   # Possible development function as input
@@ -682,7 +684,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   table_memberships <- NULL
   cell_grouping <- NULL
   if (!is.null(linkedGauss)) {
-    if (linkedGauss %in% c("consistent", "local")) {
+    if (linkedGauss %in% c("local", "consistent", "back-tracking")) {
       table_formulas <- attr(formula, "table_formulas")
       if (is.null(table_formulas)) {
         stop("missing formula attribute, table_formulas")
@@ -693,7 +695,14 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       for (i in seq_along(table_formulas)) {
         table_memberships[[i]] <- SSBtools::formula_selection(x, table_formulas[[i]], logical = TRUE)
       }
+      if (recordAware) {
+        table_memberships <- record_consistent_table_memberships(table_memberships, x, aggregatePackage)
+      }
       cell_grouping <- linkedGauss == "consistent"
+      if (linkedGauss == "back-tracking") {
+        GaussSuppression <- BackTrackingGauss
+        cell_grouping <- NULL
+      }
     }
   }
   
@@ -870,4 +879,25 @@ MoreVars = function(sWeightVar = character(0), ...){
 
 
 
+record_consistent_table_memberships <- function(table_memberships, x, aggregatePackage) {
+  dd <- DummyDuplicated(x, idx = TRUE, rnd = TRUE)
+  table_dd <- table(dd)
+  table_dd <- table_dd[table_dd > 1]
+  dd_duplicated <- as.integer(names(table_dd))
+  selected <- dd %in% dd_duplicated
+  selected_dd <- data.frame(selected_dd = dd[selected])
+  
+  selected_memberships <- aggregate_by_pkg(data = cbind(selected_dd, table_memberships[selected, ]), 
+                                           by = "selected_dd", 
+                                           var = names(table_memberships), 
+                                           pkg = aggregatePackage,
+                                           fun = sum)
+  for (i in SeqInc(2, ncol(selected_memberships))) {
+    selected_memberships[[i]] <- as.logical(selected_memberships[[i]])
+  }
+  ma <- match(dd, selected_memberships[[1]])
+  
+  table_memberships[!is.na(ma), ] <- selected_memberships[ma[!is.na(ma)], -1]
+  table_memberships
+}
 
