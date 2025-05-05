@@ -307,10 +307,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
-                     "primary", "secondary", "all")))
+                     "primary", "secondary", "all", "pre_gauss_env")))
     stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions",
          "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
-                     "primary", "secondary", "all")')
+                     "primary", "secondary", "all", "pre_gauss_env")')
   
   
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x", "all")
@@ -705,6 +705,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       }
     }
   }
+  
+  if (output == "pre_gauss_env") {
+    rm(data)    # data needed when output %in% c("all", "publish_inner_x", "publish_inner")
+    env <- environment()
+    return(env)
+  }
+  
   
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
