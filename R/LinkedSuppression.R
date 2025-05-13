@@ -7,6 +7,7 @@
 #' @param ... Arguments to `fun` that are not kept constant.
 #' @param withinArg A list of named lists. Arguments to `fun` that are not kept constant.
 #' @param linkedGauss  See \link{parameter_linkedGauss}. 
+#' @param recordAware  See \link{parameter_linkedGauss}.
 #' @param iterBackTracking See \link{parameter_linkedGauss}.
 #' @param whenEmptyUnsuppressed Parameter to \code{\link[SSBtools]{GaussSuppression}}.
 #'
@@ -37,6 +38,7 @@
 #' # 'A' 'annet'/'arbeid' suppressed in b[[1]], since suppressed in b[[3]].
 #' b <- LinkedSuppression(fun = SuppressSmallCounts,
 #'      linkedGauss = "back-tracking",  
+#'      recordAware = FALSE,
 #'      withinArg = list(
 #'        list(data = z1, dimVar = 1:2, freqVar = 3, maxN = 5), 
 #'        list(data = z2b, dimVar = 1:2, freqVar = 3, maxN = 5), 
@@ -46,9 +48,12 @@ LinkedSuppression <- function(fun,
                               ..., 
                               withinArg = NULL, 
                               linkedGauss,
+                              recordAware = TRUE,
                               iterBackTracking = Inf,
                               whenEmptyUnsuppressed = NULL) {
-  SSBtools::CheckInput(linkedGauss, type = "character", alt = c("local", "consistent", "back-tracking"), okNULL = FALSE)
+  SSBtools::CheckInput(linkedGauss, type = "character", alt = c("local", "consistent", "back-tracking", "back-tracking-old"), okNULL = FALSE)
+  
+
   if (linkedGauss == "consistent") {
     stop("not yet implemented")
   }
@@ -70,6 +75,15 @@ LinkedSuppression <- function(fun,
   
   sysCall <- c(sysCall["fun"], sysCall[!(names(sysCall) %in% removeArgs)])
   
+  if (recordAware) {
+    if (is.null(data)) {
+      stop("data as constant parameter needed when recordAware is TRUE")
+    }
+    data <- cbind(data, rnd_7(nrow(data)))
+    sysCall[["data"]] <- data
+    sysCall$r_rnd <- paste0("r_rnd_", 1:7)
+  }
+  
   env_list <- vector("list", length(withinArg))
   
   for (i in seq_along(withinArg)) {
@@ -82,9 +96,15 @@ LinkedSuppression <- function(fun,
     }
   }
   
+  n <- length(withinArg)
+  
   primary_list <- lapply(env_list, function(x) x$primary)
-  secondary_list <- rep(list(integer(0)), length(withinArg))
-  totCode_list <- vector("list", length(withinArg))
+  secondary_list <- rep(list(integer(0)), n)
+  totCode_list <- vector("list", n)
+  
+  
+  
+  crossTable_list <- lapply(env_list, function(x) x$crossTable)
   
   suppressedData <- lapply(env_list, function(x) x$crossTable)
   
@@ -93,10 +113,18 @@ LinkedSuppression <- function(fun,
     totCode_list[[i]] <- FindTotCode2(env_list[[i]]$x, crossTable = env_list[[i]]$crossTable)
   }
   
-  n <- length(withinArg)
+  
+  r_rnd_7_list <- lapply(env_list, function(x) x$r_rnd)
   
   
-  if (linkedGauss == "back-tracking") {
+  if (recordAware) {
+    dup_id <- duplicated_id_rnd(r_rnd_7_list = r_rnd_7_list, code0 = TRUE, totCode_list = totCode_list, crossTable_list = crossTable_list)
+  } else {
+    dup_id <- duplicated_id_code(totCode_list = totCode_list, crossTable_list = crossTable_list)
+  }
+  
+  
+  if (linkedGauss %in% c("back-tracking", "back-tracking-old")) {
     maxJ <- iterBackTracking * n
   } else {
     maxJ <- n
@@ -104,12 +132,65 @@ LinkedSuppression <- function(fun,
   
   j <- 0L
   nSuppressedIsPrimary <- 0L
+  
+
+  if (linkedGauss %in% c("back-tracking", "local")) {
+    if (!is.logical(primary_list[[1]])) {
+      stop("Primary must be logical in current implementation")
+    }
+    primary_list_updated <- primary_list
+    if (linkedGauss == "back-tracking") {
+      for (i in seq_along(primary_list)) {
+        primary_list_updated <- update_primary_list(primary_list_updated, i, primary_list[[i]], dup_id)
+      }
+    }
+    while (j < maxJ) {
+      j <- j + 1L
+      i <- 1L + ((j - 1L)%%n)
+      cat(i, "\n")
+      
+      secondary_list[[i]] <- GaussSuppression(x = env_list[[i]]$x, candidates = env_list[[i]]$candidates, primary = primary_list_updated[[i]], forced = env_list[[i]]$forced, hidden = env_list[[i]]$hidden, singleton = env_list[[i]]$singleton,
+                                              singletonMethod = env_list[[i]]$singletonMethod, printInc = env_list[[i]]$printInc, whenEmptyUnsuppressed = whenEmptyUnsuppressed, xExtraPrimary = env_list[[i]]$xExtraPrimary, unsafeAsNegative = TRUE)  # dot-dot-dot not include for now 
+      
+      if (linkedGauss == "back-tracking") {
+        primary_list_updated <- update_primary_list(primary_list_updated, i, secondary_list[[i]], dup_id)
+      }
+      
+      if (length(secondary_list[[i]]) == 0) {
+        nSuppressedIsPrimary <- nSuppressedIsPrimary + 1L
+      } else {
+        nSuppressedIsPrimary <- 0L
+      }
+      if (nSuppressedIsPrimary == n) {
+        break
+      }
+      
+    }
+    if (linkedGauss == "back-tracking" & nSuppressedIsPrimary != n) {
+      warning("Iteration limit exceeded")
+    }
+    
+    for (i in seq_len(n)) {
+      secondary <- primary_list_updated[[i]] & !primary_list[[i]]
+      env_list[[i]]$secondary <- which(secondary)
+    }
+    
+    for (i in seq_along(suppressedData)) {
+      environment(TailGaussSuppressionFromData) <- env_list[[i]]
+      suppressedData[[i]] <- TailGaussSuppressionFromData()
+    }
+    
+    return(suppressedData)
+    
+  }
+  
+  
   while (j < maxJ) {
     j <- j + 1L
     i <- 1L + ((j - 1L)%%n)
     cat(i, "\n")
     
-    if (linkedGauss == "back-tracking") {
+    if (linkedGauss == "back-tracking-old") {
       suppressedData[[i]]$suppressed[PrimaryFromSuppressedData(x = env_list[[i]]$x, 
                                                                crossTable = env_list[[i]]$crossTable, 
                                                                suppressedData = suppressedData, 
@@ -132,7 +213,7 @@ LinkedSuppression <- function(fun,
     
   }
   
-  if (linkedGauss == "back-tracking" & nSuppressedIsPrimary != n) {
+  if (linkedGauss == "back-tracking-old" & nSuppressedIsPrimary != n) {
     warning("Iteration limit exceeded")
   }
   
@@ -148,3 +229,118 @@ LinkedSuppression <- function(fun,
   
   suppressedData
 }
+
+
+
+
+
+
+
+# Copy of SSBtools:::Sample_Symmetric_integer.maxa 
+Sample_Symmetric_integer.max <- function(size, replace = FALSE, n = .Machine$integer.max) {
+  a <- sample.int(n = n, size = size, replace = replace)
+  s <- sample(c(-1L, 1L), size = size, replace = TRUE)
+  as.numeric(s * a)
+}
+
+rnd_7 <- function(n, seed = 123) {
+  if (!is.null(seed)) {
+    if (!exists(".Random.seed"))
+      if (runif(1) < 0)
+        stop("Now seed exists")
+    exitSeed <- .Random.seed
+    on.exit(.Random.seed <<- exitSeed)
+    set.seed(seed)
+  }
+  u <- Sample_Symmetric_integer.max(size = n * 7)
+  matrix(u, ncol = 7, dimnames = list(NULL, paste0("r_rnd_", 1:7)))
+}
+
+
+# id is a row number
+duplicated_id_rnd <- function(r_rnd_7_list, code0 = FALSE, totCode_list = NULL, crossTable_list = NULL, list_again = TRUE) {
+  r_rnd_7_all <- SSBtools::RbindAll(r_rnd_7_list)
+  nRep <- 7
+  nClaim <- 3
+  n <- nrow(r_rnd_7_all)
+  ma <- matrix(0L, n, nRep)
+  for (i in 1:nRep) {
+    ma[, i] <- match(r_rnd_7_all[, i], r_rnd_7_all[, i])
+  }
+  maMax <- apply(ma, 1, max)  # RowMax
+  
+  min_n_maMax <- min(rowSums(matrix(maMax, n, nRep) == ma))
+  
+  if (min_n_maMax < nClaim) {
+    stop("Duplicated by random method did not work")
+  }
+  
+  if (code0) {
+    r0 <- rowSums(abs(r_rnd_7_all)) == 0
+    if (any(r0)) {
+      maMax[r0] <- 0L
+      id_code <- duplicated_id_code(totCode_list, crossTable_list, list_again = FALSE)
+      if (any(maMax %in% id_code[r0])) {
+        stop("Combined duplicated method did not work")
+      }
+      maMax[r0] <- id_code[r0]
+    }
+  }
+  if (list_again) {
+    return(as_list_again(maMax, r_rnd_7_list))
+  }
+  maMax
+}
+
+# id is a row number
+duplicated_id_code <- function(totCode_list, crossTable_list, list_again = TRUE) {
+  
+  totCode <- combine_code_list(totCode_list)
+  
+  crossTable_all <- SSBtools::RbindAll(crossTable_list)
+  
+  for (nam in names(crossTable_all)) {
+    crossTable_all[[nam]][crossTable_all[[nam]] %in% c(totCode[[nam]], NA)] <- "ToTA_L_iD"
+  }
+  ma <- Match(crossTable_all, crossTable_all)
+  if (list_again) {
+    return(as_list_again(ma, crossTable_list))
+  }
+  ma
+}
+
+
+combine_code_list <- function(x) {
+  a <- x[[1]]
+  for (i in SeqInc(2, length(x))) {
+    b <- x[[i]]
+    for (nam in names(b)) {
+      a[[nam]] <- unique(c(a[[nam]], b[[nam]]))
+    }
+  }
+  a
+}
+
+as_list_again <- function(x, reference_list) {
+  x_list <- vector("list", length(reference_list))
+  j <- 0L
+  for (i in seq_along(x_list)) {
+    ni <- nrow(reference_list[[i]])
+    x_list[[i]] <- x[j + seq_len(ni)]
+    j <- j + ni
+  }
+  x_list
+}
+
+
+update_primary_list <- function(primary_list, list_nr, new_primary, dup_id) {
+  new_id <- unique(dup_id[[list_nr]][new_primary])
+  for (i in seq_along(primary_list)) {
+    new_rows <- dup_id[[i]] %in% new_id
+    primary_list[[i]][new_rows] <- TRUE
+  }
+  primary_list
+}
+
+
+

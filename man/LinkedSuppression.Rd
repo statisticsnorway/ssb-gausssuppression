@@ -10,6 +10,7 @@ LinkedSuppression(
   ...,
   withinArg = NULL,
   linkedGauss,
+  recordAware = TRUE,
   iterBackTracking = Inf,
   whenEmptyUnsuppressed = NULL
 )
@@ -25,6 +26,8 @@ LinkedSuppression(
 \item{withinArg}{A list of named lists. Arguments to \code{fun} that are not kept constant.}
 
 \item{linkedGauss}{See \link{parameter_linkedGauss}.}
+
+\item{recordAware}{See \link{parameter_linkedGauss}.}
 
 \item{iterBackTracking}{See \link{parameter_linkedGauss}.}
 
@@ -60,6 +63,7 @@ names(z2b)[1] <- "region"
 # 'A' 'annet'/'arbeid' suppressed in b[[1]], since suppressed in b[[3]].
 b <- LinkedSuppression(fun = SuppressSmallCounts,
      linkedGauss = "back-tracking",  
+     recordAware = FALSE,
      withinArg = list(
        list(data = z1, dimVar = 1:2, freqVar = 3, maxN = 5), 
        list(data = z2b, dimVar = 1:2, freqVar = 3, maxN = 5), 

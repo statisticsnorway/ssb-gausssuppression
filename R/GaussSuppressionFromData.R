@@ -346,6 +346,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   }
   
+  Vars_r_rnd = function(r_rnd = character(0), ...){
+    r_rnd
+  }
+  r_rnd <- Vars_r_rnd(...)
+  
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
   if (is.name(maxN)) maxN <- NULL
@@ -414,7 +419,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       data <- aggregate_by_pkg(
         data = data,
         by = unique(c(dVar, charVar)),
-        var = unique(c(freqVar, numVar, weightVar)),
+        var = unique(c(freqVar, numVar, weightVar, r_rnd)),
         pkg =  aggregatePackage,
         include_na = aggregateNA,
         fun = sum,
@@ -426,7 +431,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       }
     } else {
       ### START ### preliminary hack to include sWeightVar in SuppressDominantCells
-      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, MoreVars(...)))]
+      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, r_rnd, MoreVars(...)))]
       ### END ###  preliminary hack
       # data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
@@ -540,7 +545,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     data <- aggregate_by_pkg(
       data = data,
       by = unique(dVar),
-      var = unique(c(freqVar, numVar, weightVar, nUniqueVar)),
+      var = unique(c(freqVar, numVar, weightVar, r_rnd, nUniqueVar)),
       pkg =  aggregatePackage,
       include_na = aggregateNA,
       fun = sum,
@@ -707,6 +712,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   if (output == "pre_gauss_env") {
+    r_rnd <-as.matrix(crossprod(x, as.matrix(data[r_rnd])))
     rm(data)    # data needed when output %in% c("all", "publish_inner_x", "publish_inner")
     env <- environment()
     return(env)
