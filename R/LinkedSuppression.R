@@ -51,7 +51,9 @@ LinkedSuppression <- function(fun,
                               recordAware = TRUE,
                               iterBackTracking = Inf,
                               whenEmptyUnsuppressed = NULL) {
-  SSBtools::CheckInput(linkedGauss, type = "character", alt = c("local", "consistent", "back-tracking", "local-old", "local-bdiag"), okNULL = FALSE)
+  SSBtools::CheckInput(linkedGauss, type = "character", 
+    alt = c("local", "consistent", "back-tracking", "local-old", "local-bdiag", "back-tracking-old"), 
+    okNULL = FALSE)
   
   if (is.null(withinArg)) {
     return(fun(...))
@@ -128,7 +130,11 @@ LinkedSuppression <- function(fun,
   
   j <- 0L
   nSuppressedIsPrimary <- 0L
+
   
+  
+############################################################################  
+
   if (linkedGauss %in% c("consistent", "local-bdiag")) {
     if(linkedGauss == "local-bdiag") {
       dup_id <- NULL
@@ -158,6 +164,8 @@ LinkedSuppression <- function(fun,
   }
   
   
+
+############################################################################  
 
   if (linkedGauss %in% c("back-tracking", "local")) {
     if (!is.logical(primary_list[[1]])) {
@@ -214,49 +222,48 @@ LinkedSuppression <- function(fun,
   }
   
   
-  while (j < maxJ) {
-    j <- j + 1L
-    i <- 1L + ((j - 1L)%%n)
-    cat(i, "\n")
-    
-    if (linkedGauss == "back-tracking-old") {
-      suppressedData[[i]]$suppressed[PrimaryFromSuppressedData(x = env_list[[i]]$x, 
-                                                               crossTable = env_list[[i]]$crossTable, 
-                                                               suppressedData = suppressedData, 
-                                                               totCode = totCode_list[[i]])] <- TRUE 
+  
+  
+############################################################################  
+  
+  if (linkedGauss %in% c("back-tracking-old", "local-old")) {  
+    while (j < maxJ) {
+      j <- j + 1L
+      i <- 1L + ((j - 1L)%%n)
+      cat(i, "\n")
+      if (linkedGauss == "back-tracking-old") {
+        suppressedData[[i]]$suppressed[PrimaryFromSuppressedData(x = env_list[[i]]$x, 
+                                                                 crossTable = env_list[[i]]$crossTable, 
+                                                                 suppressedData = suppressedData, 
+                                                                 totCode = totCode_list[[i]])] <- TRUE 
+      }
+      secondary_list[[i]] <- GaussSuppression(x = env_list[[i]]$x, candidates = env_list[[i]]$candidates, primary = suppressedData[[i]]$suppressed, forced = env_list[[i]]$forced, hidden = env_list[[i]]$hidden,
+                                              singleton = env_list[[i]]$singleton, singletonMethod = env_list[[i]]$singletonMethod, printInc = env_list[[i]]$printInc, whenEmptyUnsuppressed = whenEmptyUnsuppressed, xExtraPrimary = env_list[[i]]$xExtraPrimary,
+                                              unsafeAsNegative = TRUE)   # dot-dot-dot not include for now 
+      suppressedData[[i]]$suppressed[secondary_list[[i]]] <- TRUE
+      
+      if (length(secondary_list[[i]]) == 0) {
+        nSuppressedIsPrimary <- nSuppressedIsPrimary + 1L
+      } else {
+        nSuppressedIsPrimary <- 0L
+      }
+      if (nSuppressedIsPrimary == n) {
+        break
+      }
     }
-    
-    secondary_list[[i]] <- GaussSuppression(x = env_list[[i]]$x, candidates = env_list[[i]]$candidates, primary = suppressedData[[i]]$suppressed, forced = env_list[[i]]$forced, hidden = env_list[[i]]$hidden,
-                                            singleton = env_list[[i]]$singleton, singletonMethod = env_list[[i]]$singletonMethod, printInc = env_list[[i]]$printInc, whenEmptyUnsuppressed = whenEmptyUnsuppressed, xExtraPrimary = env_list[[i]]$xExtraPrimary,
-                                            unsafeAsNegative = TRUE)   # dot-dot-dot not include for now 
-    suppressedData[[i]]$suppressed[secondary_list[[i]]] <- TRUE
-    
-    if (length(secondary_list[[i]]) == 0) {
-      nSuppressedIsPrimary <- nSuppressedIsPrimary + 1L
-    } else {
-      nSuppressedIsPrimary <- 0L
+    if (linkedGauss == "back-tracking-old" & nSuppressedIsPrimary != n) {
+      warning("Iteration limit exceeded")
     }
-    if (nSuppressedIsPrimary == n) {
-      break
+    for (i in seq_along(suppressedData)) {
+      secondary <- suppressedData[[i]]$suppressed & !primary_list[[i]]
+      env_list[[i]]$secondary <- which(secondary)
     }
-    
+    for (i in seq_along(suppressedData)) {
+      environment(TailGaussSuppressionFromData) <- env_list[[i]]
+      suppressedData[[i]] <- TailGaussSuppressionFromData()
+    }
+    return(suppressedData)
   }
-  
-  if (linkedGauss == "back-tracking-old" & nSuppressedIsPrimary != n) {
-    warning("Iteration limit exceeded")
-  }
-  
-  for (i in seq_along(suppressedData)) {
-    secondary <- suppressedData[[i]]$suppressed & !primary_list[[i]]
-    env_list[[i]]$secondary <- which(secondary)
-  }
-  
-  for (i in seq_along(suppressedData)) {
-    environment(TailGaussSuppressionFromData) <- env_list[[i]]
-    suppressedData[[i]] <- TailGaussSuppressionFromData()
-  }
-  
-  suppressedData
 }
 
 
