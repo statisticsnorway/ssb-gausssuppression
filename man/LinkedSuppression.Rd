@@ -52,7 +52,7 @@ output <- LinkedSuppression(data = SSBtoolsData("magnitude1"),
                  pPercent = 10, 
                  contributorVar = "company",
                  singletonMethod = "none", 
-                 linkedGauss = "back-tracking") 
+                 linkedGauss = "consistent") 
 
 ####  Similar to LazyLinkedTables example:
 z1 <- SSBtoolsData("z1")
