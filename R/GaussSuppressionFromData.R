@@ -278,7 +278,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
-  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking"), okNULL = TRUE)
+  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-old", "consistent-old"), okNULL = TRUE)
   
   
   # Possible development function as input
@@ -689,7 +689,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   table_memberships <- NULL
   cell_grouping <- NULL
   if (!is.null(linkedGauss)) {
-    if (linkedGauss %in% c("local", "consistent", "back-tracking")) {
+    if (linkedGauss %in% c("local", "consistent", "local-old", "consistent-old", "back-tracking")) {
       table_formulas <- attr(formula, "table_formulas")
       if (is.null(table_formulas)) {
         stop("missing formula attribute, table_formulas")
@@ -703,7 +703,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       if (recordAware) {
         table_memberships <- record_consistent_table_memberships(table_memberships, x, aggregatePackage)
       }
-      cell_grouping <- linkedGauss == "consistent"
+      cell_grouping <- linkedGauss %in% c("consistent", "consistent-old")
+      if (linkedGauss %in% c("local", "consistent")) {
+        GaussSuppression <- gaussSuppression_linked
+      }
       if (linkedGauss == "back-tracking") {
         GaussSuppression <- BackTrackingGauss
         cell_grouping <- NULL

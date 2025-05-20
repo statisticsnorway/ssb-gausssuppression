@@ -4,54 +4,124 @@
 gaussSuppression_linked <- function(x, candidates, primary, forced, hidden, 
                                     singleton, singletonMethod, 
                                     xExtraPrimary, 
-                                    whenEmptyUnsuppressed, 
+                                    whenEmptyUnsuppressed = message, 
                                     ..., 
-                                    dup_id = NULL) {
+                                    dup_id = NULL,
+                                    table_memberships = NULL,
+                                    cell_grouping = TRUE) {
   if (!identical(unique(unlist(singletonMethod)), "none")) {
     stop("For now singletonMethod must be none in gaussSuppression_linked")
   }
   if (any(!sapply(xExtraPrimary, is.null))) {
     stop("For now xExtraPrimary must be NULL in gaussSuppression_linked")
   }
-  n <- length(x)
   primary <- as_not_logical(primary)
   forced <- as_not_logical(forced)
   hidden <- as_not_logical(hidden)
-  cumsum_0_ncol_x <- c(0L, cumsum(sapply(x, ncol)))
-  candidates_ <- candidates
-  for (i in SeqInc(2, n)) {
-    candidates_[[i]] <- candidates_[[i]] + cumsum_0_ncol_x[[i]]
-    primary[[i]] <- primary[[i]] + cumsum_0_ncol_x[[i]]
-    forced[[i]] <- forced[[i]] + cumsum_0_ncol_x[[i]]
-    hidden[[i]] <- hidden[[i]] + cumsum_0_ncol_x[[i]]
-  }
-  candidates_ <- unlist(candidates_)
-  primary <- unlist(primary)
-  forced <- unlist(forced)
-  hidden <- unlist(hidden)
-  x <- Matrix::bdiag(x)
-  if (!is.null(dup_id)) {
-    dup_id_un <- unlist(dup_id)
-    dup_dup <- unique(dup_id_un[duplicated(dup_id_un)])
-    integer_codes <- vector("list", n)
-    for (i in seq_len(n)) {
-      dup_id[[i]][!(dup_id[[i]] %in% dup_dup)] <- 0L  # non-duplicated to 0L
-      integer_codes[[i]] <- dup_id[[i]][candidates[[i]]]
-      non0 <- integer_codes[[i]] != 0L
-      integer_codes[[i]][non0][rev_duplicated(integer_codes[[i]][non0])] <- 0L  # within-duplicated (with rev) to 0L since common_cell_grouping algorithm ... ok since fixed later   
+  
+  use_cell_grouping <- cell_grouping
+  cell_grouping <- NULL
+  
+  if (!is.null(table_memberships)) {
+    if (nrow(table_memberships) != ncol(x)) {
+      stop("nrow(table_memberships) != ncol(x)")
     }
-    ccg <- common_cell_grouping(integer_codes)
-    can <- rep(0L, length(ccg$table))
-    for (i in seq_len(n)) {
-      table_i <- ccg$table == i
-      can[table_i] <- candidates[[i]][ccg$ind[table_i]] + cumsum_0_ncol_x[[i]]
+    table_x <- vector("list", ncol(table_memberships))
+    table_x_cnames <- character(0)
+    orig_col <- integer(0)
+    table_id <- integer(0)
+    for (i in seq_along(table_x)) {
+      ti <- table_memberships[, i]
+      dd <- DummyDuplicated(x[, ti, drop = FALSE], idx = FALSE, rows = TRUE, rnd = TRUE)
+      table_x[[i]] <- x[!dd, ti, drop = FALSE]
+      table_x_cnames_i <- paste(i, seq_len(ncol(x))[ti], sep = "_")
+      orig_col_i <- seq_len(ncol(x))[ti]
+      table_id_i <- rep(i, sum(ti))
+      colsi <- colSums(abs(table_x[[i]])) != 0
+      table_x[[i]] <- table_x[[i]][, colsi, drop = FALSE]
+      table_x_cnames_i <- table_x_cnames_i[colsi]
+      orig_col_i <- orig_col_i[colsi]
+      table_id_i <- table_id_i[colsi]
+      table_x_cnames <- c(table_x_cnames, table_x_cnames_i)
+      orig_col <- c(orig_col, orig_col_i)
+      table_id <- c(table_id, table_id_i)
     }
-    candidates <- can
-    cell_grouping <- unlist(dup_id)
-  } else {
-    candidates <- candidates_
-    cell_grouping <- NULL
+    if (use_cell_grouping) {
+      cell_grouping <- orig_col
+    }
+    x <- Matrix::bdiag(table_x)
+    colnames(x) <- table_x_cnames 
+    rm(table_x)
+    fix_by_table_memberships <- function(indices, orig_col) {
+      if (!length(indices)) {
+        return(indices)
+      }
+      ma <- match(orig_col, indices)
+      indices_new <- which(!is.na(ma))
+      indices_new <- indices_new[order(ma[!is.na(ma)])]
+      indices_new
+    }
+    candidates <- fix_by_table_memberships(candidates, orig_col)
+    primary <- fix_by_table_memberships(primary, orig_col)
+    forced <- fix_by_table_memberships(forced, orig_col)
+    hidden <- fix_by_table_memberships(hidden, orig_col)
+    
+    ##    candidates <- candidates[order(table_id[candidates])]     ###################################### Maybe choose such order by a parameter 
+    
+    if (TRUE) {  # if (printXdim) {
+      #printInc <- TRUE
+      cat("{table_memberships}<", nrow(x), "*", ncol(x), ">", sep = "")
+      flush.console()
+    }
+    
+  } 
+  
+  
+    
+  n <- length(x)
+  
+  
+  
+  if (is.null(table_memberships)) {
+    cumsum_0_ncol_x <- c(0L, cumsum(sapply(x, ncol)))
+    candidates_ <- candidates
+    for (i in SeqInc(2, n)) {
+      candidates_[[i]] <- candidates_[[i]] + cumsum_0_ncol_x[[i]]
+      primary[[i]] <- primary[[i]] + cumsum_0_ncol_x[[i]]
+      forced[[i]] <- forced[[i]] + cumsum_0_ncol_x[[i]]
+      hidden[[i]] <- hidden[[i]] + cumsum_0_ncol_x[[i]]
+    }
+    candidates_ <- unlist(candidates_)
+    primary <- unlist(primary)
+    forced <- unlist(forced)
+    hidden <- unlist(hidden)
+    x <- Matrix::bdiag(x)
+    if (!is.null(dup_id)) {
+      dup_id_un <- unlist(dup_id)
+      dup_dup <- unique(dup_id_un[duplicated(dup_id_un)])
+      integer_codes <- vector("list", n)
+      for (i in seq_len(n)) {
+        dup_id[[i]][!(dup_id[[i]] %in% dup_dup)] <- 0L  # non-duplicated to 0L
+        integer_codes[[i]] <- dup_id[[i]][candidates[[i]]]
+        non0 <- integer_codes[[i]] != 0L
+        integer_codes[[i]][non0][rev_duplicated(integer_codes[[i]][non0])] <- 0L  # within-duplicated (with rev) to 0L since common_cell_grouping algorithm ... ok since fixed later   
+      }
+      ccg <- common_cell_grouping(integer_codes)
+      can <- rep(0L, length(ccg$table))
+      for (i in seq_len(n)) {
+        table_i <- ccg$table == i
+        can[table_i] <- candidates[[i]][ccg$ind[table_i]] + cumsum_0_ncol_x[[i]]
+      }
+      candidates <- can
+      cell_grouping <- unlist(dup_id)
+    } else {
+      candidates <- candidates_
+      cell_grouping <- NULL
+    }
   }
+  
+  
+  
   secondary <- GaussSuppression(x = x, 
                                 candidates = candidates, 
                                 primary = primary, 
@@ -59,13 +129,33 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                 hidden = hidden, 
                                 singleton = NULL, 
                                 singletonMethod = "none", 
-                                printInc = TRUE, 
+                                printXdim = TRUE, 
                                 whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
                                 xExtraPrimary = NULL, 
                                 unsafeAsNegative = TRUE, 
                                 cell_grouping = cell_grouping)
   
-  as_list_from_not_logical(secondary, cumsum_0_ncol_x)
+  if (is.null(table_memberships)) {
+    return(as_list_from_not_logical(secondary, cumsum_0_ncol_x))
+  }
+  
+  if (!is.null(table_memberships)) {
+    not_secondary <- rep(TRUE, length(orig_col))
+    not_secondary[secondary] <- FALSE
+    secondary_out <- unique(orig_col[secondary])
+    not_secondary_out <- unique(orig_col[not_secondary])
+    if (use_cell_grouping) {
+      message_fun <- warning
+    } else {
+      message_fun <- message
+    }
+    if (length(unique(orig_col)) != length(secondary_out) + length(not_secondary_out)) {
+      message_fun("Inconsistent suppression across common cells within the algorithm")
+    }
+    secondary <- secondary_out  #######################################################   Not finished. Negative numbers must also be handled.
+  }
+  
+  return(secondary)
 }
 
 
