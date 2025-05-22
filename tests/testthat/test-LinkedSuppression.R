@@ -22,44 +22,78 @@ test_that("LinkedSuppression", {
   linkedGauss <- "consistent"
   recordAware <- TRUE
   
-  a <- LinkedSuppression(data = d53,
-                         freqVar = "freq",
-                         fun = SuppressSmallCounts,
-                         withinArg = list(list(formula = f1),
-                                          list(formula = f2),
-                                          list(formula = f3),
-                                          list(formula = f4)), 
-                         recordAware =  recordAware,
-                         preAggregate = TRUE,
-                         maxN = 3, 
-                         protectZeros = FALSE,   extend0 = FALSE, 
-                         printXdim = TRUE,
-                         singletonMethod = "none",
-                         linkedGauss = linkedGauss)
+  #asum = NULL
   
-  expect_identical(
-    sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
-    c(1353576L, 2305412L, 5071277L, 20531L))
+  sum1 <- list(local_FALSE = c(1282693L, 2221804L, 4755062L, 20531L), 
+               local_TRUE = c(1282693L, 2221804L, 4755062L, 20531L), 
+               consistent_FALSE = c(1282693L, 2219402L, 4755062L, 20531L), 
+               consistent_TRUE = c(1353576L, 2305412L, 5071277L, 20531L), 
+               `back-tracking_FALSE` = c(1282693L, 2219402L, 4755062L, 20531L), 
+               `back-tracking_TRUE` = c(1445094L, 2768849L, 5378354L, 20531L))
   
   
+  sum2 <- list(local_FALSE = 20753475L, 
+               local_TRUE = 22023863L, 
+               consistent_FALSE = 20747225L, 
+               consistent_TRUE = 22078558L, 
+               `back-tracking_FALSE` = 20747225L, 
+               `back-tracking_TRUE` = 24137217L, 
+               global_FALSE = 21619689L, 
+               global_TRUE = 21619689L)
   
-  b <- tables_by_formulas(data = d53,
-                          freqVar = "freq",
-                          table_fun = SuppressSmallCounts,
-                          table_formulas = list(table_1 = f1,
-                                                table_2 = f2,
-                                                table_3 = f3,
-                                                table_4 = f4),
-                          recordAware =  recordAware,
-                          maxN = 3, 
-                          protectZeros = FALSE,   extend0 = FALSE, 
-                          printXdim = TRUE,
-                          singletonMethod = "none",
-                          linkedGauss = linkedGauss)
   
-  expect_identical(
-    sum(seq_len(nrow(b)) * as.integer(b$suppressed)),
-    22078558L)
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking"))
+    for(recordAware in c(FALSE, TRUE)) {
+      
+      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      
+      
+      a <- LinkedSuppression(data = d53,
+                             freqVar = "freq",
+                             fun = SuppressSmallCounts,
+                             withinArg = list(list(formula = f1),
+                                              list(formula = f2),
+                                              list(formula = f3),
+                                              list(formula = f4)), 
+                             recordAware =  recordAware,
+                             preAggregate = TRUE,
+                             maxN = 3, 
+                             protectZeros = FALSE,   extend0 = FALSE, 
+                             printXdim = TRUE,
+                             singletonMethod = "none",
+                             linkedGauss = linkedGauss)
+      
+      expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
+                       sum1[[paste(linkedGauss, recordAware, sep = "_")]])
+                       
+    }
+  
+  
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking", "global"))
+    for(recordAware in c(FALSE, TRUE)) {
+      
+      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      
+      a <- tables_by_formulas(data = d53,
+                              
+                              freqVar = "freq",
+                              table_fun = SuppressSmallCounts,
+                              table_formulas = list(table_1 = f1,
+                                                    table_2 = f2,
+                                                    table_3 = f3,
+                                                    table_4 = f4),
+                              recordAware =  recordAware,
+                              maxN = 3, 
+                              protectZeros = FALSE,   extend0 = FALSE, 
+                              printXdim = TRUE,
+                              singletonMethod = "none",
+                              linkedGauss = linkedGauss)
+      
+      expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
+                       sum2[[paste(linkedGauss, recordAware, sep = "_")]])
+    }
 })
 
 
