@@ -1,6 +1,30 @@
 # SSBtools::GaussSuppression() generalized to take parameters 
 # for multiple tables and duplicate id (cell_grouping) as list input.  
 # This is combined before SSBtools::GaussSuppression() is run.
+#
+#  Code moved from an SSBtools-branch. 
+#  Decided to move the code out of SSBtools::GaussSuppression 
+#  Below is deleted documentation 
+#
+# @param cell_grouping Numeric vector indicating suppression group membership.
+#        Cells with the same non-zero value belong to the same suppression group,
+#        meaning they will be suppressed or non-suppressed together.
+#        A value of 0 indicates that the cell is not a member of any suppression group.
+#        When used together with `table_memberships`, `cell_grouping` must be set to `TRUE` or `FALSE`;  
+#        see `table_memberships` for details. 
+# @param table_memberships A `data.frame` with `ncol(x)` rows and one logical column per linked table.  
+#      This causes the `x` matrix to be rewritten into a block-diagonal structure, with duplicate rows  
+#      and empty columns removed.  
+#         When `table_memberships` is specified, `cell_grouping` must also be set to either `TRUE` or `FALSE`.  
+#      If `cell_grouping = FALSE`, suppression is handled independently within each table,  
+#      as a consequence of the block-diagonal structure,  
+#      providing local protection per table.  
+#      If `cell_grouping = TRUE`, common cells are protected consistently across tables,  
+#      using the same method as when `cell_grouping` is used directly as input.  
+#         The final secondary indices relate to the columns in the original input `x`.  
+#      A cell is marked as secondary if any of the corresponding common cells are suppressed.  
+#         Inconsistent suppression across common cells results in a warning (`cell_grouping = TRUE`)  
+#      or a message (`cell_grouping = FALSE`).
 gaussSuppression_linked <- function(x, candidates, primary, forced, hidden, 
                                     singleton, singletonMethod, 
                                     xExtraPrimary, 
