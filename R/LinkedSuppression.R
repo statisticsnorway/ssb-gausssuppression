@@ -226,6 +226,12 @@ LinkedSuppression <- function(fun,
   
 ############################################################################  
   
+  
+  for(i in seq_along(suppressedData)){
+    attr(suppressedData[[i]], "totCode")  <- totCode_list[[i]]
+  }
+  
+  
   if (linkedGauss %in% c("back-tracking-old", "local-old")) {  
     while (j < maxJ) {
       j <- j + 1L
