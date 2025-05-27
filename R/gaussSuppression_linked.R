@@ -32,7 +32,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     ..., 
                                     dup_id = NULL,
                                     table_memberships = NULL,
-                                    cell_grouping = TRUE) {
+                                    cell_grouping = TRUE,
+                                    iterBackTracking = 0L, 
+                                    sequential = TRUE) {
   if (!identical(unique(unlist(singletonMethod)), "none")) {
     stop("For now singletonMethod must be none in gaussSuppression_linked")
   }
@@ -46,59 +48,168 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   use_cell_grouping <- cell_grouping
   cell_grouping <- NULL
   
+  fix_by_table_memberships <- function(indices, orig_col) {
+    if (!length(indices)) {
+      return(indices)
+    }
+    ma <- match(orig_col, indices)
+    indices_new <- which(!is.na(ma))
+    indices_new <- indices_new[order(ma[!is.na(ma)])]
+    indices_new
+  }
+  
   if (!is.null(table_memberships)) {
     if (nrow(table_memberships) != ncol(x)) {
       stop("nrow(table_memberships) != ncol(x)")
     }
     table_x <- vector("list", ncol(table_memberships))
     table_x_cnames <- character(0)
-    orig_col <- integer(0)
-    table_id <- integer(0)
+    if (iterBackTracking) {
+      orig_col <- vector("list", ncol(table_memberships))
+    } else {
+      orig_col <- integer(0)
+      table_id <- integer(0) 
+    }
     for (i in seq_along(table_x)) {
       ti <- table_memberships[, i]
       dd <- DummyDuplicated(x[, ti, drop = FALSE], idx = FALSE, rows = TRUE, rnd = TRUE)
       table_x[[i]] <- x[!dd, ti, drop = FALSE]
-      table_x_cnames_i <- paste(i, seq_len(ncol(x))[ti], sep = "_")
       orig_col_i <- seq_len(ncol(x))[ti]
       table_id_i <- rep(i, sum(ti))
       colsi <- colSums(abs(table_x[[i]])) != 0
-      table_x[[i]] <- table_x[[i]][, colsi, drop = FALSE]
-      table_x_cnames_i <- table_x_cnames_i[colsi]
       orig_col_i <- orig_col_i[colsi]
-      table_id_i <- table_id_i[colsi]
-      table_x_cnames <- c(table_x_cnames, table_x_cnames_i)
-      orig_col <- c(orig_col, orig_col_i)
-      table_id <- c(table_id, table_id_i)
-    }
-    if (use_cell_grouping) {
-      cell_grouping <- orig_col
-    }
-    x <- Matrix::bdiag(table_x)
-    colnames(x) <- table_x_cnames 
-    rm(table_x)
-    fix_by_table_memberships <- function(indices, orig_col) {
-      if (!length(indices)) {
-        return(indices)
+      table_x[[i]] <- table_x[[i]][, colsi, drop = FALSE]
+      if (iterBackTracking) {
+        orig_col[[i]] <- orig_col_i
+      } else {
+        table_x_cnames_i <- paste(i, seq_len(ncol(x))[ti], sep = "_")
+        table_x_cnames_i <- table_x_cnames_i[colsi]
+        table_id_i <- table_id_i[colsi]
+        table_x_cnames <- c(table_x_cnames, table_x_cnames_i)
+        orig_col <- c(orig_col, orig_col_i)
+        table_id <- c(table_id, table_id_i) 
       }
-      ma <- match(orig_col, indices)
-      indices_new <- which(!is.na(ma))
-      indices_new <- indices_new[order(ma[!is.na(ma)])]
-      indices_new
     }
-    candidates <- fix_by_table_memberships(candidates, orig_col)
-    primary <- fix_by_table_memberships(primary, orig_col)
-    forced <- fix_by_table_memberships(forced, orig_col)
-    hidden <- fix_by_table_memberships(hidden, orig_col)
     
-    ##    candidates <- candidates[order(table_id[candidates])]     ###################################### Maybe choose such order by a parameter 
-    
-    if (TRUE) {  # if (printXdim) {
-      #printInc <- TRUE
-      cat("{table_memberships}<", nrow(x), "*", ncol(x), ">", sep = "")
-      flush.console()
-    }
+    if(!iterBackTracking){
+      
+      if (use_cell_grouping) {
+        cell_grouping <- orig_col
+      }
+      x <- Matrix::bdiag(table_x)
+      colnames(x) <- table_x_cnames 
+      rm(table_x)
+      
+      candidates <- fix_by_table_memberships(candidates, orig_col)
+      primary <- fix_by_table_memberships(primary, orig_col)
+      forced <- fix_by_table_memberships(forced, orig_col)
+      hidden <- fix_by_table_memberships(hidden, orig_col)
+      
+      ##    candidates <- candidates[order(table_id[candidates])]     ###################################### Maybe choose such order by a parameter 
+      
+      if (TRUE) {  # if (printXdim) {
+        #printInc <- TRUE
+        cat("{table_memberships}<", nrow(x), "*", ncol(x), ">", sep = "")
+        flush.console()
+      }  
+    } else  {
+ #################
+    } 
     
   } 
+  
+  if(iterBackTracking) {
+    fix_by_orig_col <- function(orig_col, indices) {
+      fix_by_table_memberships(indices, orig_col)
+    }
+    if (is.null(table_memberships)) {
+      orig_col <- dup_id
+      # The code was originally written with table_memberships as input. 
+      # Thus, the variable name orig_col is used. 
+      # However, the same functionality can be used with dup_id as input.
+    } else {
+      candidates <- lapply(orig_col, fix_by_orig_col, candidates)
+      primary <- lapply(orig_col, fix_by_orig_col, primary)
+      forced <- lapply(orig_col, fix_by_orig_col, forced)
+      hidden <- lapply(orig_col, fix_by_orig_col, hidden)
+      
+      x <- table_x
+    }
+    suppressed_col <- vector("list", length(x))
+    find_suppressed_col <- function(orig_col, primary, secondary){
+      unique(orig_col[c(primary, secondary)])
+    }
+    secondary  <- lapply(orig_col, fix_by_orig_col, integer(0)) 
+    primary_input <- primary
+    
+    for(i in seq_along(suppressed_col)) {
+      suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
+    }
+    back_track <- function(i) {
+      suppressed_i <- suppressed_col[[i]] 
+      suppressed_not_i <- unique(unlist(suppressed_col[-i]))
+      suppressed_extra = orig_col[[i]][orig_col[[i]] %in% suppressed_not_i]
+      suppressed_extra = suppressed_extra[!(suppressed_extra %in% suppressed_i)]
+      return(list(
+        new_primary = fix_by_orig_col(orig_col[[i]], c(suppressed_i, suppressed_extra)),
+        any_extra = length(suppressed_extra)>0))
+    }
+    
+    
+    rerun <- TRUE
+    
+    iter <- 0
+    while (rerun) {
+      rerun <- FALSE
+      iter <- iter + 1
+      cat("\n   =====   back-tracking iteration", iter, "=====\n")
+      i_secondary <- integer(0)
+      for (i in seq_along(x)) {
+        back_track_i <- back_track(i)
+        
+        primary[[i]] <- back_track_i$new_primary
+        
+        if (back_track_i$any_extra | iter == 1) {
+          secondary[[i]] <- GaussSuppression(x = x[[i]], ..., 
+                                             candidates = candidates[[i]], primary = primary[[i]], 
+                                             forced = forced[[i]], hidden = hidden[[i]], 
+                                             singletonMethod = "none", xExtraPrimary = NULL)
+          if (sequential) {
+            suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
+          } else {
+            i_secondary <- c(i_secondary, i)
+          }
+          if (length(secondary[[i]])) {
+            rerun <- TRUE
+          }
+        }
+      }
+      if (!sequential) {
+        for (i in i_secondary) {
+          suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
+        }
+      }
+      if (iter == iterBackTracking) {
+        if (rerun) {
+          if (length(unlist(lapply(as.list(seq_along(x)), back_track)))) {
+            warning("iterBackTracking reached. Inconsistent suppression across common cells within the algorithm.")
+          }
+          rerun <- FALSE
+        }
+      }
+    }
+    
+    if (is.null(table_memberships)) {
+      for(i in seq_along(primary)){
+        primary[[i]][!(primary[[i]] %in% primary_input[[i]])]
+      }
+      return(primary)
+    }
+    
+    suppressed <- sort(unique(unlist(suppressed_col)))
+    
+    return(suppressed[!(suppressed %in% primary)])
+  }
   
   
     

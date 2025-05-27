@@ -63,6 +63,7 @@ names(z2b)[1] <- "region"
 # 'A' 'annet'/'arbeid' suppressed in b[[1]], since suppressed in b[[3]].
 b <- LinkedSuppression(fun = SuppressSmallCounts,
      linkedGauss = "back-tracking",  
+     singletonMethod = "none",  # since For now singletonMethod must be none ... 
      recordAware = FALSE,
      withinArg = list(
        list(data = z1, dimVar = 1:2, freqVar = 3, maxN = 5), 

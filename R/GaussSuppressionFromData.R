@@ -704,12 +704,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         table_memberships <- record_consistent_table_memberships(table_memberships, x, aggregatePackage)
       }
       cell_grouping <- linkedGauss == "consistent"
-      if (linkedGauss %in% c("local", "consistent")) {
+      iterBackTracking <- 0L
+      if (linkedGauss %in% c("local", "consistent", "back-tracking")) {
         GaussSuppression <- gaussSuppression_linked
       }
       if (linkedGauss == "back-tracking") {
-        GaussSuppression <- BackTrackingGauss
         cell_grouping <- NULL
+        iterBackTracking <- Inf
       }
     }
   }
@@ -725,10 +726,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
   }
   
   # Use of special temporary feature

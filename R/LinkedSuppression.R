@@ -38,6 +38,7 @@
 #' # 'A' 'annet'/'arbeid' suppressed in b[[1]], since suppressed in b[[3]].
 #' b <- LinkedSuppression(fun = SuppressSmallCounts,
 #'      linkedGauss = "back-tracking",  
+#'      singletonMethod = "none",  # since For now singletonMethod must be none ... 
 #'      recordAware = FALSE,
 #'      withinArg = list(
 #'        list(data = z1, dimVar = 1:2, freqVar = 3, maxN = 5), 
@@ -135,9 +136,14 @@ LinkedSuppression <- function(fun,
   
 ############################################################################  
 
-  if (linkedGauss %in% c("consistent", "local-bdiag")) {
+  if (linkedGauss %in% c("consistent", "local-bdiag", "back-tracking")) {
     if(linkedGauss == "local-bdiag") {
       dup_id <- NULL
+    }
+    if(linkedGauss == "back-tracking") {
+      iterBackTracking = Inf
+    } else {
+      iterBackTracking = 0L
     }
     secondary <- gaussSuppression_linked(x = list_element(env_list, "x"), 
                                          candidates = list_element(env_list, "candidates"), 
@@ -147,10 +153,11 @@ LinkedSuppression <- function(fun,
                                          singleton = list_element(env_list, "singleton"), 
                                          singletonMethod = list_element(env_list, "singletonMethod"), 
                                          xExtraPrimary = list_element(env_list, "xExtraPrimary"),
-                                         printInc = list_element(env_list, "printInc"), 
+                                         printInc = TRUE, 
                                          whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
                                          unsafeAsNegative = TRUE,
-                                         dup_id = dup_id)
+                                         dup_id = dup_id,
+                                         iterBackTracking = iterBackTracking)
     for (i in seq_len(n)) {
       env_list[[i]]$secondary <- secondary[[i]]
     }
@@ -162,17 +169,17 @@ LinkedSuppression <- function(fun,
     
   
   }
-  
+
   
 
 ############################################################################  
 
-  if (linkedGauss %in% c("back-tracking", "local")) {
+  if (linkedGauss %in% c("local")) {   #   "back-tracking" no longer here
     if (!is.logical(primary_list[[1]])) {
       stop("Primary must be logical in current implementation")
     }
     primary_list_updated <- primary_list
-    if (linkedGauss == "back-tracking") {
+    if (linkedGauss == "back-tracking") {    #   "back-tracking" no longer here
       for (i in seq_along(primary_list)) {
         primary_list_updated <- update_primary_list(primary_list_updated, i, primary_list[[i]], dup_id)
       }
