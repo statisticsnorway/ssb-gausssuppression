@@ -136,7 +136,7 @@ LinkedSuppression <- function(fun,
   
 ############################################################################  
 
-  if (linkedGauss %in% c("consistent", "local-bdiag", "back-tracking")) {
+  if (linkedGauss %in% c("consistent", "local", "local-bdiag", "back-tracking")) {
     if(linkedGauss == "local-bdiag") {
       dup_id <- NULL
     }
@@ -145,6 +145,10 @@ LinkedSuppression <- function(fun,
     } else {
       iterBackTracking = 0L
     }
+    if(linkedGauss ==  "local") {
+      iterBackTracking = "local"
+    }
+    
     secondary <- gaussSuppression_linked(x = list_element(env_list, "x"), 
                                          candidates = list_element(env_list, "candidates"), 
                                          primary = list_element(env_list, "primary"), 
@@ -169,64 +173,7 @@ LinkedSuppression <- function(fun,
     
   
   }
-
   
-
-############################################################################  
-
-  if (linkedGauss %in% c("local")) {   #   "back-tracking" no longer here
-    if (!is.logical(primary_list[[1]])) {
-      stop("Primary must be logical in current implementation")
-    }
-    primary_list_updated <- primary_list
-    if (linkedGauss == "back-tracking") {    #   "back-tracking" no longer here
-      for (i in seq_along(primary_list)) {
-        primary_list_updated <- update_primary_list(primary_list_updated, i, primary_list[[i]], dup_id)
-      }
-    }
-    while (j < maxJ) {
-      j <- j + 1L
-      i <- 1L + ((j - 1L)%%n)
-      cat(i, "\n")
-      
-      secondary_list[[i]] <- GaussSuppression(x = env_list[[i]]$x, candidates = env_list[[i]]$candidates, primary = primary_list_updated[[i]], forced = env_list[[i]]$forced, hidden = env_list[[i]]$hidden, singleton = env_list[[i]]$singleton,
-                                              singletonMethod = env_list[[i]]$singletonMethod, printInc = env_list[[i]]$printInc, whenEmptyUnsuppressed = whenEmptyUnsuppressed, xExtraPrimary = env_list[[i]]$xExtraPrimary, unsafeAsNegative = TRUE)  # dot-dot-dot not include for now 
-      
-      if (linkedGauss == "back-tracking") {
-        primary_list_updated <- update_primary_list(primary_list_updated, i, secondary_list[[i]], dup_id)
-      }
-      
-      if (length(secondary_list[[i]]) == 0) {
-        nSuppressedIsPrimary <- nSuppressedIsPrimary + 1L
-      } else {
-        nSuppressedIsPrimary <- 0L
-      }
-      if (nSuppressedIsPrimary == n) {
-        break
-      }
-      
-    }
-    if (linkedGauss == "back-tracking" & nSuppressedIsPrimary != n) {
-      warning("Iteration limit exceeded")
-    }
-    
-    for (i in seq_len(n)) {
-      if (linkedGauss == "back-tracking") {
-        secondary <- primary_list_updated[[i]] & !primary_list[[i]]
-        env_list[[i]]$secondary <- which(secondary)
-      } else {
-        env_list[[i]]$secondary <- secondary_list[[i]] 
-      }
-    }
-    
-    for (i in seq_along(suppressedData)) {
-      environment(TailGaussSuppressionFromData) <- env_list[[i]]
-      suppressedData[[i]] <- TailGaussSuppressionFromData()
-    }
-    
-    return(suppressedData)
-    
-  }
   NULL
 }
 
@@ -234,7 +181,6 @@ LinkedSuppression <- function(fun,
 list_element <- function(list_of_lists, element) {
   lapply(list_of_lists, function(x) x[[element]])
 }
-
 
 
 

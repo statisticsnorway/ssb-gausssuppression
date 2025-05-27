@@ -35,6 +35,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     cell_grouping = TRUE,
                                     iterBackTracking = 0L, 
                                     sequential = TRUE) {
+  
+  local <- identical(iterBackTracking, "local")
+  if (local) {
+    iterBackTracking <- 1L
+    sequential <- FALSE
+  }
+  
   if (!identical(unique(unlist(singletonMethod)), "none")) {
     stop("For now singletonMethod must be none in gaussSuppression_linked")
   }
@@ -128,22 +135,25 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       # Thus, the variable name orig_col is used. 
       # However, the same functionality can be used with dup_id as input.
     } else {
-      candidates <- lapply(orig_col, fix_by_orig_col, candidates)
-      primary <- lapply(orig_col, fix_by_orig_col, primary)
-      forced <- lapply(orig_col, fix_by_orig_col, forced)
-      hidden <- lapply(orig_col, fix_by_orig_col, hidden)
-      
+      if (!local) {
+        candidates <- lapply(orig_col, fix_by_orig_col, candidates)
+        primary <- lapply(orig_col, fix_by_orig_col, primary)
+        forced <- lapply(orig_col, fix_by_orig_col, forced)
+        hidden <- lapply(orig_col, fix_by_orig_col, hidden)
+      }
       x <- table_x
     }
-    suppressed_col <- vector("list", length(x))
-    find_suppressed_col <- function(orig_col, primary, secondary){
-      unique(orig_col[c(primary, secondary)])
-    }
-    secondary  <- lapply(orig_col, fix_by_orig_col, integer(0)) 
-    primary_input <- primary
-    
-    for(i in seq_along(suppressed_col)) {
-      suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
+    secondary  <- replicate(length(primary), integer(0), simplify = FALSE)
+    if (!local) {
+      suppressed_col <- vector("list", length(x))
+      find_suppressed_col <- function(orig_col, primary, secondary){
+        unique(orig_col[c(primary, secondary)])
+      }
+      primary_input <- primary
+      
+      for(i in seq_along(suppressed_col)) {
+        suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
+      }
     }
     back_track <- function(i) {
       suppressed_i <- suppressed_col[[i]] 
@@ -165,11 +175,14 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       cat("\n   =====   back-tracking iteration", iter, "=====\n")
       i_secondary <- integer(0)
       for (i in seq_along(x)) {
-        back_track_i <- back_track(i)
-        
-        primary[[i]] <- back_track_i$new_primary
-        
-        if (back_track_i$any_extra | iter == 1) {
+        if (! local) {
+          back_track_i <- back_track(i)
+          primary[[i]] <- back_track_i$new_primary
+          any_extra <- back_track_i$any_extra
+        } else {
+          any_extra <- FALSE
+        }
+        if (any_extra | iter == 1) {
           secondary[[i]] <- GaussSuppression(x = x[[i]], ..., 
                                              candidates = candidates[[i]], primary = primary[[i]], 
                                              forced = forced[[i]], hidden = hidden[[i]], 
@@ -183,6 +196,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
             rerun <- TRUE
           }
         }
+      }
+      if (local) {
+        return(secondary)
       }
       if (!sequential) {
         for (i in i_secondary) {
