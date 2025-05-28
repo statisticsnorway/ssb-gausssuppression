@@ -41,9 +41,14 @@ test_that("LinkedSuppression", {
                global_FALSE = 21619689L, 
                global_TRUE = 21619689L)
   
+  sum1[["local-bdiag_FALSE"]] <- sum1[["local_FALSE"]]
+  sum1[["local-bdiag_TRUE"]] <- sum1[["local_TRUE"]]
+  sum2[["local-bdiag_FALSE"]] <- sum2[["local_FALSE"]]
+  sum2[["local-bdiag_TRUE"]] <- sum2[["local_TRUE"]]
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking"))
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
     for(recordAware in c(FALSE, TRUE)) {
       
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
@@ -71,7 +76,7 @@ test_that("LinkedSuppression", {
   
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking", "global"))
+  for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
     for(recordAware in c(FALSE, TRUE)) {
       
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")

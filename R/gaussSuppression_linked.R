@@ -135,20 +135,18 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       # Thus, the variable name orig_col is used. 
       # However, the same functionality can be used with dup_id as input.
     } else {
-      if (!local) {
-        candidates <- lapply(orig_col, fix_by_orig_col, candidates)
-        primary <- lapply(orig_col, fix_by_orig_col, primary)
-        forced <- lapply(orig_col, fix_by_orig_col, forced)
-        hidden <- lapply(orig_col, fix_by_orig_col, hidden)
-      }
+      candidates <- lapply(orig_col, fix_by_orig_col, candidates)
+      primary <- lapply(orig_col, fix_by_orig_col, primary)
+      forced <- lapply(orig_col, fix_by_orig_col, forced)
+      hidden <- lapply(orig_col, fix_by_orig_col, hidden)
       x <- table_x
     }
+    find_suppressed_col <- function(orig_col, primary, secondary){
+      unique(orig_col[c(primary, secondary)])
+    }
     secondary  <- replicate(length(primary), integer(0), simplify = FALSE)
+    suppressed_col <- vector("list", length(x))
     if (!local) {
-      suppressed_col <- vector("list", length(x))
-      find_suppressed_col <- function(orig_col, primary, secondary){
-        unique(orig_col[c(primary, secondary)])
-      }
       primary_input <- primary
       
       for(i in seq_along(suppressed_col)) {
@@ -197,19 +195,28 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
           }
         }
       }
-      if (local) {
+      if (local & is.null(table_memberships)) {
         return(secondary)
       }
       if (!sequential) {
+        if (local) {
+          not_suppressed_col <- suppressed_col
+        }
         for (i in i_secondary) {
           suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
+          if (local) {
+            not_suppressed_col[[i]] <- unique(orig_col[[i]][!(orig_col[[i]] %in% suppressed_col[[i]])])
+          } else {
+            not_suppressed_col[[i]] <- integer(0)
+          }
         }
       }
       if (iter == iterBackTracking) {
         if (rerun) {
-          if (length(unlist(lapply(as.list(seq_along(x)), back_track)))) {
-            warning("iterBackTracking reached. Inconsistent suppression across common cells within the algorithm.")
-          }
+          if(!local)
+            if (any(unlist(lapply(as.list(seq_along(x)), function(i) back_track(i)$any_extra)))) {
+              warning("iterBackTracking reached. Inconsistent suppression across common cells within the algorithm.")
+            }
           rerun <- FALSE
         }
       }
@@ -223,7 +230,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     }
     
     suppressed <- sort(unique(unlist(suppressed_col)))
-    
+    if(local){
+      not_suppressed <- sort(unique(unlist(not_suppressed_col)))
+      if(any(not_suppressed %in% suppressed)){
+        message("Inconsistent suppression across common cells within the algorithm.")
+      }
+    }
+        
     return(suppressed[!(suppressed %in% primary)])
   }
   

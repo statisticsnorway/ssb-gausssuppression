@@ -278,7 +278,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
-  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking"), okNULL = TRUE)
+  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag"), okNULL = TRUE)
   
   
   # Possible development function as input
@@ -689,7 +689,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   table_memberships <- NULL
   cell_grouping <- NULL
   if (!is.null(linkedGauss)) {
-    if (linkedGauss %in% c("local", "consistent", "back-tracking")) {
+    if (linkedGauss %in% c("local", "consistent", "back-tracking", "local-bdiag")) {
       table_formulas <- attr(formula, "table_formulas")
       if (is.null(table_formulas)) {
         stop("missing formula attribute, table_formulas")
@@ -705,12 +705,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       }
       cell_grouping <- linkedGauss == "consistent"
       iterBackTracking <- 0L
-      if (linkedGauss %in% c("local", "consistent", "back-tracking")) {
+      if (linkedGauss %in% c("local", "consistent", "back-tracking", "local-bdiag")) {
         GaussSuppression <- gaussSuppression_linked
       }
       if (linkedGauss == "back-tracking") {
         cell_grouping <- NULL
         iterBackTracking <- Inf
+      }
+      if (linkedGauss == "local") {
+        iterBackTracking <- "local"
       }
     }
   }
