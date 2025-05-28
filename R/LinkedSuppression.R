@@ -133,48 +133,40 @@ LinkedSuppression <- function(fun,
   nSuppressedIsPrimary <- 0L
 
   
-  
-############################################################################  
-
-  if (linkedGauss %in% c("consistent", "local", "local-bdiag", "back-tracking")) {
-    if(linkedGauss == "local-bdiag") {
-      dup_id <- NULL
-    }
-    if(linkedGauss == "back-tracking") {
-      iterBackTracking = Inf
-    } else {
-      iterBackTracking = 0L
-    }
-    if(linkedGauss ==  "local") {
-      iterBackTracking = "local"
-    }
-    
-    secondary <- gaussSuppression_linked(x = list_element(env_list, "x"), 
-                                         candidates = list_element(env_list, "candidates"), 
-                                         primary = list_element(env_list, "primary"), 
-                                         forced = list_element(env_list, "forced"), 
-                                         hidden = list_element(env_list, "hidden"), 
-                                         singleton = list_element(env_list, "singleton"), 
-                                         singletonMethod = list_element(env_list, "singletonMethod"), 
-                                         xExtraPrimary = list_element(env_list, "xExtraPrimary"),
-                                         printInc = TRUE, 
-                                         whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
-                                         unsafeAsNegative = TRUE,
-                                         dup_id = dup_id,
-                                         iterBackTracking = iterBackTracking)
-    for (i in seq_len(n)) {
-      env_list[[i]]$secondary <- secondary[[i]]
-    }
-    for (i in seq_along(suppressedData)) {
-      environment(TailGaussSuppressionFromData) <- env_list[[i]]
-      suppressedData[[i]] <- TailGaussSuppressionFromData()
-    }
-    return(suppressedData)
-    
-  
+  if(linkedGauss == "local-bdiag") {
+    dup_id <- NULL
+  }
+  if(linkedGauss == "back-tracking") {
+    iterBackTracking = Inf
+  } else {
+    iterBackTracking = 0L
+  }
+  if(linkedGauss ==  "local") {
+    iterBackTracking = "local"
   }
   
-  NULL
+  secondary <- gaussSuppression_linked(x = list_element(env_list, "x"), 
+                                       candidates = list_element(env_list, "candidates"), 
+                                       primary = list_element(env_list, "primary"), 
+                                       forced = list_element(env_list, "forced"), 
+                                       hidden = list_element(env_list, "hidden"), 
+                                       singleton = list_element(env_list, "singleton"), 
+                                       singletonMethod = list_element(env_list, "singletonMethod"), 
+                                       xExtraPrimary = list_element(env_list, "xExtraPrimary"),
+                                       printInc = TRUE, 
+                                       whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
+                                       unsafeAsNegative = TRUE,
+                                       dup_id = dup_id,
+                                       iterBackTracking = iterBackTracking)
+  for (i in seq_len(n)) {
+    env_list[[i]]$secondary <- secondary[[i]]
+  }
+  for (i in seq_along(suppressedData)) {
+    environment(TailGaussSuppressionFromData) <- env_list[[i]]
+    suppressedData[[i]] <- TailGaussSuppressionFromData()
+  }
+  return(suppressedData)
+  
 }
 
 
