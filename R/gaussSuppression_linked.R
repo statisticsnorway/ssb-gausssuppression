@@ -52,6 +52,8 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   forced <- as_not_logical(forced)
   hidden <- as_not_logical(hidden)
   
+  primary_original_input <- primary
+  
   use_cell_grouping <- cell_grouping
   cell_grouping <- NULL
   
@@ -142,13 +144,12 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       x <- table_x
     }
     find_suppressed_col <- function(orig_col, primary, secondary){
-      unique(orig_col[c(primary, secondary)])
+      unique(orig_col[c(primary, secondary[secondary>0])])   # secondary>0 since negative means unsafe
     }
     secondary  <- replicate(length(primary), integer(0), simplify = FALSE)
     suppressed_col <- vector("list", length(x))
+    primary_input <- primary
     if (!local) {
-      primary_input <- primary
-      
       for(i in seq_along(suppressed_col)) {
         suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
       }
@@ -222,9 +223,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       }
     }
     
+    
     if (is.null(table_memberships)) {
       for(i in seq_along(primary)){
         primary[[i]][!(primary[[i]] %in% primary_input[[i]])]
+        unsafe <- -secondary[[i]][secondary[[i]] < 0]
+        unsafe <- unsafe[unsafe %in% primary_input[[i]]]
+        primary[[i]] <- c(primary[[i]], -unsafe)
       }
       return(primary)
     }
@@ -236,8 +241,18 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
         message("Inconsistent suppression across common cells within the algorithm.")
       }
     }
-        
-    return(suppressed[!(suppressed %in% primary)])
+    
+    suppressed <- suppressed[!(suppressed %in% primary_original_input)]
+    
+    unsafe_col <- vector("list", length(x))
+    # reuse method to capture unsafe 
+    for(i in seq_along(unsafe_col)){
+      unsafe_col[[i]] <- find_suppressed_col(orig_col[[i]], integer(0), -secondary[[i]])
+    }
+    unsafe <- sort(unique(unlist(unsafe_col)))
+    unsafe <- unsafe[unsafe %in% primary_original_input]
+    
+    return(c(suppressed, -unsafe))
   }
   
   
@@ -299,27 +314,31 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                 unsafeAsNegative = TRUE, 
                                 cell_grouping = cell_grouping)
   
+  unsafe <- -secondary[secondary < 0]
+  secondary <- secondary[secondary > 0]
+  
   if (is.null(table_memberships)) {
-    return(as_list_from_not_logical(secondary, cumsum_0_ncol_x))
+    secondary <- as_list_from_not_logical(secondary, cumsum_0_ncol_x)
+    unsafe <- as_list_from_not_logical(unsafe, cumsum_0_ncol_x)
+    for(i in seq_along(secondary)){
+      secondary[[i]] <- c(secondary[[i]], -unsafe[[i]])
+    }
+    return(secondary)
   }
   
-  if (!is.null(table_memberships)) {
-    not_secondary <- rep(TRUE, length(orig_col))
-    not_secondary[secondary] <- FALSE
-    secondary_out <- unique(orig_col[secondary])
-    not_secondary_out <- unique(orig_col[not_secondary])
-    if (use_cell_grouping) {
-      message_fun <- warning
-    } else {
-      message_fun <- message
-    }
-    if (length(unique(orig_col)) != length(secondary_out) + length(not_secondary_out)) {
-      message_fun("Inconsistent suppression across common cells within the algorithm")
-    }
-    secondary <- secondary_out  #######################################################   Not finished. Negative numbers must also be handled.
+  not_secondary <- rep(TRUE, length(orig_col))
+  not_secondary[secondary] <- FALSE
+  secondary_out <- unique(orig_col[secondary])
+  not_secondary_out <- unique(orig_col[not_secondary])
+  if (use_cell_grouping) {
+    message_fun <- warning
+  } else {
+    message_fun <- message
   }
-  
-  return(secondary)
+  if (length(unique(orig_col)) != length(secondary_out) + length(not_secondary_out)) {
+    message_fun("Inconsistent suppression across common cells within the algorithm")
+  }
+  c(secondary_out, -unique(orig_col[unsafe]))
 }
 
 
