@@ -82,7 +82,6 @@ test_that("LinkedSuppression", {
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
       a <- tables_by_formulas(data = d53,
-                              
                               freqVar = "freq",
                               table_fun = SuppressSmallCounts,
                               table_formulas = list(table_1 = f1,
@@ -100,6 +99,129 @@ test_that("LinkedSuppression", {
                        sum2[[paste(linkedGauss, recordAware, sep = "_")]])
     }
 })
+
+
+
+
+test_that("LinkedSuppression with forced", {
+  f1 <- ~sex * (age_l + age_m + age_h) * (lms_l + lms_h) 
+  f2 <- ~sex * (age_l + age_m + age_h) * (hst_l + hst_m + hst_h) 
+  f3 <- ~sex * (age_l + age_m + age_h) * (fst_l + fst_m + fst_h) 
+  f4 <- ~sex * (lms_l + lms_h) * (hst_l + hst_m + hst_h)
+  d53 <- readRDS(testthat::test_path("testdata", "d53.rds"))
+  
+  linkedGauss <- "consistent"
+  recordAware <- TRUE
+  
+  # In order for the candidates order to be the same
+  # But what should be the same will not be exactly the same anyway. 
+  # This is because the common candidates order is not 
+  # input to LinkedSuppression() 
+  set.seed(123)
+  d53$w = d53$freq + runif(nrow(d53))/nrow(d53)
+  
+  
+  # forced increases complexity and results in unsafe in output
+  # May give GaussSuppression-warning:
+  #   "some cell grouping ignored due to forced cells"
+  # Thus, it can still be inconsistent suppression and warning: 
+  #   "Inconsistent suppression across common cells within the algorithm"
+  forced <- function(freq, crossTable, ...) freq>500 & crossTable["sex"] == "Total"
+  
+  
+  sum1 <- list(local_FALSE = c(1268238, 2177150, 4681831, 19221), 
+               local_TRUE = c(1268238, 2177150, 4681831, 19221), 
+               consistent_FALSE = c(1522380, 2760176, 4803267, 22861), 
+               consistent_TRUE = c(1725084, 3204814, 6832914, 22861),
+               `back-tracking_FALSE` = c(1273760, 2174748, 4681439, 22477), 
+               `back-tracking_TRUE` = c(1427836, 2710850, 5364422, 22477))
+                                         
+                                         
+  sum2 <- list(local_FALSE = c(1269555, 2177278, 4681933, 19665), 
+               local_TRUE = c(1365557, 2363893, 4950102, 19677), 
+               consistent_FALSE = c(1522380, 2762823, 4803267, 22865), 
+               consistent_TRUE = c(1718643, 3204814, 6822305, 22877),
+               `back-tracking_FALSE` = c(1273760, 2174748, 4681413, 22481), 
+               `back-tracking_TRUE` = c(1427836, 2712055, 5364396, 22493))
+  
+  sum1[["local-bdiag_FALSE"]] <- sum1[["local_FALSE"]]
+  sum1[["local-bdiag_TRUE"]] <- sum1[["local_TRUE"]]
+  sum2[["local-bdiag_FALSE"]] <- sum2[["local_FALSE"]]
+  sum2[["local-bdiag_TRUE"]] <- sum2[["local_TRUE"]]
+  
+  
+  # Copy of PxWebApiData:::WithWarningsAsMessages 
+  WithWarningsAsMessages <- function(expr, classes = "warning") {
+    withCallingHandlers(
+      expr,
+      warning = function(w) {
+        if (inherits(w, classes)) {
+          message("Warning converted to message: ", w$message)
+          tryInvokeRestart("muffleWarning")
+        }
+      }
+    )
+  }
+  
+  As4list <- function(a){
+    list(a[a$table_1, ], a[a$table_2, ], a[a$table_3, ], a[a$table_4, ])
+  }
+  
+  
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking",  "local-bdiag"))
+    for(recordAware in c(FALSE, TRUE)) {
+      
+      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      
+      
+      a <- WithWarningsAsMessages(LinkedSuppression(data = d53,
+                                                    freqVar = "freq",
+                                                    fun = SuppressSmallCounts,
+                                                    withinArg = list(list(formula = f1),
+                                                                     list(formula = f2),
+                                                                     list(formula = f3),
+                                                                     list(formula = f4)), 
+                                                    recordAware =  recordAware,
+                                                    preAggregate = TRUE,
+                                                    maxN = 3, 
+                                                    protectZeros = FALSE,   extend0 = FALSE, 
+                                                    printXdim = TRUE,
+                                                    singletonMethod = "none", 
+                                                    forced = forced,
+                                                    linkedGauss = linkedGauss,  
+                                                    numVar = "w",
+                                                    candidates = CandidatesNum))
+      
+      expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed) + 2 * as.integer(x$unsafe))),
+                       sum1[[paste(linkedGauss, recordAware, sep = "_")]])
+      
+      
+      a <- As4list(WithWarningsAsMessages(tables_by_formulas(data = d53,
+                                                    freqVar = "freq",
+                                                    table_fun = SuppressSmallCounts,
+                                                    table_formulas = list(table_1 = f1,
+                                                                          table_2 = f2,
+                                                                          table_3 = f3,
+                                                                          table_4 = f4),
+                                                    recordAware =  recordAware,
+                                                    preAggregate = TRUE,
+                                                    maxN = 3, 
+                                                    protectZeros = FALSE,   extend0 = FALSE, 
+                                                    printXdim = TRUE,
+                                                    singletonMethod = "none", 
+                                                    forced = forced,
+                                                    linkedGauss = linkedGauss,  
+                                                    numVar = "w",
+                                                    candidates = CandidatesNum)))
+    
+      expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed) + 2 * as.integer(x$unsafe))),
+                       sum2[[paste(linkedGauss, recordAware, sep = "_")]])
+        
+    }
+})
+
+
 
 
 
