@@ -262,6 +262,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   
   
   if (is.null(table_memberships)) {
+    table_id <- NULL
     cumsum_0_ncol_x <- c(0L, cumsum(sapply(x, ncol)))
     candidates_ <- candidates
     for (i in SeqInc(2, n)) {
@@ -312,7 +313,8 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                 whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
                                 xExtraPrimary = NULL, 
                                 unsafeAsNegative = TRUE, 
-                                cell_grouping = cell_grouping)
+                                cell_grouping = cell_grouping,
+                                table_id = table_id)
   
   unsafe <- -secondary[secondary < 0]
   secondary <- secondary[secondary > 0]
