@@ -131,16 +131,16 @@ test_that("LinkedSuppression with forced", {
   
   sum1 <- list(local_FALSE = c(1268238, 2177150, 4681831, 19221), 
                local_TRUE = c(1268238, 2177150, 4681831, 19221), 
-               consistent_FALSE = c(1522380, 2760176, 4803267, 22861), 
-               consistent_TRUE = c(1725084, 3204814, 6832914, 22861),
+               consistent_FALSE = c(1265297, 2174748, 4681439, 22860), 
+               consistent_TRUE = c(1342807, 2222294, 4977701, 22860), 
                `back-tracking_FALSE` = c(1273760, 2174748, 4681439, 22477), 
                `back-tracking_TRUE` = c(1427836, 2710850, 5364422, 22477))
                                          
                                          
   sum2 <- list(local_FALSE = c(1269555, 2177278, 4681933, 19665), 
                local_TRUE = c(1365557, 2363893, 4950102, 19677), 
-               consistent_FALSE = c(1522380, 2762823, 4803267, 22865), 
-               consistent_TRUE = c(1718643, 3204814, 6822305, 22877),
+               consistent_FALSE = c(1265297, 2174748, 4681413, 22864), 
+               consistent_TRUE = c(1343774, 2222294, 5000442, 22876), 
                `back-tracking_FALSE` = c(1273760, 2174748, 4681413, 22481), 
                `back-tracking_TRUE` = c(1427836, 2712055, 5364396, 22493))
   
