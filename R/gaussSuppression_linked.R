@@ -42,9 +42,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     sequential <- FALSE
   }
   
-  if (!identical(unique(unlist(singletonMethod)), "none")) {
-    stop("For now singletonMethod must be none in gaussSuppression_linked")
-  }
+  #if (!identical(unique(unlist(singletonMethod)), "none")) {
+  #  stop("For now singletonMethod must be none in gaussSuppression_linked")
+  #}
   if (any(!sapply(xExtraPrimary, is.null))) {
     stop("For now xExtraPrimary must be NULL in gaussSuppression_linked")
   }
@@ -72,6 +72,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       stop("nrow(table_memberships) != ncol(x)")
     }
     table_x <- vector("list", ncol(table_memberships))
+    singleton_recoded <- recode_singleton(singleton, singletonMethod, x)
+    singletonMethod <- singleton_recoded$singletonMethod
+    singleton <- vector("list", ncol(table_memberships))
     table_x_cnames <- character(0)
     if (iterBackTracking) {
       orig_col <- vector("list", ncol(table_memberships))
@@ -81,8 +84,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     }
     for (i in seq_along(table_x)) {
       ti <- table_memberships[, i]
-      dd <- DummyDuplicated(x[, ti, drop = FALSE], idx = FALSE, rows = TRUE, rnd = TRUE)
-      table_x[[i]] <- x[!dd, ti, drop = FALSE]
+      # dd <- DummyDuplicated(x[, ti, drop = FALSE], idx = FALSE, rows = TRUE, rnd = TRUE)
+      # table_x[[i]] <- x[!dd, ti, drop = FALSE]
+      # replace two code lines above to include singleton
+      rrdr <- removeDuplicatedRows(x[, ti, drop = FALSE], 
+                                   singleton_recoded$singleton)
+      table_x[[i]] <- rrdr$x
+      singleton[[i]] <- rrdr$singleton
       orig_col_i <- seq_len(ncol(x))[ti]
       table_id_i <- rep(i, sum(ti))
       colsi <- colSums(abs(table_x[[i]])) != 0
@@ -108,6 +116,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       x <- Matrix::bdiag(table_x)
       colnames(x) <- table_x_cnames 
       rm(table_x)
+      singleton <- rbind_singleton(singleton)
       
       candidates <- fix_by_table_memberships(candidates, orig_col)
       primary <- fix_by_table_memberships(primary, orig_col)
@@ -122,7 +131,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
         flush.console()
       }  
     } else  {
- #################
+      singletonMethod <- rep(list(singleton_recoded$singletonMethod), ncol(table_memberships))
     } 
     
   } 
@@ -184,8 +193,11 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
         if (any_extra | iter == 1) {
           secondary[[i]] <- GaussSuppression(x = x[[i]], ..., 
                                              candidates = candidates[[i]], primary = primary[[i]], 
-                                             forced = forced[[i]], hidden = hidden[[i]], 
-                                             singletonMethod = "none", xExtraPrimary = NULL)
+                                             forced = forced[[i]], hidden = hidden[[i]],
+                                             singleton = singleton[[i]],
+                                             singletonMethod = singletonMethod[[i]], 
+                                             xExtraPrimary = NULL,
+                                             auto_anySumNOTprimary = FALSE)
           if (sequential) {
             suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
           } else {
@@ -275,6 +287,18 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     primary <- unlist(primary)
     forced <- unlist(forced)
     hidden <- unlist(hidden)
+    
+    for (i in seq_len(n)) {
+      singleton_recoded <- recode_singleton(singleton[[i]], singletonMethod[[i]], x[[i]])
+      singleton[[i]] <- singleton_recoded$singleton
+      singletonMethod[[i]] <- singleton_recoded$singletonMethod
+    }
+    if (length(unique(singletonMethod)) != 1) {
+      stop("singletonMethod must be unique")
+    }
+    singletonMethod <- singletonMethod[[1]]
+    singleton <- rbind_singleton(singleton)
+
     x <- Matrix::bdiag(x)
     if (!is.null(dup_id)) {
       dup_id_un <- unlist(dup_id)
@@ -301,20 +325,20 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   }
   
   
-  
   secondary <- GaussSuppression(x = x, 
                                 candidates = candidates, 
                                 primary = primary, 
                                 forced = forced, 
                                 hidden = hidden, 
-                                singleton = NULL, 
-                                singletonMethod = "none", 
+                                singleton = singleton, 
+                                singletonMethod = singletonMethod, 
                                 printXdim = TRUE, 
                                 whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
                                 xExtraPrimary = NULL, 
                                 unsafeAsNegative = TRUE, 
                                 cell_grouping = cell_grouping,
-                                table_id = table_id)
+                                table_id = table_id,
+                                auto_anySumNOTprimary = FALSE)
   
   unsafe <- -secondary[secondary < 0]
   secondary <- secondary[secondary > 0]
@@ -468,3 +492,182 @@ find_next <- function(integer_non0) {
 rev_duplicated <- function(x) {
   rev(duplicated(rev(x)))
 }
+
+
+
+
+
+recode_singleton <- function(singleton, singletonMethod, x){
+  # START code copy from SSBtools::GaussSuppression
+  if(is.null(singleton)){
+    singleton <- rep(FALSE, nrow(x))
+  }
+  if (is.list(singleton)){
+    if(!identical(as.vector(sort(names(singleton))), c("freq", "num"))){
+      stop('names of singleton when list must be "freq" and "num"')
+    }
+    if(!identical(as.vector(sort(names(singleton))), c("freq", "num"))){
+      stop('names of singletonMethod when several must be "freq" and "num"')
+    }
+    singleton_num <- singleton[["num"]]
+    singleton <- as.logical(singleton[["freq"]])
+    singletonMethod_num <- singletonMethod[["num"]] 
+    singletonMethod <- singletonMethod[["freq"]]
+  } else {
+    if (is.logical(singleton)) {
+      if(length(singleton) == 1L){
+        singleton <- rep(singleton, nrow(x))
+      }
+    }
+    if(is.integer(singleton)){
+      singleton_num <- singleton
+      singleton <- as.logical(singleton)
+    } else {
+      singleton_num <- singleton
+    }
+    if (!is.logical(singleton)) {
+      stop("singleton must be logical or integer")
+    }
+    if (singletonMethod %in% c("sub2Sum") | !is.null(NumSingleton(singletonMethod))) {
+      singletonMethod_num <- singletonMethod
+      singletonMethod <- "none"
+    } else {
+      singletonMethod_num <- "none"
+    }
+  }
+  # END code copy from SSBtools::GaussSuppression
+  list(singleton = list(freq = singleton, num = singleton_num), 
+       singletonMethod = list(freq = singletonMethod, num = singletonMethod_num))
+} 
+
+
+rbind_singleton <- function(singleton) {
+  singleton_freq <- unlist(lapply(singleton, function(x) x$freq))
+  singleton_num <- lapply(singleton, function(x) x$num)
+  is_logical <- unique(sapply(singleton_num, is.logical))
+  if (length(is_logical) > 1) {
+    stop("unique singleton-num class needed")
+  }
+  if (!is_logical) {
+    cum_max <- cumsum(sapply(singleton_num, max))
+    for (i in SeqInc(2, length(singleton))) {
+      s <- singleton_num[[i]]
+      s[s > 0] <- s[s > 0] + cum_max[i - 1]
+      singleton_num[[i]] <- s
+    }
+  }
+  singleton_num <- unlist(singleton_num)
+  list(freq = singleton_freq, num = singleton_num)
+}
+
+
+removeDuplicatedRows <- function(x, singleton) {
+  
+  
+  row_filter <- rowSums(x) > 0
+  x <- x[row_filter, , drop = FALSE]
+  singleton_num <- singleton[["num"]][row_filter]
+  singleton <- singleton[["freq"]][row_filter]
+  
+  
+  # START code copy from SSBtools::GaussSuppression
+  
+  #  Duplicated non-singleton rows are removed.
+  row_filter <- rep(TRUE, nrow(x))
+  if (any(singleton)) {
+    row_filter[singleton] <- FALSE
+  }
+  if (any(singleton_num)) {
+    row_filter[as.logical(singleton_num)] <- FALSE
+  }
+  if (any(row_filter)) {
+    row_filter[row_filter] <- DummyDuplicated(x[row_filter, , drop = FALSE], idx = FALSE, rows = TRUE, rnd = TRUE)
+    if (any(!row_filter)) {
+      if (any(singleton)) {
+        singleton <- singleton[!row_filter]
+      }
+      if (any(singleton_num)) {
+        singleton_num <- singleton_num[!row_filter]
+      }
+      x <- x[!row_filter, , drop = FALSE]
+    }
+  }
+  
+  #  Duplicated singleton (for frequency tables) rows are removed.
+  if (any(singleton)) {
+    row_filter <- singleton
+    row_filter[row_filter] <- DummyDuplicated(x[row_filter, , drop = FALSE], idx = FALSE, rows = TRUE, rnd = TRUE)
+    if (any(row_filter)) {
+      x <- x[!row_filter, , drop = FALSE]
+      singleton <- singleton[!row_filter]
+      if (any(singleton_num))
+        singleton_num <- singleton_num[!row_filter]
+    }
+  }
+  
+  
+  #  Some duplicated singleton (for magnitude tables) rows are removed.
+  if (any(singleton_num)) {
+    row_filter <- as.logical(singleton_num)
+    dd_idx <- DummyDuplicated(x[row_filter, , drop = FALSE], idx = TRUE, rows = TRUE, rnd = TRUE)
+    
+    
+    # First remove duplicates seen from both singleton integers and rows of x
+    # After this, the remaining problem is the same, whether singleton_num is logical or integer.
+    if (!is.logical(singleton_num)) {
+      duplicated2 <- duplicated(cbind(dd_idx, singleton_num[row_filter]))
+      row_filter[row_filter] <- duplicated2
+      if (any(row_filter)) {
+        x <- x[!row_filter, , drop = FALSE]
+        singleton_num <- singleton_num[!row_filter]
+        if (any(singleton))
+          singleton <- singleton[!row_filter]
+        dd_idx <- dd_idx[!duplicated2]
+      }
+      row_filter <- as.logical(singleton_num)
+    }
+    
+    # A group of replicated rows with more than three contributors is not 
+    # related to singleton disclosures protected by any of the methods. 
+    # Singleton marking can be removed, 
+    # and duplicates can also be eliminated. 
+    # Note that removing duplicates while retaining singleton marking will 
+    # result in incorrect calculations of the number of unique contributors.
+    table_dd_idx <- table_all_integers(dd_idx, max(dd_idx))
+    least3 <- dd_idx %in% which(table_dd_idx > 2)
+    if (any(least3)) {
+      row_filter[row_filter] <- least3
+      dd_idx <- dd_idx[least3]
+      
+      duplicated4 <- duplicated(dd_idx)
+      
+      singleton_num[row_filter] <- FALSE  # i.e. set 0 when not logical
+      row_filter[row_filter] <- duplicated4
+      x <- x[!row_filter, , drop = FALSE]
+      singleton_num <- singleton_num[!row_filter]
+      if (any(singleton))
+        singleton <- singleton[!row_filter]
+    }
+  }
+  
+  # Checks for errors in the code above
+  if (any(singleton)) 
+    if (length(singleton) != nrow(x)) 
+      stop("removeDuplicatedRows failed")
+  if (any(singleton_num)) 
+    if (length(singleton_num) != nrow(x)) 
+      stop("removeDuplicatedRows failed")
+  
+  # END code copy from SSBtools::GaussSuppression
+  
+  
+  # since cases with !any(singleton) ignored above
+  if (!any(singleton)) 
+    singleton <- rep(FALSE, nrow(x))  
+  if (!any(singleton_num)) 
+    singleton_num <- rep(FALSE, nrow(x))
+  
+  list(x = x,
+       singleton = list(freq = singleton, num = singleton_num))
+}
+

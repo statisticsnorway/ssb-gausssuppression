@@ -12,6 +12,7 @@
 #' @param whenEmptyUnsuppressed Parameter to \code{\link[SSBtools]{GaussSuppression}}.
 #'
 #' @return List of data frames
+#' @importFrom SSBtools NumSingleton
 #' @export
 #'
 #' @examples
