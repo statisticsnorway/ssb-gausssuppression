@@ -164,7 +164,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -277,7 +277,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     stop("spec must be a properly named list")
   }
   
-  
+  if (is.list(formula)) {
+    table_formulas <- formula
+    formula <- combine_formulas(table_formulas)
+    attr(formula, "table_formulas") <- table_formulas
+  }
   CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag"), okNULL = TRUE)
   
   
