@@ -223,5 +223,186 @@ test_that("LinkedSuppression with forced", {
 
 
 
+test_that("LinkedSuppression with freq-singleton", {
+  f1 <- ~sex * (age_l + age_m + age_h) * (lms_l + lms_h) 
+  f2 <- ~sex * (age_l + age_m + age_h) * (hst_l + hst_m + hst_h) 
+  f3 <- ~sex * (age_l + age_m + age_h) * (fst_l + fst_m + fst_h) 
+  f4 <- ~sex * (lms_l + lms_h) * (hst_l + hst_m + hst_h)
+  d53 <- readRDS(testthat::test_path("testdata", "d53.rds"))
+  
+  linkedGauss <- "consistent"
+  recordAware <- TRUE
+  
+  sum1 <- 
+    list(local_FALSE = c(1367202L, 2440464L, 5143007L, 20531L), 
+         local_TRUE = c(1367202L, 2440464L, 5143007L, 20531L), 
+         consistent_FALSE = c(1365362L, 2430673L, 5138722L, 21524L), 
+         consistent_TRUE = c(1431584L, 2431583L, 5229043L, 21524L),
+         `back-tracking_FALSE` = c(1367329L, 2430673L, 5138722L, 21524L), 
+         `back-tracking_TRUE` = c(1525658L, 2962522L, 5706756L, 21524L), 
+         `local-bdiag_FALSE` = c(1367202L, 2440464L, 5143007L, 20531L), 
+         `local-bdiag_TRUE` = c(1367202L, 2440464L, 5143007L, 20531L))
+  
+  
+  sum2 <- list(local_FALSE = 23753179L, 
+               local_TRUE = 24928316L, 
+               consistent_FALSE = 23680330L, 
+               consistent_TRUE = 24242046L, 
+               `back-tracking_FALSE` = 23743652L, 
+               `back-tracking_TRUE` = 27124781L, 
+               global_FALSE = 26316146L, 
+               global_TRUE = 26316146L, 
+               `local-bdiag_FALSE` = 23753179L, 
+               `local-bdiag_TRUE` = 24928316L)
+  
+  sum1[["local-bdiag_FALSE"]] <- sum1[["local_FALSE"]]
+  sum1[["local-bdiag_TRUE"]] <- sum1[["local_TRUE"]]
+  sum2[["local-bdiag_FALSE"]] <- sum2[["local_FALSE"]]
+  sum2[["local-bdiag_TRUE"]] <- sum2[["local_TRUE"]]
+  
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
+    for(recordAware in c(FALSE, TRUE)) {
+      
+      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      
+      
+      a <- LinkedSuppression(data = d53,
+                             freqVar = "freq",
+                             fun = SuppressSmallCounts,
+                             withinArg = list(list(formula = f1),
+                                              list(formula = f2),
+                                              list(formula = f3),
+                                              list(formula = f4)), 
+                             recordAware =  recordAware,
+                             preAggregate = TRUE,
+                             maxN = 3, 
+                             protectZeros = FALSE,   extend0 = FALSE, 
+                             printXdim = TRUE,
+                             linkedGauss = linkedGauss)
+      
+      expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
+                       sum1[[paste(linkedGauss, recordAware, sep = "_")]])
+      
+    }
+  
+  
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
+    for(recordAware in c(FALSE, TRUE)) {
+      
+      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      
+      a <- tables_by_formulas(data = d53,
+                              freqVar = "freq",
+                              table_fun = SuppressSmallCounts,
+                              table_formulas = list(table_1 = f1,
+                                                    table_2 = f2,
+                                                    table_3 = f3,
+                                                    table_4 = f4),
+                              recordAware =  recordAware,
+                              maxN = 3, 
+                              protectZeros = FALSE,   extend0 = FALSE, 
+                              printXdim = TRUE,
+                              linkedGauss = linkedGauss)
+      
+      expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
+                       sum2[[paste(linkedGauss, recordAware, sep = "_")]])
+    }
+})
+
+
+
+test_that("LinkedSuppression with num-singleton", {
+  f1 <- ~sex * (age_l + age_m) * (lms_l) 
+  f2 <- ~sex * (age_l + age_m) * (hst_l + hst_m) 
+  f3 <- ~sex * (age_l + age_m) * (fst_l + fst_m) 
+  f4 <- ~sex * (lms_l + lms_h) * (hst_l + hst_m)
+  d53 <- readRDS(testthat::test_path("testdata", "d53.rds"))
+  z <- SSBtools::MakeMicro(d53, "freq")
+  set.seed(123)
+  z$char <- sample(paste0("char", seq_len(nrow(z)/2)), nrow(z), replace = TRUE)
+  z$value <- rnorm(nrow(z))^2
+  
+  linkedGauss <- "consistent"
+  recordAware <- TRUE
+  
+  sum1 <- list(local_FALSE = c(13105L, 72123L, 108122L, 7233L), 
+               local_TRUE = c(13105L, 72123L, 108122L, 7233L), 
+               consistent_FALSE = c(13105L, 72123L, 108122L, 7233L), 
+               consistent_TRUE = c(13857L, 75961L, 117968L, 7233L), 
+               `back-tracking_FALSE` = c(13105L, 72123L, 108122L, 7233L), 
+               `back-tracking_TRUE` = c(23649L, 87129L, 141280L, 7233L), 
+               `local-bdiag_FALSE` = c(13105L, 72123L, 108122L, 7233L), 
+               `local-bdiag_TRUE` = c(13105L, 72123L, 108122L, 7233L))
+  
+  
+  sum2 <- list(local_FALSE = 634206L, 
+               local_TRUE = 656029L, 
+               consistent_FALSE = 634206L, 
+               consistent_TRUE = 643913L, 
+               `back-tracking_FALSE` = 682083L, 
+               `back-tracking_TRUE` = 740275L, 
+               global_FALSE = 651516L, 
+               global_TRUE = 651516L, 
+               `local-bdiag_FALSE` = 634206L, 
+               `local-bdiag_TRUE` = 656029L)
+  
+  sum1[["local-bdiag_FALSE"]] <- sum1[["local_FALSE"]]
+  sum1[["local-bdiag_TRUE"]] <- sum1[["local_TRUE"]]
+  sum2[["local-bdiag_FALSE"]] <- sum2[["local_FALSE"]]
+  sum2[["local-bdiag_TRUE"]] <- sum2[["local_TRUE"]]
+  
+  
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
+    for(recordAware in c(FALSE, TRUE)) {
+      
+      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      
+      a <- LinkedSuppression(data = z,
+                             fun = SuppressDominantCells,
+                             dominanceVar = "value",
+                             contributorVar = "char",
+                             withinArg = list(list(formula = f1),
+                                              list(formula = f2),
+                                              list(formula = f3),
+                                              list(formula = f4)), 
+                             recordAware =  recordAware,
+                             pPercent = 10,
+                             printXdim = TRUE,
+                             linkedGauss = linkedGauss)
+      
+      expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
+                       sum1[[paste(linkedGauss, recordAware, sep = "_")]])
+      
+    }
+  
+  
+  
+  for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
+    for(recordAware in c(FALSE, TRUE)) {
+      
+      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      
+      a <- tables_by_formulas(data = z,
+                              table_fun = SuppressDominantCells,
+                              dominanceVar = "value",
+                              contributorVar = "char",
+                              table_formulas = list(table_1 = f1,
+                                                    table_2 = f2,
+                                                    table_3 = f3,
+                                                    table_4 = f4),
+                              recordAware =  recordAware,
+                              pPercent = 50,
+                              printXdim = TRUE,
+                              linkedGauss = linkedGauss)
+      
+      expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
+                       sum2[[paste(linkedGauss, recordAware, sep = "_")]])
+    }
+})
+
+
 
 
