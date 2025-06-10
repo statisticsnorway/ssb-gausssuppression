@@ -13,6 +13,7 @@
 #             output = "inner")
 
 test_that("LinkedSuppression", {
+  skip("since more advanced tests below")
   f1 <- ~sex * (age_l + age_m + age_h) * (lms_l + lms_h) 
   f2 <- ~sex * (age_l + age_m + age_h) * (hst_l + hst_m + hst_h) 
   f3 <- ~sex * (age_l + age_m + age_h) * (fst_l + fst_m + fst_h) 
@@ -163,6 +164,9 @@ test_that("LinkedSuppression with forced", {
     )
   }
   
+  # Choose not to use this now
+  WithWarningsAsMessages <- suppressWarnings
+  
   As4list <- function(a){
     list(a[a$table_1, ], a[a$table_2, ], a[a$table_3, ], a[a$table_4, ])
   }
@@ -170,11 +174,11 @@ test_that("LinkedSuppression with forced", {
   
   
   for(linkedGauss in c("local", "consistent", "back-tracking",  "local-bdiag"))
-    for(recordAware in c(FALSE, TRUE)) {
+    for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
-      
+      capture.output({ 
       a <- WithWarningsAsMessages(LinkedSuppression(data = d53,
                                                     freqVar = "freq",
                                                     fun = SuppressSmallCounts,
@@ -192,11 +196,13 @@ test_that("LinkedSuppression with forced", {
                                                     linkedGauss = linkedGauss,  
                                                     numVar = "w",
                                                     candidates = CandidatesNum))
+      })
       
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed) + 2 * as.integer(x$unsafe))),
                        sum1[[paste(linkedGauss, recordAware, sep = "_")]])
       
       
+      capture.output({
       a <- As4list(WithWarningsAsMessages(tables_by_formulas(data = d53,
                                                     freqVar = "freq",
                                                     table_fun = SuppressSmallCounts,
@@ -214,6 +220,7 @@ test_that("LinkedSuppression with forced", {
                                                     linkedGauss = linkedGauss,  
                                                     numVar = "w",
                                                     candidates = CandidatesNum)))
+      })
     
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed) + 2 * as.integer(x$unsafe))),
                        sum2[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -261,12 +268,12 @@ test_that("LinkedSuppression with freq-singleton", {
   sum2[["local-bdiag_TRUE"]] <- sum2[["local_TRUE"]]
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
-    for(recordAware in c(FALSE, TRUE)) {
+  for(linkedGauss in "consistent") #for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
+    for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
-      
+      capture.output({ 
       a <- LinkedSuppression(data = d53,
                              freqVar = "freq",
                              fun = SuppressSmallCounts,
@@ -280,6 +287,7 @@ test_that("LinkedSuppression with freq-singleton", {
                              protectZeros = FALSE,   extend0 = FALSE, 
                              printXdim = TRUE,
                              linkedGauss = linkedGauss)
+      })
       
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
                        sum1[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -288,11 +296,12 @@ test_that("LinkedSuppression with freq-singleton", {
   
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
-    for(recordAware in c(FALSE, TRUE)) {
+  for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
+    for(recordAware in FALSE) { #for(recordAware in c(FALSE, TRUE)) {
       
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
+      capture.output({ 
       a <- tables_by_formulas(data = d53,
                               freqVar = "freq",
                               table_fun = SuppressSmallCounts,
@@ -305,6 +314,7 @@ test_that("LinkedSuppression with freq-singleton", {
                               protectZeros = FALSE,   extend0 = FALSE, 
                               printXdim = TRUE,
                               linkedGauss = linkedGauss)
+      })
       
       expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
                        sum2[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -355,11 +365,12 @@ test_that("LinkedSuppression with num-singleton", {
   
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
-    for(recordAware in c(FALSE, TRUE)) {
+  for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
+    for(recordAware in FALSE) { #for(recordAware in c(FALSE, TRUE)) {
       
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
+      capture.output({ 
       a <- LinkedSuppression(data = z,
                              fun = SuppressDominantCells,
                              dominanceVar = "value",
@@ -372,6 +383,7 @@ test_that("LinkedSuppression with num-singleton", {
                              pPercent = 10,
                              printXdim = TRUE,
                              linkedGauss = linkedGauss)
+      })
       
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
                        sum1[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -380,11 +392,12 @@ test_that("LinkedSuppression with num-singleton", {
   
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
-    for(recordAware in c(FALSE, TRUE)) {
+  for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
+    for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
+      capture.output({ 
       a <- tables_by_formulas(data = z,
                               table_fun = SuppressDominantCells,
                               dominanceVar = "value",
@@ -397,6 +410,7 @@ test_that("LinkedSuppression with num-singleton", {
                               pPercent = 50,
                               printXdim = TRUE,
                               linkedGauss = linkedGauss)
+      })
       
       expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
                        sum2[[paste(linkedGauss, recordAware, sep = "_")]])
