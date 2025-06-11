@@ -19,7 +19,7 @@
 #'  
 #' #### Similar to parameter_linkedGauss example
 #' # Trick "sector4 - sector4" and "geo - geo" to ensure same names in output 
-#' output <- LinkedSuppression(data = SSBtoolsData("magnitude1"),
+#' output <- SuppressLinkedTables(data = SSBtoolsData("magnitude1"),
 #'                  fun = SuppressDominantCells, 
 #'                  withinArg = list(list(formula = ~(geo + eu) * sector2 + sector4 - sector4), 
 #'                                   list(formula = ~eu:sector4 - 1 + geo - geo), 
@@ -37,7 +37,7 @@
 #' names(z2b)[1] <- "region" 
 #' # As 'f' and 'e' in ChainedSuppression example. 
 #' # 'A' 'annet'/'arbeid' suppressed in b[[1]], since suppressed in b[[3]].
-#' b <- LinkedSuppression(fun = SuppressSmallCounts,
+#' b <- SuppressLinkedTables(fun = SuppressSmallCounts,
 #'      linkedGauss = "back-tracking",  
 #'      singletonMethod = "none",  # since For now singletonMethod must be none ... 
 #'      recordAware = FALSE,
@@ -45,7 +45,7 @@
 #'        list(data = z1, dimVar = 1:2, freqVar = 3, maxN = 5), 
 #'        list(data = z2b, dimVar = 1:2, freqVar = 3, maxN = 5), 
 #'        list(data = z2, dimVar = 1:4, freqVar = 5, maxN = 1)))
-LinkedSuppression <- function(fun, 
+SuppressLinkedTables <- function(fun, 
                               data = NULL, 
                               ..., 
                               withinArg = NULL, 

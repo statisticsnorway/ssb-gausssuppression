@@ -12,7 +12,7 @@
 #                                                       table_4 = f4)), 
 #             output = "inner")
 
-test_that("LinkedSuppression", {
+test_that("SuppressLinkedTables", {
   skip("since more advanced tests below")
   f1 <- ~sex * (age_l + age_m + age_h) * (lms_l + lms_h) 
   f2 <- ~sex * (age_l + age_m + age_h) * (hst_l + hst_m + hst_h) 
@@ -55,7 +55,7 @@ test_that("LinkedSuppression", {
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
       
-      a <- LinkedSuppression(data = d53,
+      a <- SuppressLinkedTables(data = d53,
                              freqVar = "freq",
                              fun = SuppressSmallCounts,
                              withinArg = list(list(formula = f1),
@@ -104,7 +104,7 @@ test_that("LinkedSuppression", {
 
 
 
-test_that("LinkedSuppression with forced", {
+test_that("SuppressLinkedTables with forced", {
   f1 <- ~sex * (age_l + age_m + age_h) * (lms_l + lms_h) 
   f2 <- ~sex * (age_l + age_m + age_h) * (hst_l + hst_m + hst_h) 
   f3 <- ~sex * (age_l + age_m + age_h) * (fst_l + fst_m + fst_h) 
@@ -117,7 +117,7 @@ test_that("LinkedSuppression with forced", {
   # In order for the candidates order to be the same
   # But what should be the same will not be exactly the same anyway. 
   # This is because the common candidates order is not 
-  # input to LinkedSuppression() 
+  # input to SuppressLinkedTables() 
   set.seed(123)
   d53$w = d53$freq + runif(nrow(d53))/nrow(d53)
   
@@ -179,7 +179,7 @@ test_that("LinkedSuppression with forced", {
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
       capture.output({ 
-      a <- WithWarningsAsMessages(LinkedSuppression(data = d53,
+      a <- WithWarningsAsMessages(SuppressLinkedTables(data = d53,
                                                     freqVar = "freq",
                                                     fun = SuppressSmallCounts,
                                                     withinArg = list(list(formula = f1),
@@ -230,7 +230,7 @@ test_that("LinkedSuppression with forced", {
 
 
 
-test_that("LinkedSuppression with freq-singleton", {
+test_that("SuppressLinkedTables with freq-singleton", {
   f1 <- ~sex * (age_l + age_m + age_h) * (lms_l + lms_h) 
   f2 <- ~sex * (age_l + age_m + age_h) * (hst_l + hst_m + hst_h) 
   f3 <- ~sex * (age_l + age_m + age_h) * (fst_l + fst_m + fst_h) 
@@ -274,7 +274,7 @@ test_that("LinkedSuppression with freq-singleton", {
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
       capture.output({ 
-      a <- LinkedSuppression(data = d53,
+      a <- SuppressLinkedTables(data = d53,
                              freqVar = "freq",
                              fun = SuppressSmallCounts,
                              withinArg = list(list(formula = f1),
@@ -323,7 +323,7 @@ test_that("LinkedSuppression with freq-singleton", {
 
 
 
-test_that("LinkedSuppression with num-singleton", {
+test_that("SuppressLinkedTables with num-singleton", {
   f1 <- ~sex * (age_l + age_m) * (lms_l) 
   f2 <- ~sex * (age_l + age_m) * (hst_l + hst_m) 
   f3 <- ~sex * (age_l + age_m) * (fst_l + fst_m) 
@@ -371,7 +371,7 @@ test_that("LinkedSuppression with num-singleton", {
       cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
       capture.output({ 
-      a <- LinkedSuppression(data = z,
+      a <- SuppressLinkedTables(data = z,
                              fun = SuppressDominantCells,
                              dominanceVar = "value",
                              contributorVar = "char",
