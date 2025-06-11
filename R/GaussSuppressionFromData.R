@@ -159,6 +159,12 @@
 #'
 #' @param linkedGauss See \link{parameter_linkedGauss}. 
 #' @param recordAware Parameter associated with `linkedGauss`. See \link{parameter_linkedGauss}.  
+#' @param linkedTables A list specifying how the tables referenced in the `formula` 
+#'   parameter should be combined for use in the linked-tables algorithm. 
+#'   Each element in the list contains one or more names of the tables in `formula`. 
+#'   The corresponding tables will be combined and treated as a single table by the algorithm.
+#'   For example: `linkedTables = list(c("table_1", "table_3"), "table_2")`.
+#'   If `NULL` (default), each table in `formula` is used individually.
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
@@ -249,7 +255,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            aggregateBaseOrder = FALSE,
                            rowGroupsPackage = aggregatePackage,
                            linkedGauss = NULL,
-                           recordAware = TRUE
+                           recordAware = TRUE,
+                           linkedTables = NULL
                            ){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
@@ -277,14 +284,24 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     stop("spec must be a properly named list")
   }
   
+  
+  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag"), okNULL = TRUE)
   if (is.list(formula)) {
     table_formulas <- formula
     formula <- combine_formulas(table_formulas)
-    attr(formula, "table_formulas") <- table_formulas
+  } else {
+    if (!is.null(linkedGauss)) {
+      table_formulas <- attr(formula, "table_formulas")
+      if (is.null(table_formulas)) {
+        stop("missing formula attribute, table_formulas")
+      } 
+    }
   }
-  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag"), okNULL = TRUE)
-  
-  
+  if (!is.null(linkedGauss) & !is.null(linkedTables)) {
+    table_formulas <- lapply(linkedTables, function(x) combine_formulas(table_formulas[x]))
+    formula <- combine_formulas(table_formulas)
+  }
+
   # Possible development function as input
   # Special temporary feature 
   if (is.function(output)) {
@@ -694,10 +711,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   cell_grouping <- NULL
   if (!is.null(linkedGauss)) {
     if (linkedGauss %in% c("local", "consistent", "back-tracking", "local-bdiag")) {
-      table_formulas <- attr(formula, "table_formulas")
-      if (is.null(table_formulas)) {
-        stop("missing formula attribute, table_formulas")
-      }
+      names(table_formulas) <- paste0("t", seq_len(length(table_formulas)))
       table_memberships <- as.data.frame(matrix(NA, ncol(x), length(table_formulas)))
       names(table_memberships) <- names(table_formulas)
       
@@ -911,7 +925,7 @@ record_consistent_table_memberships <- function(table_memberships, x, aggregateP
   selected <- dd %in% dd_duplicated
   selected_dd <- data.frame(selected_dd = dd[selected])
   
-  selected_memberships <- aggregate_by_pkg(data = cbind(selected_dd, table_memberships[selected, ]), 
+  selected_memberships <- aggregate_by_pkg(data = cbind(selected_dd, table_memberships[selected, , drop = FALSE]), 
                                            by = "selected_dd", 
                                            var = names(table_memberships), 
                                            pkg = aggregatePackage,

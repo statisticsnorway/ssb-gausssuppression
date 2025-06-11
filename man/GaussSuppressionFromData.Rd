@@ -43,7 +43,8 @@ GaussSuppressionFromData(
   aggregateBaseOrder = FALSE,
   rowGroupsPackage = aggregatePackage,
   linkedGauss = NULL,
-  recordAware = TRUE
+  recordAware = TRUE,
+  linkedTables = NULL
 )
 }
 \arguments{
@@ -197,6 +198,13 @@ via \code{\link[SSBtools]{ModelMatrix}}.}
 \item{linkedGauss}{See \link{parameter_linkedGauss}.}
 
 \item{recordAware}{Parameter associated with \code{linkedGauss}. See \link{parameter_linkedGauss}.}
+
+\item{linkedTables}{A list specifying how the tables referenced in the \code{formula}
+parameter should be combined for use in the linked-tables algorithm.
+Each element in the list contains one or more names of the tables in \code{formula}.
+The corresponding tables will be combined and treated as a single table by the algorithm.
+For example: \code{linkedTables = list(c("table_1", "table_3"), "table_2")}.
+If \code{NULL} (default), each table in \code{formula} is used individually.}
 }
 \value{
 Aggregated data with suppression information
