@@ -1,14 +1,34 @@
  
 
 #' Consistent Suppression of Linked Tables 
+#' 
+#' Provides alternatives to global suppression for linked tables through 
+#' methods that may reduce the computational burden. 
 #'
 #' @inheritParams AdditionalSuppression
 #' @param data The `data` argument to `fun`. When NULL `data` must be included in  `withinArg`.
-#' @param ... Arguments to `fun` that are not kept constant.
+#' @param ... Arguments to `fun` that are kept constant.
 #' @param withinArg A list of named lists. Arguments to `fun` that are not kept constant.
-#' @param linkedGauss  See \link{parameter_linkedGauss}. 
-#' @param recordAware  See \link{parameter_linkedGauss}.
-#' @param iterBackTracking See \link{parameter_linkedGauss}.
+#' @param linkedGauss Specifies the strategy for protecting linked tables. Possible values are:
+#'
+#' - `"consistent"` (default): All linked tables are protected by a single call to `GaussSuppression()`. 
+#'    The algorithm internally constructs a block diagonal model matrix and handles common cells 
+#'    consistently across tables.
+#' 
+#' - `"local"`: Each table is protected independently by a separate call to `GaussSuppression()`.
+#'
+#' - `"back-tracking"`: Iterative approach where each table is protected via `GaussSuppression()`, 
+#'    and primary suppressions are adjusted based on secondary suppressions from other tables across 
+#'    iterations.
+#'
+#' - `"local-bdiag"`: Produces the same result as `"local"`, but uses a single call to 
+#'   `GaussSuppression()` with a block diagonal matrix. It does not apply the linked-table methodology.
+#' 
+#' @param recordAware If `TRUE` (default), the suppression procedure will ensure consistency 
+#'                    across cells that aggregate the same underlying records, 
+#'                    even when their variable combinations differ.
+#'                    When `TRUE`, `data` cannot be included in  `withinArg`.
+#' @param iterBackTracking Maximum number of back-tracking iterations.
 #' @param whenEmptyUnsuppressed Parameter to \code{\link[SSBtools]{GaussSuppression}}.
 #'
 #' @return List of data frames

@@ -21,15 +21,29 @@ SuppressLinkedTables(
 
 \item{data}{The \code{data} argument to \code{fun}. When NULL \code{data} must be included in  \code{withinArg}.}
 
-\item{...}{Arguments to \code{fun} that are not kept constant.}
+\item{...}{Arguments to \code{fun} that are kept constant.}
 
 \item{withinArg}{A list of named lists. Arguments to \code{fun} that are not kept constant.}
 
-\item{linkedGauss}{See \link{parameter_linkedGauss}.}
+\item{linkedGauss}{Specifies the strategy for protecting linked tables. Possible values are:
+\itemize{
+\item \code{"consistent"} (default): All linked tables are protected by a single call to \code{GaussSuppression()}.
+The algorithm internally constructs a block diagonal model matrix and handles common cells
+consistently across tables.
+\item \code{"local"}: Each table is protected independently by a separate call to \code{GaussSuppression()}.
+\item \code{"back-tracking"}: Iterative approach where each table is protected via \code{GaussSuppression()},
+and primary suppressions are adjusted based on secondary suppressions from other tables across
+iterations.
+\item \code{"local-bdiag"}: Produces the same result as \code{"local"}, but uses a single call to
+\code{GaussSuppression()} with a block diagonal matrix. It does not apply the linked-table methodology.
+}}
 
-\item{recordAware}{See \link{parameter_linkedGauss}.}
+\item{recordAware}{If \code{TRUE} (default), the suppression procedure will ensure consistency
+across cells that aggregate the same underlying records,
+even when their variable combinations differ.
+When \code{TRUE}, \code{data} cannot be included in  \code{withinArg}.}
 
-\item{iterBackTracking}{See \link{parameter_linkedGauss}.}
+\item{iterBackTracking}{Maximum number of back-tracking iterations.}
 
 \item{whenEmptyUnsuppressed}{Parameter to \code{\link[SSBtools]{GaussSuppression}}.}
 }
@@ -37,7 +51,8 @@ SuppressLinkedTables(
 List of data frames
 }
 \description{
-Consistent Suppression of Linked Tables
+Provides alternatives to global suppression for linked tables through
+methods that may reduce the computational burden.
 }
 \examples{
  
