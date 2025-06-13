@@ -51,25 +51,56 @@ When \code{TRUE}, \code{data} cannot be included in  \code{withinArg}.}
 List of data frames
 }
 \description{
-Provides alternatives to global suppression for linked tables through
+Provides alternatives to global protection for linked tables through
 methods that may reduce the computational burden.
 }
 \examples{
+
+### The first example can be performed in three ways
+### Alternatives are possible since only the formula parameter varies between the linked tables
  
-#### Similar to parameter_linkedGauss example
-# Trick "sector4 - sector4" and "geo - geo" to ensure same names in output 
-output <- SuppressLinkedTables(data = SSBtoolsData("magnitude1"),
-                 fun = SuppressDominantCells, 
+a <- SuppressLinkedTables(data = SSBtoolsData("magnitude1"), # With trick "sector4 - sector4" and 
+                 fun = SuppressDominantCells,        # "geo - geo" to ensure same names in output
                  withinArg = list(list(formula = ~(geo + eu) * sector2 + sector4 - sector4), 
                                   list(formula = ~eu:sector4 - 1 + geo - geo), 
                                   list(formula = ~geo + eu + sector4 - 1)), 
                  dominanceVar  = "value", 
                  pPercent = 10, 
                  contributorVar = "company",
-                 singletonMethod = "none", 
-                 linkedGauss = "consistent") 
+                 linkedGauss = "consistent")
+print(a)  
 
-####  Similar to LazyLinkedTables example:
+# Alternatively, SuppressDominantCells() can be run directly using the linkedGauss parameter  
+a1 <- SuppressDominantCells(SSBtoolsData("magnitude1"), 
+               formula = list(table_1 = ~(geo + eu) * sector2, 
+                              table_2 = ~eu:sector4 - 1,
+                              table_3 = ~(geo + eu) + sector4 - 1), 
+               dominanceVar = "value", 
+               pPercent = 10, 
+               contributorVar = "company", 
+               linkedGauss = "consistent")
+print(a1)
+
+# In fact, tables_by_formulas() is also a possibility
+a2 <- tables_by_formulas(SSBtoolsData("magnitude1"),
+               table_fun = SuppressDominantCells, 
+               table_formulas = list(table_1 = ~region * sector2, 
+                                    table_2 = ~region1:sector4 - 1, 
+                                    table_3 = ~region + sector4 - 1), 
+               substitute_vars = list(region = c("geo", "eu"), region1 = "eu"), 
+               collapse_vars = list(sector = c("sector2", "sector4")), 
+               dominanceVar  = "value", 
+               pPercent = 10, 
+               contributorVar = "company",
+               linkedGauss = "consistent") 
+print(a2)                 
+               
+               
+               
+               
+####  The second example cannot be handled using the alternative methods.
+####  This is similar to the (old) LazyLinkedTables() example.
+
 z1 <- SSBtoolsData("z1")
 z2 <- SSBtoolsData("z2")
 z2b <- z2[3:5]  # As in ChainedSuppression example 
@@ -77,11 +108,12 @@ names(z2b)[1] <- "region"
 # As 'f' and 'e' in ChainedSuppression example. 
 # 'A' 'annet'/'arbeid' suppressed in b[[1]], since suppressed in b[[3]].
 b <- SuppressLinkedTables(fun = SuppressSmallCounts,
-     linkedGauss = "back-tracking",  
-     singletonMethod = "none",  # since For now singletonMethod must be none ... 
-     recordAware = FALSE,
-     withinArg = list(
-       list(data = z1, dimVar = 1:2, freqVar = 3, maxN = 5), 
-       list(data = z2b, dimVar = 1:2, freqVar = 3, maxN = 5), 
-       list(data = z2, dimVar = 1:4, freqVar = 5, maxN = 1)))
+              linkedGauss = "consistent",  
+              recordAware = FALSE,
+              withinArg = list(
+                list(data = z1, dimVar = 1:2, freqVar = 3, maxN = 5), 
+                list(data = z2b, dimVar = 1:2, freqVar = 3, maxN = 5), 
+                list(data = z2, dimVar = 1:4, freqVar = 5, maxN = 1)))
+print(b)        
+       
 }

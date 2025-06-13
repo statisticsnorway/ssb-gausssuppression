@@ -156,9 +156,15 @@
 #' @param rowGroupsPackage Parameter `pkg` to \code{\link[SSBtools]{RowGroups}}.
 #'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
 #'               via \code{\link[SSBtools]{ModelMatrix}}. 
-#'
-#' @param linkedGauss See \link{parameter_linkedGauss}. 
-#' @param recordAware Parameter associated with `linkedGauss`. See \link{parameter_linkedGauss}.  
+#' @param linkedGauss Controls linked table suppression. Accepted values are described in the 
+#'        documentation for [SuppressLinkedTables()]. See also the corresponding examples, which 
+#'        demonstrate usage with alternative function interfaces. 
+#'        In addition, `linkedGauss = "global"` is allowed and corresponds to standard execution 
+#'        (i.e., when `linkedGauss` is not specified). 
+#'        When `linkedGauss` is used, the `formula` parameter should be provided as a list of formulas. 
+#'        Alternatively, `formula` may have an attribute `"table_formulas"` containing such a list.
+#'        See also the `linkedTables` parameter below.
+#' @param recordAware Parameter associated with `linkedGauss`. See [SuppressLinkedTables()].  
 #' @param linkedTables A list specifying how the tables referenced in the `formula` 
 #'   parameter should be combined for use in the linked-tables algorithm. 
 #'   Each element in the list contains one or more names of the tables in `formula`. 
@@ -293,7 +299,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     if (!is.null(linkedGauss)) {
       table_formulas <- attr(formula, "table_formulas")
       if (is.null(table_formulas)) {
-        stop("missing formula attribute, table_formulas")
+        stop("With 'linkedGauss', 'formula' must be either a list of formulas or have a 'table_formulas' attribute.")
       } 
     }
   }

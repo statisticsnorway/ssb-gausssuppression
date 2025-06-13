@@ -195,9 +195,16 @@ The parameter will have impact when, e.g \code{output = "inner"}.}
 The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}}
 via \code{\link[SSBtools]{ModelMatrix}}.}
 
-\item{linkedGauss}{See \link{parameter_linkedGauss}.}
+\item{linkedGauss}{Controls linked table suppression. Accepted values are described in the
+documentation for \code{\link[=SuppressLinkedTables]{SuppressLinkedTables()}}. See also the corresponding examples, which
+demonstrate usage with alternative function interfaces.
+In addition, \code{linkedGauss = "global"} is allowed and corresponds to standard execution
+(i.e., when \code{linkedGauss} is not specified).
+When \code{linkedGauss} is used, the \code{formula} parameter should be provided as a list of formulas.
+Alternatively, \code{formula} may have an attribute \code{"table_formulas"} containing such a list.
+See also the \code{linkedTables} parameter below.}
 
-\item{recordAware}{Parameter associated with \code{linkedGauss}. See \link{parameter_linkedGauss}.}
+\item{recordAware}{Parameter associated with \code{linkedGauss}. See \code{\link[=SuppressLinkedTables]{SuppressLinkedTables()}}.}
 
 \item{linkedTables}{A list specifying how the tables referenced in the \code{formula}
 parameter should be combined for use in the linked-tables algorithm.
