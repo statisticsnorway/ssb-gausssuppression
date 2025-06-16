@@ -180,7 +180,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     while (rerun) {
       rerun <- FALSE
       iter <- iter + 1
-      cat("\n   =====   back-tracking iteration", iter, "=====\n")
+      if (!local) {
+        cat("\n   =====   back-tracking iteration", iter, "=====\n")
+      }
       i_secondary <- integer(0)
       for (i in seq_along(x)) {
         if (! local) {
