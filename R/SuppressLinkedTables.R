@@ -97,8 +97,8 @@
 #'                 list(data = z2, dimVar = 1:4, freqVar = 5, maxN = 1)))
 #' print(b)        
 #'        
-SuppressLinkedTables <- function(fun, 
-                              data = NULL, 
+SuppressLinkedTables <- function(data = NULL,
+                              fun,
                               ..., 
                               withinArg = NULL, 
                               linkedGauss,
@@ -119,7 +119,11 @@ SuppressLinkedTables <- function(fun,
   }
   parentFrame <- parent.frame()
   sysCall <- as.list(sys.call())[-1]
-  
+
+  if (!("fun" %in% names(sysCall))) {
+    stop("Argument 'fun' must be specified by name.")
+  }
+    
   removeArgs <- c("fun", "linkedGauss", "withinArg")
   if (is.null(data)) {
     removeArgs <- c(removeArgs, "data")

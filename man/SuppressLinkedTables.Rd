@@ -5,8 +5,8 @@
 \title{Consistent Suppression of Linked Tables}
 \usage{
 SuppressLinkedTables(
-  fun,
   data = NULL,
+  fun,
   ...,
   withinArg = NULL,
   linkedGauss,
@@ -16,10 +16,10 @@ SuppressLinkedTables(
 )
 }
 \arguments{
+\item{data}{The \code{data} argument to \code{fun}. When NULL \code{data} must be included in  \code{withinArg}.}
+
 \item{fun}{A function: \code{\link{GaussSuppressionFromData}} or one of its wrappers such as
 \code{\link{SuppressSmallCounts}} and \code{\link{SuppressDominantCells}}.}
-
-\item{data}{The \code{data} argument to \code{fun}. When NULL \code{data} must be included in  \code{withinArg}.}
 
 \item{...}{Arguments to \code{fun} that are kept constant.}
 
