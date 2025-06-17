@@ -4,6 +4,15 @@
 #' 
 #' Provides alternatives to global protection for linked tables through 
 #' methods that may reduce the computational burden. 
+#' 
+#' The reason for introducing the new method `"consistent"`, which has not yet been extensively tested in practice, 
+#' is to provide something that works better than `"back-tracking"`, while still offering equally strong protection.
+#'
+#' Note that for singleton methods of the *elimination* type (see [SSBtools::NumSingleton()]), `"back-tracking"` may lead to 
+#' the creation of a large number of redundant secondary cells. This is because, during the method's iterations, 
+#' all secondary cells are eventually treated as primary. As a result, protection is applied to prevent a singleton 
+#' contributor from inferring a secondary cell that was only included to protect that same contributor.
+
 #'
 #' @inheritParams AdditionalSuppression
 #' @param data The `data` argument to `fun`. When NULL `data` must be included in  `withinArg`.
@@ -101,7 +110,7 @@ SuppressLinkedTables <- function(data = NULL,
                               fun,
                               ..., 
                               withinArg = NULL, 
-                              linkedGauss,
+                              linkedGauss = "consistent",
                               recordAware = TRUE,
                               iterBackTracking = Inf,
                               whenEmptyUnsuppressed = NULL) {

@@ -9,7 +9,7 @@ SuppressLinkedTables(
   fun,
   ...,
   withinArg = NULL,
-  linkedGauss,
+  linkedGauss = "consistent",
   recordAware = TRUE,
   iterBackTracking = Inf,
   whenEmptyUnsuppressed = NULL
@@ -53,6 +53,15 @@ List of data frames
 \description{
 Provides alternatives to global protection for linked tables through
 methods that may reduce the computational burden.
+}
+\details{
+The reason for introducing the new method \code{"consistent"}, which has not yet been extensively tested in practice,
+is to provide something that works better than \code{"back-tracking"}, while still offering equally strong protection.
+
+Note that for singleton methods of the \emph{elimination} type (see \code{\link[SSBtools:NumSingleton]{SSBtools::NumSingleton()}}), \code{"back-tracking"} may lead to
+the creation of a large number of redundant secondary cells. This is because, during the method's iterations,
+all secondary cells are eventually treated as primary. As a result, protection is applied to prevent a singleton
+contributor from inferring a secondary cell that was only included to protect that same contributor.
 }
 \examples{
 
