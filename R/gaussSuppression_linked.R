@@ -34,7 +34,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     table_memberships = NULL,
                                     cell_grouping = TRUE,
                                     iterBackTracking = 0L, 
-                                    sequential = TRUE) {
+                                    sequential = TRUE,
+                                    printInc = TRUE,
+                                    printXdim = FALSE) {
   
   local <- identical(iterBackTracking, "local")
   if (local) {
@@ -125,8 +127,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       
       ##    candidates <- candidates[order(table_id[candidates])]     ###################################### Maybe choose such order by a parameter 
       
-      if (TRUE) {  # if (printXdim) {
-        #printInc <- TRUE
+      if (printXdim) {
         cat("{table_memberships}<", nrow(x), "*", ncol(x), ">", sep = "")
         flush.console()
       }  
@@ -176,11 +177,19 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     
     rerun <- TRUE
     
+    if (printInc) {
+      if (local) {
+        cat_linkedGauss("local")
+      } else {
+        cat_linkedGauss("back-tracking")
+      }
+    }
+    
     iter <- 0
     while (rerun) {
       rerun <- FALSE
       iter <- iter + 1
-      if (!local) {
+      if (!local & printInc) {
         cat("\n   =====   back-tracking iteration", iter, "=====\n")
       }
       i_secondary <- integer(0)
@@ -198,8 +207,8 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                              forced = forced[[i]], hidden = hidden[[i]],
                                              singleton = singleton[[i]],
                                              singletonMethod = singletonMethod[[i]], 
-                                             xExtraPrimary = NULL,
-                                             auto_anySumNOTprimary = FALSE)
+                                             auto_anySumNOTprimary = FALSE, 
+                                             printInc = printInc, printXdim = printXdim)
           if (sequential) {
             suppressed_col[[i]] <- find_suppressed_col(orig_col[[i]], primary[[i]], secondary[[i]])
           } else {
@@ -326,21 +335,28 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     }
   }
   
+  if (printInc) {
+    if (is.null(cell_grouping)) {
+      cat_linkedGauss("local-bdiag")
+    } else {
+      cat_linkedGauss("consistent")
+    }
+  }
   
   secondary <- GaussSuppression(x = x, 
+                                ...,
                                 candidates = candidates, 
                                 primary = primary, 
                                 forced = forced, 
                                 hidden = hidden, 
                                 singleton = singleton, 
                                 singletonMethod = singletonMethod, 
-                                printXdim = TRUE, 
                                 whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
-                                xExtraPrimary = NULL, 
-                                unsafeAsNegative = TRUE, 
                                 cell_grouping = cell_grouping,
                                 table_id = table_id,
-                                auto_anySumNOTprimary = FALSE)
+                                auto_anySumNOTprimary = FALSE,
+                                printInc = printInc,
+                                printXdim = printXdim)
   
   unsafe <- -secondary[secondary < 0]
   secondary <- secondary[secondary > 0]
@@ -673,3 +689,7 @@ removeDuplicatedRows <- function(x, singleton) {
        singleton = list(freq = singleton, num = singleton_num))
 }
 
+
+cat_linkedGauss <- function(linkedGauss = "consistent") {
+  cat('\n====== Linked GaussSuppression by "', linkedGauss, '" algorithm:\n\n', sep = "")
+}

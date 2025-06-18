@@ -12,7 +12,6 @@
 #' the creation of a large number of redundant secondary cells. This is because, during the method's iterations, 
 #' all secondary cells are eventually treated as primary. As a result, protection is applied to prevent a singleton 
 #' contributor from inferring a secondary cell that was only included to protect that same contributor.
-
 #'
 #' @inheritParams AdditionalSuppression
 #' @param data The `data` argument to `fun`. When NULL `data` must be included in  `withinArg`.
@@ -211,19 +210,20 @@ SuppressLinkedTables <- function(data = NULL,
     iterBackTracking = "local"
   }
   
-  secondary <- gaussSuppression_linked(x = list_element(env_list, "x"), 
-                                       candidates = list_element(env_list, "candidates"), 
-                                       primary = list_element(env_list, "primary"), 
-                                       forced = list_element(env_list, "forced"), 
-                                       hidden = list_element(env_list, "hidden"), 
-                                       singleton = list_element(env_list, "singleton"), 
-                                       singletonMethod = list_element(env_list, "singletonMethod"), 
-                                       xExtraPrimary = list_element(env_list, "xExtraPrimary"),
-                                       printInc = TRUE, 
+  secondary <- gaussSuppression_linked_fix_dots(
+                                       x_ = list_element(env_list, "x"), 
+                                       candidates_ = list_element(env_list, "candidates"), 
+                                       primary_ = list_element(env_list, "primary"), 
+                                       forced_ = list_element(env_list, "forced"), 
+                                       hidden_ = list_element(env_list, "hidden"), 
+                                       singleton_ = list_element(env_list, "singleton"), 
+                                       singletonMethod_ = list_element(env_list, "singletonMethod"), 
+                                       xExtraPrimary_ = list_element(env_list, "xExtraPrimary"),
                                        whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
                                        unsafeAsNegative = TRUE,
                                        dup_id = dup_id,
-                                       iterBackTracking = iterBackTracking)
+                                       iterBackTracking = iterBackTracking, 
+                                       ...)
   for (i in seq_len(n)) {
     env_list[[i]]$secondary <- secondary[[i]]
   }
@@ -233,6 +233,35 @@ SuppressLinkedTables <- function(data = NULL,
   }
   return(suppressedData)
   
+}
+
+# To avoid formal argument "candidates" matched by multiple actual arguments
+gaussSuppression_linked_fix_dots <- function(x_,  
+                        candidates_, 
+                        primary_, 
+                        forced_, 
+                        hidden_, 
+                        singleton_, 
+                        singletonMethod_, 
+                        xExtraPrimary_,
+                        x,
+                        candidates, 
+                        primary, 
+                        forced, 
+                        hidden, 
+                        singleton, 
+                        singletonMethod, 
+                        xExtraPrimary,
+                        ...){
+  gaussSuppression_linked(x = x_, 
+                          candidates = candidates_, 
+                          primary = primary_, 
+                          forced = forced_, 
+                          hidden = hidden_, 
+                          singleton = singleton_, 
+                          singletonMethod = singletonMethod_,  
+                          xExtraPrimary = xExtraPrimary_,
+                          ...)
 }
 
 
