@@ -111,8 +111,8 @@ test_that("SuppressLinkedTables with forced", {
   f4 <- ~sex * (lms_l + lms_h) * (hst_l + hst_m + hst_h)
   d53 <- readRDS(testthat::test_path("testdata", "d53.rds"))
   
-  linkedGauss <- "consistent"
-  recordAware <- TRUE
+  printXdim <- FALSE
+  printInc <- FALSE
   
   # In order for the candidates order to be the same
   # But what should be the same will not be exactly the same anyway. 
@@ -165,7 +165,11 @@ test_that("SuppressLinkedTables with forced", {
   }
   
   # Choose not to use this now
-  WithWarningsAsMessages <- suppressWarnings
+  # WithWarningsAsMessages <- suppressWarnings
+  
+  # Choose not to suppress messages now
+  WithWarningsAsMessages_ <- WithWarningsAsMessages
+  WithWarningsAsMessages <- function(...) suppressMessages(WithWarningsAsMessages_(...))
   
   As4list <- function(a){
     list(a[a$table_1, ], a[a$table_2, ], a[a$table_3, ], a[a$table_4, ])
@@ -176,9 +180,8 @@ test_that("SuppressLinkedTables with forced", {
   for(linkedGauss in c("local", "consistent", "back-tracking",  "local-bdiag"))
     for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
-      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
-      capture.output({ 
       a <- WithWarningsAsMessages(SuppressLinkedTables(data = d53,
                                                     freqVar = "freq",
                                                     fun = SuppressSmallCounts,
@@ -190,19 +193,18 @@ test_that("SuppressLinkedTables with forced", {
                                                     preAggregate = TRUE,
                                                     maxN = 3, 
                                                     protectZeros = FALSE,   extend0 = FALSE, 
-                                                    printXdim = TRUE,
+                                                    printXdim = printXdim,
+                                                    printInc = printInc,
                                                     singletonMethod = "none", 
                                                     forced = forced,
                                                     linkedGauss = linkedGauss,  
                                                     numVar = "w",
                                                     candidates = CandidatesNum))
-      })
       
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed) + 2 * as.integer(x$unsafe))),
                        sum1[[paste(linkedGauss, recordAware, sep = "_")]])
       
       
-      capture.output({
       a <- As4list(WithWarningsAsMessages(tables_by_formulas(data = d53,
                                                     freqVar = "freq",
                                                     table_fun = SuppressSmallCounts,
@@ -214,13 +216,13 @@ test_that("SuppressLinkedTables with forced", {
                                                     preAggregate = TRUE,
                                                     maxN = 3, 
                                                     protectZeros = FALSE,   extend0 = FALSE, 
-                                                    printXdim = TRUE,
+                                                    printXdim = printXdim,
+                                                    printInc = printInc,
                                                     singletonMethod = "none", 
                                                     forced = forced,
                                                     linkedGauss = linkedGauss,  
                                                     numVar = "w",
                                                     candidates = CandidatesNum)))
-      })
     
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed) + 2 * as.integer(x$unsafe))),
                        sum2[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -237,8 +239,8 @@ test_that("SuppressLinkedTables with freq-singleton", {
   f4 <- ~sex * (lms_l + lms_h) * (hst_l + hst_m + hst_h)
   d53 <- readRDS(testthat::test_path("testdata", "d53.rds"))
   
-  linkedGauss <- "consistent"
-  recordAware <- TRUE
+  printXdim <- FALSE
+  printInc <- FALSE
   
   sum1 <- 
     list(local_FALSE = c(1367202L, 2440464L, 5143007L, 20531L), 
@@ -271,9 +273,8 @@ test_that("SuppressLinkedTables with freq-singleton", {
   for(linkedGauss in "consistent") #for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
     for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
-      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
-      capture.output({ 
       a <- SuppressLinkedTables(data = d53,
                              freqVar = "freq",
                              fun = SuppressSmallCounts,
@@ -285,9 +286,9 @@ test_that("SuppressLinkedTables with freq-singleton", {
                              preAggregate = TRUE,
                              maxN = 3, 
                              protectZeros = FALSE,   extend0 = FALSE, 
-                             printXdim = TRUE,
+                             printXdim = printXdim,
+                             printInc = printInc,
                              linkedGauss = linkedGauss)
-      })
       
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
                        sum1[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -299,9 +300,8 @@ test_that("SuppressLinkedTables with freq-singleton", {
   for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
     for(recordAware in FALSE) { #for(recordAware in c(FALSE, TRUE)) {
       
-      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
-      capture.output({ 
       a <- tables_by_formulas(data = d53,
                               freqVar = "freq",
                               table_fun = SuppressSmallCounts,
@@ -312,9 +312,9 @@ test_that("SuppressLinkedTables with freq-singleton", {
                               recordAware =  recordAware,
                               maxN = 3, 
                               protectZeros = FALSE,   extend0 = FALSE, 
-                              printXdim = TRUE,
+                              printXdim = printXdim,
+                              printInc = printInc,
                               linkedGauss = linkedGauss)
-      })
       
       expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
                        sum2[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -334,8 +334,8 @@ test_that("SuppressLinkedTables with num-singleton", {
   z$char <- sample(paste0("char", seq_len(nrow(z)/2)), nrow(z), replace = TRUE)
   z$value <- rnorm(nrow(z))^2
   
-  linkedGauss <- "consistent"
-  recordAware <- TRUE
+  printXdim <- FALSE
+  printInc <- FALSE
   
   sum1 <- list(local_FALSE = c(13105L, 72123L, 108122L, 7233L), 
                local_TRUE = c(13105L, 72123L, 108122L, 7233L), 
@@ -368,9 +368,8 @@ test_that("SuppressLinkedTables with num-singleton", {
   for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
     for(recordAware in FALSE) { #for(recordAware in c(FALSE, TRUE)) {
       
-      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
-      capture.output({ 
       a <- SuppressLinkedTables(data = z,
                              fun = SuppressDominantCells,
                              dominanceVar = "value",
@@ -381,9 +380,9 @@ test_that("SuppressLinkedTables with num-singleton", {
                                               list(formula = f4)), 
                              recordAware =  recordAware,
                              pPercent = 10,
-                             printXdim = TRUE,
+                             printXdim = printXdim,
+                             printInc = printInc,
                              linkedGauss = linkedGauss)
-      })
       
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
                        sum1[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -395,9 +394,8 @@ test_that("SuppressLinkedTables with num-singleton", {
   for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
     for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
-      cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
+      if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
-      capture.output({ 
       a <- tables_by_formulas(data = z,
                               table_fun = SuppressDominantCells,
                               dominanceVar = "value",
@@ -408,9 +406,9 @@ test_that("SuppressLinkedTables with num-singleton", {
                                                     table_4 = f4),
                               recordAware =  recordAware,
                               pPercent = 50,
-                              printXdim = TRUE,
+                              printXdim = printXdim,
+                              printInc = printInc,
                               linkedGauss = linkedGauss)
-      })
       
       expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
                        sum2[[paste(linkedGauss, recordAware, sep = "_")]])
