@@ -307,6 +307,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     table_formulas <- lapply(linkedTables, function(x) combine_formulas(table_formulas[x]))
     formula <- combine_formulas(table_formulas)
   }
+  
+  if (!is.null(lpPackage) & !is.null(linkedGauss)) {
+    lpPackage <- NULL
+    warning("The 'lpPackage' parameter is currently ignored when 'linkedGauss' is specified.")
+  }
 
   # Possible development function as input
   # Special temporary feature 

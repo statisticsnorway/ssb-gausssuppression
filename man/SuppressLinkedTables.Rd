@@ -12,7 +12,8 @@ SuppressLinkedTables(
   linkedGauss = "consistent",
   recordAware = TRUE,
   iterBackTracking = Inf,
-  whenEmptyUnsuppressed = NULL
+  whenEmptyUnsuppressed = NULL,
+  lpPackage = NULL
 )
 }
 \arguments{
@@ -46,6 +47,8 @@ When \code{TRUE}, \code{data} cannot be included in  \code{withinArg}.}
 \item{iterBackTracking}{Maximum number of back-tracking iterations.}
 
 \item{whenEmptyUnsuppressed}{Parameter to \code{\link[SSBtools]{GaussSuppression}}.}
+
+\item{lpPackage}{Currently ignored. If specified, a warning will be issued.}
 }
 \value{
 List of data frames
@@ -62,6 +65,9 @@ Note that for singleton methods of the \emph{elimination} type (see \code{\link[
 the creation of a large number of redundant secondary cells. This is because, during the method's iterations,
 all secondary cells are eventually treated as primary. As a result, protection is applied to prevent a singleton
 contributor from inferring a secondary cell that was only included to protect that same contributor.
+
+The combination of intervals with the various linked table strategies is not yet implemented,
+so the 'lpPackage' parameter is currently ignored.
 }
 \examples{
 

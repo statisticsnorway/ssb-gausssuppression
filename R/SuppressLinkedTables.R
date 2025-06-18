@@ -12,6 +12,9 @@
 #' the creation of a large number of redundant secondary cells. This is because, during the method's iterations, 
 #' all secondary cells are eventually treated as primary. As a result, protection is applied to prevent a singleton 
 #' contributor from inferring a secondary cell that was only included to protect that same contributor.
+#' 
+#' The combination of intervals with the various linked table strategies is not yet implemented, 
+#' so the 'lpPackage' parameter is currently ignored.
 #'
 #' @inheritParams AdditionalSuppression
 #' @param data The `data` argument to `fun`. When NULL `data` must be included in  `withinArg`.
@@ -38,6 +41,7 @@
 #'                    When `TRUE`, `data` cannot be included in  `withinArg`.
 #' @param iterBackTracking Maximum number of back-tracking iterations.
 #' @param whenEmptyUnsuppressed Parameter to \code{\link[SSBtools]{GaussSuppression}}.
+#' @param lpPackage Currently ignored. If specified, a warning will be issued.
 #'
 #' @return List of data frames
 #' @importFrom SSBtools NumSingleton
@@ -112,7 +116,13 @@ SuppressLinkedTables <- function(data = NULL,
                               linkedGauss = "consistent",
                               recordAware = TRUE,
                               iterBackTracking = Inf,
-                              whenEmptyUnsuppressed = NULL) {
+                              whenEmptyUnsuppressed = NULL,
+                              lpPackage = NULL) {
+  
+  if (!is.null(lpPackage)) {
+    warning("The 'lpPackage' parameter is currently ignored by SuppressLinkedTables().")
+  }
+  
   SSBtools::CheckInput(linkedGauss, type = "character", 
     alt = c("local", "consistent", "back-tracking", "local-bdiag"), 
     okNULL = FALSE)
