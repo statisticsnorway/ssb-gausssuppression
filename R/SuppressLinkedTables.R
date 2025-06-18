@@ -13,8 +13,14 @@
 #' all secondary cells are eventually treated as primary. As a result, protection is applied to prevent a singleton 
 #' contributor from inferring a secondary cell that was only included to protect that same contributor.
 #' 
+#' Note that the frequency singleton methods `"subSpace"`, `"anySum0"`, and `"anySumNOTprimary"` are currently not implemented 
+#' and will result in an error. Also note that automatic forcing of `"anySumNOTprimary"` is disabled. 
+#' That is, [SSBtools::GaussSuppression()] is called with `auto_anySumNOTprimary = FALSE`. 
+#' See the parameter documentation for an explanation of why `FALSE` is required.
+#' 
 #' The combination of intervals with the various linked table strategies is not yet implemented, 
 #' so the 'lpPackage' parameter is currently ignored.
+#' 
 #'
 #' @inheritParams AdditionalSuppression
 #' @param data The `data` argument to `fun`. When NULL `data` must be included in  `withinArg`.
