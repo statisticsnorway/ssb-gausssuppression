@@ -64,7 +64,7 @@
 #' @param whenEmptyUnsuppressed Parameter to \code{\link[SSBtools]{GaussSuppression}}.
 #' @param lpPackage Currently ignored. If specified, a warning will be issued.
 #'
-#' @return List of data frames
+#' @return A list of data frames, or, if `withinArg` is `NULL`, the ordinary output from `fun`.
 #' @importFrom SSBtools NumSingleton
 #' @export
 #'
@@ -149,7 +149,7 @@ SuppressLinkedTables <- function(data = NULL,
     okNULL = FALSE)
   
   if (is.null(withinArg)) {
-    return(fun(...))
+    return(fun(data = data, ...))
   }
   if (!is.null(withinArg)) {
     if (!is.list(withinArg)) {

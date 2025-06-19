@@ -51,7 +51,7 @@ When \code{TRUE}, \code{data} cannot be included in  \code{withinArg}.}
 \item{lpPackage}{Currently ignored. If specified, a warning will be issued.}
 }
 \value{
-List of data frames
+A list of data frames, or, if \code{withinArg} is \code{NULL}, the ordinary output from \code{fun}.
 }
 \description{
 Provides alternatives to global protection for linked tables through
