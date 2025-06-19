@@ -196,7 +196,8 @@ The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}}
 via \code{\link[SSBtools]{ModelMatrix}}.}
 
 \item{linkedGauss}{Controls linked table suppression. Accepted values are described in the
-documentation for \code{\link[=SuppressLinkedTables]{SuppressLinkedTables()}}. See also the corresponding examples, which
+documentation for \code{\link[=SuppressLinkedTables]{SuppressLinkedTables()}}.
+See also the note and the corresponding examples, which
 demonstrate usage with alternative function interfaces.
 In addition, \code{linkedGauss = "global"} is allowed and corresponds to standard execution
 (i.e., when \code{linkedGauss} is not specified).

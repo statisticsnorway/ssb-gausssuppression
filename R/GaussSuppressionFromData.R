@@ -157,7 +157,8 @@
 #'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
 #'               via \code{\link[SSBtools]{ModelMatrix}}. 
 #' @param linkedGauss Controls linked table suppression. Accepted values are described in the 
-#'        documentation for [SuppressLinkedTables()]. See also the corresponding examples, which 
+#'        documentation for [SuppressLinkedTables()]. 
+#'        See also the note and the corresponding examples, which 
 #'        demonstrate usage with alternative function interfaces. 
 #'        In addition, `linkedGauss = "global"` is allowed and corresponds to standard execution 
 #'        (i.e., when `linkedGauss` is not specified). 
