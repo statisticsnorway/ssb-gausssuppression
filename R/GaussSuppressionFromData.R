@@ -933,6 +933,9 @@ record_consistent_table_memberships <- function(table_memberships, x, aggregateP
   dd <- DummyDuplicated(x, idx = TRUE, rnd = TRUE)
   table_dd <- table(dd)
   table_dd <- table_dd[table_dd > 1]
+  if (!length(table_dd)) {
+    return(table_memberships)
+  }
   dd_duplicated <- as.integer(names(table_dd))
   selected <- dd %in% dd_duplicated
   selected_dd <- data.frame(selected_dd = dd[selected])
