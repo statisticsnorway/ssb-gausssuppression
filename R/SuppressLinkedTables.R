@@ -14,12 +14,15 @@
 #' contributor from inferring a secondary cell that was only included to protect that same contributor.
 #' 
 #' Note that the frequency singleton methods `"subSpace"`, `"anySum0"`, and `"anySumNOTprimary"` are currently not implemented 
-#' and will result in an error. Also note that automatic forcing of `"anySumNOTprimary"` is disabled. 
+#' and will result in an error. 
+#' As a result, the `singletonZeros` parameter in the `SuppressDominantCells()` function cannot be set to `TRUE`, 
+#' and the `SuppressKDisclosure()` function is not available for use.
+#' Also note that automatic forcing of `"anySumNOTprimary"` is disabled. 
 #' That is, [SSBtools::GaussSuppression()] is called with `auto_anySumNOTprimary = FALSE`. 
 #' See the parameter documentation for an explanation of why `FALSE` is required.
 #' 
 #' The combination of intervals with the various linked table strategies is not yet implemented, 
-#' so the 'lpPackage' parameter is currently ignored.
+#' so the `lpPackage` parameter is currently ignored.
 #' 
 #' @note Note on differences between `SuppressLinkedTables()` and alternative approaches.  
 #' By *alternatives*, we refer to using the `linkedGauss` parameter via `GaussSuppressionFromData()`, its wrappers, or through `tables_by_formulas()`, as shown in the examples below.

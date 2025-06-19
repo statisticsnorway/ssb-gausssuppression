@@ -67,12 +67,15 @@ all secondary cells are eventually treated as primary. As a result, protection i
 contributor from inferring a secondary cell that was only included to protect that same contributor.
 
 Note that the frequency singleton methods \code{"subSpace"}, \code{"anySum0"}, and \code{"anySumNOTprimary"} are currently not implemented
-and will result in an error. Also note that automatic forcing of \code{"anySumNOTprimary"} is disabled.
+and will result in an error.
+As a result, the \code{singletonZeros} parameter in the \code{SuppressDominantCells()} function cannot be set to \code{TRUE},
+and the \code{SuppressKDisclosure()} function is not available for use.
+Also note that automatic forcing of \code{"anySumNOTprimary"} is disabled.
 That is, \code{\link[SSBtools:GaussSuppression]{SSBtools::GaussSuppression()}} is called with \code{auto_anySumNOTprimary = FALSE}.
 See the parameter documentation for an explanation of why \code{FALSE} is required.
 
 The combination of intervals with the various linked table strategies is not yet implemented,
-so the 'lpPackage' parameter is currently ignored.
+so the \code{lpPackage} parameter is currently ignored.
 }
 \note{
 Note on differences between \code{SuppressLinkedTables()} and alternative approaches.
