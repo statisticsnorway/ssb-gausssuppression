@@ -157,7 +157,9 @@ SuppressLinkedTables <- function(data = NULL,
     }
   }
   parentFrame <- parent.frame()
-  sysCall <- as.list(sys.call())[-1]
+  sysCall <- as.list(match.call())[-1] 
+  # sys.call() is similar to match.call, but does not expand the argument name 
+  # match.call needed here for unnamed data when fun = GaussSuppressionFromData
 
   if (!("fun" %in% names(sysCall))) {
     stop("Argument 'fun' must be specified by name.")
