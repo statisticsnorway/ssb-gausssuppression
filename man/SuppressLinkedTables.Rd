@@ -47,7 +47,11 @@ When \code{TRUE}, \code{data} cannot be included in  \code{withinArg}.}
 
 \item{iterBackTracking}{Maximum number of back-tracking iterations.}
 
-\item{whenEmptyUnsuppressed}{Parameter to \code{\link[SSBtools]{GaussSuppression}}.}
+\item{whenEmptyUnsuppressed}{Parameter to \code{\link[SSBtools]{GaussSuppression}}.
+This is about a helpful message
+\emph{"Cells with empty input will never be secondary suppressed. Extend input data with zeros?"}
+Here, the default is set to \code{NULL} (no message), since preprocessing of the model matrix
+may invalidate the assumptions behind this message.}
 
 \item{lpPackage}{Currently ignored. If specified, a warning will be issued.}
 }

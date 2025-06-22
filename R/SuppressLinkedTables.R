@@ -63,6 +63,10 @@
 #'                    When `TRUE`, `data` cannot be included in  `withinArg`.
 #' @param iterBackTracking Maximum number of back-tracking iterations.
 #' @param whenEmptyUnsuppressed Parameter to \code{\link[SSBtools]{GaussSuppression}}.
+#'   This is about a helpful message  
+#'   *"Cells with empty input will never be secondary suppressed. Extend input data with zeros?"*  
+#'   Here, the default is set to \code{NULL} (no message), since preprocessing of the model matrix  
+#'   may invalidate the assumptions behind this message.
 #' @param lpPackage Currently ignored. If specified, a warning will be issued.
 #'
 #' @return A list of data frames, or, if `withinArg` is `NULL`, the ordinary output from `fun`.
