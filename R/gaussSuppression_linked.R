@@ -312,23 +312,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
 
     x <- Matrix::bdiag(x)
     if (!is.null(dup_id)) {
-      dup_id_un <- unlist(dup_id)
-      dup_dup <- unique(dup_id_un[duplicated(dup_id_un)])
-      integer_codes <- vector("list", n)
-      for (i in seq_len(n)) {
-        dup_id[[i]][!(dup_id[[i]] %in% dup_dup)] <- 0L  # non-duplicated to 0L
-        integer_codes[[i]] <- dup_id[[i]][candidates[[i]]]
-        non0 <- integer_codes[[i]] != 0L
-        integer_codes[[i]][non0][rev_duplicated(integer_codes[[i]][non0])] <- 0L  # within-duplicated (with rev) to 0L since common_cell_grouping algorithm ... ok since fixed later   
-      }
-      ccg <- common_cell_grouping(integer_codes)
-      can <- rep(0L, length(ccg$table))
-      for (i in seq_len(n)) {
-        table_i <- ccg$table == i
-        can[table_i] <- candidates[[i]][ccg$ind[table_i]] + cumsum_0_ncol_x[[i]]
-      }
-      candidates <- can
-      cell_grouping <- unlist(dup_id)
+      fcgac <- fix_cell_grouping_and_candidates(dup_id, candidates, cumsum_0_ncol_x)
+      candidates <- fcgac$candidates
+      cell_grouping <- fcgac$cell_grouping
     } else {
       candidates <- candidates_
       cell_grouping <- NULL
@@ -411,6 +397,48 @@ as_not_logical <- function(obj) {
     obj <- unique(obj)
   }
   obj
+}
+
+# final_fix set to FALSE, since this is part of general functionality
+# within SSBtools:::GaussSuppression. Don't need to run twice.
+fix_cell_grouping_and_candidates <- function(dup_id, candidates, cumsum_0_ncol_x, final_fix = FALSE) {
+  n <- length(dup_id)
+  dup_id_un <- unlist(dup_id)
+  dup_dup <- unique(dup_id_un[duplicated(dup_id_un)])
+  integer_codes <- vector("list", n)
+  for (i in seq_len(n)) {
+    dup_id[[i]][!(dup_id[[i]] %in% dup_dup)] <- 0L  # non-duplicated to 0L
+    integer_codes[[i]] <- dup_id[[i]][candidates[[i]]]
+    non0 <- integer_codes[[i]] != 0L
+    integer_codes[[i]][non0][rev_duplicated(integer_codes[[i]][non0])] <- 0L  # within-duplicated (with rev) to 0L since common_cell_grouping algorithm ... ok since fixed later   
+  }
+  ccg <- common_cell_grouping(integer_codes)
+  can <- rep(0L, length(ccg$table))
+  for (i in seq_len(n)) {
+    table_i <- ccg$table == i
+    can[table_i] <- candidates[[i]][ccg$ind[table_i]] + cumsum_0_ncol_x[[i]]
+  }
+  out <- list(candidates = can, cell_grouping = unlist(dup_id))
+  if (final_fix) {
+    out$candidates <- order_candidates_by_cell_grouping(out$candidates, out$cell_grouping)
+  }
+  out
+}
+
+
+
+# copy of SSBtools:::order_candidates_by_cell_grouping
+# included here as code documentation
+order_candidates_by_cell_grouping <- function(candidates, cell_grouping) {
+  candidates_order <- seq_along(candidates)
+  cell_grouping_candidates <- cell_grouping[candidates]
+  pos_cell_grouping_candidates <- cell_grouping_candidates > 0
+  candidates_order_g0 <- candidates_order[pos_cell_grouping_candidates]
+  cell_grouping_g0 <- cell_grouping_candidates[pos_cell_grouping_candidates]
+  ma <- match(cell_grouping_g0, cell_grouping_g0)
+  candidates_order_g0 <- candidates_order_g0[ma]
+  candidates_order[pos_cell_grouping_candidates] <- candidates_order_g0
+  candidates[order(candidates_order)]
 }
 
 
