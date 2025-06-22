@@ -41,6 +41,7 @@
 #' @param data The `data` argument to `fun`. When NULL `data` must be included in  `withinArg`.
 #' @param ... Arguments to `fun` that are kept constant.
 #' @param withinArg A list of named lists. Arguments to `fun` that are not kept constant.
+#'                  If `withinArg` is named, the names will be used as names in the output list.
 #' @param linkedGauss Specifies the strategy for protecting linked tables. Possible values are:
 #'
 #' - `"consistent"` (default): All linked tables are protected by a single call to `GaussSuppression()`. 
@@ -264,6 +265,7 @@ SuppressLinkedTables <- function(data = NULL,
     environment(TailGaussSuppressionFromData) <- env_list[[i]]
     suppressedData[[i]] <- TailGaussSuppressionFromData()
   }
+  names(suppressedData) <- names(withinArg)
   return(suppressedData)
   
 }

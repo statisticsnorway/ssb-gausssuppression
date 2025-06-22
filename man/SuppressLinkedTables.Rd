@@ -24,7 +24,8 @@ SuppressLinkedTables(
 
 \item{...}{Arguments to \code{fun} that are kept constant.}
 
-\item{withinArg}{A list of named lists. Arguments to \code{fun} that are not kept constant.}
+\item{withinArg}{A list of named lists. Arguments to \code{fun} that are not kept constant.
+If \code{withinArg} is named, the names will be used as names in the output list.}
 
 \item{linkedGauss}{Specifies the strategy for protecting linked tables. Possible values are:
 \itemize{
