@@ -305,6 +305,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   }
   if (!is.null(linkedGauss) & !is.null(linkedTables)) {
+    if (!all(unlist(linkedTables) %in% names(table_formulas))) {
+      stop("All tables in 'linkedTables' must exist in 'formula'.")
+    }
     table_formulas <- lapply(linkedTables, function(x) combine_formulas(table_formulas[x]))
     formula <- combine_formulas(table_formulas)
   }
