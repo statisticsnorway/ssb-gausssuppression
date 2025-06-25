@@ -6,6 +6,10 @@
     new parameter `linkedGauss` in `GaussSuppressionFromData()` and its wrappers.  
   - Also note the related new parameters to `GaussSuppressionFromData()`: 
     `recordAware` and `linkedTables`.
+* Improved support for named `maxN` with variable-specific values.  
+  - Enables setups with multiple primary functions using different `maxN` values.  
+  - See the documentation for `GaussSuppressionFromData()`, `PrimaryDefault()`, and `NContributorsRule()`.  
+  - Thanks to Jonas Lindblad for [issue #120](https://github.com/statisticsnorway/ssb-gausssuppression/issues/120).
 
 
 ## GaussSuppression	1.0.0
