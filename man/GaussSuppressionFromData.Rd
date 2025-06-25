@@ -69,8 +69,12 @@ Thus, the variables can also be coded by \code{"rowFactor"} or \code{""}, which 
 
 \item{formula}{A model formula}
 
-\item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
-Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
+\item{maxN}{Suppression parameter forwarded to the supplied functions.
+With the default \code{primary} function, \code{\link[=PrimaryDefault]{PrimaryDefault()}}, cells with frequency \verb{<= maxN} are marked as primary suppressed,
+and the default value of \code{maxN} is \code{3}. See details below.
+The parameter is also used by \code{\link[=NContributorsRule]{NContributorsRule()}}.
+For advanced use cases, including setups with multiple primary functions, \code{maxN} can be specified
+as a named list or vector. See each primary function’s documentation for details.}
 
 \item{protectZeros}{Suppression parameter.
 When \code{TRUE}, cells with zero frequency or value are set as primary suppressed.

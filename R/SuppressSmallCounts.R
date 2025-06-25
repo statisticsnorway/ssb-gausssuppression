@@ -21,6 +21,9 @@
 #'
 #'
 #' @inheritParams GaussSuppressionFromData
+#' @param maxN Suppression threshold. Cells with frequency `<= maxN` are marked  
+#'        as primary suppressed. This parameter is passed to [PrimaryDefault()]  
+#'        via [GaussSuppressionFromData()].
 #'
 #' @return data frame containing aggregated data and suppression information.
 #' @export

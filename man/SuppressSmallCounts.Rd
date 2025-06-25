@@ -20,8 +20,9 @@ SuppressSmallCounts(
 If \code{data} is not a classic data frame, it will be coerced to one internally
 unless \code{preAggregate} is \code{TRUE} and \code{aggregatePackage} is \code{"data.table"}.}
 
-\item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
-Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
+\item{maxN}{Suppression threshold. Cells with frequency \verb{<= maxN} are marked
+as primary suppressed. This parameter is passed to \code{\link[=PrimaryDefault]{PrimaryDefault()}}
+via \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.}
 
 \item{freqVar}{A single variable holding counts (name or number).}
 
