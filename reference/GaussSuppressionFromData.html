@@ -138,8 +138,12 @@ Thus, the variables can also be coded by <code>"rowFactor"</code> or <code>""</c
 
 
 <dt id="arg-maxn">maxN<a class="anchor" aria-label="anchor" href="#arg-maxn"></a></dt>
-<dd><p>Suppression parameter. Cells with frequency <code>&lt;= maxN</code> are set as primary suppressed.
-Using the default <code>primary</code> function, <code>maxN</code> is by default set to <code>3</code>. See details.</p></dd>
+<dd><p>Suppression parameter forwarded to the supplied functions.
+With the default <code>primary</code> function, <code><a href="PrimaryDefault.html">PrimaryDefault()</a></code>, cells with frequency <code>&lt;= maxN</code> are marked as primary suppressed,
+and the default value of <code>maxN</code> is <code>3</code>. See details below.
+The parameter is also used by <code><a href="NContributorsRule.html">NContributorsRule()</a></code>.
+For advanced use cases, including setups with multiple primary functions, <code>maxN</code> can be specified
+as a named list or vector. See each primary function’s documentation for details.</p></dd>
 
 
 <dt id="arg-protectzeros">protectZeros<a class="anchor" aria-label="anchor" href="#arg-protectzeros"></a></dt>

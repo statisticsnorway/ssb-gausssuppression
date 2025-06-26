@@ -44,7 +44,7 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">PrimaryDefault</span><span class="op">(</span><span class="va">freq</span>, maxN <span class="op">=</span> <span class="fl">3</span>, protectZeros <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">PrimaryDefault</span><span class="op">(</span><span class="va">freq</span>, maxN <span class="op">=</span> <span class="fl">3</span>, protectZeros <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">freqVar</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -56,11 +56,18 @@
 
 
 <dt id="arg-maxn">maxN<a class="anchor" aria-label="anchor" href="#arg-maxn"></a></dt>
-<dd><p>Cells with frequency <code>&lt;= maxN</code> are set as primary suppressed.</p></dd>
+<dd><p>Cells with frequency <code>&lt;= maxN</code> are set as primary suppressed.
+Can also be a named list or vector, where the value corresponding to <code>freqVar</code> will be used
+if available. If not found, the name <code>"freq"</code> is tried as an alternative.</p></dd>
 
 
 <dt id="arg-protectzeros">protectZeros<a class="anchor" aria-label="anchor" href="#arg-protectzeros"></a></dt>
 <dd><p>When <code>TRUE</code>, cells with zero frequency are set as primary suppressed.</p></dd>
+
+
+<dt id="arg-freqvar">freqVar<a class="anchor" aria-label="anchor" href="#arg-freqvar"></a></dt>
+<dd><p>Character string used to select the appropriate value from <code>maxN</code> if it is a named object.
+see <code>maxN</code> above.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>

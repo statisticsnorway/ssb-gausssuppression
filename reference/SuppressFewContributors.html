@@ -74,8 +74,11 @@ unless <code>preAggregate</code> is <code>TRUE</code> and <code>aggregatePackage
 
 
 <dt id="arg-maxn">maxN<a class="anchor" aria-label="anchor" href="#arg-maxn"></a></dt>
-<dd><p>Suppression parameter. Cells with frequency <code>&lt;= maxN</code> are set as primary suppressed.
-Using the default <code>primary</code> function, <code>maxN</code> is by default set to <code>3</code>. See details.</p></dd>
+<dd><p>Suppression threshold. Cells where the number of unique contributors
+is less than or equal to <code>maxN</code> are marked as primary suppressed.
+This parameter is passed to <code><a href="NContributorsRule.html">NContributorsRule()</a></code> via <code><a href="GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code>.
+Note that within those functions, the parameter name <code>charVar</code> is used
+instead of <code>contributorVar</code>.</p></dd>
 
 
 <dt id="arg-numvar">numVar<a class="anchor" aria-label="anchor" href="#arg-numvar"></a></dt>

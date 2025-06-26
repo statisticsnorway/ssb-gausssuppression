@@ -79,7 +79,13 @@
 
 
 <dt id="arg-maxn">maxN<a class="anchor" aria-label="anchor" href="#arg-maxn"></a></dt>
-<dd><p>Primary suppression when number of contributors <code>&lt;= maxN</code>.</p></dd>
+<dd><p>Suppression threshold. Cells where the number of unique contributors
+(based on <code>charVar</code>) is less than or equal to <code>maxN</code> are marked as primary suppressed.
+Can be specified as a single numeric value, or as a named list or named vector.
+When named, the value matching the <code>charVar</code> name will be used.
+If <code>charVar</code> contains multiple variables and you want different thresholds for each,
+<code>maxN</code> must be a named list or vector with one value per variable.
+For example: <code>maxN = list(char1 = 3, char2 = 2)</code>.</p></dd>
 
 
 <dt id="arg-protectzeros">protectZeros<a class="anchor" aria-label="anchor" href="#arg-protectzeros"></a></dt>
@@ -93,9 +99,11 @@ When several variables, see details.</p></dd>
 
 
 <dt id="arg-removecodes">removeCodes<a class="anchor" aria-label="anchor" href="#arg-removecodes"></a></dt>
-<dd><p>Vector of codes to be omitted when counting contributors.
-With empty <code>charVar</code> row indices are assumed
-and conversion to integer is performed.</p></dd>
+<dd><p>Codes to exclude when counting contributors.
+Can be specified as a character vector (applied to all <code>charVar</code> variables),
+or as a named list of vectors to use different codes per variable.
+When using a list, its names must match the variables in <code>charVar</code>.
+If <code>charVar</code> is empty, codes are interpreted as row indices and converted to integers.</p></dd>
 
 
 <dt id="arg-remove-">remove0<a class="anchor" aria-label="anchor" href="#arg-remove-"></a></dt>
@@ -122,8 +130,8 @@ in rule and where <code>nAll</code> is similar, but without omitting codes in <c
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>When several <code>charVar</code> variables, the rule is applied independently to each variable.
 Primary suppression in at least one case results in  primary suppression in the output.
-It is possible to specify <code>maxN</code> and <code>removeCodes</code> independently for each <code>charVar</code> by using a
-named list as input with <code>charVar</code> as names. E.g. <code>maxN = list(char1 = 3, char2 = 2)</code>.</p>
+As described in the documentation for the <code>maxN</code> and <code>removeCodes</code> parameters,
+it is possible to specify them independently for each <code>charVar</code>.</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

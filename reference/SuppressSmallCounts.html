@@ -76,8 +76,9 @@ unless <code>preAggregate</code> is <code>TRUE</code> and <code>aggregatePackage
 
 
 <dt id="arg-maxn">maxN<a class="anchor" aria-label="anchor" href="#arg-maxn"></a></dt>
-<dd><p>Suppression parameter. Cells with frequency <code>&lt;= maxN</code> are set as primary suppressed.
-Using the default <code>primary</code> function, <code>maxN</code> is by default set to <code>3</code>. See details.</p></dd>
+<dd><p>Suppression threshold. Cells with frequency <code>&lt;= maxN</code> are marked
+as primary suppressed. This parameter is passed to <code><a href="PrimaryDefault.html">PrimaryDefault()</a></code>
+via <code><a href="GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code>.</p></dd>
 
 
 <dt id="arg-freqvar">freqVar<a class="anchor" aria-label="anchor" href="#arg-freqvar"></a></dt>
