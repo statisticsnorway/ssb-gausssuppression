@@ -58,8 +58,12 @@
 #' @param hierarchies List of hierarchies, which can be converted by \code{\link[SSBtools]{AutoHierarchies}}.
 #'        Thus, the variables can also be coded by `"rowFactor"` or `""`, which correspond to using the categories in the data.
 #' @param formula A model formula
-#' @param maxN Suppression parameter. Cells with frequency `<= maxN` are set as primary suppressed.   
-#'        Using the default `primary` function, `maxN` is by default set to `3`. See details.
+#' @param maxN Suppression parameter forwarded to the supplied functions.  
+#'      With the default `primary` function, [PrimaryDefault()], cells with frequency `<= maxN` are marked as primary suppressed,  
+#'      and the default value of `maxN` is `3`. See details below.  
+#'      The parameter is also used by [NContributorsRule()].  
+#'      For advanced use cases, including setups with multiple primary functions, `maxN` can be specified  
+#'      as a named list or vector. See each primary function’s documentation for details.
 #' @param protectZeros Suppression parameter. 
 #'        When `TRUE`, cells with zero frequency or value are set as primary suppressed. 
 #'        Using the default `primary` function, `protectZeros` is by default set to `TRUE`. See details.

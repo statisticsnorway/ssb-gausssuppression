@@ -4,6 +4,11 @@
 #' the few contributors rule (\code{\link{NContributorsRule}}).
 #'
 #' @inheritParams GaussSuppressionFromData
+#' @param maxN Suppression threshold. Cells where the number of unique contributors  
+#'        is less than or equal to `maxN` are marked as primary suppressed.  
+#'        This parameter is passed to [NContributorsRule()] via [GaussSuppressionFromData()].  
+#'        Note that within those functions, the parameter name `charVar` is used  
+#'        instead of `contributorVar`.
 #' @param numVar Numerical variable to be aggregated.
 #'           Any `candidatesVar` that is specified and 
 #'           not included in `numVar` will be aggregated accordingly.

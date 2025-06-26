@@ -24,8 +24,11 @@ SuppressFewContributors(
 If \code{data} is not a classic data frame, it will be coerced to one internally
 unless \code{preAggregate} is \code{TRUE} and \code{aggregatePackage} is \code{"data.table"}.}
 
-\item{maxN}{Suppression parameter. Cells with frequency \verb{<= maxN} are set as primary suppressed.
-Using the default \code{primary} function, \code{maxN} is by default set to \code{3}. See details.}
+\item{maxN}{Suppression threshold. Cells where the number of unique contributors
+is less than or equal to \code{maxN} are marked as primary suppressed.
+This parameter is passed to \code{\link[=NContributorsRule]{NContributorsRule()}} via \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
+Note that within those functions, the parameter name \code{charVar} is used
+instead of \code{contributorVar}.}
 
 \item{numVar}{Numerical variable to be aggregated.
 Any \code{candidatesVar} that is specified and

@@ -4,14 +4,19 @@
 \alias{PrimaryDefault}
 \title{Default primary function}
 \usage{
-PrimaryDefault(freq, maxN = 3, protectZeros = TRUE, ...)
+PrimaryDefault(freq, maxN = 3, protectZeros = TRUE, freqVar, ...)
 }
 \arguments{
 \item{freq}{Vector of output frequencies}
 
-\item{maxN}{Cells with frequency \verb{<= maxN} are set as primary suppressed.}
+\item{maxN}{Cells with frequency \verb{<= maxN} are set as primary suppressed.
+Can also be a named list or vector, where the value corresponding to \code{freqVar} will be used
+if available. If not found, the name \code{"freq"} is tried as an alternative.}
 
 \item{protectZeros}{When \code{TRUE}, cells with zero frequency are set as primary suppressed.}
+
+\item{freqVar}{Character string used to select the appropriate value from \code{maxN} if it is a named object.
+see \code{maxN} above.}
 
 \item{...}{Unused parameters}
 }

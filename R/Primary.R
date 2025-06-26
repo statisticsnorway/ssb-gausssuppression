@@ -96,19 +96,61 @@ Primary <- function(primary, crossTable, x, eachPrimary = FALSE, ...) {
 #'
 #' @param freq Vector of output frequencies 
 #' @param maxN Cells with frequency `<= maxN` are set as primary suppressed. 
+#'             Can also be a named list or vector, where the value corresponding to `freqVar` will be used 
+#'             if available. If not found, the name `"freq"` is tried as an alternative.
 #' @param protectZeros When `TRUE`, cells with zero frequency are set as primary suppressed. 
+#' @param freqVar Character string used to select the appropriate value from `maxN` if it is a named object. 
+#'                see `maxN` above.
 #' @param ... Unused parameters 
 #'
 #' @return primary, \code{\link[SSBtools]{GaussSuppression}} input 
 #' @export
-PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, ...) {
+PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, freqVar, ...) {
   
   if(is.null(maxN))         stop("A non-NULL value of maxN is required.")
   if(is.null(protectZeros)) stop("A non-NULL value of protectZeros is required.")
-  
+
+  maxN <- get_numeric_item(maxN, freqVar, "freq")
+    
   primary <- freq <= maxN
   if (!protectZeros) 
     primary[freq == 0] <- FALSE
   
   primary
 }
+
+# Extracts numeric value(s) from a named list or vector.
+# Tries 'var_names' first, then 'alt_names' if provided.
+# If input is a single value, it is returned as a numeric vector.
+# Always returns a vector (via unlist); 'txt' is used for context in error messages.
+#  examples
+#    maxN <- c(freq = 5, char1 = 10, char2 = 20, char3 = 30)  # or maxN <- list(freq = 5, ..... 
+#    get_numeric_item(maxN, "ant", "freq")
+#    get_numeric_item(maxN, c("char1", "char3"))
+get_numeric_item <- function(obj, var_names, alt_names = NULL, txt = "maxN") {
+  if (length(obj) == 1) {
+    return(unlist(obj))
+  }
+  obj <- as.list(obj)
+  if (is.null(names(obj))) {
+    stop(paste("Name(s) of", txt, "needed:"))
+  }
+  if (identical(var_names, alt_names)) {
+    alt_names <- NULL
+  }
+  if (all(var_names %in% names(obj))) {
+    return(unlist(obj[var_names]))
+  }
+  if (!is.null(alt_names) & all(alt_names %in% names(obj))) {
+    return(unlist(obj[alt_names]))
+  }
+  if (is.null(alt_names)) {
+    stop(paste("Name(s) of", txt, "needed:", paste0('"', var_names, '"',collapse = ", ")))
+  }
+  stop(paste("Name(s) of", txt, "needed:", 
+             paste0('"', var_names, '"', collapse = ", "), " or ", 
+             paste0('"', alt_names, '"', collapse = ", ")))
+}
+
+
+
