@@ -1,4 +1,4 @@
-## GaussSuppression	1.0.1
+## GaussSuppression	1.1.0
 * Significant update: new functionality via **`SuppressLinkedTables()`** and **`linkedGauss`** 
   for consistent suppression of linked tables  
   - Introduces alternatives to global protection, potentially reducing computational burden.  
