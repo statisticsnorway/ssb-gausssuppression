@@ -156,13 +156,28 @@
 #' @param rowGroupsPackage Parameter `pkg` to \code{\link[SSBtools]{RowGroups}}.
 #'               The parameter is input to \code{\link[SSBtools]{Formula2ModelMatrix}} 
 #'               via \code{\link[SSBtools]{ModelMatrix}}. 
-#'                           
+#' @param linkedGauss Controls linked table suppression. Accepted values are described in the 
+#'        documentation for [SuppressLinkedTables()]. 
+#'        See also the note and the corresponding examples, which 
+#'        demonstrate usage with alternative function interfaces. 
+#'        In addition, `linkedGauss = "global"` is allowed and corresponds to standard execution 
+#'        (i.e., when `linkedGauss` is not specified). 
+#'        When `linkedGauss` is used, the `formula` parameter should be provided as a list of formulas. 
+#'        Alternatively, `formula` may have an attribute `"table_formulas"` containing such a list.
+#'        See also the `linkedTables` parameter below.
+#' @param recordAware Parameter associated with `linkedGauss`. See [SuppressLinkedTables()].  
+#' @param linkedTables A list specifying how the tables referenced in the `formula` 
+#'   parameter should be combined for use in the linked-tables algorithm. 
+#'   Each element in the list contains one or more names of the tables in `formula`. 
+#'   The corresponding tables will be combined and treated as a single table by the algorithm.
+#'   For example: `linkedTables = list(c("table_1", "table_3"), "table_2")`.
+#'   If `NULL` (default), each table in `formula` is used individually.
 #'                                                            
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -245,7 +260,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            aggregatePackage = "base",
                            aggregateNA = TRUE,
                            aggregateBaseOrder = FALSE,
-                           rowGroupsPackage = aggregatePackage 
+                           rowGroupsPackage = aggregatePackage,
+                           linkedGauss = NULL,
+                           recordAware = TRUE,
+                           linkedTables = NULL
                            ){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
@@ -274,6 +292,31 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
+  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag"), okNULL = TRUE)
+  if (is.list(formula)) {
+    table_formulas <- formula
+    formula <- combine_formulas(table_formulas)
+  } else {
+    if (!is.null(linkedGauss)) {
+      table_formulas <- attr(formula, "table_formulas")
+      if (is.null(table_formulas)) {
+        stop("With 'linkedGauss', 'formula' must be either a list of formulas or have a 'table_formulas' attribute.")
+      } 
+    }
+  }
+  if (!is.null(linkedGauss) & !is.null(linkedTables)) {
+    if (!all(unlist(linkedTables) %in% names(table_formulas))) {
+      stop("All tables in 'linkedTables' must exist in 'formula'.")
+    }
+    table_formulas <- lapply(linkedTables, function(x) combine_formulas(table_formulas[x]))
+    formula <- combine_formulas(table_formulas)
+  }
+  
+  if (!is.null(lpPackage) & !is.null(linkedGauss)) {
+    lpPackage <- NULL
+    warning("The 'lpPackage' parameter is currently ignored when 'linkedGauss' is specified.")
+  }
+
   # Possible development function as input
   # Special temporary feature 
   if (is.function(output)) {
@@ -300,10 +343,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
-                     "primary", "secondary", "all")))
+                     "primary", "secondary", "all", "pre_gauss_env")))
     stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions",
          "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
-                     "primary", "secondary", "all")')
+                     "primary", "secondary", "all", "pre_gauss_env")')
   
   
   innerReturn <- output %in% c("inner", "publish_inner", "publish_inner_x", "inner_x", "all")
@@ -338,6 +381,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       unsafeInOutput <- "no"
     }
   }
+  
+  Vars_r_rnd = function(r_rnd = character(0), ...){
+    r_rnd
+  }
+  r_rnd <- Vars_r_rnd(...)
   
   
   # Trick to ensure missing defaults transferred to NULL. Here is.name a replacement for rlang::is_missing.
@@ -407,7 +455,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       data <- aggregate_by_pkg(
         data = data,
         by = unique(c(dVar, charVar)),
-        var = unique(c(freqVar, numVar, weightVar)),
+        var = unique(c(freqVar, numVar, weightVar, r_rnd)),
         pkg =  aggregatePackage,
         include_na = aggregateNA,
         fun = sum,
@@ -419,7 +467,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       }
     } else {
       ### START ### preliminary hack to include sWeightVar in SuppressDominantCells
-      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, MoreVars(...)))]
+      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, r_rnd, MoreVars(...)))]
       ### END ###  preliminary hack
       # data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
@@ -533,7 +581,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     data <- aggregate_by_pkg(
       data = data,
       by = unique(dVar),
-      var = unique(c(freqVar, numVar, weightVar, nUniqueVar)),
+      var = unique(c(freqVar, numVar, weightVar, r_rnd, nUniqueVar)),
       pkg =  aggregatePackage,
       include_na = aggregateNA,
       fun = sum,
@@ -674,13 +722,50 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     rm(data)
   } 
   
+  table_memberships <- NULL
+  cell_grouping <- NULL
+  if (!is.null(linkedGauss)) {
+    if (linkedGauss %in% c("local", "consistent", "back-tracking", "local-bdiag")) {
+      names(table_formulas) <- paste0("t", seq_len(length(table_formulas)))
+      table_memberships <- as.data.frame(matrix(NA, ncol(x), length(table_formulas)))
+      names(table_memberships) <- names(table_formulas)
+      
+      for (i in seq_along(table_formulas)) {
+        table_memberships[[i]] <- SSBtools::formula_selection(x, table_formulas[[i]], logical = TRUE)
+      }
+      if (recordAware) {
+        table_memberships <- record_consistent_table_memberships(table_memberships, x, aggregatePackage)
+      }
+      cell_grouping <- linkedGauss == "consistent"
+      iterBackTracking <- 0L
+      if (linkedGauss %in% c("local", "consistent", "back-tracking", "local-bdiag")) {
+        GaussSuppression <- gaussSuppression_linked
+      }
+      if (linkedGauss == "back-tracking") {
+        cell_grouping <- NULL
+        iterBackTracking <- Inf
+      }
+      if (linkedGauss == "local") {
+        iterBackTracking <- "local"
+      }
+    }
+  }
+  
+  if (output == "pre_gauss_env") {
+    r_rnd <-as.matrix(crossprod(x, as.matrix(data[r_rnd])))
+    rm(data)    # data needed when output %in% c("all", "publish_inner_x", "publish_inner")
+    env <- environment()
+    return(env)
+  }
+  
+  
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
   }
   
   # Use of special temporary feature
@@ -847,4 +932,28 @@ MoreVars = function(sWeightVar = character(0), ...){
 
 
 
+record_consistent_table_memberships <- function(table_memberships, x, aggregatePackage) {
+  dd <- DummyDuplicated(x, idx = TRUE, rnd = TRUE)
+  table_dd <- table(dd)
+  table_dd <- table_dd[table_dd > 1]
+  if (!length(table_dd)) {
+    return(table_memberships)
+  }
+  dd_duplicated <- as.integer(names(table_dd))
+  selected <- dd %in% dd_duplicated
+  selected_dd <- data.frame(selected_dd = dd[selected])
+  
+  selected_memberships <- aggregate_by_pkg(data = cbind(selected_dd, table_memberships[selected, , drop = FALSE]), 
+                                           by = "selected_dd", 
+                                           var = names(table_memberships), 
+                                           pkg = aggregatePackage,
+                                           fun = sum)
+  for (i in SeqInc(2, ncol(selected_memberships))) {
+    selected_memberships[[i]] <- as.logical(selected_memberships[[i]])
+  }
+  ma <- match(dd, selected_memberships[[1]])
+  
+  table_memberships[!is.na(ma), ] <- selected_memberships[ma[!is.na(ma)], -1]
+  table_memberships
+}
 

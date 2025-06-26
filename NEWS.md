@@ -1,3 +1,13 @@
+## GaussSuppression	1.0.1
+* Significant update: new functionality via **`SuppressLinkedTables()`** and **`linkedGauss`** 
+  for consistent suppression of linked tables  
+  - Introduces alternatives to global protection, potentially reducing computational burden.  
+  - Available via the new function `SuppressLinkedTables()`, or alternatively by using the 
+    new parameter `linkedGauss` in `GaussSuppressionFromData()` and its wrappers.  
+  - Also note the related new parameters to `GaussSuppressionFromData()`: 
+    `recordAware` and `linkedTables`.
+
+
 ## GaussSuppression	1.0.0
 * The package has been stable and in practical use for a long time. The release of version 1.0.0 is therefore appropriate.
 * Interval examples are now included in the vignettes.
