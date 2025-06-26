@@ -11,7 +11,7 @@ secondary suppression by Gaussian elimination by GaussSuppression"><meta propert
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -87,7 +87,10 @@ secondary suppression by Gaussian elimination by <code><a href="https://statisti
 <span>  aggregatePackage <span class="op">=</span> <span class="st">"base"</span>,</span>
 <span>  aggregateNA <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  aggregateBaseOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  rowGroupsPackage <span class="op">=</span> <span class="va">aggregatePackage</span></span>
+<span>  rowGroupsPackage <span class="op">=</span> <span class="va">aggregatePackage</span>,</span>
+<span>  linkedGauss <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  recordAware <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  linkedTables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -311,6 +314,31 @@ The parameter will have impact when, e.g <code>output = "inner"</code>.</p></dd>
 <dd><p>Parameter <code>pkg</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/RowGroups.html" class="external-link">RowGroups</a></code>.
 The parameter is input to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FormulaSums.html" class="external-link">Formula2ModelMatrix</a></code>
 via <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/ModelMatrix.html" class="external-link">ModelMatrix</a></code>.</p></dd>
+
+
+<dt id="arg-linkedgauss">linkedGauss<a class="anchor" aria-label="anchor" href="#arg-linkedgauss"></a></dt>
+<dd><p>Controls linked table suppression. Accepted values are described in the
+documentation for <code><a href="SuppressLinkedTables.html">SuppressLinkedTables()</a></code>.
+See also the note and the corresponding examples, which
+demonstrate usage with alternative function interfaces.
+In addition, <code>linkedGauss = "global"</code> is allowed and corresponds to standard execution
+(i.e., when <code>linkedGauss</code> is not specified).
+When <code>linkedGauss</code> is used, the <code>formula</code> parameter should be provided as a list of formulas.
+Alternatively, <code>formula</code> may have an attribute <code>"table_formulas"</code> containing such a list.
+See also the <code>linkedTables</code> parameter below.</p></dd>
+
+
+<dt id="arg-recordaware">recordAware<a class="anchor" aria-label="anchor" href="#arg-recordaware"></a></dt>
+<dd><p>Parameter associated with <code>linkedGauss</code>. See <code><a href="SuppressLinkedTables.html">SuppressLinkedTables()</a></code>.</p></dd>
+
+
+<dt id="arg-linkedtables">linkedTables<a class="anchor" aria-label="anchor" href="#arg-linkedtables"></a></dt>
+<dd><p>A list specifying how the tables referenced in the <code>formula</code>
+parameter should be combined for use in the linked-tables algorithm.
+Each element in the list contains one or more names of the tables in <code>formula</code>.
+The corresponding tables will be combined and treated as a single table by the algorithm.
+For example: <code>linkedTables = list(c("table_1", "table_3"), "table_2")</code>.
+If <code>NULL</code> (default), each table in <code>formula</code> is used individually.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -792,7 +820,7 @@ Such cells will be protected while also being assigned the <code>NA</code> value
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
     </footer></div>
