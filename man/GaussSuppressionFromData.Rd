@@ -187,7 +187,13 @@ Intervals, \verb{[lo_1, up_1]}, are intervals calculated prior to additional sup
 Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
 
 \item{aggregateNA}{Whether to include NAs in the grouping variables while preAggregate/extraAggregate.
-Parameter \code{include_na} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
+Parameter \code{include_na} to \code{\link[SSBtools]{aggregate_by_pkg}}.
+NAs will not be present in the output table's dimensions even if \code{aggregateNA = FALSE}.
+When using the formula interface, this is controlled by the \code{NAomit} parameter (default \code{TRUE}),
+which is passed to the function \code{SSBtools::Formula2ModelMatrix()}.
+Note that under normal circumstances NAs should never be present in the grouping variables.
+As such, if NAs are present in the grouping variables, using the \code{dimVar} or \code{hierarchies} interfaces
+will result in errors.}
 
 \item{aggregateBaseOrder}{Parameter \code{base_order} to \code{\link[SSBtools]{aggregate_by_pkg}},
 used when preAggregate/extraAggregate.
