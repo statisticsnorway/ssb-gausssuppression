@@ -151,7 +151,13 @@
 #' @param aggregatePackage Package used to preAggregate/extraAggregate. 
 #'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
 #' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate/extraAggregate. 
-#'                    Parameter `include_na` to \code{\link[SSBtools]{aggregate_by_pkg}}.
+#'                    Parameter `include_na` to \code{\link[SSBtools]{aggregate_by_pkg}}. 
+#'                    NAs will not be present in the output table's dimensions even if `aggregateNA = FALSE`.
+#'                    When using the formula interface, this is controlled by the `NAomit` parameter (default `TRUE`),
+#'                    which is passed to the function `SSBtools::Formula2ModelMatrix()`.
+#'                    Note that under normal circumstances NAs should never be present in the grouping variables.
+#'                    As such, if NAs are present in the grouping variables, using the `dimVar` or `hierarchies` interfaces 
+#'                    will result in errors.
 #' @param aggregateBaseOrder Parameter `base_order` to \code{\link[SSBtools]{aggregate_by_pkg}},
 #'                           used when preAggregate/extraAggregate. 
 #'                           The parameter does not affect the ordering of ordinary output. 
