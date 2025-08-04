@@ -11,7 +11,7 @@ secondary suppression by Gaussian elimination by GaussSuppression"><meta propert
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -303,7 +303,14 @@ Parameter <code>pkg</code> to <code><a href="https://statisticsnorway.github.io/
 
 <dt id="arg-aggregatena">aggregateNA<a class="anchor" aria-label="anchor" href="#arg-aggregatena"></a></dt>
 <dd><p>Whether to include NAs in the grouping variables while preAggregate/extraAggregate.
-Parameter <code>include_na</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>.</p></dd>
+Parameter <code>include_na</code> to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/aggregate_by_pkg.html" class="external-link">aggregate_by_pkg</a></code>.
+Note that NAs will not be present in the output table's dimensions regardless of the value of <code>aggregateNA</code>.
+When using the formula interface, this is controlled by the <code>NAomit</code> parameter (default <code>TRUE</code>),
+which is passed to the function <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/FormulaSums.html" class="external-link">SSBtools::Formula2ModelMatrix()</a></code>.
+It is through this use of the formula interface that NAs in the input data make sense.
+Note that under normal circumstances, grouping variables should not use NA to represent a category.
+As such, if NAs are present in the grouping variables, using the <code>dimVar</code> or <code>hierarchies</code> interfaces
+will result in errors.</p></dd>
 
 
 <dt id="arg-aggregatebaseorder">aggregateBaseOrder<a class="anchor" aria-label="anchor" href="#arg-aggregatebaseorder"></a></dt>
