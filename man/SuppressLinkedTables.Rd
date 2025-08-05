@@ -96,6 +96,7 @@ By \emph{alternatives}, we refer to using the \code{linkedGauss} parameter via \
 \item \code{SuppressLinkedTables()} creates several smaller model matrices, which may be combined into a single block-diagonal matrix. A large overall matrix is never created.
 \item With the alternatives, a large overall matrix is created first. Smaller matrices are then derived from it. If the size of the full matrix is a bottleneck, \code{SuppressLinkedTables()} is the better choice.
 \item The \code{"global"} method is available with the alternatives, but not with \code{SuppressLinkedTables()}.
+\item The \code{collapseAware} parameter is supported by the alternatives, but not by \code{SuppressLinkedTables()}. This option may improve coordination across tables. See \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
 \item Due to differences in candidate ordering, the two methods may not always produce identical results. With the alternatives, candidate order is constructed globally across all cells (as with the global method).
 In contrast, \code{SuppressLinkedTables()} uses a locally determined candidate order within each table.  The ordering across tables
 is coordinated to ensure the method works, but it is not based on a strictly defined global order.

@@ -177,6 +177,18 @@
 #'        Alternatively, `formula` may have an attribute `"table_formulas"` containing such a list.
 #'        See also the `linkedTables` parameter below.
 #' @param recordAware Parameter associated with `linkedGauss`. See [SuppressLinkedTables()].  
+#' @param collapseAware Parameter associated with `linkedGauss`.
+#'        In the linked‑tables algorithm, the model matrix is first *collapsed* by
+#'        removing duplicate rows. 
+#'        When `collapseAware = TRUE`, every cell that remains numerically derivable 
+#'        after a pre‑aggregation corresponding to this row reduction will be treated 
+#'        as a common cell. This
+#'        maximizes coordination across tables, given the duplicate‑row removal,
+#'        while adding limited additional computational overhead. In particular,
+#'        the suppression algorithm automatically accounts for cells in one table
+#'        that are sums of cells in another table.
+#'        Note that any cell that `recordAware = TRUE` would introduce is already
+#'        included automatically when `collapseAware = TRUE`.
 #' @param linkedTables A list specifying how the tables referenced in the `formula` 
 #'   parameter should be combined for use in the linked-tables algorithm. 
 #'   Each element in the list contains one or more names of the tables in `formula`. 
@@ -274,6 +286,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            rowGroupsPackage = aggregatePackage,
                            linkedGauss = NULL,
                            recordAware = TRUE,
+                           collapseAware = FALSE,
                            linkedTables = NULL
                            ){ 
   if (!is.null(spec)) {
@@ -756,8 +769,19 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       for (i in seq_along(table_formulas)) {
         table_memberships[[i]] <- SSBtools::formula_selection(x, table_formulas[[i]], logical = TRUE)
       }
+      sum_1_table_memberships <- sum(table_memberships)
+      if (collapseAware) {
+        table_memberships <- collapse_aware_table_memberships(table_memberships, x)
+      }
+      sum_2_table_memberships <- sum(table_memberships)
       if (recordAware) {
         table_memberships <- record_consistent_table_memberships(table_memberships, x, aggregatePackage)
+      }
+      sum_3_table_memberships <- sum(table_memberships)
+      if (recordAware & collapseAware) {
+        if (sum_2_table_memberships != sum_3_table_memberships) {
+          warning("recordAware matters when collapseAware is TRUE")
+        }
       }
       cell_grouping <- linkedGauss == "consistent"
       iterBackTracking <- 0L
@@ -999,6 +1023,25 @@ record_consistent_table_memberships <- function(table_memberships, x, aggregateP
   
   table_memberships[!is.na(ma), ] <- selected_memberships[ma[!is.na(ma)], -1]
   table_memberships
+}
+
+
+collapse_aware_table_memberships <- function(table_memberships, x, aggregatePackage) {
+  
+  r7 <- rnd_7(nrow(x))
+  table_memberships_out <- table_memberships
+  
+  for(i in seq_along(table_memberships)){
+    ti <- table_memberships[, i]
+    idx <- DummyDuplicated(x[, ti, drop = FALSE], idx = TRUE, rows = TRUE, rnd = TRUE)
+    useq <- SSBtools::UniqueSeq(idx)
+    ord1 <- SortRows(cbind(idx, useq), index.return = TRUE)
+    ord2 <- SortRows(cbind(idx, -useq), index.return = TRUE)
+    cp1 <- Matrix::crossprod(x[ord1 , ,drop=FALSE], r7[ord1 , ,drop=FALSE])
+    cp2 <- Matrix::crossprod(x[ord1 , ,drop=FALSE], r7[ord2 , ,drop=FALSE])
+    table_memberships_out[, i] <- as.vector(rowSums(abs(cp2 -cp1)) == 0)
+  }
+  table_memberships_out
 }
 
 

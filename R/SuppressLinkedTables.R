@@ -31,6 +31,7 @@
 #' - `SuppressLinkedTables()` creates several smaller model matrices, which may be combined into a single block-diagonal matrix. A large overall matrix is never created.
 #' - With the alternatives, a large overall matrix is created first. Smaller matrices are then derived from it. If the size of the full matrix is a bottleneck, `SuppressLinkedTables()` is the better choice.
 #' - The `"global"` method is available with the alternatives, but not with `SuppressLinkedTables()`.
+#' - The `collapseAware` parameter is supported by the alternatives, but not by `SuppressLinkedTables()`. This option may improve coordination across tables. See [GaussSuppressionFromData()]. 
 #' - Due to differences in candidate ordering, the two methods may not always produce identical results. With the alternatives, candidate order is constructed globally across all cells (as with the global method).  
 #'   In contrast, `SuppressLinkedTables()` uses a locally determined candidate order within each table.  The ordering across tables 
 #'   is coordinated to ensure the method works, but it is not based on a strictly defined global order.  

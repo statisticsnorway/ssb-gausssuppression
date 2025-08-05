@@ -44,6 +44,7 @@ GaussSuppressionFromData(
   rowGroupsPackage = aggregatePackage,
   linkedGauss = NULL,
   recordAware = TRUE,
+  collapseAware = FALSE,
   linkedTables = NULL
 )
 }
@@ -217,6 +218,19 @@ Alternatively, \code{formula} may have an attribute \code{"table_formulas"} cont
 See also the \code{linkedTables} parameter below.}
 
 \item{recordAware}{Parameter associated with \code{linkedGauss}. See \code{\link[=SuppressLinkedTables]{SuppressLinkedTables()}}.}
+
+\item{collapseAware}{Parameter associated with \code{linkedGauss}.
+In the linked‑tables algorithm, the model matrix is first \emph{collapsed} by
+removing duplicate rows.
+When \code{collapseAware = TRUE}, every cell that remains numerically derivable
+after a pre‑aggregation corresponding to this row reduction will be treated
+as a common cell. This
+maximizes coordination across tables, given the duplicate‑row removal,
+while adding limited additional computational overhead. In particular,
+the suppression algorithm automatically accounts for cells in one table
+that are sums of cells in another table.
+Note that any cell that \code{recordAware = TRUE} would introduce is already
+included automatically when \code{collapseAware = TRUE}.}
 
 \item{linkedTables}{A list specifying how the tables referenced in the \code{formula}
 parameter should be combined for use in the linked-tables algorithm.
