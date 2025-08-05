@@ -303,7 +303,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
-  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag"), okNULL = TRUE)
+  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), okNULL = TRUE)
   if (is.list(formula)) {
     table_formulas <- formula
     formula <- combine_formulas(table_formulas)
@@ -736,6 +736,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   table_memberships <- NULL
   cell_grouping <- NULL
   if (!is.null(linkedGauss)) {
+    if (linkedGauss == "super-consistent") {
+      super_consistent <- TRUE
+      linkedGauss <- "consistent"
+    } else {
+      super_consistent <- FALSE
+    }
     if (linkedGauss %in% c("local", "consistent", "back-tracking", "local-bdiag")) {
       names(table_formulas) <- paste0("t", seq_len(length(table_formulas)))
       table_memberships <- as.data.frame(matrix(NA, ncol(x), length(table_formulas)))
@@ -773,10 +779,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking,
+                                  super_consistent = super_consistent,
+                                  lpPackage = lpPackage,
+                                  ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, 
+                                  super_consistent = super_consistent,
+                                  lpPackage = lpPackage,
+                                  ...)
   }
   
   # Use of special temporary feature

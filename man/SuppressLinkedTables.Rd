@@ -38,6 +38,12 @@ and primary suppressions are adjusted based on secondary suppressions from other
 iterations.
 \item \code{"local-bdiag"}: Produces the same result as \code{"local"}, but uses a single call to
 \code{GaussSuppression()} with a block diagonal matrix. It does not apply the linked-table methodology.
+\item \code{"super-consistent"}: A method that provides improved protection compared to \code{"consistent"}.
+Like \code{"consistent"}, it uses a single call to \code{GaussSuppression()}. In addition, it exploits
+the fact that common cells have the same value in all tables. This enables a more thorough
+coordination than in \code{"consistent"}, which only requires that common cells be suppressed equally.
+If intervals are calculated using such coordination, common cells will have identical
+interval boundaries in each table.
 }}
 
 \item{recordAware}{If \code{TRUE} (default), the suppression procedure will ensure consistency

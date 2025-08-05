@@ -56,6 +56,13 @@
 #'
 #' - `"local-bdiag"`: Produces the same result as `"local"`, but uses a single call to 
 #'   `GaussSuppression()` with a block diagonal matrix. It does not apply the linked-table methodology.
+#'   
+#' - `"super-consistent"`: A method that provides improved protection compared to `"consistent"`. 
+#'   Like `"consistent"`, it uses a single call to `GaussSuppression()`. In addition, it exploits 
+#'   the fact that common cells have the same value in all tables. This enables a more thorough 
+#'   coordination than in `"consistent"`, which only requires that common cells be suppressed equally. 
+#'   If intervals are calculated using such coordination, common cells will have identical 
+#'   interval boundaries in each table. 
 #' 
 #' @param recordAware If `TRUE` (default), the suppression procedure will ensure consistency 
 #'                    across cells that aggregate the same underlying records, 
@@ -150,7 +157,7 @@ SuppressLinkedTables <- function(data = NULL,
   }
   
   SSBtools::CheckInput(linkedGauss, type = "character", 
-    alt = c("local", "consistent", "back-tracking", "local-bdiag"), 
+    alt = c("local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), 
     okNULL = FALSE)
   
   if (is.null(withinArg)) {
@@ -248,6 +255,8 @@ SuppressLinkedTables <- function(data = NULL,
     iterBackTracking = "local"
   }
   
+  super_consistent <- linkedGauss == "super-consistent" 
+  
   secondary <- gaussSuppression_linked_fix_dots(
                                        x_ = list_element(env_list, "x"), 
                                        candidates_ = list_element(env_list, "candidates"), 
@@ -260,6 +269,7 @@ SuppressLinkedTables <- function(data = NULL,
                                        whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
                                        unsafeAsNegative = TRUE,
                                        dup_id = dup_id,
+                                       super_consistent = super_consistent, 
                                        iterBackTracking = iterBackTracking, 
                                        ...)
   for (i in seq_len(n)) {

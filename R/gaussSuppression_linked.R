@@ -33,6 +33,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     dup_id = NULL,
                                     table_memberships = NULL,
                                     cell_grouping = TRUE,
+                                    super_consistent = FALSE, 
                                     iterBackTracking = 0L, 
                                     sequential = TRUE,
                                     printInc = TRUE,
@@ -320,27 +321,50 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       cell_grouping <- NULL
     }
   }
+ 
+  if (super_consistent) {
+    ncol_old <- ncol(x)
+    x_ <- cbind(x, x0diff(x, SSBtools:::repeated_as_integer(cell_grouping)))
+    forced_ <- c(forced, SeqInc(ncol_old + 1, ncol(x_)))
+    if (get0("super_consistent_cell_grouping", ifnotfound = FALSE)) {
+      cell_grouping_ <- c(cell_grouping, rep(0L, ncol(x_) - ncol_old))
+      message('"super_consistent" with "cell_grouping"')
+    } else {
+      cell_grouping_ <- NULL
+    }
+    table_id_ <- NULL
+  } else {
+    x_ <- x
+    forced_ <- forced
+    cell_grouping_ = cell_grouping
+    table_id_ = table_id
+  }
   
   if (printInc) {
     if (is.null(cell_grouping)) {
       cat_linkedGauss("local-bdiag")
     } else {
-      cat_linkedGauss("consistent")
+      if (super_consistent) {
+        cat_linkedGauss("super-consistent")
+      } else {
+        cat_linkedGauss("consistent")
+      }
     }
   }
   
-  secondary <- GaussSuppression(x = x, 
+  secondary <- GaussSuppression(x = x_, 
                                 ...,
                                 candidates = candidates, 
                                 primary = primary, 
-                                forced = forced, 
+                                forced = forced_, 
                                 hidden = hidden, 
                                 singleton = singleton, 
                                 singletonMethod = singletonMethod, 
                                 whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
-                                cell_grouping = cell_grouping,
-                                table_id = table_id,
+                                cell_grouping = cell_grouping_,
+                                table_id = table_id_,
                                 auto_anySumNOTprimary = FALSE,
+                                auto_subSumAny = FALSE,
                                 printInc = printInc,
                                 printXdim = printXdim)
   
@@ -366,6 +390,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     message_fun <- message
   }
   if (length(unique(orig_col)) != length(secondary_out) + length(not_secondary_out)) {
+    cat("length(unique(orig_col))", length(unique(orig_col)),"\n")
+    cat("length(secondary_out)", length(secondary_out),"\n")
+    cat("length(not_secondary_out)", length(not_secondary_out),"\n")
     message_fun("Inconsistent suppression across common cells within the algorithm")
   }
   c(secondary_out, -unique(orig_col[unsafe]))
@@ -721,3 +748,38 @@ removeDuplicatedRows <- function(x, singleton) {
 cat_linkedGauss <- function(linkedGauss = "consistent") {
   cat('\n====== Linked GaussSuppression by "', linkedGauss, '" algorithm:\n\n', sep = "")
 }
+
+
+
+
+
+x0diff <- function(x, cell_grouping){
+  uc = unique(cell_grouping)
+  uc = uc[uc!=0]
+  
+  ma = match(uc, cell_grouping)
+  xuc = x[ , ma,drop = FALSE]
+  m = x[, integer(0),drop=FALSE]
+  
+  cell_grouping[ma[!is.na(ma)]] <- 0L
+  
+  while(any(cell_grouping != 0)){
+    ma = match(uc, cell_grouping)
+    m = cbind(m, xuc[ , !is.na(ma),drop = FALSE] - x[ , ma[!is.na(ma)],drop = FALSE])
+    cell_grouping[ma[!is.na(ma)]] <- 0L 
+  }
+  m[ , !DummyDuplicated(m, rnd = TRUE)]
+}
+
+
+# Copy of SSBtools:::repeated_as_integer
+# Replaces non-zero elements occurring at least twice 
+# with unique integer group codes; all others become 0.
+repeated_as_integer <- function(a) {
+  a_non0 <- a[a != 0]
+  a_dup <- a %in% unique(a_non0[duplicated(a_non0)])
+  b <- rep(0L, length(a))
+  b[a_dup] <- as.integer(factor(a[a_dup]))
+  b
+}
+
