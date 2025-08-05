@@ -29,6 +29,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     singleton, singletonMethod, 
                                     xExtraPrimary, 
                                     whenEmptyUnsuppressed = message, 
+                                    z = rep(0, ncol(x)),
+                                    rangeLimits = data.frame(a = rep(0, ncol(x))),
+                                    lpPackage = NULL, 
                                     ..., 
                                     dup_id = NULL,
                                     table_memberships = NULL,
@@ -116,6 +119,8 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       if (use_cell_grouping) {
         cell_grouping <- orig_col
       }
+      z <- z[orig_col]
+      rangeLimits <- rangeLimits[orig_col, , drop = FALSE]
       x <- Matrix::bdiag(table_x)
       colnames(x) <- table_x_cnames 
       rm(table_x)
@@ -324,7 +329,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
  
   if (super_consistent) {
     ncol_old <- ncol(x)
-    x_ <- cbind(x, x0diff(x, SSBtools:::repeated_as_integer(cell_grouping)))
+    x_ <- cbind(x, x0diff(x, repeated_as_integer(cell_grouping)))
     forced_ <- c(forced, SeqInc(ncol_old + 1, ncol(x_)))
     if (get0("super_consistent_cell_grouping", ifnotfound = FALSE)) {
       cell_grouping_ <- c(cell_grouping, rep(0L, ncol(x_) - ncol_old))
@@ -371,6 +376,56 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   unsafe <- -secondary[secondary < 0]
   secondary <- secondary[secondary > 0]
   
+
+  if(!is.null(lpPackage)){
+    if(sum(rangeLimits, na.rm = TRUE)){
+      interval_suppressed <- interval_suppression(x = x, 
+                                  candidates = candidates, 
+                                  primary = primary, 
+                                  secondary = secondary,
+                                  forced = forced, 
+                                  hidden = hidden, 
+                                  singleton = singleton, 
+                                  singletonMethod = singletonMethod, 
+                                  whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
+                                  cell_grouping = cell_grouping,
+                                  ...,
+                                  xExtraPrimary = NULL,
+                                  lpPackage = lpPackage,
+                                  rangeLimits = rangeLimits,
+                                  z = z,
+                                  printInc = printInc,
+                                  printXdim = printXdim,
+                                  auto_anySumNOTprimary = FALSE,
+                                  auto_subSumAny = FALSE)
+      secondary <-  interval_suppressed[[1]]
+      gauss_intervals <- interval_suppressed[[2]]
+    } else {
+      suppressed__ <- rep(FALSE, ncol(x))
+      suppressed__[primary] <- TRUE
+      suppressed__[secondary] <- TRUE
+      suppressed__[hidden] <- TRUE     # in interval computation, hidden similar to secondary
+      suppressed__[forced] <- FALSE
+      
+      gauss_intervals <- ComputeIntervals(
+        x = x,
+        z = z,
+        primary = primary,
+        suppressed = suppressed__,
+        minVal = NULL,
+        allInt = FALSE,
+        sparseConstraints = TRUE,
+        lpPackage = lpPackage,
+        gaussI = TRUE,
+        cell_grouping = cell_grouping
+      ) 
+      gauss_intervals <- as.data.frame(gauss_intervals)
+    }
+    
+  } else {
+    gauss_intervals <- NULL
+  }
+  
   if (is.null(table_memberships)) {
     secondary <- as_list_from_not_logical(secondary, cumsum_0_ncol_x)
     unsafe <- as_list_from_not_logical(unsafe, cumsum_0_ncol_x)
@@ -395,7 +450,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     cat("length(not_secondary_out)", length(not_secondary_out),"\n")
     message_fun("Inconsistent suppression across common cells within the algorithm")
   }
-  c(secondary_out, -unique(orig_col[unsafe]))
+  secondary <- c(secondary_out, -unique(orig_col[unsafe]))
+  if (!is.null(gauss_intervals)) {
+    ma <- match(seq_len(max(orig_col)), orig_col)   # same interval calculated several times, to be fixed 
+    gauss_intervals <- gauss_intervals[ma, ]
+    return(list(secondary, gauss_intervals))
+  }
+  secondary
 }
 
 

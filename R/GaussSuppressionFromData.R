@@ -324,8 +324,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   if (!is.null(lpPackage) & !is.null(linkedGauss)) {
-    lpPackage <- NULL
-    warning("The 'lpPackage' parameter is currently ignored when 'linkedGauss' is specified.")
+    # lpPackage <- NULL
+    # warning("The 'lpPackage' parameter is currently ignored when 'linkedGauss' is specified.")
   }
 
   # Possible development function as input
@@ -346,6 +346,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       } else {
         OutputFunction <- OutputIntervals
       }
+      if( !(identical(linkedGauss, "global") | is.null(linkedGauss))) {    ### INTERVALS ANOTHER WAY 
+        OutputFunction <- NULL
+      } 
     } else {
       OutputFunction <- NULL
     }
@@ -725,10 +728,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary))
   }
   
+  z <- z_interval(..., freq = freq, freqVar = freqVar, num = num)
+  rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  
   if( output %in% c("outputGaussSuppression", "outputGaussSuppression_x", "secondary")){
     rm(crossTable)
     rm(freq)
-    rm(num)
+    num <- NULL
     rm(weight)
     rm(data)
   } 
@@ -776,19 +782,34 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
+  
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
                                   unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking,
                                   super_consistent = super_consistent,
+                                  z = z,
+                                  rangeLimits = rangeLimits,
                                   lpPackage = lpPackage,
                                   ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
                                   unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, 
                                   super_consistent = super_consistent,
+                                  z = z,
+                                  rangeLimits = rangeLimits,
                                   lpPackage = lpPackage,
                                   ...)
+  }
+  
+  # possible secondary with extra output 
+  #   for intervals due to lpPackage
+  # similar to primary 
+  if (is.list(secondary)) {
+    if (!is.null(num)) {
+      num <- cbind(num, secondary[[2]])
+    }
+    secondary <- secondary[[1]]
   }
   
   # Use of special temporary feature
@@ -980,3 +1001,21 @@ record_consistent_table_memberships <- function(table_memberships, x, aggregateP
   table_memberships
 }
 
+
+# Function to find vector with z-values for interval calculation
+z_interval <- function(..., freq, freqVar, num, dominanceVar = NULL, intervalVar = NULL) {
+  intervalVar <- intervalVar[1]  # Only single intervalVar is (for now) supported in functions where this is used
+  if (identical(intervalVar, freqVar) | ncol(num) == 0) {
+    z <- freq
+  } else {
+    if (is.null(intervalVar)) {
+      if (is.null(dominanceVar)) {
+        intervalVar <- names(num)[1]
+      } else {
+        intervalVar <- dominanceVar
+      }
+    }
+    z <- num[[intervalVar]]
+  }
+  z
+}

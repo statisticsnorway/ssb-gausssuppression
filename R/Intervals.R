@@ -30,6 +30,11 @@
 #' @param  sparseConstraints When TRUE, a sparse constraint matrix will be input to the 
 #' solver. In the case of `lpSolve`, the sparse matrix is represented in triplet form 
 #' as a dense matrix with three columns, and the `dense.const` parameter is utilized.
+#' @param cell_grouping Numeric vector indicating group membership.
+#'   Cells with the same value that is not 0 belong to the same group.
+#'   A value of 0 indicates that the cell is not a member of any group.
+#'   Members of the same group are assumed to have the same z-value and this
+#'   is included as a condition when calculating intervals.
 #'
 #' @importFrom stats na.omit runif
 #' @importFrom utils flush.console
@@ -49,7 +54,8 @@ ComputeIntervals <-
            lpPackage = "lpSolve",
            gaussI = TRUE,
            allInt = FALSE,
-           sparseConstraints = TRUE) {
+           sparseConstraints = TRUE,
+           cell_grouping = rep(0, length(z))) {
     
     if (!lpPackage %in% c("lpSolve", "Rsymphony", "Rglpk", "highs"))
       stop("Only 'lpSolve', 'Rsymphony' and 'Rglpk' solvers are supported.")
@@ -80,7 +86,15 @@ ComputeIntervals <-
     published <- seq_len(ncol(x))
     published <- published[!(published %in% suppressed)]
     
-    if (!length(published)) {
+    
+    cell_grouping <- repeated_as_integer(cell_grouping)
+    if(any(cell_grouping != 0)){
+      x <- cbind(x, x0diff(x, cell_grouping))
+      z <- c(z, rep(0, ncol(x) - input_ncol_x))
+    }
+    cell_diff = SeqInc(input_ncol_x + 1, ncol(x))
+    
+    if (!length(c(published, cell_diff))) {
       cat("Infinity intervals without using a solver ...\n")
       lo <- rep(NA_integer_, input_ncol_x)
       up <- lo
@@ -90,13 +104,14 @@ ComputeIntervals <-
     }
     
     # Reorder since first match important in DummyDuplicated
-    x <- x[, c(published, primary, secondary), drop = FALSE]
-    z <- z[c(published, primary, secondary)]
+    x <- x[, c(published, cell_diff, primary, secondary), drop = FALSE]
+    z <- z[c(published, cell_diff, primary, secondary)]
     
     published2 <- seq_len(length(published))
-    primary2 <- length(published) + seq_len(length(primary))
+    cell_diff2 <- length(published) + seq_len(length(cell_diff))
+    primary2 <- length(published) + length(cell_diff) + seq_len(length(primary))
     secondary2 <-
-      length(published) + length(primary) + seq_len(length(secondary))
+      length(published) + length(cell_diff) + length(primary) + seq_len(length(secondary))
     
     cat("(", dim(x)[1], "*", length(published2), sep = "")
     
@@ -108,13 +123,14 @@ ComputeIntervals <-
     if (length(idxDDunique) < length(idxDD)) {
       x <- x[, idxDDunique, drop = FALSE]
       z <- z[idxDDunique]
-      
       published3 <- which(idxDDunique %in% published2)
+      cell_diff3 <- which(idxDDunique %in% cell_diff2)
       primary3 <- which(idxDDunique %in% primary2)
       secondary3 <- which(idxDDunique %in% secondary2)
       cat("-DDcol->", dim(x)[1], "*", length(published3), sep = "")
     } else {
       published3 <- published2
+      cell_diff3 <- cell_diff2
       primary3 <- primary2
       secondary3 <- secondary2
     }
@@ -162,7 +178,8 @@ ComputeIntervals <-
                                  allInt,
                                  lpPackage,
                                  sparseConstraints,
-                                 AsMatrix) 
+                                 AsMatrix,
+                                 cell_diff3 = cell_diff3) 
     
   
     # Transfer to before  "Reduce problem by duplicated columns"
@@ -208,18 +225,37 @@ ComputeIntervals1 <- function(a,
                              sparseConstraints,
                              AsMatrix,
                              check = rep(TRUE, length(primary3)),
-                             verbose = TRUE) {
+                             verbose = TRUE, 
+                             cell_diff3 = integer(0)) {
   # Vectors of limits to be filled inn
   lo <- rep(NA_integer_, ncol(x))
   up <- lo
   
+  
+  if (lpPackage == "lpSolve"){
+    eqtxt <- "="
+  } else{
+    eqtxt <- "=="  
+  }
+  
   # Make lp-input from Reduce0exact solution
   f.con <- AsMatrix(t(a$x))
-  if (lpPackage == "lpSolve")
-    f.dir <- rep("=", nrow(f.con))
-  else
-    f.dir <- rep("==", nrow(f.con))
+  f.dir <- rep(eqtxt, nrow(f.con))
   f.rhs <- as.vector((as.matrix(a$z)))
+  
+  
+  if(length(cell_diff3)){
+    
+    f.con <-
+      rbind(f.con, AsMatrix(t(x[!a$yKnown, cell_diff3, drop = FALSE])))
+    f.dir <-
+      c(f.dir, rep(eqtxt, length(cell_diff3)))
+    f.rhs <-
+      c(f.rhs, -as.vector(Matrix::crossprod(x[ , cell_diff3, drop = FALSE], a$y))) # a$y: A version of y (freq here) with known values correct and others zero
+    
+  }
+  
+  
   
   if (!is.null(minVal)) {
     f.con <-
