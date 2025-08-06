@@ -75,7 +75,6 @@
 #'   *"Cells with empty input will never be secondary suppressed. Extend input data with zeros?"*  
 #'   Here, the default is set to \code{NULL} (no message), since preprocessing of the model matrix  
 #'   may invalidate the assumptions behind this message.
-#' @param lpPackage Currently ignored. If specified, a warning will be issued.
 #'
 #' @return A list of data frames, or, if `withinArg` is `NULL`, the ordinary output from `fun`.
 #' @importFrom SSBtools NumSingleton
@@ -150,12 +149,7 @@ SuppressLinkedTables <- function(data = NULL,
                               linkedGauss = "consistent",
                               recordAware = TRUE,
                               iterBackTracking = Inf,
-                              whenEmptyUnsuppressed = NULL,
-                              lpPackage = NULL) {
-  
-  if (!is.null(lpPackage)) {
-    warning("The 'lpPackage' parameter is currently ignored by SuppressLinkedTables().")
-  }
+                              whenEmptyUnsuppressed = NULL) {
   
   SSBtools::CheckInput(linkedGauss, type = "character", 
     alt = c("local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), 
@@ -268,13 +262,26 @@ SuppressLinkedTables <- function(data = NULL,
                                        singletonMethod_ = list_element(env_list, "singletonMethod"), 
                                        xExtraPrimary_ = list_element(env_list, "xExtraPrimary"),
                                        whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
+                                       z = list_element(env_list, "z"),
+                                       rangeLimits = list_element(env_list, "rangeLimits"),
                                        unsafeAsNegative = TRUE,
                                        dup_id = dup_id,
                                        super_consistent = super_consistent, 
                                        iterBackTracking = iterBackTracking, 
                                        ...)
-  for (i in seq_len(n)) {
-    env_list[[i]]$secondary <- secondary[[i]]
+  
+  
+  if (identical(names(secondary), c("secondary", "gauss_intervals"))) {
+    for (i in seq_len(n)) {
+      env_list[[i]]$secondary <- secondary$secondary[[i]]
+      if (!is.null(env_list[[i]]$num)) {
+        env_list[[i]]$num <- cbind(env_list[[i]]$num, secondary$gauss_intervals[[i]])
+      }
+    }
+  } else {
+    for (i in seq_len(n)) {
+      env_list[[i]]$secondary <- secondary[[i]]
+    }
   }
   for (i in seq_along(suppressedData)) {
     environment(TailGaussSuppressionFromData) <- env_list[[i]]

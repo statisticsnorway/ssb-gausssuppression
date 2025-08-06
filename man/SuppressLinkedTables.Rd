@@ -12,8 +12,7 @@ SuppressLinkedTables(
   linkedGauss = "consistent",
   recordAware = TRUE,
   iterBackTracking = Inf,
-  whenEmptyUnsuppressed = NULL,
-  lpPackage = NULL
+  whenEmptyUnsuppressed = NULL
 )
 }
 \arguments{
@@ -58,8 +57,6 @@ This is about a helpful message
 \emph{"Cells with empty input will never be secondary suppressed. Extend input data with zeros?"}
 Here, the default is set to \code{NULL} (no message), since preprocessing of the model matrix
 may invalidate the assumptions behind this message.}
-
-\item{lpPackage}{Currently ignored. If specified, a warning will be issued.}
 }
 \value{
 A list of data frames, or, if \code{withinArg} is \code{NULL}, the ordinary output from \code{fun}.

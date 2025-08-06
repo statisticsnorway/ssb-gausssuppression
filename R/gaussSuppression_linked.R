@@ -317,6 +317,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     singleton <- rbind_singleton(singleton)
 
     x <- Matrix::bdiag(x)
+    z <- unlist(z)
+    rangeLimits <- SSBtools::RbindAll(rangeLimits)
+    
     if (!is.null(dup_id)) {
       fcgac <- fix_cell_grouping_and_candidates(dup_id, candidates, cumsum_0_ncol_x)
       candidates <- fcgac$candidates
@@ -432,7 +435,12 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     for(i in seq_along(secondary)){
       secondary[[i]] <- c(secondary[[i]], -unsafe[[i]])
     }
-    return(secondary)
+    if (!is.null(gauss_intervals)) {
+      return(list(secondary = secondary, 
+                  gauss_intervals = as_data_frame_list(gauss_intervals, cumsum_0_ncol_x)))
+    } else {
+      return(secondary)
+    }
   }
   
   not_secondary <- rep(TRUE, length(orig_col))
@@ -459,6 +467,16 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   secondary
 }
 
+
+as_data_frame_list <- function(x, cumsum_0_ncol_x) {
+  n <- length(cumsum_0_ncol_x) - 1
+  x_list <- vector("list", n)
+  for (i in seq_len(n)) {
+    r <- x > cumsum_0_ncol_x[i] & x <= cumsum_0_ncol_x[i + 1]
+    x_list[[i]] <- x[SSBtools::SeqInc(cumsum_0_ncol_x[i] + 1, cumsum_0_ncol_x[i + 1]), , drop = FALSE]
+  }
+  x_list
+}
 
 as_list_from_not_logical <- function(x, cumsum_0_ncol_x) {
   n <- length(cumsum_0_ncol_x) - 1
