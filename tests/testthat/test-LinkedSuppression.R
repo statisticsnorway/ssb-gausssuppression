@@ -134,6 +134,7 @@ test_that("SuppressLinkedTables with forced", {
                local_TRUE = c(1268238, 2177150, 4681831, 19221), 
                consistent_FALSE = c(1265297, 2174748, 4681439, 22860), 
                consistent_TRUE = c(1342807, 2222294, 4977701, 22860), 
+               `super-consistent_TRUE` = c(1339256, 2161034, 4887808, 17202),
                `back-tracking_FALSE` = c(1273760, 2174748, 4681439, 22477), 
                `back-tracking_TRUE` = c(1427836, 2710850, 5364422, 22477))
                                          
@@ -141,7 +142,8 @@ test_that("SuppressLinkedTables with forced", {
   sum2 <- list(local_FALSE = c(1269555, 2177278, 4681933, 19665), 
                local_TRUE = c(1365557, 2363893, 4950102, 19677), 
                consistent_FALSE = c(1265297, 2174748, 4681413, 22864), 
-               consistent_TRUE = c(1343774, 2222294, 5000442, 22876), 
+               consistent_TRUE = c(1343774, 2222294, 5000442, 22876),
+               `super-consistent_TRUE` = c(1355825, 2161034, 4877349, 17202),
                `back-tracking_FALSE` = c(1273760, 2174748, 4681413, 22481), 
                `back-tracking_TRUE` = c(1427836, 2712055, 5364396, 22493))
   
@@ -177,7 +179,7 @@ test_that("SuppressLinkedTables with forced", {
   
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking",  "local-bdiag"))
+  for(linkedGauss in c("local", "consistent", "super-consistent", "back-tracking",  "local-bdiag"))
     for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
       if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
@@ -347,22 +349,14 @@ test_that("SuppressLinkedTables with num-singleton", {
                `local-bdiag_TRUE` = c(13105L, 72123L, 108122L, 7233L))
   
   
-  sum2 <- list(local_FALSE = 634206L, 
-               local_TRUE = 656029L, 
-               consistent_FALSE = 634206L, 
-               consistent_TRUE = 643913L, 
-               `back-tracking_FALSE` = 682083L, 
-               `back-tracking_TRUE` = 740275L, 
-               global_FALSE = 651516L, 
-               global_TRUE = 651516L, 
-               `local-bdiag_FALSE` = 634206L, 
-               `local-bdiag_TRUE` = 656029L)
+  sum2 <- list(consistent_FALSE = 634206L,
+               `super-consistent_FALSE` = 634206L, 
+               consistent_TRUE = 651709L,
+               `super-consistent_TRUE` = 661968L)
   
   sum1[["local-bdiag_FALSE"]] <- sum1[["local_FALSE"]]
   sum1[["local-bdiag_TRUE"]] <- sum1[["local_TRUE"]]
-  sum2[["local-bdiag_FALSE"]] <- sum2[["local_FALSE"]]
-  sum2[["local-bdiag_TRUE"]] <- sum2[["local_TRUE"]]
-  
+
   
   
   for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "local-bdiag"))
@@ -391,8 +385,8 @@ test_that("SuppressLinkedTables with num-singleton", {
   
   
   
-  for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
-    for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
+  for(linkedGauss in c("consistent", "super-consistent")) 
+    for(collapseAware in c(FALSE, TRUE)) {
       
       if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
@@ -404,14 +398,15 @@ test_that("SuppressLinkedTables with num-singleton", {
                                                     table_2 = f2,
                                                     table_3 = f3,
                                                     table_4 = f4),
-                              recordAware =  recordAware,
+                              collapseAware =  collapseAware,
+                              recordAware = FALSE, 
                               pPercent = 50,
                               printXdim = printXdim,
                               printInc = printInc,
                               linkedGauss = linkedGauss)
       
       expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
-                       sum2[[paste(linkedGauss, recordAware, sep = "_")]])
+                       sum2[[paste(linkedGauss, collapseAware, sep = "_")]])
     }
 })
 
