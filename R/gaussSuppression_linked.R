@@ -37,6 +37,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     table_memberships = NULL,
                                     cell_grouping = TRUE,
                                     super_consistent = FALSE, 
+                                    linkedIntervals = "local-bdiag", 
                                     iterBackTracking = 0L, 
                                     sequential = TRUE,
                                     printInc = TRUE,
@@ -380,7 +381,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   secondary <- secondary[secondary > 0]
   
 
+
   if(!is.null(lpPackage)){
+    
+    if (linkedIntervals == "local-bdiag") {
+      cell_grouping <- NULL
+    }
+    
     if(sum(rangeLimits, na.rm = TRUE)){
       interval_suppressed <- interval_suppression(x = x, 
                                   candidates = candidates, 
@@ -460,8 +467,8 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   }
   secondary <- c(secondary_out, -unique(orig_col[unsafe]))
   if (!is.null(gauss_intervals)) {
-    ma <- match(seq_len(max(orig_col)), orig_col)   # same interval calculated several times, to be fixed 
-    gauss_intervals <- gauss_intervals[ma, ]
+      # same interval calculated several times, to be fixed 
+    gauss_intervals <- gauss_intervals_orig_col(gauss_intervals, orig_col)
     return(list(secondary, gauss_intervals))
   }
   secondary
@@ -861,4 +868,30 @@ repeated_as_integer <- function(a) {
   b[a_dup] <- as.integer(factor(a[a_dup]))
   b
 }
+
+
+
+# Function to make sure maximum of lower bounds 
+#                   and minimum of upper bounds 
+gauss_intervals_orig_col = function(gauss_intervals, orig_col){
+  ma <- match(seq_len(max(orig_col)), orig_col)   # same interval calculated several times, to be fixed 
+  gauss_intervals_out <- gauss_intervals[ma, ]
+  for(i in which(substr(names(gauss_intervals),1,2) == "lo")){
+    gauss_intervals_out[[i]] = order_matched(gauss_intervals[[i]], orig_col, TRUE)
+  }
+  for(i in which(substr(names(gauss_intervals),1,2) == "up")){
+    gauss_intervals_out[[i]] = order_matched(gauss_intervals[[i]], orig_col, FALSE)
+  }
+  gauss_intervals_out
+}
+
+order_matched <- function(x, orig_col, decreasing = FALSE) {
+  ord <- order(x, decreasing = decreasing)
+  x <- x[ord]
+  orig_col <- orig_col[ord]
+  ma <- match(seq_len(max(orig_col)), orig_col) 
+  x[ma]
+}
+
+
 

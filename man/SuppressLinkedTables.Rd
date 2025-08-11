@@ -10,6 +10,8 @@ SuppressLinkedTables(
   ...,
   withinArg = NULL,
   linkedGauss = "consistent",
+  linkedIntervals = NA,
+  lpPackage = NULL,
   recordAware = TRUE,
   iterBackTracking = Inf,
   whenEmptyUnsuppressed = NULL

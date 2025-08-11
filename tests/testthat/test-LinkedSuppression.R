@@ -408,7 +408,57 @@ test_that("SuppressLinkedTables with num-singleton", {
       expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
                        sum2[[paste(linkedGauss, collapseAware, sep = "_")]])
     }
+  
+  
+  lpPackage <- "highs"
+  
+  if (requireNamespace(lpPackage, quietly = TRUE)) {
+    a <- SuppressLinkedTables(data = z,
+                              fun = SuppressDominantCells,
+                              dominanceVar = "value",
+                              contributorVar = "char",
+                              withinArg = list(list(formula = f1),
+                                               list(formula = f2),
+                                               list(formula = f3),
+                                               list(formula = f4)), 
+                              recordAware =  TRUE,
+                              pPercent = 10,
+                              printXdim = printXdim,
+                              printInc = printInc,
+                              linkedGauss = "super-consistent", 
+                              lpPackage = lpPackage, rangePercent = 30)
+    
+    
+    expect_equal(c(sapply(a, function(x) sum(x$up_1 - x$lo_1, na.rm = TRUE)), 
+                   sapply(a, function(x) sum(x$up - x$lo, na.rm = TRUE))),
+                 c(108.451443490531, 453.585585819333, 410.024972053277, 19827.313322723, 
+                   140.764225703884, 545.329747572031, 465.986753611841, 19827.313322723))
+    
+    b <- tables_by_formulas(data = z,
+                            table_fun = SuppressDominantCells,
+                            dominanceVar = "value",
+                            contributorVar = "char",
+                            table_formulas = list(table_1 = f1,
+                                                  table_2 = f2,
+                                                  table_3 = f3,
+                                                  table_4 = f4),
+                            collapseAware =  TRUE,
+                            pPercent = 10,
+                            printXdim = printXdim,
+                            printInc = printInc,
+                            linkedGauss = "super-consistent",
+                            lpPackage = lpPackage, rangePercent = 30)
+    
+    expect_equal(c(sum(b$up_1 - b$lo_1, na.rm = TRUE), sum(b$up - b$lo, na.rm = TRUE)),
+                 c(3412.18379723384, 3694.87320815467))
+    
+  }
+  
+  
+  
 })
+
+
 
 
 

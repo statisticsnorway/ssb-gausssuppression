@@ -147,6 +147,8 @@ SuppressLinkedTables <- function(data = NULL,
                               ..., 
                               withinArg = NULL, 
                               linkedGauss = "consistent",
+                              linkedIntervals = NA,
+                              lpPackage = NULL,
                               recordAware = TRUE,
                               iterBackTracking = Inf,
                               whenEmptyUnsuppressed = NULL) {
@@ -154,6 +156,11 @@ SuppressLinkedTables <- function(data = NULL,
   SSBtools::CheckInput(linkedGauss, type = "character", 
     alt = c("local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), 
     okNULL = FALSE)
+  
+  if (!is.null(lpPackage)) {
+    linkedIntervals <- parameter_linkedIntervals(linkedGauss, linkedIntervals)
+  }
+  
   
   if (is.null(withinArg)) {
     return(fun(data = data, ...))
@@ -268,6 +275,8 @@ SuppressLinkedTables <- function(data = NULL,
                                        dup_id = dup_id,
                                        super_consistent = super_consistent, 
                                        iterBackTracking = iterBackTracking, 
+                                       linkedIntervals = linkedIntervals,
+                                       lpPackage = lpPackage, 
                                        ...)
   
   
@@ -433,6 +442,40 @@ update_primary_list <- function(primary_list, list_nr, new_primary, dup_id) {
   }
   primary_list
 }
+
+
+
+parameter_linkedIntervals <- function(linkedGauss, linkedIntervals = NA, ok_global = FALSE) {
+  if (ok_global) {
+    if (identical(linkedIntervals, "global")) {
+      return("global")
+    }
+  }
+  if (linkedGauss == "super-consistent") {
+    if (is.na(linkedIntervals) | identical(linkedIntervals, "super-consistent")) {
+      return("super-consistent")
+    }
+    if (identical(linkedIntervals, "local-bdiag")) {
+      return("local-bdiag")
+    }
+  }
+  
+  if (linkedGauss == "consistent") {
+    if (is.na(linkedIntervals) | identical(linkedIntervals, "local-bdiag")) {
+      return("local-bdiag")
+    }
+    if (identical(linkedIntervals, "super-consistent")) {
+      return("super-consistent")
+    }
+  }
+  if (linkedGauss == "local-bdiag") {
+    if (is.na(linkedIntervals) | identical(linkedIntervals, "local-bdiag")) {
+      return("local-bdiag")
+    }
+  }
+  stop(paste0("'linkedGauss = ", linkedGauss, "', linkedIntervals = ", linkedIntervals, "' is not valid input."))
+}
+
 
 
 

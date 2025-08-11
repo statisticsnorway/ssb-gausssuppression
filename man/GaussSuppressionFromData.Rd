@@ -43,6 +43,7 @@ GaussSuppressionFromData(
   aggregateBaseOrder = FALSE,
   rowGroupsPackage = aggregatePackage,
   linkedGauss = NULL,
+  linkedIntervals = NA,
   recordAware = TRUE,
   collapseAware = FALSE,
   linkedTables = NULL

@@ -285,6 +285,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            aggregateBaseOrder = FALSE,
                            rowGroupsPackage = aggregatePackage,
                            linkedGauss = NULL,
+                           linkedIntervals = NA,
                            recordAware = TRUE,
                            collapseAware = FALSE,
                            linkedTables = NULL
@@ -317,6 +318,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   
   CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), okNULL = TRUE)
+  
+  if (!is.null(lpPackage) & !is.null(linkedGauss)) {
+    if (linkedGauss != "global") {
+      linkedIntervals <- parameter_linkedIntervals(linkedGauss, linkedIntervals, TRUE)
+    }
+  }
+  
   if (is.list(formula)) {
     table_formulas <- formula
     formula <- combine_formulas(table_formulas)
@@ -815,6 +823,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                                   z = z,
                                   rangeLimits = rangeLimits,
                                   lpPackage = lpPackage,
+                                  linkedIntervals = linkedIntervals,
                                   ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
@@ -823,6 +832,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                                   z = z,
                                   rangeLimits = rangeLimits,
                                   lpPackage = lpPackage,
+                                  linkedIntervals = linkedIntervals,
                                   ...)
   }
   
