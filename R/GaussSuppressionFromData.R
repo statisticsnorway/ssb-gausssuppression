@@ -285,7 +285,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            aggregateBaseOrder = FALSE,
                            rowGroupsPackage = aggregatePackage,
                            linkedGauss = NULL,
-                           linkedIntervals = NA,
+                           linkedIntervals = "local-bdiag",
                            recordAware = TRUE,
                            collapseAware = FALSE,
                            linkedTables = NULL
@@ -321,7 +321,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   if (!is.null(lpPackage) & !is.null(linkedGauss)) {
     if (linkedGauss != "global") {
-      linkedIntervals <- parameter_linkedIntervals(linkedGauss, linkedIntervals, TRUE)
+      check_parameter_linkedIntervals(linkedGauss, linkedIntervals, TRUE)
     }
   }
   

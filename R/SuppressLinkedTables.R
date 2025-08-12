@@ -147,7 +147,7 @@ SuppressLinkedTables <- function(data = NULL,
                               ..., 
                               withinArg = NULL, 
                               linkedGauss = "consistent",
-                              linkedIntervals = NA,
+                              linkedIntervals = "local-bdiag",
                               lpPackage = NULL,
                               recordAware = TRUE,
                               iterBackTracking = Inf,
@@ -158,9 +158,8 @@ SuppressLinkedTables <- function(data = NULL,
     okNULL = FALSE)
   
   if (!is.null(lpPackage)) {
-    linkedIntervals <- parameter_linkedIntervals(linkedGauss, linkedIntervals)
+    check_parameter_linkedIntervals(linkedGauss, linkedIntervals)
   }
-  
   
   if (is.null(withinArg)) {
     return(fun(data = data, ...))
@@ -445,37 +444,46 @@ update_primary_list <- function(primary_list, list_nr, new_primary, dup_id) {
 
 
 
-parameter_linkedIntervals <- function(linkedGauss, linkedIntervals = NA, ok_global = FALSE) {
-  if (ok_global) {
-    if (identical(linkedIntervals, "global")) {
-      return("global")
-    }
+check_parameter_linkedIntervals <- function(linkedGauss, linkedIntervals, ok_global = FALSE) {
+  if (anyDuplicated(linkedIntervals)) {
+    stop("Duplicates in linkedIntervals")
   }
-  if (linkedGauss == "super-consistent") {
-    if (is.na(linkedIntervals) | identical(linkedIntervals, "super-consistent")) {
-      return("super-consistent")
-    }
-    if (identical(linkedIntervals, "local-bdiag")) {
-      return("local-bdiag")
-    }
+  for (i in seq_along(linkedIntervals)) {
+    check_pl(linkedGauss, linkedIntervals[i], ifelse(i == 1, FALSE, ok_global))
   }
-  
-  if (linkedGauss == "consistent") {
-    if (is.na(linkedIntervals) | identical(linkedIntervals, "local-bdiag")) {
-      return("local-bdiag")
-    }
-    if (identical(linkedIntervals, "super-consistent")) {
-      return("super-consistent")
-    }
-  }
-  if (linkedGauss == "local-bdiag") {
-    if (is.na(linkedIntervals) | identical(linkedIntervals, "local-bdiag")) {
-      return("local-bdiag")
-    }
-  }
-  stop(paste0("'linkedGauss = ", linkedGauss, "', linkedIntervals = ", linkedIntervals, "' is not valid input."))
 }
 
-
+check_pl <- function(linkedGauss, linkedIntervals, ok_global) {
+  if (!(linkedGauss %in% c("super-consistent", "consistent", "local-bdiag"))) {
+    if (ok_global) {
+      stop('When intervals, linkedGauss must be "super-consistent", "consistent", "local-bdiag" or "global"')  
+    }
+    stop('When intervals, linkedGauss must be "super-consistent", "consistent" or "local-bdiag"')
+  }
+  if (linkedGauss == "local-bdiag") {
+    if (linkedIntervals != "local-bdiag") {
+      if (ok_global) {
+        if (linkedIntervals != "global") {
+          stop('When linkedGauss is "local-bdiag", linkedIntervals must be "local-bdiag" or "global"') 
+        }
+      } else {
+        stop('When linkedGauss is "local-bdiag", linkedIntervals must be "local-bdiag"') 
+      }
+    }
+  }
+  if (linkedIntervals == "global") {
+    if (!ok_global) {
+      stop('linkedIntervals cannot be "global"')
+    }
+  } else {
+    if (!(linkedIntervals %in% c("super-consistent", "local-bdiag"))) {
+      if (ok_global) {
+        stop('linkedIntervals must be "local-bdiag", "super-consistent" or "global"') 
+      } else {
+        stop('linkedIntervals must be "local-bdiag" or "super-consistent"') 
+      }
+    }
+  }
+}
 
 

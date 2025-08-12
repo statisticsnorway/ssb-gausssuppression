@@ -120,6 +120,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       if (use_cell_grouping) {
         cell_grouping <- orig_col
       }
+      if ("global" %in% linkedIntervals) {
+        x_g <- x
+        z_g <- z
+        primary_g <- primary
+        hidden_g <- hidden
+        forced_g <- forced
+      }
       z <- z[orig_col]
       rangeLimits <- rangeLimits[orig_col, , drop = FALSE]
       x <- Matrix::bdiag(table_x)
@@ -384,10 +391,6 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
 
   if(!is.null(lpPackage)){
     
-    if (linkedIntervals == "local-bdiag") {
-      cell_grouping <- NULL
-    }
-    
     if(sum(rangeLimits, na.rm = TRUE)){
       interval_suppressed <- interval_suppression(x = x, 
                                   candidates = candidates, 
@@ -398,7 +401,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                   singleton = singleton, 
                                   singletonMethod = singletonMethod, 
                                   whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
-                                  cell_grouping = cell_grouping,
+                                  cell_grouping = {if (linkedIntervals[1] == "local-bdiag") NULL else cell_grouping},
                                   ...,
                                   xExtraPrimary = NULL,
                                   lpPackage = lpPackage,
@@ -411,23 +414,19 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       secondary <-  interval_suppressed[[1]]
       gauss_intervals <- interval_suppressed[[2]]
     } else {
-      suppressed__ <- rep(FALSE, ncol(x))
-      suppressed__[primary] <- TRUE
-      suppressed__[secondary] <- TRUE
-      suppressed__[hidden] <- TRUE     # in interval computation, hidden similar to secondary
-      suppressed__[forced] <- FALSE
-      
-      gauss_intervals <- ComputeIntervals(
+      gauss_intervals <- ComputeIntervals_(
         x = x,
         z = z,
         primary = primary,
-        suppressed = suppressed__,
+        secondary = secondary,
+        hidden = hidden, 
+        forced = forced,
         minVal = NULL,
         allInt = FALSE,
         sparseConstraints = TRUE,
         lpPackage = lpPackage,
         gaussI = TRUE,
-        cell_grouping = cell_grouping
+        cell_grouping = {if (linkedIntervals[1] == "local-bdiag") NULL else cell_grouping}
       ) 
       gauss_intervals <- as.data.frame(gauss_intervals)
     }
@@ -435,6 +434,55 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   } else {
     gauss_intervals <- NULL
   }
+  
+  
+  if(!is.null(lpPackage) & length(linkedIntervals) > 1){
+    short_name_linked = c(`local-bdiag` = "lb", `super-consistent` = "sc", global = "global")
+    for(i in SeqInc(2, length(linkedIntervals))){
+      if(linkedIntervals[i] %in% c("local-bdiag", "super-consistent")){
+        gauss_intervals_extra = as.data.frame(
+          ComputeIntervals_(
+            x = x,
+            z = z,
+            primary = primary,
+            secondary = secondary,
+            hidden = hidden, 
+            forced = forced,
+            minVal = NULL,
+            allInt = FALSE,
+            sparseConstraints = TRUE,
+            lpPackage = lpPackage,
+            gaussI = TRUE,
+            cell_grouping = {if (linkedIntervals[i] == "local-bdiag") NULL else cell_grouping}
+          )
+        )
+      }
+      if(linkedIntervals[i] %in% c("global")){
+        gauss_intervals_extra = as.data.frame(
+          ComputeIntervals_(
+            x = x_g,
+            z = z_g,
+            primary = primary_g,
+            secondary =  unique(orig_col[secondary]),
+            hidden = hidden_g, 
+            forced = forced_g,
+            minVal = NULL,
+            allInt = FALSE,
+            sparseConstraints = TRUE,
+            lpPackage = lpPackage,
+            gaussI = TRUE,
+            cell_grouping = NULL 
+          )
+        )
+        gauss_intervals_extra = gauss_intervals_extra[orig_col, , drop = FALSE]  # Possible to move code to avoid this
+      }
+      
+      names(gauss_intervals_extra) = paste(names(gauss_intervals_extra), short_name_linked[linkedIntervals[i]], sep = "_")
+      gauss_intervals = cbind(gauss_intervals, gauss_intervals_extra)
+    }
+  }
+  
+  
   
   if (is.null(table_memberships)) {
     secondary <- as_list_from_not_logical(secondary, cumsum_0_ncol_x)
@@ -894,4 +942,18 @@ order_matched <- function(x, orig_col, decreasing = FALSE) {
 }
 
 
+
+ComputeIntervals_ <- function(..., x, primary, secondary, hidden, forced) {
+  suppressed <- rep(FALSE, ncol(x))
+  suppressed[primary] <- TRUE
+  suppressed[secondary] <- TRUE
+  suppressed[hidden] <- TRUE  # in interval computation, hidden similar to secondary
+  suppressed[forced] <- FALSE
+  ComputeIntervals(..., x = x, primary = primary, suppressed = suppressed)
+}
+
+  
+short_name_linked = c(`local-bdiag` = "lb", `super-consistent` = "sc", global = "global")
+  
+  
 

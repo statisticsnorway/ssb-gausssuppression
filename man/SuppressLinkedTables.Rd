@@ -10,7 +10,7 @@ SuppressLinkedTables(
   ...,
   withinArg = NULL,
   linkedGauss = "consistent",
-  linkedIntervals = NA,
+  linkedIntervals = "local-bdiag",
   lpPackage = NULL,
   recordAware = TRUE,
   iterBackTracking = Inf,
