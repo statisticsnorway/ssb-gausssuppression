@@ -21,9 +21,6 @@
 #' That is, [SSBtools::GaussSuppression()] is called with `auto_anySumNOTprimary = FALSE`. 
 #' See the parameter documentation for an explanation of why `FALSE` is required.
 #' 
-#' The combination of intervals with the various linked table strategies is not yet implemented, 
-#' so the `lpPackage` parameter is currently ignored.
-#' 
 #' @note Note on differences between `SuppressLinkedTables()` and alternative approaches.  
 #' By *alternatives*, we refer to using the `linkedGauss` parameter via `GaussSuppressionFromData()`, its wrappers, or through `tables_by_formulas()`, as shown in the examples below.
 #'
@@ -36,6 +33,8 @@
 #'   In contrast, `SuppressLinkedTables()` uses a locally determined candidate order within each table.  The ordering across tables 
 #'   is coordinated to ensure the method works, but it is not based on a strictly defined global order.  
 #'   This may lead to some differences.
+#' - With the alternatives, `linkedIntervals` may also contain `"global"`. 
+#'   See the documentaion of the `linkedIntervals` parameter above and in [GaussSuppressionFromData()].
 #' 
 #'
 #' @inheritParams AdditionalSuppression
@@ -64,6 +63,26 @@
 #'   coordination than in `"consistent"`, which only requires that common cells be suppressed equally. 
 #'   If intervals are calculated using such coordination, common cells will have identical 
 #'   interval boundaries in each table. 
+#'   
+#'        
+#' @param linkedIntervals This parameter controls how interval calculations, 
+#'         triggered by the `lpPackage` parameter, are performed.
+#'         
+#'  - Possible values of **`linkedIntervals`** are `"local-bdiag"` and `"super-consistent"`.
+#'    
+#'  - Interval calculations can be performed when **`linkedGauss`** is `"super-consistent"`, `"consistent"`, or `"local-bdiag"`.
+#'         
+#'  - When `linkedGauss` is `"local-bdiag"`, `"local-bdiag"` is the only allowed value in `linkedIntervals`  
+#'    (except that, with the alternative approaches, `"global"` may appear as a later element; 
+#'    `"super-consistent"` is never allowed).
+#'         
+#'  - It is possible to request multiple types of intervals by supplying `linkedIntervals` as a vector.  
+#'    Only the first value affects the additional suppression defined by `rangePercent` and/or `rangeMin`.
+#'         
+#'  - With the alternative approaches (see the note below), `"global"` may also appear in `linkedIntervals`, 
+#'    provided it is not the first element. 
+#'  
+#' @param lpPackage See [GaussSuppressionFromData()].    
 #' 
 #' @param recordAware If `TRUE` (default), the suppression procedure will ensure consistency 
 #'                    across cells that aggregate the same underlying records, 

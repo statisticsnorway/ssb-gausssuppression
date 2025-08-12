@@ -218,6 +218,16 @@ When \code{linkedGauss} is used, the \code{formula} parameter should be provided
 Alternatively, \code{formula} may have an attribute \code{"table_formulas"} containing such a list.
 See also the \code{linkedTables} parameter below.}
 
+\item{linkedIntervals}{Determines how interval calculations,
+triggered by the \code{lpPackage} parameter, are performed when \code{linkedGauss} is not \code{"global"}.
+When \code{linkedGauss = "global"}, interval settings in \code{linkedIntervals} are ignored.
+For allowed values and detailed behaviour, see the documentation of \code{\link[=SuppressLinkedTables]{SuppressLinkedTables()}}.
+\itemize{
+\item Note: With \code{linkedIntervals = "local-bdiag"}, common cells may have different table-specific intervals.
+Since the output shows one interval per cell, it is constructed using the maximum lower bound and
+minimum upper bound across the tables.
+}}
+
 \item{recordAware}{Parameter associated with \code{linkedGauss}. See \code{\link[=SuppressLinkedTables]{SuppressLinkedTables()}}.}
 
 \item{collapseAware}{Parameter associated with \code{linkedGauss}.

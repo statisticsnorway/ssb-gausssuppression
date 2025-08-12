@@ -176,6 +176,14 @@
 #'        When `linkedGauss` is used, the `formula` parameter should be provided as a list of formulas. 
 #'        Alternatively, `formula` may have an attribute `"table_formulas"` containing such a list.
 #'        See also the `linkedTables` parameter below.
+#' @param linkedIntervals  Determines how interval calculations, 
+#'        triggered by the `lpPackage` parameter, are performed when `linkedGauss` is not `"global"`.  
+#'        When `linkedGauss = "global"`, interval settings in `linkedIntervals` are ignored.  
+#'        For allowed values and detailed behaviour, see the documentation of [SuppressLinkedTables()].
+#'        
+#'  - Note: With `linkedIntervals = "local-bdiag"`, common cells may have different table-specific intervals. 
+#'    Since the output shows one interval per cell, it is constructed using the maximum lower bound and 
+#'    minimum upper bound across the tables.
 #' @param recordAware Parameter associated with `linkedGauss`. See [SuppressLinkedTables()].  
 #' @param collapseAware Parameter associated with `linkedGauss`.
 #'        In the linked‑tables algorithm, the model matrix is first *collapsed* by

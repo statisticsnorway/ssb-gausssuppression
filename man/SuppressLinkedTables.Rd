@@ -47,6 +47,22 @@ If intervals are calculated using such coordination, common cells will have iden
 interval boundaries in each table.
 }}
 
+\item{linkedIntervals}{This parameter controls how interval calculations,
+triggered by the \code{lpPackage} parameter, are performed.
+\itemize{
+\item Possible values of \strong{\code{linkedIntervals}} are \code{"local-bdiag"} and \code{"super-consistent"}.
+\item Interval calculations can be performed when \strong{\code{linkedGauss}} is \code{"super-consistent"}, \code{"consistent"}, or \code{"local-bdiag"}.
+\item When \code{linkedGauss} is \code{"local-bdiag"}, \code{"local-bdiag"} is the only allowed value in \code{linkedIntervals}
+(except that, with the alternative approaches, \code{"global"} may appear as a later element;
+\code{"super-consistent"} is never allowed).
+\item It is possible to request multiple types of intervals by supplying \code{linkedIntervals} as a vector.
+Only the first value affects the additional suppression defined by \code{rangePercent} and/or \code{rangeMin}.
+\item With the alternative approaches (see the note below), \code{"global"} may also appear in \code{linkedIntervals},
+provided it is not the first element.
+}}
+
+\item{lpPackage}{See \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.}
+
 \item{recordAware}{If \code{TRUE} (default), the suppression procedure will ensure consistency
 across cells that aggregate the same underlying records,
 even when their variable combinations differ.
@@ -83,9 +99,6 @@ and the \code{SuppressKDisclosure()} function is not available for use.
 Also note that automatic forcing of \code{"anySumNOTprimary"} is disabled.
 That is, \code{\link[SSBtools:GaussSuppression]{SSBtools::GaussSuppression()}} is called with \code{auto_anySumNOTprimary = FALSE}.
 See the parameter documentation for an explanation of why \code{FALSE} is required.
-
-The combination of intervals with the various linked table strategies is not yet implemented,
-so the \code{lpPackage} parameter is currently ignored.
 }
 \note{
 Note on differences between \code{SuppressLinkedTables()} and alternative approaches.
@@ -100,6 +113,8 @@ By \emph{alternatives}, we refer to using the \code{linkedGauss} parameter via \
 In contrast, \code{SuppressLinkedTables()} uses a locally determined candidate order within each table.  The ordering across tables
 is coordinated to ensure the method works, but it is not based on a strictly defined global order.
 This may lead to some differences.
+\item With the alternatives, \code{linkedIntervals} may also contain \code{"global"}.
+See the documentaion of the \code{linkedIntervals} parameter above and in \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
 }
 }
 \examples{
