@@ -922,7 +922,7 @@ repeated_as_integer <- function(a) {
 # Function to make sure maximum of lower bounds 
 #                   and minimum of upper bounds 
 gauss_intervals_orig_col = function(gauss_intervals, orig_col){
-  ma <- match(seq_len(max(orig_col)), orig_col)   # same interval calculated several times, to be fixed 
+  ma <- match(seq_len(max(orig_col)), orig_col)
   gauss_intervals_out <- gauss_intervals[ma, ]
   for(i in which(substr(names(gauss_intervals),1,2) == "lo")){
     gauss_intervals_out[[i]] = order_matched(gauss_intervals[[i]], orig_col, TRUE)

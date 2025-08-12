@@ -75,6 +75,23 @@ ComputeIntervals <-
     if (is.logical(suppressed))
       suppressed <- which(suppressed)
     
+    cell_grouping <- repeated_as_integer(cell_grouping)
+    
+    avoid_duplicate_computation <- TRUE
+    
+    if (avoid_duplicate_computation) {
+      avoid_duplicate_computation <- FALSE
+      if (any(cell_grouping != 0)) {
+        duplicated_cell_grouping <- which(cell_grouping != 0 & duplicated(cell_grouping))
+        primary_in_duplicated_cell_grouping <- primary %in% duplicated_cell_grouping
+        if (any(primary_in_duplicated_cell_grouping)) {
+          avoid_duplicate_computation <- TRUE
+          primary_cg_duplicated <- primary[primary_in_duplicated_cell_grouping]
+          primary <- primary[!primary_in_duplicated_cell_grouping]
+        }
+      }
+    }
+    
     if (is.null(minVal)) {     # secondary not needed
       secondary <- integer(0)  # removing is more efficient 
     } else {
@@ -87,7 +104,6 @@ ComputeIntervals <-
     published <- published[!(published %in% suppressed)]
     
     
-    cell_grouping <- repeated_as_integer(cell_grouping)
     if(any(cell_grouping != 0)){
       x <- cbind(x, x0diff(x, cell_grouping))
       z <- c(z, rep(0, ncol(x) - input_ncol_x))
@@ -206,7 +222,14 @@ ComputeIntervals <-
     
     cat("\n")
     
-    cbind(lo = lo_output, up = up_output)
+    output <- cbind(lo = lo_output, up = up_output)
+    
+    if (avoid_duplicate_computation) {
+      ma <- match(cell_grouping[primary_cg_duplicated], cell_grouping)
+      output[primary_cg_duplicated, ] <- output[ma, , drop = FALSE]
+    }
+    
+    output
 }
 # lp wrapper
 
