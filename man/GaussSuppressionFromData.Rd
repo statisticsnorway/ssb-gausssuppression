@@ -43,7 +43,8 @@ GaussSuppressionFromData(
   aggregateBaseOrder = FALSE,
   rowGroupsPackage = aggregatePackage,
   linkedGauss = NULL,
-  linkedIntervals = "local-bdiag",
+  linkedIntervals = ifelse(linkedGauss == "local-bdiag", "local-bdiag",
+    "super-consistent"),
   recordAware = TRUE,
   collapseAware = FALSE,
   linkedTables = NULL

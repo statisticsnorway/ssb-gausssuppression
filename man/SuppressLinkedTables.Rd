@@ -9,8 +9,9 @@ SuppressLinkedTables(
   fun,
   ...,
   withinArg = NULL,
-  linkedGauss = "consistent",
-  linkedIntervals = "local-bdiag",
+  linkedGauss = "super-consistent",
+  linkedIntervals = ifelse(linkedGauss == "local-bdiag", "local-bdiag",
+    "super-consistent"),
   lpPackage = NULL,
   recordAware = TRUE,
   iterBackTracking = Inf,
@@ -28,28 +29,31 @@ SuppressLinkedTables(
 \item{withinArg}{A list of named lists. Arguments to \code{fun} that are not kept constant.
 If \code{withinArg} is named, the names will be used as names in the output list.}
 
-\item{linkedGauss}{Specifies the strategy for protecting linked tables. Possible values are:
+\item{linkedGauss}{Specifies the strategy for protecting linked tables.
+The \code{"super-consistent"}, \code{"consistent"}, and \code{"local-bdiag"} methods
+protect all linked tables together in a single call to \code{GaussSuppression()}
+using an internally constructed block-diagonal model matrix.
 \itemize{
-\item \code{"consistent"} (default): All linked tables are protected by a single call to \code{GaussSuppression()}.
-The algorithm internally constructs a block diagonal model matrix and handles common cells
-consistently across tables.
-\item \code{"local"}: Each table is protected independently by a separate call to \code{GaussSuppression()}.
-\item \code{"back-tracking"}: Iterative approach where each table is protected via \code{GaussSuppression()},
-and primary suppressions are adjusted based on secondary suppressions from other tables across
-iterations.
-\item \code{"local-bdiag"}: Produces the same result as \code{"local"}, but uses a single call to
-\code{GaussSuppression()} with a block diagonal matrix. It does not apply the linked-table methodology.
-\item \code{"super-consistent"}: A method that provides improved protection compared to \code{"consistent"}.
-Like \code{"consistent"}, it uses a single call to \code{GaussSuppression()}. In addition, it exploits
-the fact that common cells have the same value in all tables. This enables a more thorough
-coordination than in \code{"consistent"}, which only requires that common cells be suppressed equally.
-If intervals are calculated using such coordination, common cells will have identical
-interval boundaries in each table.
+\item \code{"super-consistent"} (default): Shares the key property of \code{"consistent"} that
+common cells are suppressed equally across tables, but also exploits the fact
+that these cells have identical values in all tables. The coordination is
+therefore stronger. If intervals are calculated using such coordination,
+common cells will have identical interval bounds in each table.
+\item \code{"consistent"}: Common cells are suppressed equally across tables.
+\item \code{"local"}: Each table is protected independently by a separate call to
+\code{GaussSuppression()}.
+\item \code{"back-tracking"}: Iterative approach where each table is protected via
+\code{GaussSuppression()}, and primary suppressions are adjusted based on
+secondary suppressions from other tables across iterations.
+\item \code{"local-bdiag"}: Produces the same result as \code{"local"}, but uses a single call
+to \code{GaussSuppression()}. It does not apply the linked-table methodology.
 }}
 
 \item{linkedIntervals}{This parameter controls how interval calculations,
 triggered by the \code{lpPackage} parameter, are performed.
 \itemize{
+\item \strong{Default:} \code{"local-bdiag"} if \code{linkedGauss} is set to \code{"local-bdiag"},
+and \code{"super-consistent"} in all other cases.
 \item Possible values of \strong{\code{linkedIntervals}} are \code{"local-bdiag"} and \code{"super-consistent"}.
 \item Interval calculations can be performed when \strong{\code{linkedGauss}} is \code{"super-consistent"}, \code{"consistent"}, or \code{"local-bdiag"}.
 \item When \code{linkedGauss} is \code{"local-bdiag"}, \code{"local-bdiag"} is the only allowed value in \code{linkedIntervals}

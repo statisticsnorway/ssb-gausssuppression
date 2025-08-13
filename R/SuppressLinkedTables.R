@@ -42,31 +42,35 @@
 #' @param ... Arguments to `fun` that are kept constant.
 #' @param withinArg A list of named lists. Arguments to `fun` that are not kept constant.
 #'                  If `withinArg` is named, the names will be used as names in the output list.
-#' @param linkedGauss Specifies the strategy for protecting linked tables. Possible values are:
+#' @param linkedGauss Specifies the strategy for protecting linked tables. 
+#'        The `"super-consistent"`, `"consistent"`, and `"local-bdiag"` methods 
+#'        protect all linked tables together in a single call to `GaussSuppression()` 
+#'        using an internally constructed block-diagonal model matrix.
 #'
-#' - `"consistent"` (default): All linked tables are protected by a single call to `GaussSuppression()`. 
-#'    The algorithm internally constructs a block diagonal model matrix and handles common cells 
-#'    consistently across tables.
-#' 
-#' - `"local"`: Each table is protected independently by a separate call to `GaussSuppression()`.
+#' - `"super-consistent"` (default): Shares the key property of `"consistent"` that
+#'   common cells are suppressed equally across tables, but also exploits the fact
+#'   that these cells have identical values in all tables. The coordination is
+#'   therefore stronger. If intervals are calculated using such coordination,
+#'   common cells will have identical interval bounds in each table.
 #'
-#' - `"back-tracking"`: Iterative approach where each table is protected via `GaussSuppression()`, 
-#'    and primary suppressions are adjusted based on secondary suppressions from other tables across 
-#'    iterations.
+#' - `"consistent"`: Common cells are suppressed equally across tables.
 #'
-#' - `"local-bdiag"`: Produces the same result as `"local"`, but uses a single call to 
-#'   `GaussSuppression()` with a block diagonal matrix. It does not apply the linked-table methodology.
-#'   
-#' - `"super-consistent"`: A method that provides improved protection compared to `"consistent"`. 
-#'   Like `"consistent"`, it uses a single call to `GaussSuppression()`. In addition, it exploits 
-#'   the fact that common cells have the same value in all tables. This enables a more thorough 
-#'   coordination than in `"consistent"`, which only requires that common cells be suppressed equally. 
-#'   If intervals are calculated using such coordination, common cells will have identical 
-#'   interval boundaries in each table. 
+#' - `"local"`: Each table is protected independently by a separate call to
+#'   `GaussSuppression()`.
+#'
+#' - `"back-tracking"`: Iterative approach where each table is protected via
+#'   `GaussSuppression()`, and primary suppressions are adjusted based on
+#'   secondary suppressions from other tables across iterations.
+#'
+#' - `"local-bdiag"`: Produces the same result as `"local"`, but uses a single call
+#'   to `GaussSuppression()`. It does not apply the linked-table methodology.
 #'   
 #'        
 #' @param linkedIntervals This parameter controls how interval calculations, 
 #'         triggered by the `lpPackage` parameter, are performed.
+#'  
+#' -  **Default:** `"local-bdiag"` if `linkedGauss` is set to `"local-bdiag"`, 
+#'    and `"super-consistent"` in all other cases.      
 #'         
 #'  - Possible values of **`linkedIntervals`** are `"local-bdiag"` and `"super-consistent"`.
 #'    
@@ -165,8 +169,8 @@ SuppressLinkedTables <- function(data = NULL,
                               fun,
                               ..., 
                               withinArg = NULL, 
-                              linkedGauss = "consistent",
-                              linkedIntervals = "local-bdiag",
+                              linkedGauss = "super-consistent",
+                              linkedIntervals = ifelse(linkedGauss == "local-bdiag", "local-bdiag", "super-consistent"),
                               lpPackage = NULL,
                               recordAware = TRUE,
                               iterBackTracking = Inf,
