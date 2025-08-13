@@ -87,15 +87,29 @@ FixRiskyIntervals <-
     published <- seq_len(ncol(x))
     published <- published[!(published %in% suppressed)]
     
-    candidates_published <- candidates[published] 
-    
+  
     cell_grouping <- repeated_as_integer(cell_grouping)
 
     if(any(cell_grouping != 0)){
       x <- cbind(x, x0diff(x, cell_grouping))
       z <- c(z, rep(0, ncol(x) - input_ncol_x))
       rangeLimits_ <- c(rangeLimits_, rep(NA, ncol(x) - input_ncol_x))
+      avoid_duplicate_computation <- TRUE   # Similar code as in ComputeIntervals()
+      if (avoid_duplicate_computation) {
+          duplicated_cell_grouping <- which(cell_grouping != 0 & duplicated(cell_grouping))
+          published_in_duplicated_cell_grouping <- published %in% duplicated_cell_grouping
+          if (any(published_in_duplicated_cell_grouping)) {
+            published <- published[!published_in_duplicated_cell_grouping]
+          }
+          primary_in_duplicated_cell_grouping <- primary %in% duplicated_cell_grouping
+          if (any(primary_in_duplicated_cell_grouping)) {
+            primary <- primary[!primary_in_duplicated_cell_grouping]
+          }
+      }
     }
+    
+    candidates_published <- candidates[published]
+    
     cell_diff = SeqInc(input_ncol_x + 1, ncol(x))
     
     if (!length(c(published, cell_diff))) {

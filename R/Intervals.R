@@ -75,6 +75,10 @@ ComputeIntervals <-
     if (is.logical(suppressed))
       suppressed <- which(suppressed)
     
+    input_ncol_x <- ncol(x)
+    published <- seq_len(ncol(x))
+    published <- published[!(published %in% suppressed)]
+    
     cell_grouping <- repeated_as_integer(cell_grouping)
     
     avoid_duplicate_computation <- TRUE
@@ -83,6 +87,10 @@ ComputeIntervals <-
       avoid_duplicate_computation <- FALSE
       if (any(cell_grouping != 0)) {
         duplicated_cell_grouping <- which(cell_grouping != 0 & duplicated(cell_grouping))
+        published_in_duplicated_cell_grouping <- published %in% duplicated_cell_grouping
+        if (any(published_in_duplicated_cell_grouping)) {
+          published <- published[!published_in_duplicated_cell_grouping]
+        }
         primary_in_duplicated_cell_grouping <- primary %in% duplicated_cell_grouping
         if (any(primary_in_duplicated_cell_grouping)) {
           avoid_duplicate_computation <- TRUE
@@ -97,12 +105,6 @@ ComputeIntervals <-
     } else {
       secondary <- suppressed[!(suppressed %in% primary)]
     }
-    
-    input_ncol_x <- ncol(x)
-    
-    published <- seq_len(ncol(x))
-    published <- published[!(published %in% suppressed)]
-    
     
     if(any(cell_grouping != 0)){
       x <- cbind(x, x0diff(x, cell_grouping))
