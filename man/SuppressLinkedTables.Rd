@@ -183,4 +183,40 @@ b <- SuppressLinkedTables(fun = SuppressSmallCounts,
                 list(data = z2, dimVar = 1:4, freqVar = 5, maxN = 1)))
 print(b)        
        
+    
+    
+##################################       
+####  Examples with intervals     
+################################## 
+  
+lpPackage <- "highs" 
+if (requireNamespace(lpPackage, quietly = TRUE)) {
+
+  # Common cells occur because the default for recordAware is TRUE
+  out1 <- SuppressLinkedTables(data = SSBtoolsData("magnitude1"), 
+               fun = SuppressDominantCells, 
+               withinArg = list(table_1 = list(dimVar = c("geo", "sector2")), 
+                                table_2 = list(dimVar = c("eu", "sector4"))), 
+               dominanceVar = "value", k = 90, contributorVar = "company", 
+               lpPackage = lpPackage, rangeMin = 50)
+  print(out1)
+                      
+ 
+ # In the algorithm, common cells occur because recordAware is TRUE, 
+ # although this is not reflected in the output variables table_1 and table_2
+ out2 <- tables_by_formulas(data = SSBtoolsData("magnitude1"), 
+               table_fun = SuppressDominantCells, 
+               table_formulas = list(table_1 = ~geo * sector2, 
+                                    table_2 = ~eu * sector4), 
+               substitute_vars = list(region = c("geo", "eu"), 
+                                     sector = c("sector2", "sector4")), 
+               dominanceVar = "value", k = 90, contributorVar = "company", 
+               linkedGauss = "super-consistent", 
+               lpPackage = lpPackage, rangeMin = 50, 
+               linkedIntervals = c("super-consistent", "local-bdiag", "global"))
+ print(out2)
+                       
+} else {
+  message(paste0("Examples skipped because the '", lpPackage, "' package is not installed."))
+}  
 }
