@@ -1,3 +1,16 @@
+## GaussSuppression 1.1.5
+* Major update to the functionality via **`SuppressLinkedTables()`** and **`linkedGauss`**:  
+  - New method `"super-consistent"` is now the `linkedGauss` default in `SuppressLinkedTables()`, 
+    providing stronger coordination across tables than `"consistent"`.  
+  - Added parameter `collapseAware` for stronger coordination across tables than `recordAware`.  
+  - Intervals are now supported, with the option to apply further suppression to meet interval width requirements.  
+    - Existing parameters `lpPackage`, `rangePercent`, and `rangeMin` can now be used with this functionality.  
+    - Added parameter `linkedIntervals` to determine how interval calculations are performed.  
+* Improved documentation for the `aggregateNA` parameter in `GaussSuppressionFromData()`:  
+  - Description about NA handling.  
+  - With contribution from Jonas Lindblad, in line with [issue #125](https://github.com/statisticsnorway/ssb-gausssuppression/issues/125).
+
+
 ## GaussSuppression	1.1.0
 * Significant update: new functionality via **`SuppressLinkedTables()`** and **`linkedGauss`** 
   for consistent suppression of linked tables  
