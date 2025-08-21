@@ -1,4 +1,4 @@
-## GaussSuppression 1.1.5
+## GaussSuppression 1.1.2
 * Major update to the functionality via **`SuppressLinkedTables()`** and **`linkedGauss`**:  
   - New method `"super-consistent"` is now the `linkedGauss` default in `SuppressLinkedTables()`, 
     providing stronger coordination across tables than `"consistent"`.  
