@@ -267,8 +267,8 @@ test_that("Wrappers", {
   k <- SSBtools::model_aggregate(dataset, 
                                  formula = ~sector4 * eu + geo * sector2, 
       fun_vars = list(`sum1,sum2,sum1r,sum2r,sum,wsum,sumr,wsumr,fsum,fwsum,max1,max2,max1r,max2r,n,n0,nall,n0all` = list(f = c("i_company2", "y", "w"))),
-      fun = c(f = f)
-      )
+      fun = c(f = f),
+      verbose = FALSE)
   
   for (var in c("max1", "max2", "max1r", "max2r")) {
     k[[var]] <- levels(dataset$f_company2)[k[[var]]]

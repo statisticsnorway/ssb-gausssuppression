@@ -404,7 +404,8 @@ test_that("SuppressLinkedTables with num-singleton", {
   lpPackage <- "highs"
   
   if (requireNamespace(lpPackage, quietly = TRUE)) {
-    a <- SuppressLinkedTables(data = z,
+    capture.output({
+      a <- SuppressLinkedTables(data = z,
                               fun = SuppressDominantCells,
                               dominanceVar = "value",
                               contributorVar = "char",
@@ -419,6 +420,7 @@ test_that("SuppressLinkedTables with num-singleton", {
                               linkedGauss = "super-consistent", 
                               linkedIntervals = c("super-consistent", "local-bdiag"),
                               lpPackage = lpPackage, rangePercent = 100)
+      })
     
     
     expect_equal(c(sapply(a, function(x) sum(x$up_1 - x$lo_1, na.rm = TRUE)), 
@@ -428,7 +430,8 @@ test_that("SuppressLinkedTables with num-singleton", {
                    63.0146389958929, 220.445112972418, 454.045573572603, 4951.02367010228, 
                    99.8724522094226, 293.380040891785, 804.740113843912, 4951.02367010228))
     
-    b <- tables_by_formulas(data = z,
+    capture.output({
+      b <- tables_by_formulas(data = z,
                             table_fun = SuppressDominantCells,
                             dominanceVar = "value",
                             contributorVar = "char",
@@ -442,6 +445,7 @@ test_that("SuppressLinkedTables with num-singleton", {
                             printInc = printInc,
                             linkedGauss = "super-consistent", linkedIntervals = c("super-consistent", "local-bdiag", "global"),
                             lpPackage = lpPackage, rangePercent = 100)
+      })
     
     expect_equal(c(sum(b$up_1 - b$lo_1, na.rm = TRUE), 
                    sum(b$up - b$lo, na.rm = TRUE), 
