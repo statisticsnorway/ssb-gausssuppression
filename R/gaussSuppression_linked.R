@@ -508,9 +508,6 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     message_fun <- message
   }
   if (length(unique(orig_col)) != length(secondary_out) + length(not_secondary_out)) {
-    cat("length(unique(orig_col))", length(unique(orig_col)),"\n")
-    cat("length(secondary_out)", length(secondary_out),"\n")
-    cat("length(not_secondary_out)", length(not_secondary_out),"\n")
     message_fun("Inconsistent suppression across common cells within the algorithm")
   }
   secondary <- c(secondary_out, -unique(orig_col[unsafe]))
