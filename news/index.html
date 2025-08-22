@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,21 @@
       <small>Source: <a href="https://github.com/statisticsnorway/ssb-gausssuppression/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.2" id="gausssuppression-112">GaussSuppression 1.1.2<a class="anchor" aria-label="anchor" href="#gausssuppression-112"></a></h2>
+<ul><li>Major update to the functionality via <strong><code><a href="../reference/SuppressLinkedTables.html">SuppressLinkedTables()</a></code></strong> and <strong><code>linkedGauss</code></strong>:
+<ul><li>New method <code>"super-consistent"</code> is now the <code>linkedGauss</code> default in <code><a href="../reference/SuppressLinkedTables.html">SuppressLinkedTables()</a></code>, providing stronger coordination across tables than <code>"consistent"</code>.<br></li>
+<li>Added parameter <code>collapseAware</code> for stronger coordination across tables than <code>recordAware</code>.<br></li>
+<li>Intervals are now supported, with the option to apply further suppression to meet interval width requirements.
+<ul><li>Existing parameters <code>lpPackage</code>, <code>rangePercent</code>, and <code>rangeMin</code> can now be used with this functionality.<br></li>
+<li>Added parameter <code>linkedIntervals</code> to determine how interval calculations are performed.<br></li>
+</ul></li>
+</ul></li>
+<li>Improved documentation for the <code>aggregateNA</code> parameter in <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code>:
+<ul><li>Description about NA handling.<br></li>
+<li>With contribution from Jonas Lindblad, in line with <a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/125" class="external-link">issue </a><a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/125" class="external-link">#125</a>.</li>
+</ul></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.0" id="gausssuppression-110">GaussSuppression 1.1.0<a class="anchor" aria-label="anchor" href="#gausssuppression-110"></a></h2><p class="text-muted">CRAN release: 2025-06-26</p>
 <ul><li>Significant update: new functionality via <strong><code><a href="../reference/SuppressLinkedTables.html">SuppressLinkedTables()</a></code></strong> and <strong><code>linkedGauss</code></strong> for consistent suppression of linked tables

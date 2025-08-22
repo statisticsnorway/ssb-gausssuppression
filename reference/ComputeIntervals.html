@@ -9,7 +9,7 @@ for suppressed cells."><meta property="og:image" content="https://statisticsnorw
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,7 +56,8 @@ for suppressed cells.</p>
 <span>  lpPackage <span class="op">=</span> <span class="st">"lpSolve"</span>,</span>
 <span>  gaussI <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  allInt <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  sparseConstraints <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  sparseConstraints <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  cell_grouping <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">z</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -110,6 +111,14 @@ See <code>all.int</code> parameter in <code>lpSolve</code> and <code>types</code
 <dd><p>When TRUE, a sparse constraint matrix will be input to the
 solver. In the case of <code>lpSolve</code>, the sparse matrix is represented in triplet form
 as a dense matrix with three columns, and the <code>dense.const</code> parameter is utilized.</p></dd>
+
+
+<dt id="arg-cell-grouping">cell_grouping<a class="anchor" aria-label="anchor" href="#arg-cell-grouping"></a></dt>
+<dd><p>Numeric vector indicating group membership.
+Cells with the same value that is not 0 belong to the same group.
+A value of 0 indicates that the cell is not a member of any group.
+Members of the same group are assumed to have the same z-value and this
+is included as a condition when calculating intervals.</p></dd>
 
 </dl></div>
     <div class="section level2">

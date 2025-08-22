@@ -11,7 +11,7 @@ secondary suppression by Gaussian elimination by GaussSuppression"><meta propert
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,7 +89,10 @@ secondary suppression by Gaussian elimination by <code><a href="https://statisti
 <span>  aggregateBaseOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  rowGroupsPackage <span class="op">=</span> <span class="va">aggregatePackage</span>,</span>
 <span>  linkedGauss <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  linkedIntervals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">linkedGauss</span> <span class="op">==</span> <span class="st">"local-bdiag"</span>, <span class="st">"local-bdiag"</span>,</span>
+<span>    <span class="st">"super-consistent"</span><span class="op">)</span>,</span>
 <span>  recordAware <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  collapseAware <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  linkedTables <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -339,8 +342,33 @@ Alternatively, <code>formula</code> may have an attribute <code>"table_formulas"
 See also the <code>linkedTables</code> parameter below.</p></dd>
 
 
+<dt id="arg-linkedintervals">linkedIntervals<a class="anchor" aria-label="anchor" href="#arg-linkedintervals"></a></dt>
+<dd><p>Determines how interval calculations,
+triggered by the <code>lpPackage</code> parameter, are performed when <code>linkedGauss</code> is not <code>"global"</code>.
+When <code>linkedGauss = "global"</code>, interval settings in <code>linkedIntervals</code> are ignored.
+For allowed values and detailed behaviour, see the documentation of <code><a href="SuppressLinkedTables.html">SuppressLinkedTables()</a></code>.</p><ul><li><p>Note: With <code>linkedIntervals = "local-bdiag"</code>, common cells may have different table-specific intervals.
+Since the output shows one interval per cell, it is constructed using the maximum lower bound and
+minimum upper bound across the tables.</p></li>
+</ul></dd>
+
+
 <dt id="arg-recordaware">recordAware<a class="anchor" aria-label="anchor" href="#arg-recordaware"></a></dt>
 <dd><p>Parameter associated with <code>linkedGauss</code>. See <code><a href="SuppressLinkedTables.html">SuppressLinkedTables()</a></code>.</p></dd>
+
+
+<dt id="arg-collapseaware">collapseAware<a class="anchor" aria-label="anchor" href="#arg-collapseaware"></a></dt>
+<dd><p>Parameter associated with <code>linkedGauss</code>.
+In the linked‑tables algorithm, the model matrix is first <em>collapsed</em> by
+removing duplicate rows.
+When <code>collapseAware = TRUE</code>, every cell that remains numerically derivable
+after a pre‑aggregation corresponding to this row reduction will be treated
+as a common cell. This
+maximizes coordination across tables, given the duplicate‑row removal,
+while adding limited additional computational overhead. In particular,
+the suppression algorithm automatically accounts for cells in one table
+that are sums of cells in another table.
+Note that any cell that <code>recordAware = TRUE</code> would introduce is already
+included automatically when <code>collapseAware = TRUE</code>.</p></dd>
 
 
 <dt id="arg-linkedtables">linkedTables<a class="anchor" aria-label="anchor" href="#arg-linkedtables"></a></dt>

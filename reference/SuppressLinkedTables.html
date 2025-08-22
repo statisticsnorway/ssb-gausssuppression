@@ -9,7 +9,7 @@ methods that may reduce the computational burden."><meta property="og:image" con
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,11 +52,13 @@ methods that may reduce the computational burden.</p>
 <span>  <span class="va">fun</span>,</span>
 <span>  <span class="va">...</span>,</span>
 <span>  withinArg <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  linkedGauss <span class="op">=</span> <span class="st">"consistent"</span>,</span>
+<span>  linkedGauss <span class="op">=</span> <span class="st">"super-consistent"</span>,</span>
+<span>  linkedIntervals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">linkedGauss</span> <span class="op">==</span> <span class="st">"local-bdiag"</span>, <span class="st">"local-bdiag"</span>,</span>
+<span>    <span class="st">"super-consistent"</span><span class="op">)</span>,</span>
+<span>  lpPackage <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  recordAware <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  iterBackTracking <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>  whenEmptyUnsuppressed <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  lpPackage <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  whenEmptyUnsuppressed <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -83,16 +85,43 @@ If <code>withinArg</code> is named, the names will be used as names in the outpu
 
 
 <dt id="arg-linkedgauss">linkedGauss<a class="anchor" aria-label="anchor" href="#arg-linkedgauss"></a></dt>
-<dd><p>Specifies the strategy for protecting linked tables. Possible values are:</p><ul><li><p><code>"consistent"</code> (default): All linked tables are protected by a single call to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>.
-The algorithm internally constructs a block diagonal model matrix and handles common cells
-consistently across tables.</p></li>
-<li><p><code>"local"</code>: Each table is protected independently by a separate call to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>.</p></li>
-<li><p><code>"back-tracking"</code>: Iterative approach where each table is protected via <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>,
-and primary suppressions are adjusted based on secondary suppressions from other tables across
-iterations.</p></li>
-<li><p><code>"local-bdiag"</code>: Produces the same result as <code>"local"</code>, but uses a single call to
-<code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code> with a block diagonal matrix. It does not apply the linked-table methodology.</p></li>
+<dd><p>Specifies the strategy for protecting linked tables.
+The <code>"super-consistent"</code>, <code>"consistent"</code>, and <code>"local-bdiag"</code> methods
+protect all linked tables together in a single call to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>
+using an internally constructed block-diagonal model matrix.</p><ul><li><p><code>"super-consistent"</code> (default): Shares the key property of <code>"consistent"</code> that
+common cells are suppressed equally across tables, but also exploits the fact
+that these cells have identical values in all tables. The coordination is
+therefore stronger. If intervals are calculated using such coordination,
+common cells will have identical interval bounds in each table.</p></li>
+<li><p><code>"consistent"</code>: Common cells are suppressed equally across tables.</p></li>
+<li><p><code>"local"</code>: Each table is protected independently by a separate call to
+<code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>.</p></li>
+<li><p><code>"back-tracking"</code>: Iterative approach where each table is protected via
+<code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>, and primary suppressions are adjusted based on
+secondary suppressions from other tables across iterations.</p></li>
+<li><p><code>"local-bdiag"</code>: Produces the same result as <code>"local"</code>, but uses a single call
+to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression()</a></code>. It does not apply the linked-table methodology.</p></li>
 </ul></dd>
+
+
+<dt id="arg-linkedintervals">linkedIntervals<a class="anchor" aria-label="anchor" href="#arg-linkedintervals"></a></dt>
+<dd><p>This parameter controls how interval calculations,
+triggered by the <code>lpPackage</code> parameter, are performed.</p><ul><li><p><strong>Default:</strong> <code>"local-bdiag"</code> if <code>linkedGauss</code> is set to <code>"local-bdiag"</code>,
+and <code>"super-consistent"</code> in all other cases.</p></li>
+<li><p>Possible values of <strong><code>linkedIntervals</code></strong> are <code>"local-bdiag"</code> and <code>"super-consistent"</code>.</p></li>
+<li><p>Interval calculations can be performed when <strong><code>linkedGauss</code></strong> is <code>"super-consistent"</code>, <code>"consistent"</code>, or <code>"local-bdiag"</code>.</p></li>
+<li><p>When <code>linkedGauss</code> is <code>"local-bdiag"</code>, <code>"local-bdiag"</code> is the only allowed value in <code>linkedIntervals</code>
+(except that, with the alternative approaches, <code>"global"</code> may appear as a later element;
+<code>"super-consistent"</code> is never allowed).</p></li>
+<li><p>It is possible to request multiple types of intervals by supplying <code>linkedIntervals</code> as a vector.
+Only the first value affects the additional suppression defined by <code>rangePercent</code> and/or <code>rangeMin</code>.</p></li>
+<li><p>With the alternative approaches (see the note below), <code>"global"</code> may also appear in <code>linkedIntervals</code>,
+provided it is not the first element.</p></li>
+</ul></dd>
+
+
+<dt id="arg-lppackage">lpPackage<a class="anchor" aria-label="anchor" href="#arg-lppackage"></a></dt>
+<dd><p>See <code><a href="GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code>.</p></dd>
 
 
 <dt id="arg-recordaware">recordAware<a class="anchor" aria-label="anchor" href="#arg-recordaware"></a></dt>
@@ -112,10 +141,6 @@ This is about a helpful message
 <em>"Cells with empty input will never be secondary suppressed. Extend input data with zeros?"</em>
 Here, the default is set to <code>NULL</code> (no message), since preprocessing of the model matrix
 may invalidate the assumptions behind this message.</p></dd>
-
-
-<dt id="arg-lppackage">lpPackage<a class="anchor" aria-label="anchor" href="#arg-lppackage"></a></dt>
-<dd><p>Currently ignored. If specified, a warning will be issued.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -137,8 +162,6 @@ and the <code><a href="SuppressKDisclosure.html">SuppressKDisclosure()</a></code
 Also note that automatic forcing of <code>"anySumNOTprimary"</code> is disabled.
 That is, <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">SSBtools::GaussSuppression()</a></code> is called with <code>auto_anySumNOTprimary = FALSE</code>.
 See the parameter documentation for an explanation of why <code>FALSE</code> is required.</p>
-<p>The combination of intervals with the various linked table strategies is not yet implemented,
-so the <code>lpPackage</code> parameter is currently ignored.</p>
     </div>
     <div class="section level2">
     <h2 id="note">Note<a class="anchor" aria-label="anchor" href="#note"></a></h2>
@@ -147,10 +170,13 @@ By <em>alternatives</em>, we refer to using the <code>linkedGauss</code> paramet
 <li><p><code>SuppressLinkedTables()</code> creates several smaller model matrices, which may be combined into a single block-diagonal matrix. A large overall matrix is never created.</p></li>
 <li><p>With the alternatives, a large overall matrix is created first. Smaller matrices are then derived from it. If the size of the full matrix is a bottleneck, <code>SuppressLinkedTables()</code> is the better choice.</p></li>
 <li><p>The <code>"global"</code> method is available with the alternatives, but not with <code>SuppressLinkedTables()</code>.</p></li>
+<li><p>The <code>collapseAware</code> parameter is supported by the alternatives, but not by <code>SuppressLinkedTables()</code>. This option may improve coordination across tables. See <code><a href="GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code>.</p></li>
 <li><p>Due to differences in candidate ordering, the two methods may not always produce identical results. With the alternatives, candidate order is constructed globally across all cells (as with the global method).
 In contrast, <code>SuppressLinkedTables()</code> uses a locally determined candidate order within each table.  The ordering across tables
 is coordinated to ensure the method works, but it is not based on a strictly defined global order.
 This may lead to some differences.</p></li>
+<li><p>With the alternatives, <code>linkedIntervals</code> may also contain <code>"global"</code>.
+See the documentaion of the <code>linkedIntervals</code> parameter above and in <code><a href="GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code>.</p></li>
 </ul></div>
 
     <div class="section level2">
@@ -508,6 +534,234 @@ This may lead to some differences.</p></li>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 100      K    trygd  11   FALSE      FALSE</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span>       </span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span>    </span></span>
+<span class="r-in"><span><span class="co">##################################       </span></span></span>
+<span class="r-in"><span><span class="co">####  Examples with intervals     </span></span></span>
+<span class="r-in"><span><span class="co">################################## </span></span></span>
+<span class="r-in"><span>  </span></span>
+<span class="r-in"><span><span class="va">lpPackage</span> <span class="op">&lt;-</span> <span class="st">"highs"</span> </span></span>
+<span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="va">lpPackage</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span>  <span class="co"># Common cells occur because the default for recordAware is TRUE</span></span></span>
+<span class="r-in"><span>  <span class="va">out1</span> <span class="op">&lt;-</span> <span class="fu">SuppressLinkedTables</span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"magnitude1"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>               fun <span class="op">=</span> <span class="va">SuppressDominantCells</span>, </span></span>
+<span class="r-in"><span>               withinArg <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>table_1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dimVar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo"</span>, <span class="st">"sector2"</span><span class="op">)</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                                table_2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>dimVar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"eu"</span>, <span class="st">"sector4"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>               dominanceVar <span class="op">=</span> <span class="st">"value"</span>, k <span class="op">=</span> <span class="fl">90</span>, contributorVar <span class="op">=</span> <span class="st">"company"</span>, </span></span>
+<span class="r-in"><span>               lpPackage <span class="op">=</span> <span class="va">lpPackage</span>, rangeMin <span class="op">=</span> <span class="fl">50</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">out1</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                      </span></span>
+<span class="r-in"><span> </span></span>
+<span class="r-in"><span> <span class="co"># In the algorithm, common cells occur because recordAware is TRUE, </span></span></span>
+<span class="r-in"><span> <span class="co"># although this is not reflected in the output variables table_1 and table_2</span></span></span>
+<span class="r-in"><span> <span class="va">out2</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/tables_by_formulas.html" class="external-link">tables_by_formulas</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SSBtoolsData.html" class="external-link">SSBtoolsData</a></span><span class="op">(</span><span class="st">"magnitude1"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>               table_fun <span class="op">=</span> <span class="va">SuppressDominantCells</span>, </span></span>
+<span class="r-in"><span>               table_formulas <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>table_1 <span class="op">=</span> <span class="op">~</span><span class="va">geo</span> <span class="op">*</span> <span class="va">sector2</span>, </span></span>
+<span class="r-in"><span>                                     table_2 <span class="op">=</span> <span class="op">~</span><span class="va">eu</span> <span class="op">*</span> <span class="va">sector4</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>               substitute_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>region <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"geo"</span>, <span class="st">"eu"</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>                                      sector <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sector2"</span>, <span class="st">"sector4"</span><span class="op">)</span><span class="op">)</span>, </span></span>
+<span class="r-in"><span>               dominanceVar <span class="op">=</span> <span class="st">"value"</span>, k <span class="op">=</span> <span class="fl">90</span>, contributorVar <span class="op">=</span> <span class="st">"company"</span>, </span></span>
+<span class="r-in"><span>               linkedGauss <span class="op">=</span> <span class="st">"super-consistent"</span>, </span></span>
+<span class="r-in"><span>               lpPackage <span class="op">=</span> <span class="va">lpPackage</span>, rangeMin <span class="op">=</span> <span class="fl">50</span>, </span></span>
+<span class="r-in"><span>               linkedIntervals <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"super-consistent"</span>, <span class="st">"local-bdiag"</span>, <span class="st">"global"</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span> <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">out2</span><span class="op">)</span></span></span>
+<span class="r-in"><span>                       </span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/base/message.html" class="external-link">message</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="st">"Examples skipped because the '"</span>, <span class="va">lpPackage</span>, <span class="st">"' package is not installed."</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">}</span>  </span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 20*13-&gt;13*12]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extraAggregate 13*12-&gt;5*12] Checking .....</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 20*13-&gt;16*12]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extraAggregate 16*12-&gt;6*12] Checking .....</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ====== Linked GaussSuppression by "super-consistent" algorithm:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_numttHTT: ..................:::::::</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (11*13-DDcol-&gt;11*11-0exact-&gt;9*8-GaussI-&gt;9*6)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Using highs for intervals...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (11*13-DDcol-&gt;11*11)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ...........</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7-10+8-9-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   9: 1 new, (425.2) 8+7-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   7: 2 new, (429.5) 1-5-6+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5: 3 new, (162.5) 2-4-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   4: 4 new, (37.10) 3+2-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2: 5 new, (57.80) 1-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1: 6 new, (32.80) 1+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_none: .............</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (11*7-DDcol-&gt;11*5-0exact-&gt;10*3-GaussI-&gt;10*3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Using highs for intervals...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $table_1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>         geo sector2 freq value rlim_value lo_1 up_1 lo   up suppressed_integer</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     Total   Total   20 462.3         NA   NA   NA NA   NA                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     Total private   16 429.5         NA   NA   NA NA   NA                  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     Total  public    4  32.8         NA   NA   NA NA   NA                  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   Iceland   Total    4  37.1         NA   NA   NA NA   NA                  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   Iceland private    4  37.1         NA   NA   NA NA   NA                  4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6   Iceland  public    0   0.0         NA   NA   NA NA   NA                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7  Portugal   Total    8 162.5         NA   NA   NA NA   NA                  3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8  Portugal private    6 138.9         NA   NA   NA NA   NA                  2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9  Portugal  public    2  23.6         50    0 32.8  0 90.6                  1</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    Spain   Total    8 262.7         NA   NA   NA NA   NA                  0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11    Spain private    6 253.5         NA   NA   NA NA   NA                  2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12    Spain  public    2   9.2         NA   NA   NA NA   NA                  2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    primary suppressed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3    FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4    FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5    FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6    FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $table_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       eu       sector4 freq value rlim_value lo_1 up_1 lo    up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1  Total         Total   20 462.3         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2  Total   Agriculture    4 240.2         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Total Entertainment    6 131.5         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4  Total  Governmental    4  32.8         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5  Total      Industry    6  57.8         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     EU         Total   16 425.2         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7     EU   Agriculture    4 240.2         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     EU Entertainment    5 114.7         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     EU  Governmental    4  32.8         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    EU      Industry    3  37.5         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11 nonEU         Total    4  37.1         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12 nonEU   Agriculture    0   0.0         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13 nonEU Entertainment    1  16.8         50    0 37.1  0 131.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 nonEU  Governmental    0   0.0         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 nonEU      Industry    3  20.3         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    suppressed_integer primary suppressed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                   0   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   0   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                   0   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                   4   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                   3   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                   3   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                   0   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                   2   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                   4   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                  2   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                  4   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                  0   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                  1    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                  0   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                  2   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 20*6-&gt;20*7]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extraAggregate 20*7-&gt;10*7] Checking .....</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ====== Linked GaussSuppression by "super-consistent" algorithm:</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_numttHTT: ..............::::::::</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (14*15-DDcol-&gt;14*10-DDrow-&gt;11*10-&gt;-0exact-&gt;9*8-GaussI-&gt;9*6)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Using highs for intervals...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (14*15-DDcol-&gt;14*10-DDrow-&gt;11*10-&gt;)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ..........</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6-9-10+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   9: 1 new, (429.5) 7-8-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   8: 2 new, (425.2) 7+6+1-4-5-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   5: 3 new, (162.5) 4+2-3-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   3: 4 new, (57.80) 2-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   2: 5 new, (37.10) 1-</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   1: 6 new, (32.80) 1+</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_none: ..........</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (14*5-DDcol-&gt;14*4-DDrow-&gt;11*4-&gt;-0exact-&gt;10*3-GaussI-&gt;10*3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Using highs for intervals...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (14*6-DDcol-&gt;14*5-DDrow-&gt;7*5-&gt;-0exact-&gt;5*3-GaussI-&gt;5*3)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Using highs for intervals...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> (10*5-DDcol-&gt;10*4-DDrow-&gt;8*4-&gt;-0exact-&gt;8*4-GaussI-&gt;8*4)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Using highs for intervals...</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> --</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>      region        sector freq value rlim_value lo_1 up_1 lo    up</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     Total         Total   20 462.3         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   Iceland         Total    4  37.1         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3  Portugal         Total    8 162.5         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     Spain         Total    8 262.7         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     Total       private   16 429.5         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     Total        public    4  32.8         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7        EU         Total   16 425.2         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8     nonEU         Total    4  37.1         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9     Total   Agriculture    4 240.2         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10    Total Entertainment    6 131.5         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11    Total  Governmental    4  32.8         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12    Total      Industry    6  57.8         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13  Iceland       private    4  37.1         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14 Portugal       private    6 138.9         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15 Portugal        public    2  23.6         50    0 32.8  0  90.6</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16    Spain       private    6 253.5         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17    Spain        public    2   9.2         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18       EU   Agriculture    4 240.2         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19       EU Entertainment    5 114.7         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20       EU  Governmental    4  32.8         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21       EU      Industry    3  37.5         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22    nonEU Entertainment    1  16.8         50    0 37.1  0 131.5</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23    nonEU      Industry    3  20.3         NA   NA   NA NA    NA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    suppressed_integer lo_lb up_lb lo_global up_global primary suppressed</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1                   0    NA    NA        NA        NA   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2                   3    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3                   3    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4                   0    NA    NA        NA        NA   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5                   3    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6                   3    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7                   3    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8                   4    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9                   0    NA    NA        NA        NA   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10                  0    NA    NA        NA        NA   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11                  4    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12                  3    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13                  4    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14                  2    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15                  1     0 199.6         0      90.6    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16                  2    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17                  2    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18                  0    NA    NA        NA        NA   FALSE      FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19                  2    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20                  4    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21                  2    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22                  1     0 131.5         0     131.5    TRUE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23                  2    NA    NA        NA        NA   FALSE       TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    table_1 table_2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1     TRUE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2     TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3     TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4     TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5     TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6     TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 7    FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 8    FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 9    FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 10   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 11   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 12   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 13    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 14    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 15    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 16    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 17    TRUE   FALSE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 18   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 19   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 20   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 21   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 22   FALSE    TRUE</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 23   FALSE    TRUE</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
