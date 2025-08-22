@@ -13,7 +13,8 @@ ComputeIntervals(
   lpPackage = "lpSolve",
   gaussI = TRUE,
   allInt = FALSE,
-  sparseConstraints = TRUE
+  sparseConstraints = TRUE,
+  cell_grouping = rep(0, length(z))
 )
 }
 \arguments{
@@ -46,6 +47,12 @@ See \code{all.int} parameter in \code{lpSolve} and \code{types} parameter in \co
 \item{sparseConstraints}{When TRUE, a sparse constraint matrix will be input to the
 solver. In the case of \code{lpSolve}, the sparse matrix is represented in triplet form
 as a dense matrix with three columns, and the \code{dense.const} parameter is utilized.}
+
+\item{cell_grouping}{Numeric vector indicating group membership.
+Cells with the same value that is not 0 belong to the same group.
+A value of 0 indicates that the cell is not a member of any group.
+Members of the same group are assumed to have the same z-value and this
+is included as a condition when calculating intervals.}
 }
 \description{
 This function solves linear programs to determine interval boundaries

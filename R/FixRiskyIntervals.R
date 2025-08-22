@@ -29,7 +29,10 @@ FixRiskyIntervals <-
            gaussI = FALSE,   # Here important parameter, FALSE for best results, gaussI2 instead below  
            allInt = FALSE,
            sparseConstraints = TRUE, 
-           rangeLimits) {
+           rangeLimits,
+           cell_grouping = rep(0, length(z))) {
+    
+
     
     if (!lpPackage %in% c("lpSolve", "Rsymphony", "Rglpk", "highs"))
       stop("Only 'lpSolve', 'Rsymphony' and 'Rglpk' solvers are supported.")
@@ -74,6 +77,7 @@ FixRiskyIntervals <-
     
     x <- x[, candidates, drop = FALSE]
     z <- z[candidates]
+    cell_grouping <- cell_grouping[candidates]
     primary <- match(primary, candidates)
     suppressed <- match(suppressed, candidates)
     
@@ -83,9 +87,32 @@ FixRiskyIntervals <-
     published <- seq_len(ncol(x))
     published <- published[!(published %in% suppressed)]
     
-    candidates_published <- candidates[published] 
+  
+    cell_grouping <- repeated_as_integer(cell_grouping)
+
+    if(any(cell_grouping != 0)){
+      x <- cbind(x, x0diff(x, cell_grouping))
+      z <- c(z, rep(0, ncol(x) - input_ncol_x))
+      rangeLimits_ <- c(rangeLimits_, rep(NA, ncol(x) - input_ncol_x))
+      avoid_duplicate_computation <- TRUE   # Similar code as in ComputeIntervals()
+      if (avoid_duplicate_computation) {
+          duplicated_cell_grouping <- which(cell_grouping != 0 & duplicated(cell_grouping))
+          published_in_duplicated_cell_grouping <- published %in% duplicated_cell_grouping
+          if (any(published_in_duplicated_cell_grouping)) {
+            published <- published[!published_in_duplicated_cell_grouping]
+          }
+          primary_in_duplicated_cell_grouping <- primary %in% duplicated_cell_grouping
+          if (any(primary_in_duplicated_cell_grouping)) {
+            primary <- primary[!primary_in_duplicated_cell_grouping]
+          }
+      }
+    }
     
-    if (!length(published)) {
+    candidates_published <- candidates[published]
+    
+    cell_diff = SeqInc(input_ncol_x + 1, ncol(x))
+    
+    if (!length(c(published, cell_diff))) {
       cat("Infinity intervals without using a solver ...\n")
       lo <- rep(NA_integer_, input_ncol_x)
       up <- lo
@@ -95,15 +122,16 @@ FixRiskyIntervals <-
     }
     
     # Reorder since first match important in DummyDuplicated
-    x <- x[, c(published, primary, secondary), drop = FALSE]
-    z <- z[c(published, primary, secondary)]
+    x <- x[, c(published, cell_diff, primary, secondary), drop = FALSE]
+    z <- z[c(published, cell_diff, primary, secondary)]
     
-    rangeLimits_ <- rangeLimits_[c(published, primary, secondary)] 
+    rangeLimits_ <- rangeLimits_[c(published, cell_diff, primary, secondary)] 
     
     published2 <- seq_len(length(published))
-    primary2 <- length(published) + seq_len(length(primary))
+    cell_diff2 <- length(published) + seq_len(length(cell_diff))
+    primary2 <- length(published) + length(cell_diff) + seq_len(length(primary))
     secondary2 <-
-      length(published) + length(primary) + seq_len(length(secondary))
+      length(published) + length(cell_diff) + length(primary) + seq_len(length(secondary))
     
     cat("(", dim(x)[1], "*", length(published2), sep = "")
     
@@ -127,12 +155,14 @@ FixRiskyIntervals <-
       candidates_published3 <- candidates_published[idxDDunique] 
       
       published3 <- which(idxDDunique %in% published2)
+      cell_diff3 <- which(idxDDunique %in% cell_diff2)
       primary3 <- which(idxDDunique %in% primary2)
       secondary3 <- which(idxDDunique %in% secondary2)
       cat("-DDcol->", dim(x)[1], "*", length(published3), sep = "")
     } else {
       candidates_published3 <- candidates_published
       published3 <- published2
+      cell_diff3 <- cell_diff2
       primary3 <- primary2
       secondary3 <- secondary2
     }
@@ -268,6 +298,7 @@ FixRiskyIntervals <-
                                     lpPackage,
                                     sparseConstraints,
                                     AsMatrix,
+                                    cell_diff3 = cell_diff3,
                                     check,
                                     verbose = FALSE, 
                                     extra_suppressed = c(extra_suppressed, extra_from_gaussI),
@@ -339,6 +370,7 @@ RiskyInterInterval <- function(a,
                                lpPackage,
                                sparseConstraints,
                                AsMatrix,
+                               cell_diff3,
                                check,
                                verbose, 
                                extra_suppressed,
@@ -351,7 +383,11 @@ RiskyInterInterval <- function(a,
   ai <- a
   ai$x <- ai$x[, cols, drop = FALSE]
   ai$z <- ai$z[cols]
-  intervals1 <- ComputeIntervals1(ai, x, primary3, secondary3, minVal, allInt, lpPackage, sparseConstraints, AsMatrix, check, verbose)
+  
+  intervals1 <- ComputeIntervals1(ai, x, primary3, secondary3, minVal, allInt, lpPackage, sparseConstraints, AsMatrix, check, verbose,
+                                  cell_diff3 = cell_diff3)
+
+  
   gauss_ranges <- intervals1$up[primary3] - intervals1$lo[primary3]
   
   risky <- (gauss_ranges - rangeLimits_[primary3]) < 0

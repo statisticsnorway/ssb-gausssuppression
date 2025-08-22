@@ -176,7 +176,27 @@
 #'        When `linkedGauss` is used, the `formula` parameter should be provided as a list of formulas. 
 #'        Alternatively, `formula` may have an attribute `"table_formulas"` containing such a list.
 #'        See also the `linkedTables` parameter below.
+#' @param linkedIntervals  Determines how interval calculations, 
+#'        triggered by the `lpPackage` parameter, are performed when `linkedGauss` is not `"global"`.  
+#'        When `linkedGauss = "global"`, interval settings in `linkedIntervals` are ignored.  
+#'        For allowed values and detailed behaviour, see the documentation of [SuppressLinkedTables()].
+#'        
+#'  - Note: With `linkedIntervals = "local-bdiag"`, common cells may have different table-specific intervals. 
+#'    Since the output shows one interval per cell, it is constructed using the maximum lower bound and 
+#'    minimum upper bound across the tables.
 #' @param recordAware Parameter associated with `linkedGauss`. See [SuppressLinkedTables()].  
+#' @param collapseAware Parameter associated with `linkedGauss`.
+#'        In the linked‑tables algorithm, the model matrix is first *collapsed* by
+#'        removing duplicate rows. 
+#'        When `collapseAware = TRUE`, every cell that remains numerically derivable 
+#'        after a pre‑aggregation corresponding to this row reduction will be treated 
+#'        as a common cell. This
+#'        maximizes coordination across tables, given the duplicate‑row removal,
+#'        while adding limited additional computational overhead. In particular,
+#'        the suppression algorithm automatically accounts for cells in one table
+#'        that are sums of cells in another table.
+#'        Note that any cell that `recordAware = TRUE` would introduce is already
+#'        included automatically when `collapseAware = TRUE`.
 #' @param linkedTables A list specifying how the tables referenced in the `formula` 
 #'   parameter should be combined for use in the linked-tables algorithm. 
 #'   Each element in the list contains one or more names of the tables in `formula`. 
@@ -273,7 +293,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            aggregateBaseOrder = FALSE,
                            rowGroupsPackage = aggregatePackage,
                            linkedGauss = NULL,
+                           linkedIntervals = ifelse(linkedGauss == "local-bdiag", "local-bdiag", "super-consistent"),
                            recordAware = TRUE,
+                           collapseAware = FALSE,
                            linkedTables = NULL
                            ){ 
   if (!is.null(spec)) {
@@ -303,7 +325,14 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
-  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag"), okNULL = TRUE)
+  CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), okNULL = TRUE)
+  
+  if (!is.null(lpPackage) & !is.null(linkedGauss)) {
+    if (linkedGauss != "global") {
+      check_parameter_linkedIntervals(linkedGauss, linkedIntervals, TRUE)
+    }
+  }
+  
   if (is.list(formula)) {
     table_formulas <- formula
     formula <- combine_formulas(table_formulas)
@@ -324,8 +353,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   if (!is.null(lpPackage) & !is.null(linkedGauss)) {
-    lpPackage <- NULL
-    warning("The 'lpPackage' parameter is currently ignored when 'linkedGauss' is specified.")
+    # lpPackage <- NULL
+    # warning("The 'lpPackage' parameter is currently ignored when 'linkedGauss' is specified.")
   }
 
   # Possible development function as input
@@ -346,6 +375,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       } else {
         OutputFunction <- OutputIntervals
       }
+      if( !(identical(linkedGauss, "global") | is.null(linkedGauss))) {    ### INTERVALS ANOTHER WAY 
+        OutputFunction <- NULL
+      } 
     } else {
       OutputFunction <- NULL
     }
@@ -725,10 +757,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     return(list(candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary))
   }
   
+  z <- z_interval(..., freq = freq, freqVar = freqVar, num = num)
+  rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  
   if( output %in% c("outputGaussSuppression", "outputGaussSuppression_x", "secondary")){
     rm(crossTable)
     rm(freq)
-    rm(num)
+    num <- NULL
     rm(weight)
     rm(data)
   } 
@@ -736,6 +771,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   table_memberships <- NULL
   cell_grouping <- NULL
   if (!is.null(linkedGauss)) {
+    if (linkedGauss == "super-consistent") {
+      super_consistent <- TRUE
+      linkedGauss <- "consistent"
+    } else {
+      super_consistent <- FALSE
+    }
     if (linkedGauss %in% c("local", "consistent", "back-tracking", "local-bdiag")) {
       names(table_formulas) <- paste0("t", seq_len(length(table_formulas)))
       table_memberships <- as.data.frame(matrix(NA, ncol(x), length(table_formulas)))
@@ -744,8 +785,19 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       for (i in seq_along(table_formulas)) {
         table_memberships[[i]] <- SSBtools::formula_selection(x, table_formulas[[i]], logical = TRUE)
       }
+      sum_1_table_memberships <- sum(table_memberships)
+      if (collapseAware) {
+        table_memberships <- collapse_aware_table_memberships(table_memberships, x)
+      }
+      sum_2_table_memberships <- sum(table_memberships)
       if (recordAware) {
         table_memberships <- record_consistent_table_memberships(table_memberships, x, aggregatePackage)
+      }
+      sum_3_table_memberships <- sum(table_memberships)
+      if (recordAware & collapseAware) {
+        if (sum_2_table_memberships != sum_3_table_memberships) {
+          warning("recordAware matters when collapseAware is TRUE")
+        }
       }
       cell_grouping <- linkedGauss == "consistent"
       iterBackTracking <- 0L
@@ -770,13 +822,36 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   
+  
   # To calls to avoid possible error:  argument "whenEmptyUnsuppressed" matched by multiple actual arguments 
   if(hasArg("whenEmptyUnsuppressed") | !structuralEmpty){
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking,
+                                  super_consistent = super_consistent,
+                                  z = z,
+                                  rangeLimits = rangeLimits,
+                                  lpPackage = lpPackage,
+                                  linkedIntervals = linkedIntervals,
+                                  ...)
   } else {
     secondary <- GaussSuppression(x = x, candidates = candidates, primary = primary, forced = forced, hidden = hidden, singleton = singleton, singletonMethod = singletonMethod, printInc = printInc, whenEmptyUnsuppressed = NULL, xExtraPrimary = xExtraPrimary, 
-                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, ...)
+                                  unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, 
+                                  super_consistent = super_consistent,
+                                  z = z,
+                                  rangeLimits = rangeLimits,
+                                  lpPackage = lpPackage,
+                                  linkedIntervals = linkedIntervals,
+                                  ...)
+  }
+  
+  # possible secondary with extra output 
+  #   for intervals due to lpPackage
+  # similar to primary 
+  if (is.list(secondary)) {
+    if (!is.null(num)) {
+      num <- cbind(num, secondary[[2]])
+    }
+    secondary <- secondary[[1]]
   }
   
   # Use of special temporary feature
@@ -968,3 +1043,40 @@ record_consistent_table_memberships <- function(table_memberships, x, aggregateP
   table_memberships
 }
 
+
+collapse_aware_table_memberships <- function(table_memberships, x, aggregatePackage) {
+  
+  r7 <- rnd_7(nrow(x))
+  table_memberships_out <- table_memberships
+  
+  for(i in seq_along(table_memberships)){
+    ti <- table_memberships[, i]
+    idx <- DummyDuplicated(x[, ti, drop = FALSE], idx = TRUE, rows = TRUE, rnd = TRUE)
+    useq <- SSBtools::UniqueSeq(idx)
+    ord1 <- SortRows(cbind(idx, useq), index.return = TRUE)
+    ord2 <- SortRows(cbind(idx, -useq), index.return = TRUE)
+    cp1 <- Matrix::crossprod(x[ord1 , ,drop=FALSE], r7[ord1 , ,drop=FALSE])
+    cp2 <- Matrix::crossprod(x[ord1 , ,drop=FALSE], r7[ord2 , ,drop=FALSE])
+    table_memberships_out[, i] <- as.vector(rowSums(abs(cp2 -cp1)) == 0)
+  }
+  table_memberships_out
+}
+
+
+# Function to find vector with z-values for interval calculation
+z_interval <- function(..., freq, freqVar, num, dominanceVar = NULL, intervalVar = NULL) {
+  intervalVar <- intervalVar[1]  # Only single intervalVar is (for now) supported in functions where this is used
+  if (identical(intervalVar, freqVar) | ncol(num) == 0) {
+    z <- freq
+  } else {
+    if (is.null(intervalVar)) {
+      if (is.null(dominanceVar)) {
+        intervalVar <- names(num)[1]
+      } else {
+        intervalVar <- dominanceVar
+      }
+    }
+    z <- num[[intervalVar]]
+  }
+  z
+}

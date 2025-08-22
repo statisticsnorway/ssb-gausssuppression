@@ -21,9 +21,6 @@
 #' That is, [SSBtools::GaussSuppression()] is called with `auto_anySumNOTprimary = FALSE`. 
 #' See the parameter documentation for an explanation of why `FALSE` is required.
 #' 
-#' The combination of intervals with the various linked table strategies is not yet implemented, 
-#' so the `lpPackage` parameter is currently ignored.
-#' 
 #' @note Note on differences between `SuppressLinkedTables()` and alternative approaches.  
 #' By *alternatives*, we refer to using the `linkedGauss` parameter via `GaussSuppressionFromData()`, its wrappers, or through `tables_by_formulas()`, as shown in the examples below.
 #'
@@ -31,10 +28,13 @@
 #' - `SuppressLinkedTables()` creates several smaller model matrices, which may be combined into a single block-diagonal matrix. A large overall matrix is never created.
 #' - With the alternatives, a large overall matrix is created first. Smaller matrices are then derived from it. If the size of the full matrix is a bottleneck, `SuppressLinkedTables()` is the better choice.
 #' - The `"global"` method is available with the alternatives, but not with `SuppressLinkedTables()`.
+#' - The `collapseAware` parameter is supported by the alternatives, but not by `SuppressLinkedTables()`. This option may improve coordination across tables. See [GaussSuppressionFromData()]. 
 #' - Due to differences in candidate ordering, the two methods may not always produce identical results. With the alternatives, candidate order is constructed globally across all cells (as with the global method).  
 #'   In contrast, `SuppressLinkedTables()` uses a locally determined candidate order within each table.  The ordering across tables 
 #'   is coordinated to ensure the method works, but it is not based on a strictly defined global order.  
 #'   This may lead to some differences.
+#' - With the alternatives, `linkedIntervals` may also contain `"global"`. 
+#'   See the documentaion of the `linkedIntervals` parameter above and in [GaussSuppressionFromData()].
 #' 
 #'
 #' @inheritParams AdditionalSuppression
@@ -42,20 +42,51 @@
 #' @param ... Arguments to `fun` that are kept constant.
 #' @param withinArg A list of named lists. Arguments to `fun` that are not kept constant.
 #'                  If `withinArg` is named, the names will be used as names in the output list.
-#' @param linkedGauss Specifies the strategy for protecting linked tables. Possible values are:
+#' @param linkedGauss Specifies the strategy for protecting linked tables. 
+#'        The `"super-consistent"`, `"consistent"`, and `"local-bdiag"` methods 
+#'        protect all linked tables together in a single call to `GaussSuppression()` 
+#'        using an internally constructed block-diagonal model matrix.
 #'
-#' - `"consistent"` (default): All linked tables are protected by a single call to `GaussSuppression()`. 
-#'    The algorithm internally constructs a block diagonal model matrix and handles common cells 
-#'    consistently across tables.
-#' 
-#' - `"local"`: Each table is protected independently by a separate call to `GaussSuppression()`.
+#' - `"super-consistent"` (default): Shares the key property of `"consistent"` that
+#'   common cells are suppressed equally across tables, but also exploits the fact
+#'   that these cells have identical values in all tables. The coordination is
+#'   therefore stronger. If intervals are calculated using such coordination,
+#'   common cells will have identical interval bounds in each table.
 #'
-#' - `"back-tracking"`: Iterative approach where each table is protected via `GaussSuppression()`, 
-#'    and primary suppressions are adjusted based on secondary suppressions from other tables across 
-#'    iterations.
+#' - `"consistent"`: Common cells are suppressed equally across tables.
 #'
-#' - `"local-bdiag"`: Produces the same result as `"local"`, but uses a single call to 
-#'   `GaussSuppression()` with a block diagonal matrix. It does not apply the linked-table methodology.
+#' - `"local"`: Each table is protected independently by a separate call to
+#'   `GaussSuppression()`.
+#'
+#' - `"back-tracking"`: Iterative approach where each table is protected via
+#'   `GaussSuppression()`, and primary suppressions are adjusted based on
+#'   secondary suppressions from other tables across iterations.
+#'
+#' - `"local-bdiag"`: Produces the same result as `"local"`, but uses a single call
+#'   to `GaussSuppression()`. It does not apply the linked-table methodology.
+#'   
+#'        
+#' @param linkedIntervals This parameter controls how interval calculations, 
+#'         triggered by the `lpPackage` parameter, are performed.
+#'  
+#' -  **Default:** `"local-bdiag"` if `linkedGauss` is set to `"local-bdiag"`, 
+#'    and `"super-consistent"` in all other cases.      
+#'         
+#'  - Possible values of **`linkedIntervals`** are `"local-bdiag"` and `"super-consistent"`.
+#'    
+#'  - Interval calculations can be performed when **`linkedGauss`** is `"super-consistent"`, `"consistent"`, or `"local-bdiag"`.
+#'         
+#'  - When `linkedGauss` is `"local-bdiag"`, `"local-bdiag"` is the only allowed value in `linkedIntervals`  
+#'    (except that, with the alternative approaches, `"global"` may appear as a later element; 
+#'    `"super-consistent"` is never allowed).
+#'         
+#'  - It is possible to request multiple types of intervals by supplying `linkedIntervals` as a vector.  
+#'    Only the first value affects the additional suppression defined by `rangePercent` and/or `rangeMin`.
+#'         
+#'  - With the alternative approaches (see the note below), `"global"` may also appear in `linkedIntervals`, 
+#'    provided it is not the first element. 
+#'  
+#' @param lpPackage See [GaussSuppressionFromData()].    
 #' 
 #' @param recordAware If `TRUE` (default), the suppression procedure will ensure consistency 
 #'                    across cells that aggregate the same underlying records, 
@@ -67,7 +98,6 @@
 #'   *"Cells with empty input will never be secondary suppressed. Extend input data with zeros?"*  
 #'   Here, the default is set to \code{NULL} (no message), since preprocessing of the model matrix  
 #'   may invalidate the assumptions behind this message.
-#' @param lpPackage Currently ignored. If specified, a warning will be issued.
 #'
 #' @return A list of data frames, or, if `withinArg` is `NULL`, the ordinary output from `fun`.
 #' @importFrom SSBtools NumSingleton
@@ -135,23 +165,60 @@
 #'                 list(data = z2, dimVar = 1:4, freqVar = 5, maxN = 1)))
 #' print(b)        
 #'        
+#'     
+#'     
+#' ##################################       
+#' ####  Examples with intervals     
+#' ################################## 
+#'   
+#' lpPackage <- "highs" 
+#' if (requireNamespace(lpPackage, quietly = TRUE)) {
+#' 
+#'   # Common cells occur because the default for recordAware is TRUE
+#'   out1 <- SuppressLinkedTables(data = SSBtoolsData("magnitude1"), 
+#'                fun = SuppressDominantCells, 
+#'                withinArg = list(table_1 = list(dimVar = c("geo", "sector2")), 
+#'                                 table_2 = list(dimVar = c("eu", "sector4"))), 
+#'                dominanceVar = "value", k = 90, contributorVar = "company", 
+#'                lpPackage = lpPackage, rangeMin = 50)
+#'   print(out1)
+#'                       
+#'  
+#'  # In the algorithm, common cells occur because recordAware is TRUE, 
+#'  # although this is not reflected in the output variables table_1 and table_2
+#'  out2 <- tables_by_formulas(data = SSBtoolsData("magnitude1"), 
+#'                table_fun = SuppressDominantCells, 
+#'                table_formulas = list(table_1 = ~geo * sector2, 
+#'                                      table_2 = ~eu * sector4), 
+#'                substitute_vars = list(region = c("geo", "eu"), 
+#'                                       sector = c("sector2", "sector4")), 
+#'                dominanceVar = "value", k = 90, contributorVar = "company", 
+#'                linkedGauss = "super-consistent", 
+#'                lpPackage = lpPackage, rangeMin = 50, 
+#'                linkedIntervals = c("super-consistent", "local-bdiag", "global"))
+#'  print(out2)
+#'                        
+#' } else {
+#'   message(paste0("Examples skipped because the '", lpPackage, "' package is not installed."))
+#' }  
 SuppressLinkedTables <- function(data = NULL,
                               fun,
                               ..., 
                               withinArg = NULL, 
-                              linkedGauss = "consistent",
+                              linkedGauss = "super-consistent",
+                              linkedIntervals = ifelse(linkedGauss == "local-bdiag", "local-bdiag", "super-consistent"),
+                              lpPackage = NULL,
                               recordAware = TRUE,
                               iterBackTracking = Inf,
-                              whenEmptyUnsuppressed = NULL,
-                              lpPackage = NULL) {
-  
-  if (!is.null(lpPackage)) {
-    warning("The 'lpPackage' parameter is currently ignored by SuppressLinkedTables().")
-  }
+                              whenEmptyUnsuppressed = NULL) {
   
   SSBtools::CheckInput(linkedGauss, type = "character", 
-    alt = c("local", "consistent", "back-tracking", "local-bdiag"), 
+    alt = c("local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), 
     okNULL = FALSE)
+  
+  if (!is.null(lpPackage)) {
+    check_parameter_linkedIntervals(linkedGauss, linkedIntervals)
+  }
   
   if (is.null(withinArg)) {
     return(fun(data = data, ...))
@@ -248,6 +315,8 @@ SuppressLinkedTables <- function(data = NULL,
     iterBackTracking = "local"
   }
   
+  super_consistent <- linkedGauss == "super-consistent" 
+  
   secondary <- gaussSuppression_linked_fix_dots(
                                        x_ = list_element(env_list, "x"), 
                                        candidates_ = list_element(env_list, "candidates"), 
@@ -258,12 +327,28 @@ SuppressLinkedTables <- function(data = NULL,
                                        singletonMethod_ = list_element(env_list, "singletonMethod"), 
                                        xExtraPrimary_ = list_element(env_list, "xExtraPrimary"),
                                        whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
+                                       z = list_element(env_list, "z"),
+                                       rangeLimits = list_element(env_list, "rangeLimits"),
                                        unsafeAsNegative = TRUE,
                                        dup_id = dup_id,
+                                       super_consistent = super_consistent, 
                                        iterBackTracking = iterBackTracking, 
+                                       linkedIntervals = linkedIntervals,
+                                       lpPackage = lpPackage, 
                                        ...)
-  for (i in seq_len(n)) {
-    env_list[[i]]$secondary <- secondary[[i]]
+  
+  
+  if (identical(names(secondary), c("secondary", "gauss_intervals"))) {
+    for (i in seq_len(n)) {
+      env_list[[i]]$secondary <- secondary$secondary[[i]]
+      if (!is.null(env_list[[i]]$num)) {
+        env_list[[i]]$num <- cbind(env_list[[i]]$num, secondary$gauss_intervals[[i]])
+      }
+    }
+  } else {
+    for (i in seq_len(n)) {
+      env_list[[i]]$secondary <- secondary[[i]]
+    }
   }
   for (i in seq_along(suppressedData)) {
     environment(TailGaussSuppressionFromData) <- env_list[[i]]
@@ -416,5 +501,48 @@ update_primary_list <- function(primary_list, list_nr, new_primary, dup_id) {
   primary_list
 }
 
+
+
+check_parameter_linkedIntervals <- function(linkedGauss, linkedIntervals, ok_global = FALSE) {
+  if (anyDuplicated(linkedIntervals)) {
+    stop("Duplicates in linkedIntervals")
+  }
+  for (i in seq_along(linkedIntervals)) {
+    check_pl(linkedGauss, linkedIntervals[i], ifelse(i == 1, FALSE, ok_global))
+  }
+}
+
+check_pl <- function(linkedGauss, linkedIntervals, ok_global) {
+  if (!(linkedGauss %in% c("super-consistent", "consistent", "local-bdiag"))) {
+    if (ok_global) {
+      stop('When intervals, linkedGauss must be "super-consistent", "consistent", "local-bdiag" or "global"')  
+    }
+    stop('When intervals, linkedGauss must be "super-consistent", "consistent" or "local-bdiag"')
+  }
+  if (linkedGauss == "local-bdiag") {
+    if (linkedIntervals != "local-bdiag") {
+      if (ok_global) {
+        if (linkedIntervals != "global") {
+          stop('When linkedGauss is "local-bdiag", linkedIntervals must be "local-bdiag" or "global"') 
+        }
+      } else {
+        stop('When linkedGauss is "local-bdiag", linkedIntervals must be "local-bdiag"') 
+      }
+    }
+  }
+  if (linkedIntervals == "global") {
+    if (!ok_global) {
+      stop('linkedIntervals cannot be "global"')
+    }
+  } else {
+    if (!(linkedIntervals %in% c("super-consistent", "local-bdiag"))) {
+      if (ok_global) {
+        stop('linkedIntervals must be "local-bdiag", "super-consistent" or "global"') 
+      } else {
+        stop('linkedIntervals must be "local-bdiag" or "super-consistent"') 
+      }
+    }
+  }
+}
 
 

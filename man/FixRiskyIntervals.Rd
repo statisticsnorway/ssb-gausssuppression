@@ -15,7 +15,8 @@ FixRiskyIntervals(
   gaussI = FALSE,
   allInt = FALSE,
   sparseConstraints = TRUE,
-  rangeLimits
+  rangeLimits,
+  cell_grouping = rep(0, length(z))
 )
 }
 \arguments{
@@ -52,6 +53,12 @@ solver. In the case of \code{lpSolve}, the sparse matrix is represented in tripl
 as a dense matrix with three columns, and the \code{dense.const} parameter is utilized.}
 
 \item{rangeLimits}{As computed by \code{\link{RangeLimitsDefault}}}
+
+\item{cell_grouping}{Numeric vector indicating group membership.
+Cells with the same value that is not 0 belong to the same group.
+A value of 0 indicates that the cell is not a member of any group.
+Members of the same group are assumed to have the same z-value and this
+is included as a condition when calculating intervals.}
 }
 \description{
 Indices to new primary cells are returned

@@ -9,11 +9,13 @@ SuppressLinkedTables(
   fun,
   ...,
   withinArg = NULL,
-  linkedGauss = "consistent",
+  linkedGauss = "super-consistent",
+  linkedIntervals = ifelse(linkedGauss == "local-bdiag", "local-bdiag",
+    "super-consistent"),
+  lpPackage = NULL,
   recordAware = TRUE,
   iterBackTracking = Inf,
-  whenEmptyUnsuppressed = NULL,
-  lpPackage = NULL
+  whenEmptyUnsuppressed = NULL
 )
 }
 \arguments{
@@ -27,18 +29,43 @@ SuppressLinkedTables(
 \item{withinArg}{A list of named lists. Arguments to \code{fun} that are not kept constant.
 If \code{withinArg} is named, the names will be used as names in the output list.}
 
-\item{linkedGauss}{Specifies the strategy for protecting linked tables. Possible values are:
+\item{linkedGauss}{Specifies the strategy for protecting linked tables.
+The \code{"super-consistent"}, \code{"consistent"}, and \code{"local-bdiag"} methods
+protect all linked tables together in a single call to \code{GaussSuppression()}
+using an internally constructed block-diagonal model matrix.
 \itemize{
-\item \code{"consistent"} (default): All linked tables are protected by a single call to \code{GaussSuppression()}.
-The algorithm internally constructs a block diagonal model matrix and handles common cells
-consistently across tables.
-\item \code{"local"}: Each table is protected independently by a separate call to \code{GaussSuppression()}.
-\item \code{"back-tracking"}: Iterative approach where each table is protected via \code{GaussSuppression()},
-and primary suppressions are adjusted based on secondary suppressions from other tables across
-iterations.
-\item \code{"local-bdiag"}: Produces the same result as \code{"local"}, but uses a single call to
-\code{GaussSuppression()} with a block diagonal matrix. It does not apply the linked-table methodology.
+\item \code{"super-consistent"} (default): Shares the key property of \code{"consistent"} that
+common cells are suppressed equally across tables, but also exploits the fact
+that these cells have identical values in all tables. The coordination is
+therefore stronger. If intervals are calculated using such coordination,
+common cells will have identical interval bounds in each table.
+\item \code{"consistent"}: Common cells are suppressed equally across tables.
+\item \code{"local"}: Each table is protected independently by a separate call to
+\code{GaussSuppression()}.
+\item \code{"back-tracking"}: Iterative approach where each table is protected via
+\code{GaussSuppression()}, and primary suppressions are adjusted based on
+secondary suppressions from other tables across iterations.
+\item \code{"local-bdiag"}: Produces the same result as \code{"local"}, but uses a single call
+to \code{GaussSuppression()}. It does not apply the linked-table methodology.
 }}
+
+\item{linkedIntervals}{This parameter controls how interval calculations,
+triggered by the \code{lpPackage} parameter, are performed.
+\itemize{
+\item \strong{Default:} \code{"local-bdiag"} if \code{linkedGauss} is set to \code{"local-bdiag"},
+and \code{"super-consistent"} in all other cases.
+\item Possible values of \strong{\code{linkedIntervals}} are \code{"local-bdiag"} and \code{"super-consistent"}.
+\item Interval calculations can be performed when \strong{\code{linkedGauss}} is \code{"super-consistent"}, \code{"consistent"}, or \code{"local-bdiag"}.
+\item When \code{linkedGauss} is \code{"local-bdiag"}, \code{"local-bdiag"} is the only allowed value in \code{linkedIntervals}
+(except that, with the alternative approaches, \code{"global"} may appear as a later element;
+\code{"super-consistent"} is never allowed).
+\item It is possible to request multiple types of intervals by supplying \code{linkedIntervals} as a vector.
+Only the first value affects the additional suppression defined by \code{rangePercent} and/or \code{rangeMin}.
+\item With the alternative approaches (see the note below), \code{"global"} may also appear in \code{linkedIntervals},
+provided it is not the first element.
+}}
+
+\item{lpPackage}{See \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.}
 
 \item{recordAware}{If \code{TRUE} (default), the suppression procedure will ensure consistency
 across cells that aggregate the same underlying records,
@@ -52,8 +79,6 @@ This is about a helpful message
 \emph{"Cells with empty input will never be secondary suppressed. Extend input data with zeros?"}
 Here, the default is set to \code{NULL} (no message), since preprocessing of the model matrix
 may invalidate the assumptions behind this message.}
-
-\item{lpPackage}{Currently ignored. If specified, a warning will be issued.}
 }
 \value{
 A list of data frames, or, if \code{withinArg} is \code{NULL}, the ordinary output from \code{fun}.
@@ -78,9 +103,6 @@ and the \code{SuppressKDisclosure()} function is not available for use.
 Also note that automatic forcing of \code{"anySumNOTprimary"} is disabled.
 That is, \code{\link[SSBtools:GaussSuppression]{SSBtools::GaussSuppression()}} is called with \code{auto_anySumNOTprimary = FALSE}.
 See the parameter documentation for an explanation of why \code{FALSE} is required.
-
-The combination of intervals with the various linked table strategies is not yet implemented,
-so the \code{lpPackage} parameter is currently ignored.
 }
 \note{
 Note on differences between \code{SuppressLinkedTables()} and alternative approaches.
@@ -90,10 +112,13 @@ By \emph{alternatives}, we refer to using the \code{linkedGauss} parameter via \
 \item \code{SuppressLinkedTables()} creates several smaller model matrices, which may be combined into a single block-diagonal matrix. A large overall matrix is never created.
 \item With the alternatives, a large overall matrix is created first. Smaller matrices are then derived from it. If the size of the full matrix is a bottleneck, \code{SuppressLinkedTables()} is the better choice.
 \item The \code{"global"} method is available with the alternatives, but not with \code{SuppressLinkedTables()}.
+\item The \code{collapseAware} parameter is supported by the alternatives, but not by \code{SuppressLinkedTables()}. This option may improve coordination across tables. See \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
 \item Due to differences in candidate ordering, the two methods may not always produce identical results. With the alternatives, candidate order is constructed globally across all cells (as with the global method).
 In contrast, \code{SuppressLinkedTables()} uses a locally determined candidate order within each table.  The ordering across tables
 is coordinated to ensure the method works, but it is not based on a strictly defined global order.
 This may lead to some differences.
+\item With the alternatives, \code{linkedIntervals} may also contain \code{"global"}.
+See the documentaion of the \code{linkedIntervals} parameter above and in \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
 }
 }
 \examples{
@@ -158,4 +183,40 @@ b <- SuppressLinkedTables(fun = SuppressSmallCounts,
                 list(data = z2, dimVar = 1:4, freqVar = 5, maxN = 1)))
 print(b)        
        
+    
+    
+##################################       
+####  Examples with intervals     
+################################## 
+  
+lpPackage <- "highs" 
+if (requireNamespace(lpPackage, quietly = TRUE)) {
+
+  # Common cells occur because the default for recordAware is TRUE
+  out1 <- SuppressLinkedTables(data = SSBtoolsData("magnitude1"), 
+               fun = SuppressDominantCells, 
+               withinArg = list(table_1 = list(dimVar = c("geo", "sector2")), 
+                                table_2 = list(dimVar = c("eu", "sector4"))), 
+               dominanceVar = "value", k = 90, contributorVar = "company", 
+               lpPackage = lpPackage, rangeMin = 50)
+  print(out1)
+                      
+ 
+ # In the algorithm, common cells occur because recordAware is TRUE, 
+ # although this is not reflected in the output variables table_1 and table_2
+ out2 <- tables_by_formulas(data = SSBtoolsData("magnitude1"), 
+               table_fun = SuppressDominantCells, 
+               table_formulas = list(table_1 = ~geo * sector2, 
+                                     table_2 = ~eu * sector4), 
+               substitute_vars = list(region = c("geo", "eu"), 
+                                      sector = c("sector2", "sector4")), 
+               dominanceVar = "value", k = 90, contributorVar = "company", 
+               linkedGauss = "super-consistent", 
+               lpPackage = lpPackage, rangeMin = 50, 
+               linkedIntervals = c("super-consistent", "local-bdiag", "global"))
+ print(out2)
+                       
+} else {
+  message(paste0("Examples skipped because the '", lpPackage, "' package is not installed."))
+}  
 }

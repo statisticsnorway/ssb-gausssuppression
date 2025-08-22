@@ -134,6 +134,7 @@ test_that("SuppressLinkedTables with forced", {
                local_TRUE = c(1268238, 2177150, 4681831, 19221), 
                consistent_FALSE = c(1265297, 2174748, 4681439, 22860), 
                consistent_TRUE = c(1342807, 2222294, 4977701, 22860), 
+               `super-consistent_TRUE` = c(1339256, 2161034, 4887808, 17202),
                `back-tracking_FALSE` = c(1273760, 2174748, 4681439, 22477), 
                `back-tracking_TRUE` = c(1427836, 2710850, 5364422, 22477))
                                          
@@ -141,7 +142,8 @@ test_that("SuppressLinkedTables with forced", {
   sum2 <- list(local_FALSE = c(1269555, 2177278, 4681933, 19665), 
                local_TRUE = c(1365557, 2363893, 4950102, 19677), 
                consistent_FALSE = c(1265297, 2174748, 4681413, 22864), 
-               consistent_TRUE = c(1343774, 2222294, 5000442, 22876), 
+               consistent_TRUE = c(1343774, 2222294, 5000442, 22876),
+               `super-consistent_TRUE` = c(1355825, 2161034, 4877349, 17202),
                `back-tracking_FALSE` = c(1273760, 2174748, 4681413, 22481), 
                `back-tracking_TRUE` = c(1427836, 2712055, 5364396, 22493))
   
@@ -177,7 +179,7 @@ test_that("SuppressLinkedTables with forced", {
   
   
   
-  for(linkedGauss in c("local", "consistent", "back-tracking",  "local-bdiag"))
+  for(linkedGauss in c("local", "consistent", "super-consistent", "back-tracking",  "local-bdiag"))
     for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
       
       if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
@@ -323,13 +325,15 @@ test_that("SuppressLinkedTables with freq-singleton", {
 
 
 
+
 test_that("SuppressLinkedTables with num-singleton", {
-  f1 <- ~sex * (age_l + age_m) * (lms_l) 
-  f2 <- ~sex * (age_l + age_m) * (hst_l + hst_m) 
-  f3 <- ~sex * (age_l + age_m) * (fst_l + fst_m) 
-  f4 <- ~sex * (lms_l + lms_h) * (hst_l + hst_m)
+  f1 <- ~(age_l + age_m) * (lms_l) 
+  f2 <- ~(age_l + age_m) * (hst_l + hst_m) 
+  f3 <- ~(age_l + age_m) * (fst_l + fst_m) 
+  f4 <- ~(lms_l + lms_h) * (hst_l + hst_m)
   d53 <- readRDS(testthat::test_path("testdata", "d53.rds"))
   z <- SSBtools::MakeMicro(d53, "freq")
+  z <- z[z$sex == 2, ]
   set.seed(123)
   z$char <- sample(paste0("char", seq_len(nrow(z)/2)), nrow(z), replace = TRUE)
   z$value <- rnorm(nrow(z))^2
@@ -337,31 +341,13 @@ test_that("SuppressLinkedTables with num-singleton", {
   printXdim <- FALSE
   printInc <- FALSE
   
-  sum1 <- list(local_FALSE = c(13105L, 72123L, 108122L, 7233L), 
-               local_TRUE = c(13105L, 72123L, 108122L, 7233L), 
-               consistent_FALSE = c(13105L, 72123L, 108122L, 7233L), 
-               consistent_TRUE = c(13857L, 75961L, 117968L, 7233L), 
-               `back-tracking_FALSE` = c(13105L, 72123L, 108122L, 7233L), 
-               `back-tracking_TRUE` = c(23649L, 87129L, 141280L, 7233L), 
-               `local-bdiag_FALSE` = c(13105L, 72123L, 108122L, 7233L), 
-               `local-bdiag_TRUE` = c(13105L, 72123L, 108122L, 7233L))
+  sum1 <- list(consistent_FALSE = c(1362L, 6656L, 11724L, 993L))
   
   
-  sum2 <- list(local_FALSE = 634206L, 
-               local_TRUE = 656029L, 
-               consistent_FALSE = 634206L, 
-               consistent_TRUE = 643913L, 
-               `back-tracking_FALSE` = 682083L, 
-               `back-tracking_TRUE` = 740275L, 
-               global_FALSE = 651516L, 
-               global_TRUE = 651516L, 
-               `local-bdiag_FALSE` = 634206L, 
-               `local-bdiag_TRUE` = 656029L)
-  
-  sum1[["local-bdiag_FALSE"]] <- sum1[["local_FALSE"]]
-  sum1[["local-bdiag_TRUE"]] <- sum1[["local_TRUE"]]
-  sum2[["local-bdiag_FALSE"]] <- sum2[["local_FALSE"]]
-  sum2[["local-bdiag_TRUE"]] <- sum2[["local_TRUE"]]
+  sum2 <- c(consistent_FALSE = 64962L, 
+            consistent_TRUE = 71056L, 
+            `super-consistent_FALSE` = 64962L, 
+            `super-consistent_TRUE` = 71157L)
   
   
   
@@ -371,18 +357,18 @@ test_that("SuppressLinkedTables with num-singleton", {
       if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
       a <- SuppressLinkedTables(data = z,
-                             fun = SuppressDominantCells,
-                             dominanceVar = "value",
-                             contributorVar = "char",
-                             withinArg = list(list(formula = f1),
-                                              list(formula = f2),
-                                              list(formula = f3),
-                                              list(formula = f4)), 
-                             recordAware =  recordAware,
-                             pPercent = 10,
-                             printXdim = printXdim,
-                             printInc = printInc,
-                             linkedGauss = linkedGauss)
+                                fun = SuppressDominantCells,
+                                dominanceVar = "value",
+                                contributorVar = "char",
+                                withinArg = list(list(formula = f1),
+                                                 list(formula = f2),
+                                                 list(formula = f3),
+                                                 list(formula = f4)), 
+                                recordAware =  recordAware,
+                                pPercent = 10,
+                                printXdim = printXdim,
+                                printInc = printInc,
+                                linkedGauss = linkedGauss)
       
       expect_identical(sapply(a, function(x) sum(seq_len(nrow(x)) * as.integer(x$suppressed))),
                        sum1[[paste(linkedGauss, recordAware, sep = "_")]])
@@ -390,9 +376,8 @@ test_that("SuppressLinkedTables with num-singleton", {
     }
   
   
-  
-  for(linkedGauss in "consistent") # for(linkedGauss in c("local", "consistent", "back-tracking", "global", "local-bdiag"))
-    for(recordAware in TRUE) { #for(recordAware in c(FALSE, TRUE)) {
+  for(linkedGauss in c("consistent", "super-consistent")) 
+    for(collapseAware in c(FALSE, TRUE)) {
       
       if (printInc) cat("\n------------", paste(linkedGauss, recordAware, sep = "_"), "--------------\n")
       
@@ -404,16 +389,79 @@ test_that("SuppressLinkedTables with num-singleton", {
                                                     table_2 = f2,
                                                     table_3 = f3,
                                                     table_4 = f4),
-                              recordAware =  recordAware,
+                              collapseAware =  collapseAware,
+                              recordAware = FALSE, 
                               pPercent = 50,
                               printXdim = printXdim,
                               printInc = printInc,
                               linkedGauss = linkedGauss)
       
       expect_identical(sum(seq_len(nrow(a)) * as.integer(a$suppressed)),
-                       sum2[[paste(linkedGauss, recordAware, sep = "_")]])
+                       sum2[[paste(linkedGauss, collapseAware, sep = "_")]])
     }
+  
+  
+  lpPackage <- "highs"
+  
+  if (requireNamespace(lpPackage, quietly = TRUE)) {
+    capture.output({
+      a <- SuppressLinkedTables(data = z,
+                              fun = SuppressDominantCells,
+                              dominanceVar = "value",
+                              contributorVar = "char",
+                              withinArg = list(list(formula = f1),
+                                               list(formula = f2),
+                                               list(formula = f3),
+                                               list(formula = f4)), 
+                              recordAware =  TRUE,
+                              pPercent = 50,
+                              printXdim = printXdim,
+                              printInc = printInc,
+                              linkedGauss = "super-consistent", 
+                              linkedIntervals = c("super-consistent", "local-bdiag"),
+                              lpPackage = lpPackage, rangePercent = 100)
+      })
+    
+    
+    expect_equal(c(sapply(a, function(x) sum(x$up_1 - x$lo_1, na.rm = TRUE)), 
+                   sapply(a, function(x) sum(x$up - x$lo, na.rm = TRUE)),
+                   sapply(a, function(x) sum(x$up_lb - x$lo_lb, na.rm = TRUE))),
+                 c(53.6501570133984, 215.174034096945, 438.489020508674, 4951.02367010228, 
+                   63.0146389958929, 220.445112972418, 454.045573572603, 4951.02367010228, 
+                   99.8724522094226, 293.380040891785, 804.740113843912, 4951.02367010228))
+    
+    capture.output({
+      b <- tables_by_formulas(data = z,
+                            table_fun = SuppressDominantCells,
+                            dominanceVar = "value",
+                            contributorVar = "char",
+                            table_formulas = list(table_1 = f1,
+                                                  table_2 = f2,
+                                                  table_3 = f3,
+                                                  table_4 = f4),
+                            collapseAware =  TRUE,
+                            pPercent = 30,
+                            printXdim = printXdim,
+                            printInc = printInc,
+                            linkedGauss = "super-consistent", linkedIntervals = c("super-consistent", "local-bdiag", "global"),
+                            lpPackage = lpPackage, rangePercent = 100)
+      })
+    
+    expect_equal(c(sum(b$up_1 - b$lo_1, na.rm = TRUE), 
+                   sum(b$up - b$lo, na.rm = TRUE), 
+                   sum(b$up_lb - b$lo_lb, na.rm = TRUE), 
+                   sum(b$up_global - b$lo_global, na.rm = TRUE)),
+                 c(1366.98220095118, 
+                   1438.33109987627, 
+                   1597.84174633637, 
+                   1016.64535487785))
+
+  }
+  
+  
+  
 })
+
 
 
 

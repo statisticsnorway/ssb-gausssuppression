@@ -29,10 +29,15 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     singleton, singletonMethod, 
                                     xExtraPrimary, 
                                     whenEmptyUnsuppressed = message, 
+                                    z = rep(0, ncol(x)),
+                                    rangeLimits = data.frame(a = rep(0, ncol(x))),
+                                    lpPackage = NULL, 
                                     ..., 
                                     dup_id = NULL,
                                     table_memberships = NULL,
                                     cell_grouping = TRUE,
+                                    super_consistent = FALSE, 
+                                    linkedIntervals = "local-bdiag", 
                                     iterBackTracking = 0L, 
                                     sequential = TRUE,
                                     printInc = TRUE,
@@ -115,6 +120,15 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       if (use_cell_grouping) {
         cell_grouping <- orig_col
       }
+      if ("global" %in% linkedIntervals) {
+        x_g <- x
+        z_g <- z
+        primary_g <- primary
+        hidden_g <- hidden
+        forced_g <- forced
+      }
+      z <- z[orig_col]
+      rangeLimits <- rangeLimits[orig_col, , drop = FALSE]
       x <- Matrix::bdiag(table_x)
       colnames(x) <- table_x_cnames 
       rm(table_x)
@@ -311,6 +325,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     singleton <- rbind_singleton(singleton)
 
     x <- Matrix::bdiag(x)
+    z <- unlist(z)
+    rangeLimits <- SSBtools::RbindAll(rangeLimits)
+    
     if (!is.null(dup_id)) {
       fcgac <- fix_cell_grouping_and_candidates(dup_id, candidates, cumsum_0_ncol_x)
       candidates <- fcgac$candidates
@@ -320,32 +337,152 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
       cell_grouping <- NULL
     }
   }
+ 
+  if (super_consistent) {
+    ncol_old <- ncol(x)
+    x_ <- cbind(x, x0diff(x, repeated_as_integer(cell_grouping)))
+    forced_ <- c(forced, SeqInc(ncol_old + 1, ncol(x_)))
+    if (get0("super_consistent_cell_grouping", ifnotfound = FALSE)) {
+      cell_grouping_ <- c(cell_grouping, rep(0L, ncol(x_) - ncol_old))
+      message('"super_consistent" with "cell_grouping"')
+    } else {
+      cell_grouping_ <- NULL
+    }
+    table_id_ <- NULL
+  } else {
+    x_ <- x
+    forced_ <- forced
+    cell_grouping_ = cell_grouping
+    table_id_ = table_id
+  }
   
   if (printInc) {
     if (is.null(cell_grouping)) {
       cat_linkedGauss("local-bdiag")
     } else {
-      cat_linkedGauss("consistent")
+      if (super_consistent) {
+        cat_linkedGauss("super-consistent")
+      } else {
+        cat_linkedGauss("consistent")
+      }
     }
   }
   
-  secondary <- GaussSuppression(x = x, 
+  secondary <- GaussSuppression(x = x_, 
                                 ...,
                                 candidates = candidates, 
                                 primary = primary, 
-                                forced = forced, 
+                                forced = forced_, 
                                 hidden = hidden, 
                                 singleton = singleton, 
                                 singletonMethod = singletonMethod, 
                                 whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
-                                cell_grouping = cell_grouping,
-                                table_id = table_id,
+                                cell_grouping = cell_grouping_,
+                                table_id = table_id_,
                                 auto_anySumNOTprimary = FALSE,
+                                auto_subSumAny = FALSE,
                                 printInc = printInc,
                                 printXdim = printXdim)
   
   unsafe <- -secondary[secondary < 0]
   secondary <- secondary[secondary > 0]
+  
+
+
+  if(!is.null(lpPackage)){
+    
+    if(sum(rangeLimits, na.rm = TRUE)){
+      interval_suppressed <- interval_suppression(x = x, 
+                                  candidates = candidates, 
+                                  primary = primary, 
+                                  secondary = secondary,
+                                  forced = forced, 
+                                  hidden = hidden, 
+                                  singleton = singleton, 
+                                  singletonMethod = singletonMethod, 
+                                  whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
+                                  cell_grouping = {if (linkedIntervals[1] == "local-bdiag") NULL else cell_grouping},
+                                  ...,
+                                  xExtraPrimary = NULL,
+                                  lpPackage = lpPackage,
+                                  rangeLimits = rangeLimits,
+                                  z = z,
+                                  printInc = printInc,
+                                  printXdim = printXdim,
+                                  auto_anySumNOTprimary = FALSE,
+                                  auto_subSumAny = FALSE)
+      secondary <-  interval_suppressed[[1]]
+      gauss_intervals <- interval_suppressed[[2]]
+    } else {
+      gauss_intervals <- ComputeIntervals_(
+        x = x,
+        z = z,
+        primary = primary,
+        secondary = secondary,
+        hidden = hidden, 
+        forced = forced,
+        minVal = NULL,
+        allInt = FALSE,
+        sparseConstraints = TRUE,
+        lpPackage = lpPackage,
+        gaussI = TRUE,
+        cell_grouping = {if (linkedIntervals[1] == "local-bdiag") NULL else cell_grouping}
+      ) 
+      gauss_intervals <- as.data.frame(gauss_intervals)
+    }
+    
+  } else {
+    gauss_intervals <- NULL
+  }
+  
+  
+  if(!is.null(lpPackage) & length(linkedIntervals) > 1){
+    short_name_linked = c(`local-bdiag` = "lb", `super-consistent` = "sc", global = "global")
+    for(i in SeqInc(2, length(linkedIntervals))){
+      if(linkedIntervals[i] %in% c("local-bdiag", "super-consistent")){
+        gauss_intervals_extra = as.data.frame(
+          ComputeIntervals_(
+            x = x,
+            z = z,
+            primary = primary,
+            secondary = secondary,
+            hidden = hidden, 
+            forced = forced,
+            minVal = NULL,
+            allInt = FALSE,
+            sparseConstraints = TRUE,
+            lpPackage = lpPackage,
+            gaussI = TRUE,
+            cell_grouping = {if (linkedIntervals[i] == "local-bdiag") NULL else cell_grouping}
+          )
+        )
+      }
+      if(linkedIntervals[i] %in% c("global")){
+        gauss_intervals_extra = as.data.frame(
+          ComputeIntervals_(
+            x = x_g,
+            z = z_g,
+            primary = primary_g,
+            secondary =  unique(orig_col[secondary]),
+            hidden = hidden_g, 
+            forced = forced_g,
+            minVal = NULL,
+            allInt = FALSE,
+            sparseConstraints = TRUE,
+            lpPackage = lpPackage,
+            gaussI = TRUE,
+            cell_grouping = NULL 
+          )
+        )
+        gauss_intervals_extra = gauss_intervals_extra[orig_col, , drop = FALSE]  # Possible to move code to avoid this
+      }
+      
+      names(gauss_intervals_extra) = paste(names(gauss_intervals_extra), short_name_linked[linkedIntervals[i]], sep = "_")
+      gauss_intervals = cbind(gauss_intervals, gauss_intervals_extra)
+    }
+  }
+  
+  
   
   if (is.null(table_memberships)) {
     secondary <- as_list_from_not_logical(secondary, cumsum_0_ncol_x)
@@ -353,7 +490,12 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     for(i in seq_along(secondary)){
       secondary[[i]] <- c(secondary[[i]], -unsafe[[i]])
     }
-    return(secondary)
+    if (!is.null(gauss_intervals)) {
+      return(list(secondary = secondary, 
+                  gauss_intervals = as_data_frame_list(gauss_intervals, cumsum_0_ncol_x)))
+    } else {
+      return(secondary)
+    }
   }
   
   not_secondary <- rep(TRUE, length(orig_col))
@@ -368,9 +510,25 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
   if (length(unique(orig_col)) != length(secondary_out) + length(not_secondary_out)) {
     message_fun("Inconsistent suppression across common cells within the algorithm")
   }
-  c(secondary_out, -unique(orig_col[unsafe]))
+  secondary <- c(secondary_out, -unique(orig_col[unsafe]))
+  if (!is.null(gauss_intervals)) {
+      # same interval calculated several times, to be fixed 
+    gauss_intervals <- gauss_intervals_orig_col(gauss_intervals, orig_col)
+    return(list(secondary, gauss_intervals))
+  }
+  secondary
 }
 
+
+as_data_frame_list <- function(x, cumsum_0_ncol_x) {
+  n <- length(cumsum_0_ncol_x) - 1
+  x_list <- vector("list", n)
+  for (i in seq_len(n)) {
+    r <- x > cumsum_0_ncol_x[i] & x <= cumsum_0_ncol_x[i + 1]
+    x_list[[i]] <- x[SSBtools::SeqInc(cumsum_0_ncol_x[i] + 1, cumsum_0_ncol_x[i + 1]), , drop = FALSE]
+  }
+  x_list
+}
 
 as_list_from_not_logical <- function(x, cumsum_0_ncol_x) {
   n <- length(cumsum_0_ncol_x) - 1
@@ -721,3 +879,78 @@ removeDuplicatedRows <- function(x, singleton) {
 cat_linkedGauss <- function(linkedGauss = "consistent") {
   cat('\n====== Linked GaussSuppression by "', linkedGauss, '" algorithm:\n\n', sep = "")
 }
+
+
+
+
+
+x0diff <- function(x, cell_grouping){
+  uc = unique(cell_grouping)
+  uc = uc[uc!=0]
+  
+  ma = match(uc, cell_grouping)
+  xuc = x[ , ma,drop = FALSE]
+  m = x[, integer(0),drop=FALSE]
+  
+  cell_grouping[ma[!is.na(ma)]] <- 0L
+  
+  while(any(cell_grouping != 0)){
+    ma = match(uc, cell_grouping)
+    m = cbind(m, xuc[ , !is.na(ma),drop = FALSE] - x[ , ma[!is.na(ma)],drop = FALSE])
+    cell_grouping[ma[!is.na(ma)]] <- 0L 
+  }
+  m[ , !DummyDuplicated(m, rnd = TRUE)]
+}
+
+
+# Copy of SSBtools:::repeated_as_integer
+# Replaces non-zero elements occurring at least twice 
+# with unique integer group codes; all others become 0.
+repeated_as_integer <- function(a) {
+  a_non0 <- a[a != 0]
+  a_dup <- a %in% unique(a_non0[duplicated(a_non0)])
+  b <- rep(0L, length(a))
+  b[a_dup] <- as.integer(factor(a[a_dup]))
+  b
+}
+
+
+
+# Function to make sure maximum of lower bounds 
+#                   and minimum of upper bounds 
+gauss_intervals_orig_col = function(gauss_intervals, orig_col){
+  ma <- match(seq_len(max(orig_col)), orig_col)
+  gauss_intervals_out <- gauss_intervals[ma, ]
+  for(i in which(substr(names(gauss_intervals),1,2) == "lo")){
+    gauss_intervals_out[[i]] = order_matched(gauss_intervals[[i]], orig_col, TRUE)
+  }
+  for(i in which(substr(names(gauss_intervals),1,2) == "up")){
+    gauss_intervals_out[[i]] = order_matched(gauss_intervals[[i]], orig_col, FALSE)
+  }
+  gauss_intervals_out
+}
+
+order_matched <- function(x, orig_col, decreasing = FALSE) {
+  ord <- order(x, decreasing = decreasing)
+  x <- x[ord]
+  orig_col <- orig_col[ord]
+  ma <- match(seq_len(max(orig_col)), orig_col) 
+  x[ma]
+}
+
+
+
+ComputeIntervals_ <- function(..., x, primary, secondary, hidden, forced) {
+  suppressed <- rep(FALSE, ncol(x))
+  suppressed[primary] <- TRUE
+  suppressed[secondary] <- TRUE
+  suppressed[hidden] <- TRUE  # in interval computation, hidden similar to secondary
+  suppressed[forced] <- FALSE
+  ComputeIntervals(..., x = x, primary = primary, suppressed = suppressed)
+}
+
+  
+short_name_linked = c(`local-bdiag` = "lb", `super-consistent` = "sc", global = "global")
+  
+  
+
