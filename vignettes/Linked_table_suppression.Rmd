@@ -46,6 +46,8 @@ Below we start with some examples of protected tables with alternative methods.
 Then we show in more detail different function calls that achieve this.
 We also discuss the parameters `recordAware` and `collapseAware`.
 
+Finally, an example with interval protection is also shown.
+
 
 ## Input data and examples 
 
@@ -294,3 +296,71 @@ In our example, this means that the combination `"consistent"` and `collapseAwar
 For more details on parameters and options, see the documentation for `SuppressLinkedTables()`.
 
 
+
+
+## Interval protection
+
+Intervals for the primary suppressed cells are computed whenever the `lpPackage` parameter is specified.
+When `linkedGauss = "super-consistent"`, intervals can be calculated using this method as well.  
+
+There are several possibilities. See the documentation for the parameter `linkedIntervals` in 
+the help page for `SuppressLinkedTables()`.
+
+If `rangePercent` and/or `rangeMin` are provided, further suppression is performed to ensure
+that the interval width requirements are met.
+See the help page for `GaussSuppressionFromData()`, under the description of the `lpPackage` parameter, for more details.
+
+In the example below, the required interval width is 4.
+To achieve this, two additional cells are suppressed: *Portugal-2015* and *Spain-2015*.
+Without this additional suppression, some intervals are as narrow as 3 (see variables `lo_1` and `up_1` below).
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+lpPackage <- "highs" 
+if (!requireNamespace(lpPackage, quietly = TRUE)) {
+  cat(paste0("Note: The final part of this vignette requires the suggested package '", lpPackage, "' which is not installed. That part has been skipped.\n"))
+  knitr::knit_exit()
+}
+```
+
+
+\
+<p style="text-align: center;"> <font size = 4> **Table 4**: Linked suppressed tables with intervals by <br> **`linkedGauss = "super-consistent", rangeMin = 4`**</font> </p>
+<div style="display: flex;  align-items: flex-start;">
+```{r echo=FALSE}
+P(data = dataset, fun = SuppressSmallCounts1,
+  withinArg = list(list(formula = f1), list(formula = f2)), 
+  freqVar = "freq", maxN = 2, extend0 = FALSE, linkedGauss = "super-consistent",
+  lpPackage = "highs", rangeMin = 4,
+  formula = f1, item = 1, timevar = "eu",
+  print_expr = 'ifelse(is.na(lo), freq, paste0(freq, " [", lo, ", ", up, "]"))')
+P(data = dataset, fun = SuppressSmallCounts1,
+  withinArg = list(list(formula = f1), list(formula = f2)), 
+  freqVar = "freq", maxN = 2, extend0 = FALSE, linkedGauss = "super-consistent",
+  lpPackage = "highs", rangeMin = 4,
+  formula = f2, item = 2, timevar = "geo",
+  print_expr = 'ifelse(is.na(lo), freq, paste0(freq, " [", lo, ", ", up, "]"))')
+```
+</div>
+  \
+
+This functionality can be used with all the function calls above. 
+Below is shown `SuppressLinkedTables()`  with `dimVar`.
+
+
+```{r}
+output <- SuppressLinkedTables(data = dataset,
+                               fun = SuppressSmallCounts, 
+                               withinArg = list(table_1 = list(dimVar = c("age", "eu", "year")), 
+                                                table_2 = list(dimVar = c("geo", "year"))),
+                               freqVar = "freq", 
+                               maxN = 2,
+                               extend0 = FALSE, 
+                               removeEmpty = TRUE,
+                               linkedGauss = "super-consistent",
+                               lpPackage = "highs", 
+                               rangeMin = 4)
+
+print(output[["table_1"]])
+print(output[["table_2"]])
+```
