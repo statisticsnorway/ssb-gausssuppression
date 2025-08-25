@@ -1,0 +1,296 @@
+---
+title: "Linked table suppression"
+author: ""
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Linked table suppression}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+options(rmarkdown.html_vignette.check_title = FALSE)
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r include = FALSE}
+htmltables = TRUE
+if(htmltables){
+  source("GaussKable.R")
+  P = function(..., timevar= "geo", fun = SuppressSmallCounts) G(fun = fun, timevar = timevar, ...)
+} else { 
+  P = function(...) cat("Formatted table not avalable")
+}
+
+SuppressSmallCounts1 <- function(withinArg, item, formula, ...){
+  SuppressLinkedTables(..., fun = SuppressSmallCounts, withinArg = withinArg)[[item]]
+}
+
+
+```
+
+
+
+
+## Introduction 
+
+By using the formula parameter, it is already possible to protect linked tables with the functions described in the other vignettes. The result is the strictest form of protection, which we call global protection.
+
+This vignette illustrates alternative methods for linked tables. A common method for such protection is *back-tracking* where one iterates until a consistent solution is found. In the functions described below, such a method can be achieved by specifying `linkedGauss = "back-tracking"`. With the GaussSuppression package, one can find such a consistent solution using an improved approach, avoiding the need for iteration.
+
+Below we start with some examples of protected tables with alternative methods.
+Then we show in more detail different function calls that achieve this.
+We also discuss the parameters `recordAware` and `collapseAware`.
+
+
+## Input data and examples 
+
+We use a modified version of the *example 1* dataset used elsewhere.
+
+```{r}
+library(GaussSuppression)
+dataset <- SSBtoolsData("example1")
+dataset <- dataset[c(1, 2, 4, 6, 8, 10, 12, 13, 14, 15), ]
+dataset$freq = c(6, 8, 9, 1, 2, 4, 3, 7, 2, 2)
+print(dataset)
+```
+
+
+In the examples, we work with two linked tables:  
+- a three-way table where `age`, `eu`, and `year` are crossed, and  
+- a two-way table where `geo` and `year` are crossed.  
+
+In this example, small counts (1s and 2s) are protected.  All zeros are treated as known structural zeros and are omitted from both the input and the output.  
+
+As in the other vignettes, primary suppressed cells are underlined and labeled in red, while the secondary suppressed cells are labeled in purple.
+
+We first illustrate local protection, where the tables are protected separately without any coordination between them.
+
+
+```{r echo=FALSE}
+f1 <- ~age*eu*year
+f2 <- ~geo*year
+```
+
+
+\
+<p style="text-align: center;"> <font size = 4> **Table 1**: Linked suppressed tables by <br> **`linkedGauss = "local"`** </font> </p>
+<div style="display: flex;  align-items: flex-start;">
+```{r echo=FALSE}
+P(data = dataset, formula = f1, freqVar = "freq", maxN = 2, extend0 = FALSE, timevar = "eu")
+P(data = dataset, formula = f2, freqVar = "freq", maxN = 2, extend0 = FALSE,timevar = "geo")
+```
+</div>
+\
+
+
+Clearly, this is not a satisfactory solution.
+The totals for 2015 and 2016 are suppressed in one table, but not in the other. 
+Furthermore, there is also an inconsistency for *Iceland-2014*, which is the same as *nonEU-2014*.
+
+We continue with consistent protection.
+
+
+\
+<p style="text-align: center;"> <font size = 4> **Table 2**: Linked suppressed tables by <br> **`linkedGauss = "consistent"`** </font> </p>
+<div style="display: flex;  align-items: flex-start;">
+```{r echo=FALSE}
+P(data = dataset, fun = SuppressSmallCounts1,
+  withinArg = list(list(formula = f1), list(formula = f2)), 
+  freqVar = "freq", maxN = 2, extend0 = FALSE, linkedGauss = "consistent",
+  formula = f1, item = 1, timevar = "eu")
+P(data = dataset, fun = SuppressSmallCounts1,
+  withinArg = list(list(formula = f1), list(formula = f2)), 
+  freqVar = "freq", maxN = 2, extend0 = FALSE, linkedGauss = "consistent",
+  formula = f2, item = 2, timevar = "geo")
+```
+</div>
+\
+
+
+The inconsistency problems are now avoided.  
+
+However, a remaining problem with this solution is that *Spain-2015* can be derived from *EU-2015* and *Portugal-2015*.  
+
+Finally, we illustrate an improved form of consistent protection, denoted as *super-consistent*, which also avoids this problem.
+
+
+
+\
+<p style="text-align: center;"> <font size = 4> **Table 3**: Linked suppressed tables by <br> **`linkedGauss = "super-consistent"`**</font> </p>
+<div style="display: flex;  align-items: flex-start;">
+```{r echo=FALSE}
+P(data = dataset, fun = SuppressSmallCounts1,
+  withinArg = list(list(formula = f1), list(formula = f2)), 
+  freqVar = "freq", maxN = 2, extend0 = FALSE, linkedGauss = "super-consistent",
+  formula = f1, item = 1, timevar = "eu")
+P(data = dataset, fun = SuppressSmallCounts1,
+  withinArg = list(list(formula = f1), list(formula = f2)), 
+  freqVar = "freq", maxN = 2, extend0 = FALSE, linkedGauss = "super-consistent",
+  formula = f2, item = 2, timevar = "geo")
+```
+</div>
+\
+
+
+The suppressed cells in each table correspond to related equations that cannot be solved.
+The *super-consistent* method makes use of the fact that common cells across tables must have the same value. Thus, the equations from the different tables can be combined when searching for solutions.
+The *super-consistent* method ensures that suppressed cells cannot be uniquely determined from the combined system of equations.
+However, the coordination is not as strict as in the global method, where the system of equations becomes even larger.
+In this particular case, the *super-consistent* solution turns out to be the same as the global one.
+
+
+
+## Function calls and output
+To achieve both treating zeros as known structural zeros and omitting them from the output, 
+we use the parameter settings `extend0 = FALSE` and `removeEmpty = TRUE`.
+
+In `SuppressLinkedTables()`, the argument `withinArg` specifies which parameters may differ between the linked tables.
+In our examples, we choose this to be either `dimVar`, `hierarchies`, or `formula`.
+
+The output from `SuppressLinkedTables()` is a list, with one element for each of the linked tables.
+
+
+
+
+## `SuppressLinkedTables()`  with `dimVar`
+
+```{r}
+output <- SuppressLinkedTables(data = dataset,
+              fun = SuppressSmallCounts, 
+              withinArg = list(table_1 = list(dimVar = c("age", "eu", "year")), 
+                               table_2 = list(dimVar = c("geo", "year"))),
+              freqVar = "freq", 
+              maxN = 2,
+              extend0 = FALSE, 
+              removeEmpty = TRUE,
+              linkedGauss = "super-consistent")
+
+print(output[["table_1"]])
+print(output[["table_2"]])
+```
+
+
+
+
+
+## `SuppressLinkedTables()`  with `hierarchies`
+
+First, we need hierarchies for the input. Here, these are generated separately with `SSBtools::FindDimLists()`.
+
+```{r}
+h_age  <- SSBtools::FindDimLists(dataset["age"])[[1]]
+h_geo  <- SSBtools::FindDimLists(dataset["geo"])[[1]]
+h_eu   <- SSBtools::FindDimLists(dataset["eu"])[[1]]
+h_year <- SSBtools::FindDimLists(dataset["year"])[[1]]
+  
+print(h_age)
+print(h_geo)
+print(h_eu)
+print(h_year)
+
+```
+
+The output is identical to using `dimVar`, so we only show the code.
+Note that the only difference is the `withinArg` argument.
+
+
+```{r eval = FALSE}
+output <- SuppressLinkedTables(data = dataset,
+              fun = SuppressSmallCounts, 
+              withinArg = 
+                list(table_1 = list(hierarchies = list(age = h_age, eu = h_eu, year = h_year)), 
+                     table_2 = list(hierarchies = list(geo = h_geo, year = h_year))),
+              freqVar = "freq", 
+              maxN = 2,
+              extend0 = FALSE, 
+              removeEmpty = TRUE,
+              linkedGauss = "super-consistent")
+```
+
+
+
+
+## `SuppressLinkedTables()` with  `formula`
+
+When using `formula`, the output is similar to that obtained with `dimVar` or `hierarchies`.
+The only difference in the output is the ordering of rows, so we only show the code.  
+
+Again, the only difference in the code is the `withinArg` argument.
+However, note that we have omitted `removeEmpty = TRUE` here, since this is the default when a formula is used as input.
+
+```{r eval = FALSE}
+output <- SuppressLinkedTables(data = dataset,
+              fun = SuppressSmallCounts, 
+              withinArg = list(table_1 = list(formula = ~age*eu*year), 
+                               table_2 = list(formula = ~geo*year)),
+              freqVar = "freq", 
+              maxN = 2,
+              extend0 = FALSE,
+              linkedGauss = "super-consistent")
+```
+
+
+
+## `SuppressSmallCounts()` with  `formula` and `linkedGauss`
+
+Since only the `formula` parameter varies between the linked tables,
+one option is to run `SuppressSmallCounts()` directly with `formula` as a list and the `linkedGauss` parameter specified.
+Here we show 10 output rows.
+
+
+```{r}
+output <- SuppressSmallCounts(data = dataset,
+              formula = list(table_1 = ~age*eu*year, table_2 = ~geo*year),   
+              freqVar = "freq",
+              maxN = 2,
+              extend0 = FALSE,
+              linkedGauss = "super-consistent") 
+print(output[c(1, 6:7, 12, 19, 23, 25:28), ])
+```
+
+
+
+## `tables_by_formulas()` with  `formula` and `linkedGauss`
+
+Similar output can be obtained by `tables_by_formulas()`.
+In this case, the region variable is specified manually, and table membership variables are included in the output.
+Again, 10 output rows are shown.
+
+
+```{r}
+output <-  tables_by_formulas(data = dataset,
+              table_fun = SuppressSmallCounts,                
+              table_formulas = list(table_1 = ~age*eu*year, table_2 = ~geo*year),   
+              freqVar = "freq",
+              maxN = 2,
+              extend0 = FALSE,
+              linkedGauss = "super-consistent",
+              substitute_vars = list(region = c("geo", "eu"))) 
+              
+print(output[c(1, 6:7, 12, 19, 23, 25:28), ])
+```
+
+
+## The parameters `recordAware` and `collapseAware`
+
+An important issue is which cells are considered common cells.
+In the functions, the parameter `recordAware` is set to `TRUE` by default.
+In this case, common cells are determined based on whether they aggregate the same underlying records.
+This is similar to the use of cell keys, a well-known concept from the cell-key method of statistical disclosure control.
+
+When `recordAware = FALSE`, common cells are instead identified by matching variable combinations.
+This does not always work well. For example, here `recordAware = TRUE` is necessary to capture that *Iceland-2014* and *nonEU-2014* are the same.
+
+A related parameter is `collapseAware`, but it is not available when using `SuppressLinkedTables()`.
+When it is used, even more cells are treated as common cells.
+In particular, the suppression algorithm then automatically accounts for cells in one table that are sums of cells in another table.
+In our example, this means that the combination `"consistent"` and `collapseAware = TRUE` gives the same result as `"super-consistent"`.
+
+For more details on parameters and options, see the documentation for `SuppressLinkedTables()`.
+
+
