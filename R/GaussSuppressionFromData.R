@@ -341,7 +341,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   CheckInput(action_unused_dots, type = "character", alt = c("warn", "abort", "inform", "none"), okNULL = FALSE)
   
   if(action_unused_dots != "none") {
-    allowed_unused_dots <- unique(c(allowed_unused_dots, "printXdim"))  # printXdim may not be registered as used when early return form SSBtools::GaussSuppression() 
+    # extra_allowed_unused since these may not be registered as used 
+    # when early return form SSBtools::GaussSuppression() caused by no primary cells
+    extra_allowed_unused <- c("printXdim", "tolGauss", "whenEmptySuppressed", "whenPrimaryForced", "iWait", "iFunction")
+    allowed_unused_dots <- unique(c(allowed_unused_dots, extra_allowed_unused)) 
     if (hasArg("avoidHierarchical") & hasArg("avoid_hierarchical")) {   # i.e. called from SSBtools::tables_by_formulas()
       allowed_unused_dots <- unique(c(allowed_unused_dots, "avoid_hierarchical", "hierarchical_extend0"))
     }
