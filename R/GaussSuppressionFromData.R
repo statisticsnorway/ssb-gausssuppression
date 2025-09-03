@@ -340,13 +340,25 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   CheckInput(action_unused_dots, type = "character", alt = c("warn", "abort", "inform", "none"), okNULL = FALSE)
   
+  if (is.character(output)) {
+    if (output %in% c("inner", "inner_x", "input2functions", "primary", "inputGaussSuppression", "inputGaussSuppression_x")) {
+      action_unused_dots <- "none"
+    }
+  }
+  
   if(action_unused_dots != "none") {
-    # extra_allowed_unused since these may not be registered as used 
-    # when early return form SSBtools::GaussSuppression() caused by no primary cells
-    extra_allowed_unused <- c("printXdim", "tolGauss", "whenEmptySuppressed", "whenPrimaryForced", "iWait", "iFunction")
+    # extra_allowed_unused since these arguments may not be registered as used 
+    # in special cases, e.g. when no primary suppression occurs
+    extra_allowed_unused <- c(
+      "printXdim", "tolGauss", "whenEmptySuppressed", # SSBtools::GaussSuppression
+      "whenPrimaryForced", "iWait", "iFunction",      # SSBtools::GaussSuppression
+      "avoidHierarchical",    # SSBtools::Extend0fromModelMatrixInput and  SSBtools::FormulaSums
+      "hierarchical_extend0"  # SSBtools::Extend0fromModelMatrixInput
+      )
     allowed_unused_dots <- unique(c(allowed_unused_dots, extra_allowed_unused)) 
-    if (hasArg("avoidHierarchical") & hasArg("avoid_hierarchical")) {   # i.e. called from SSBtools::tables_by_formulas()
-      allowed_unused_dots <- unique(c(allowed_unused_dots, "avoid_hierarchical", "hierarchical_extend0"))
+    if (hasArg("avoidHierarchical") & hasArg("avoid_hierarchical")) {   
+      # i.e. called from SSBtools::tables_by_formulas()
+      allowed_unused_dots <- unique(c(allowed_unused_dots, "avoid_hierarchical"))
     }
     rlang_warn_extra <- generate_rlang_warn_extra(action_unused_dots, 
             note = "See arguments `action_unused_dots` and `allowed_unused_dots` in `?GaussSuppressionFromData`.")
