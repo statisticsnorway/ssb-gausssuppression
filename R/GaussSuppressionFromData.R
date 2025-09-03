@@ -207,12 +207,20 @@
 #' @param action_unused_dots Character string controlling how unused arguments
 #'   in `...` are handled. Internally uses [ellipsis::check_dots_used()] with a
 #'   custom action. One of "warn", "abort", "inform", or "none". The value "none"
-#'   disables the check entirely. Defaults to "warn".
+#'   disables the check entirely. The default is taken from
+#'   `getOption("GaussSuppression.action_unused_dots")`, falling back to "warn"
+#'   if the option is not set. Users can change the default globally with e.g.
+#'   `options(GaussSuppression.action_unused_dots = "abort")`.
 #'
 #' @param allowed_unused_dots Character vector of argument names ignored by the
 #'   unused-argument check. May be useful when this function is wrapped by
 #'   another function, or in other cases where a correctly spelled argument is
-#'   nevertheless not registered as used.
+#'   nevertheless not registered as used. The default is taken from
+#'   `getOption("GaussSuppression.allowed_unused_dots")`, falling back to
+#'   `character(0)` if the option is not set. Users can change the default
+#'   globally with e.g.
+#'   `options(GaussSuppression.allowed_unused_dots = c("plotColor", "lineType"))`.
+
 #'   
 #' @param ... Further arguments to be passed to the supplied functions and to \code{\link[SSBtools]{ModelMatrix}} (such as `inputInOutput` and `removeEmpty`).
 #'
@@ -309,8 +317,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            recordAware = TRUE,
                            collapseAware = FALSE,
                            linkedTables = NULL,
-                           action_unused_dots = "warn",
-                           allowed_unused_dots = character(0)
+                           action_unused_dots  = getOption("GaussSuppression.action_unused_dots", "warn"),
+                           allowed_unused_dots = getOption("GaussSuppression.allowed_unused_dots", character(0))
                            ){ 
   if (!is.null(spec)) {
     if (is.call(spec)) {
