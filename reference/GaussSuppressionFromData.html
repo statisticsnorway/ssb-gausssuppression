@@ -11,7 +11,7 @@ secondary suppression by Gaussian elimination by GaussSuppression"><meta propert
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,7 +94,9 @@ secondary suppression by Gaussian elimination by <code><a href="https://statisti
 <span>    <span class="st">"super-consistent"</span><span class="op">)</span>,</span>
 <span>  recordAware <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  collapseAware <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  linkedTables <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  linkedTables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  action_unused_dots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"GaussSuppression.action_unused_dots"</span>, <span class="st">"inform"</span><span class="op">)</span>,</span>
+<span>  allowed_unused_dots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"GaussSuppression.allowed_unused_dots"</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -379,6 +381,27 @@ Each element in the list contains one or more names of the tables in <code>formu
 The corresponding tables will be combined and treated as a single table by the algorithm.
 For example: <code>linkedTables = list(c("table_1", "table_3"), "table_2")</code>.
 If <code>NULL</code> (default), each table in <code>formula</code> is used individually.</p></dd>
+
+
+<dt id="arg-action-unused-dots">action_unused_dots<a class="anchor" aria-label="anchor" href="#arg-action-unused-dots"></a></dt>
+<dd><p>Character string controlling how unused arguments
+in <code>...</code> are handled. Internally uses <code><a href="https://rlang.r-lib.org/reference/check_dots_used.html" class="external-link">ellipsis::check_dots_used()</a></code> with a
+custom action. One of "warn", "abort", "inform", or "none". The value "none"
+disables the check entirely. The default is taken from
+<code>getOption("GaussSuppression.action_unused_dots")</code>, falling back to "inform"
+if the option is not set. Users can change the default globally with e.g.
+<code>options(GaussSuppression.action_unused_dots = "abort")</code>.</p></dd>
+
+
+<dt id="arg-allowed-unused-dots">allowed_unused_dots<a class="anchor" aria-label="anchor" href="#arg-allowed-unused-dots"></a></dt>
+<dd><p>Character vector of argument names ignored by the
+unused-argument check. May be useful when this function is wrapped by
+another function, or in other cases where a correctly spelled argument is
+nevertheless not registered as used. The default is taken from
+<code>getOption("GaussSuppression.allowed_unused_dots")</code>, falling back to
+<code>character(0)</code> if the option is not set. Users can change the default
+globally with e.g.
+<code>options(GaussSuppression.allowed_unused_dots = c("plotColor", "lineType"))</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
