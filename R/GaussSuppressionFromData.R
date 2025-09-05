@@ -208,7 +208,7 @@
 #'   in `...` are handled. Internally uses [ellipsis::check_dots_used()] with a
 #'   custom action. One of "warn", "abort", "inform", or "none". The value "none"
 #'   disables the check entirely. The default is taken from
-#'   `getOption("GaussSuppression.action_unused_dots")`, falling back to "warn"
+#'   `getOption("GaussSuppression.action_unused_dots")`, falling back to "inform"
 #'   if the option is not set. Users can change the default globally with e.g.
 #'   `options(GaussSuppression.action_unused_dots = "abort")`.
 #'
@@ -316,7 +316,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            recordAware = TRUE,
                            collapseAware = FALSE,
                            linkedTables = NULL,
-                           action_unused_dots  = getOption("GaussSuppression.action_unused_dots", "warn"),
+                           action_unused_dots  = getOption("GaussSuppression.action_unused_dots", "inform"),
                            allowed_unused_dots = getOption("GaussSuppression.allowed_unused_dots", character(0))
                            ){ 
   if (!is.null(spec)) {

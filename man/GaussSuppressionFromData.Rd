@@ -48,7 +48,7 @@ GaussSuppressionFromData(
   recordAware = TRUE,
   collapseAware = FALSE,
   linkedTables = NULL,
-  action_unused_dots = getOption("GaussSuppression.action_unused_dots", "warn"),
+  action_unused_dots = getOption("GaussSuppression.action_unused_dots", "inform"),
   allowed_unused_dots = getOption("GaussSuppression.allowed_unused_dots", character(0))
 )
 }
@@ -257,7 +257,7 @@ If \code{NULL} (default), each table in \code{formula} is used individually.}
 in \code{...} are handled. Internally uses \code{\link[ellipsis:check_dots_used]{ellipsis::check_dots_used()}} with a
 custom action. One of "warn", "abort", "inform", or "none". The value "none"
 disables the check entirely. The default is taken from
-\code{getOption("GaussSuppression.action_unused_dots")}, falling back to "warn"
+\code{getOption("GaussSuppression.action_unused_dots")}, falling back to "inform"
 if the option is not set. Users can change the default globally with e.g.
 \code{options(GaussSuppression.action_unused_dots = "abort")}.}
 
