@@ -1,3 +1,17 @@
+## GaussSuppression 1.1.6
+* New checks for unused arguments in `...` using 
+  [ellipsis::check_dots_used()](https://ellipsis.r-lib.org/reference/check_dots_used.html),
+  so that misspelled or irrelevant arguments are not silently ignored.
+  - Introduces new arguments in `GaussSuppressionFromData()`, available through all wrappers:
+    - `action_unused_dots` controls how unused arguments are handled. 
+    - `allowed_unused_dots` specifies argument names to ignore in the unused-argument check.
+  - Users can configure global defaults via options 
+     `GaussSuppression.action_unused_dots` and
+     `GaussSuppression.allowed_unused_dots`.
+  - Note: The default for `action_unused_dots` is `"inform"` as a cautious starting point.
+  This may change to `"warn"` in a future release.
+  - Thanks to Jonas Lindblad for [issue #124](https://github.com/statisticsnorway/ssb-gausssuppression/issues/124).
+
 ## GaussSuppression 1.1.5
 * Major update to the functionality via **`SuppressLinkedTables()`** and **`linkedGauss`**:  
   - New method `"super-consistent"` is now the `linkedGauss` default in `SuppressLinkedTables()`, 
