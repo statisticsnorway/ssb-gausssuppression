@@ -368,72 +368,33 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
     }
   }
   
-  secondary <- GaussSuppression(x = x_, 
-                                ...,
-                                candidates = candidates, 
-                                primary = primary, 
-                                forced = forced_, 
-                                hidden = hidden, 
-                                singleton = singleton, 
-                                singletonMethod = singletonMethod, 
-                                whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
-                                cell_grouping = cell_grouping_,
-                                table_id = table_id_,
-                                auto_anySumNOTprimary = FALSE,
-                                auto_subSumAny = FALSE,
-                                printInc = printInc,
-                                printXdim = printXdim)
   
+  secondary_with_int <- GaussSuppression_with_intervals(x = x_, 
+          candidates = candidates, 
+          primary = primary, 
+          forced = forced_, 
+          hidden = hidden, 
+          singleton = singleton, 
+          singletonMethod = singletonMethod, 
+          whenEmptyUnsuppressed = whenEmptyUnsuppressed,
+          lpPackage = lpPackage,
+          rangeLimits = rangeLimits,
+          z = z,
+          printInc = printInc,
+          printXdim = printXdim,
+          ..., 
+          cell_grouping = cell_grouping_, 
+          table_id = table_id,
+          x_interval = x,
+          forced_interval = forced, 
+          cell_grouping_interval = {if (linkedIntervals[1] == "local-bdiag") NULL else cell_grouping})
+  
+                      
+  
+  secondary <- secondary_with_int$secondary
+  gauss_intervals <- secondary_with_int$gauss_intervals
   unsafe <- -secondary[secondary < 0]
   secondary <- secondary[secondary > 0]
-  
-
-
-  if(!is.null(lpPackage)){
-    
-    if(sum(rangeLimits, na.rm = TRUE)){
-      interval_suppressed <- interval_suppression(x = x, 
-                                  candidates = candidates, 
-                                  primary = primary, 
-                                  secondary = secondary,
-                                  forced = forced, 
-                                  hidden = hidden, 
-                                  singleton = singleton, 
-                                  singletonMethod = singletonMethod, 
-                                  whenEmptyUnsuppressed = whenEmptyUnsuppressed, 
-                                  cell_grouping = {if (linkedIntervals[1] == "local-bdiag") NULL else cell_grouping},
-                                  ...,
-                                  xExtraPrimary = NULL,
-                                  lpPackage = lpPackage,
-                                  rangeLimits = rangeLimits,
-                                  z = z,
-                                  printInc = printInc,
-                                  printXdim = printXdim,
-                                  auto_anySumNOTprimary = FALSE,
-                                  auto_subSumAny = FALSE)
-      secondary <-  interval_suppressed[[1]]
-      gauss_intervals <- interval_suppressed[[2]]
-    } else {
-      gauss_intervals <- ComputeIntervals_(
-        x = x,
-        z = z,
-        primary = primary,
-        secondary = secondary,
-        hidden = hidden, 
-        forced = forced,
-        minVal = NULL,
-        allInt = FALSE,
-        sparseConstraints = TRUE,
-        lpPackage = lpPackage,
-        gaussI = TRUE,
-        cell_grouping = {if (linkedIntervals[1] == "local-bdiag") NULL else cell_grouping}
-      ) 
-      gauss_intervals <- as.data.frame(gauss_intervals)
-    }
-    
-  } else {
-    gauss_intervals <- NULL
-  }
   
   
   if(!is.null(lpPackage) & length(linkedIntervals) > 1){
