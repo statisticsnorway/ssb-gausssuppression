@@ -47,7 +47,9 @@ GaussSuppressionFromData(
     "super-consistent"),
   recordAware = TRUE,
   collapseAware = FALSE,
-  linkedTables = NULL
+  linkedTables = NULL,
+  action_unused_dots = getOption("GaussSuppression.action_unused_dots", "inform"),
+  allowed_unused_dots = getOption("GaussSuppression.allowed_unused_dots", character(0))
 )
 }
 \arguments{
@@ -250,6 +252,23 @@ Each element in the list contains one or more names of the tables in \code{formu
 The corresponding tables will be combined and treated as a single table by the algorithm.
 For example: \code{linkedTables = list(c("table_1", "table_3"), "table_2")}.
 If \code{NULL} (default), each table in \code{formula} is used individually.}
+
+\item{action_unused_dots}{Character string controlling how unused arguments
+in \code{...} are handled. Internally uses \code{\link[ellipsis:check_dots_used]{ellipsis::check_dots_used()}} with a
+custom action. One of "warn", "abort", "inform", or "none". The value "none"
+disables the check entirely. The default is taken from
+\code{getOption("GaussSuppression.action_unused_dots")}, falling back to "inform"
+if the option is not set. Users can change the default globally with e.g.
+\code{options(GaussSuppression.action_unused_dots = "abort")}.}
+
+\item{allowed_unused_dots}{Character vector of argument names ignored by the
+unused-argument check. May be useful when this function is wrapped by
+another function, or in other cases where a correctly spelled argument is
+nevertheless not registered as used. The default is taken from
+\code{getOption("GaussSuppression.allowed_unused_dots")}, falling back to
+\code{character(0)} if the option is not set. Users can change the default
+globally with e.g.
+\code{options(GaussSuppression.allowed_unused_dots = c("plotColor", "lineType"))}.}
 }
 \value{
 Aggregated data with suppression information

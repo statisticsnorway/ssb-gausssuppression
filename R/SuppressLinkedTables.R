@@ -261,6 +261,11 @@ SuppressLinkedTables <- function(data = NULL,
         stop("non-named element of withinArg must be a data frame")
       }
     } else {
+      if (i == 2) { # To prevent multiple identical unused-dots warnings 
+        if (!("action_unused_dots" %in% unlist(lapply(withinArg, names)))) {
+          sysCall[["action_unused_dots"]] <- "none"
+        }
+      }
       env_list[[i]] <- eval(as.call(c(sysCall, withinArg[[i]], output = "pre_gauss_env")), envir = parentFrame)
     }
   }
