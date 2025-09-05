@@ -1,6 +1,7 @@
 ## GaussSuppression 1.1.6
 * New checks for unused arguments in `...` using 
-  [ellipsis::check_dots_used()](https://ellipsis.r-lib.org/reference/check_dots_used.html).
+  [ellipsis::check_dots_used()](https://ellipsis.r-lib.org/reference/check_dots_used.html),
+  so that misspelled or irrelevant arguments are not silently ignored.
   - Introduces new arguments in `GaussSuppressionFromData()`, available through all wrappers:
     - `action_unused_dots` controls how unused arguments are handled. 
     - `allowed_unused_dots` specifies argument names to ignore in the unused-argument check.
