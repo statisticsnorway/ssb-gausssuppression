@@ -415,25 +415,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     OutputFunction <- output
     output <- "publish"
   } else {
-    if (!is.null(lpPackage)) {
-      if (!requireNamespace(lpPackage, quietly = TRUE)) {
-        on.exit(add = FALSE)  # Avoids unused-dots check on error
-        stop(paste0("Package '", lpPackage, "' is not available."))
-      }
-      if (hasArg(rangePercent) | hasArg(rangeMin)) {
-        # if (!(hasArg(rangePercent) & hasArg(rangeMin))) {
-        #   stop("Both rangePercent and rangeMin must be specified, not just one of them.")
-        # }
-        OutputFunction <- OutputFixRiskyIntervals
-      } else {
-        OutputFunction <- OutputIntervals
-      }
-      if( !(identical(linkedGauss, "global") | is.null(linkedGauss))) {    ### INTERVALS ANOTHER WAY 
-        OutputFunction <- NULL
-      } 
-    } else {
-      OutputFunction <- NULL
+    OutputFunction <- NULL
+  }  
+    
+  if (!is.null(lpPackage)){
+    if (!requireNamespace(lpPackage, quietly = TRUE)) {
+      on.exit(add = FALSE)  # Avoids unused-dots check on error
+      stop(paste0("Package '", lpPackage, "' is not available."))
     }
+    GaussSuppression <- GaussSuppression_with_intervals
   }
   
   
