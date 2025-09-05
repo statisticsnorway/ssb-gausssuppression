@@ -15,7 +15,6 @@ interval_suppression <- function(x,
                                  rangeLimits,
                                  z,
                                  printInc,
-                                 printXdim,
                                  minVal = NULL,
                                  allInt = FALSE,
                                  gaussIFix = FALSE){

@@ -150,6 +150,8 @@ MagnitudeRule <- function(data,
                           intervalVar = dominanceVar,
                           ...) {
   if (!is.null(pPercent)) {
+    force(n) # To avoid unused-dots-warning 
+    force(k) # To avoid unused-dots-warning
     n <- 1:2
     k <- c(0, 0)
   }
