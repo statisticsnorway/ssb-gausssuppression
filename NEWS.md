@@ -9,6 +9,7 @@
      `GaussSuppression.allowed_unused_dots`.
   - Note: The default for `action_unused_dots` is `"inform"` as a cautious starting point.
   This may change to `"warn"` in a future release.
+  - Thanks to Jonas Lindblad for [issue #124](https://github.com/statisticsnorway/ssb-gausssuppression/issues/124).
 
 ## GaussSuppression 1.1.5
 * Major update to the functionality via **`SuppressLinkedTables()`** and **`linkedGauss`**:  
