@@ -1167,3 +1167,10 @@ generate_touch_dots <- function(allowed_unused_dots, envir = parent.frame()){
   fun_txt <- paste("function(", paste(paste(a,"= 1"), collapse = ", "), ", ...){\n ", paste(paste("force(", a, ")"), collapse = "\n "), "\n }")
   eval(parse(text = fun_txt), envir = envir)
 }
+
+
+
+# To avoid check problems
+utils::globalVariables(c("rangeMin", "rangePercent"))
+
+
