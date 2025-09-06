@@ -65,11 +65,9 @@ FixRiskyIntervals <-
     
     candidates <- unique(c(candidates, seq_len(ncol(x))))
     
-    
-    rangeLimits_ <- rep(NaN, ncol(x))
-    rangeLimits_[primary] <- rangeLimits
-    
-    rangeLimits_ <-  rangeLimits_[candidates]
+    rangeLimits_ <- matrix(NA, ncol(x), ncol(rangeLimits), dimnames = list(NULL, names(rangeLimits)))
+    rangeLimits_[primary, ] <- as.matrix(rangeLimits)
+    rangeLimits_ <- rangeLimits_[candidates, , drop = FALSE]
     
     rearrange <- order(candidates)
     
@@ -93,7 +91,8 @@ FixRiskyIntervals <-
     if(any(cell_grouping != 0)){
       x <- cbind(x, x0diff(x, cell_grouping))
       z <- c(z, rep(0, ncol(x) - input_ncol_x))
-      rangeLimits_ <- c(rangeLimits_, rep(NA, ncol(x) - input_ncol_x))
+      rangeLimits_ <- rbind(rangeLimits_, matrix(NA, ncol(x) - input_ncol_x, ncol(rangeLimits_)))
+      
       avoid_duplicate_computation <- TRUE   # Similar code as in ComputeIntervals()
       if (avoid_duplicate_computation) {
           duplicated_cell_grouping <- which(cell_grouping != 0 & duplicated(cell_grouping))
@@ -125,7 +124,7 @@ FixRiskyIntervals <-
     x <- x[, c(published, cell_diff, primary, secondary), drop = FALSE]
     z <- z[c(published, cell_diff, primary, secondary)]
     
-    rangeLimits_ <- rangeLimits_[c(published, cell_diff, primary, secondary)] 
+    rangeLimits_ <- rangeLimits_[c(published, cell_diff, primary, secondary), , drop = FALSE] 
     
     published2 <- seq_len(length(published))
     cell_diff2 <- length(published) + seq_len(length(cell_diff))
@@ -150,7 +149,7 @@ FixRiskyIntervals <-
       x <- x[, idxDDunique, drop = FALSE]
       z <- z[idxDDunique]
       
-      rangeLimits_ <- rangeLimits_[idxDDunique]
+      rangeLimits_ <- rangeLimits_[idxDDunique, , drop = FALSE]
       
       candidates_published3 <- candidates_published[idxDDunique] 
       
@@ -390,7 +389,7 @@ RiskyInterInterval <- function(a,
   
   gauss_ranges <- intervals1$up[primary3] - intervals1$lo[primary3]
   
-  risky <- (gauss_ranges - rangeLimits_[primary3]) < 0
+  risky <- (gauss_ranges - rangeLimits_[primary3, "rlim"]) < 0
   risky[is.na(risky)] <- FALSE
   risky
 }

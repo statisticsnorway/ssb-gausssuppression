@@ -24,14 +24,14 @@ interval_suppression <- function(x,
   }
   
   #rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+    
+  rangeLimits <- split_by_intervalVar(rangeLimits)
   
-  if (ncol(rangeLimits) != 1) {
+  if (length(rangeLimits) != 1) {
     stop("Only single intervalVar implemented")
   }
   
-  intervalVar <- colnames(rangeLimits)
-  colnames(rangeLimits) <- paste("rlim", colnames(rangeLimits), sep = "_")
-  num <- as.data.frame(rangeLimits)
+  rangeLimits <- rangeLimits[[1]]
   
   m <- ncol(x)
   
@@ -62,14 +62,14 @@ interval_suppression <- function(x,
   )
   
   gauss_ranges <- gauss_intervals[, 2] - gauss_intervals[, 1]
-  risky <- (gauss_ranges - rangeLimits[, 1]) < 0
+  risky <- (gauss_ranges - rangeLimits[, "rlim"]) < 0
   risky[!primary] <- FALSE
   
   risky[is.na(risky)] <- FALSE    #  MISSING SET TO FALSE HERE, MISSING WILL CAUSE WARNING LATER
   
   
   colnames(gauss_intervals) <- paste(colnames(gauss_intervals), "1", sep = "_")
-  num <- cbind(num, as.data.frame(gauss_intervals))
+  num <- as.data.frame(gauss_intervals)
   
   newPrimary <- FixRiskyIntervals(
     x = x,
@@ -81,7 +81,7 @@ interval_suppression <- function(x,
     allInt = allInt,
     gaussI = gaussIFix,
     lpPackage = lpPackage,
-    rangeLimits =  rangeLimits[risky, 1],
+    rangeLimits =  rangeLimits[risky, , drop = FALSE],
     cell_grouping = cell_grouping
   )
   
@@ -126,7 +126,7 @@ interval_suppression <- function(x,
   
   
   gauss_ranges <- gauss_intervals[, 2] - gauss_intervals[, 1]
-  risky <- (gauss_ranges - rangeLimits[, 1]) < 0
+  risky <- (gauss_ranges - rangeLimits[, "rlim"]) < 0
   risky[!primary] <- FALSE
   
   if (any(is.na(risky))) {
@@ -146,4 +146,74 @@ interval_suppression <- function(x,
   
   list(secondary, num)
 }
+
+
+
+
+
+
+# Flower since I used that as the term when I asked ChatGPT to create the function
+split_by_intervalVar <- function(df) {  ##split_by_flower <- function(df) {
+  # allowed prefixes and regex for column names
+  pref <- c("rlim", "lomax", "upmin")
+  rx <- "^(rlim|lomax|upmin)_(.+)$"
+  
+  nms <- names(df)
+  m <- regexec(rx, nms)
+  parts <- regmatches(nms, m)
+  
+  # collect matches: column index, prefix, and flower
+  matches <- do.call(rbind, lapply(seq_along(parts), function(i) {
+    p <- parts[[i]]
+    if (length(p) == 3) {
+      data.frame(col = i, prefix = p[2], flower = p[3], 
+                 stringsAsFactors = FALSE)
+    }
+  }))
+  
+  if (is.null(matches)) {
+    stop("No columns found matching rlim_|lomax_|upmin_.")
+  }
+  
+  # build one sub-data.frame per flower
+  flowers <- unique(matches$flower)
+  out <- setNames(lapply(flowers, function(fl) {
+    s <- matches[matches$flower == fl, ]
+    subdf <- df[, s$col, drop = FALSE]
+    
+    # rename columns to just the prefix (rlim/lomax/upmin)
+    names(subdf) <- s$prefix
+    
+    # reorder columns consistently (rlim, lomax, upmin when present)
+    ord <- order(match(names(subdf), pref))
+    subdf[, ord, drop = FALSE]
+  }), flowers)
+  
+  out
+}
+
+
+# df <- data.frame(
+#   rlim_rose = 1:3,
+#   lomax_lily = 4:6,
+#   upmin_rose = 7:9,
+#   lomax_rose = 10:12,
+#   upmin_tulip = 13:15,
+#   check.names = FALSE
+# )
+# 
+# split_by_intervalVar(df)
+
+
+
+
+
+
+
+
+
+
+
+
+
 

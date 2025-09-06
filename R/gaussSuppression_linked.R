@@ -30,7 +30,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     xExtraPrimary, 
                                     whenEmptyUnsuppressed = message, 
                                     z = rep(0, ncol(x)),
-                                    rangeLimits = data.frame(a = rep(0, ncol(x))),
+                                    rangeLimits = NULL,
                                     lpPackage = NULL, 
                                     ..., 
                                     dup_id = NULL,
@@ -128,7 +128,9 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
         forced_g <- forced
       }
       z <- z[orig_col]
-      rangeLimits <- rangeLimits[orig_col, , drop = FALSE]
+      if (!is.null(rangeLimits)) {
+        rangeLimits <- rangeLimits[orig_col, , drop = FALSE]
+      }
       x <- Matrix::bdiag(table_x)
       colnames(x) <- table_x_cnames 
       rm(table_x)
@@ -326,8 +328,14 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
 
     x <- Matrix::bdiag(x)
     z <- unlist(z)
-    rangeLimits <- SSBtools::RbindAll(rangeLimits)
-    
+    if (!any(sapply(rangeLimits, is.null))) {
+      rangeLimits <- SSBtools::RbindAll(rangeLimits)
+    } else {
+      if (any(!sapply(rangeLimits, is.null))) {
+        stop("rangeLimits problem")
+      }
+      rangeLimits <- NULL
+    }
     if (!is.null(dup_id)) {
       fcgac <- fix_cell_grouping_and_candidates(dup_id, candidates, cumsum_0_ncol_x)
       candidates <- fcgac$candidates

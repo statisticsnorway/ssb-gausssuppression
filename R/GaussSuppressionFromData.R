@@ -810,7 +810,19 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   z <- z_interval(..., freq = freq, freqVar = freqVar, num = num)
-  rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  
+  if(hasArg(rangePercent) | hasArg(rangeMin)) {
+    rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+    num <- cbind(num, rangeLimits)
+  } else {
+    rangeLimits <- NULL
+  }
+  lim_names <- grep("^(rlim_|lomax_|upmin_)", names(num))
+  if(length(lim_names)) {
+    rangeLimits <-  num[lim_names]
+  } else {
+    rangeLimits <- NULL
+  }
   
   if( output %in% c("outputGaussSuppression", "outputGaussSuppression_x", "secondary")){
     rm(crossTable)

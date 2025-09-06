@@ -63,7 +63,7 @@ RangeLimitsDefault <- function(...,
   rangeMin <- rep_len(rangeMin, length(intervalVar))
   
   rangeLimits <- matrix(0, nrow(num), length(intervalVar))
-  colnames(rangeLimits) <- intervalVar
+  colnames(rangeLimits) <- paste("rlim", intervalVar, sep = "_")
   
   for (i in seq_along(intervalVar)) {
     if (intervalVar[i] == c(freqVar, "")[1]) { # since freqVar may be NULL
