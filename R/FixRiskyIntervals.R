@@ -15,6 +15,7 @@
 #' @importFrom utils flush.console
 #' @importFrom Matrix colSums t crossprod solve
 #' @importFrom SSBtools DummyDuplicated GaussIndependent Reduce0exact As_TsparseMatrix
+#' @importFrom stats setNames
 #'
 #' @export
 #'
