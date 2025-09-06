@@ -394,3 +394,23 @@ RiskyInterInterval <- function(a,
   risky
 }
 
+
+
+
+# Made by ChatGPT 
+# Function to adjust precision based on the magnitude of the number
+adjust_precision <- function(number) {
+  if(number < 0.001) {
+    return(formatC(number, format = "f", digits = 7))
+  } else if(number < 1) {
+    return(formatC(number, format = "f", digits = 4))
+  } else if(number < 10) {
+    return(formatC(number, format = "f", digits = 3))
+  } else if(number < 100) {
+    return(formatC(number, format = "f", digits = 2))
+  } else {
+    return(formatC(number, format = "f", digits = 1))
+  }
+}
+
+
