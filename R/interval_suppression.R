@@ -12,7 +12,7 @@ interval_suppression <- function(x,
                                  whenEmptyUnsuppressed,
                                  cell_grouping,
                                  lpPackage,
-                                 rangeLimits,
+                                 intervalLimits,
                                  z,
                                  printInc,
                                  minVal = NULL,
@@ -23,15 +23,15 @@ interval_suppression <- function(x,
     stop("forced when interval iteration not implemented")
   }
   
-  #rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  #intervalLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
     
-  rangeLimits <- split_by_intervalVar(rangeLimits)
+  intervalLimits <- split_by_intervalVar(intervalLimits)
   
-  if (length(rangeLimits) != 1) {
+  if (length(intervalLimits) != 1) {
     stop("Only single intervalVar implemented")
   }
   
-  rangeLimits <- rangeLimits[[1]]
+  intervalLimits <- intervalLimits[[1]]
   
   m <- ncol(x)
   
@@ -62,7 +62,7 @@ interval_suppression <- function(x,
   )
   
   gauss_ranges <- gauss_intervals[, 2] - gauss_intervals[, 1]
-  risky <- (gauss_ranges - rangeLimits[, "rlim"]) < 0
+  risky <- (gauss_ranges - intervalLimits[, "rlim"]) < 0
   risky[!primary] <- FALSE
   
   risky[is.na(risky)] <- FALSE    #  MISSING SET TO FALSE HERE, MISSING WILL CAUSE WARNING LATER
@@ -81,7 +81,7 @@ interval_suppression <- function(x,
     allInt = allInt,
     gaussI = gaussIFix,
     lpPackage = lpPackage,
-    rangeLimits =  rangeLimits[risky, , drop = FALSE],
+    intervalLimits =  intervalLimits[risky, , drop = FALSE],
     cell_grouping = cell_grouping
   )
   
@@ -126,7 +126,7 @@ interval_suppression <- function(x,
   
   
   gauss_ranges <- gauss_intervals[, 2] - gauss_intervals[, 1]
-  risky <- (gauss_ranges - rangeLimits[, "rlim"]) < 0
+  risky <- (gauss_ranges - intervalLimits[, "rlim"]) < 0
   risky[!primary] <- FALSE
   
   if (any(is.na(risky))) {

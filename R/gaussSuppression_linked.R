@@ -30,7 +30,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
                                     xExtraPrimary, 
                                     whenEmptyUnsuppressed = message, 
                                     z = rep(0, ncol(x)),
-                                    rangeLimits = NULL,
+                                    intervalLimits = NULL,
                                     lpPackage = NULL, 
                                     ..., 
                                     dup_id = NULL,
@@ -128,8 +128,8 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
         forced_g <- forced
       }
       z <- z[orig_col]
-      if (!is.null(rangeLimits)) {
-        rangeLimits <- rangeLimits[orig_col, , drop = FALSE]
+      if (!is.null(intervalLimits)) {
+        intervalLimits <- intervalLimits[orig_col, , drop = FALSE]
       }
       x <- Matrix::bdiag(table_x)
       colnames(x) <- table_x_cnames 
@@ -328,13 +328,13 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
 
     x <- Matrix::bdiag(x)
     z <- unlist(z)
-    if (!any(sapply(rangeLimits, is.null))) {
-      rangeLimits <- SSBtools::RbindAll(rangeLimits)
+    if (!any(sapply(intervalLimits, is.null))) {
+      intervalLimits <- SSBtools::RbindAll(intervalLimits)
     } else {
-      if (any(!sapply(rangeLimits, is.null))) {
-        stop("rangeLimits problem")
+      if (any(!sapply(intervalLimits, is.null))) {
+        stop("intervalLimits problem")
       }
-      rangeLimits <- NULL
+      intervalLimits <- NULL
     }
     if (!is.null(dup_id)) {
       fcgac <- fix_cell_grouping_and_candidates(dup_id, candidates, cumsum_0_ncol_x)
@@ -386,7 +386,7 @@ gaussSuppression_linked <- function(x, candidates, primary, forced, hidden,
           singletonMethod = singletonMethod, 
           whenEmptyUnsuppressed = whenEmptyUnsuppressed,
           lpPackage = lpPackage,
-          rangeLimits = rangeLimits,
+          intervalLimits = intervalLimits,
           z = z,
           printInc = printInc,
           printXdim = printXdim,

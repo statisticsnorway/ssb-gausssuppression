@@ -8,7 +8,7 @@
 #' 
 #' @inheritParams ComputeIntervals
 #' @param candidates `candidates` as indices
-#' @param rangeLimits As computed by \code{\link{RangeLimitsDefault}} 
+#' @param intervalLimits As computed by \code{\link{RangeLimitsDefault}} 
 #'
 #'
 #' @importFrom stats na.omit runif
@@ -30,7 +30,7 @@ FixRiskyIntervals <-
            gaussI = FALSE,   # Here important parameter, FALSE for best results, gaussI2 instead below  
            allInt = FALSE,
            sparseConstraints = TRUE, 
-           rangeLimits,
+           intervalLimits,
            cell_grouping = rep(0, length(z))) {
     
 
@@ -66,9 +66,9 @@ FixRiskyIntervals <-
     
     candidates <- unique(c(candidates, seq_len(ncol(x))))
     
-    rangeLimits_ <- matrix(NA, ncol(x), ncol(rangeLimits), dimnames = list(NULL, names(rangeLimits)))
-    rangeLimits_[primary, ] <- as.matrix(rangeLimits)
-    rangeLimits_ <- rangeLimits_[candidates, , drop = FALSE]
+    intervalLimits_ <- matrix(NA, ncol(x), ncol(intervalLimits), dimnames = list(NULL, names(intervalLimits)))
+    intervalLimits_[primary, ] <- as.matrix(intervalLimits)
+    intervalLimits_ <- intervalLimits_[candidates, , drop = FALSE]
     
     rearrange <- order(candidates)
     
@@ -92,7 +92,7 @@ FixRiskyIntervals <-
     if(any(cell_grouping != 0)){
       x <- cbind(x, x0diff(x, cell_grouping))
       z <- c(z, rep(0, ncol(x) - input_ncol_x))
-      rangeLimits_ <- rbind(rangeLimits_, matrix(NA, ncol(x) - input_ncol_x, ncol(rangeLimits_)))
+      intervalLimits_ <- rbind(intervalLimits_, matrix(NA, ncol(x) - input_ncol_x, ncol(intervalLimits_)))
       
       avoid_duplicate_computation <- TRUE   # Similar code as in ComputeIntervals()
       if (avoid_duplicate_computation) {
@@ -125,7 +125,7 @@ FixRiskyIntervals <-
     x <- x[, c(published, cell_diff, primary, secondary), drop = FALSE]
     z <- z[c(published, cell_diff, primary, secondary)]
     
-    rangeLimits_ <- rangeLimits_[c(published, cell_diff, primary, secondary), , drop = FALSE] 
+    intervalLimits_ <- intervalLimits_[c(published, cell_diff, primary, secondary), , drop = FALSE] 
     
     published2 <- seq_len(length(published))
     cell_diff2 <- length(published) + seq_len(length(cell_diff))
@@ -150,7 +150,7 @@ FixRiskyIntervals <-
       x <- x[, idxDDunique, drop = FALSE]
       z <- z[idxDDunique]
       
-      rangeLimits_ <- rangeLimits_[idxDDunique, , drop = FALSE]
+      intervalLimits_ <- intervalLimits_[idxDDunique, , drop = FALSE]
       
       candidates_published3 <- candidates_published[idxDDunique] 
       
@@ -302,7 +302,7 @@ FixRiskyIntervals <-
                                     check,
                                     verbose = FALSE, 
                                     extra_suppressed = c(extra_suppressed, extra_from_gaussI),
-                                    rangeLimits_,
+                                    intervalLimits_,
                                     i)
         
         best_ok[!risky & check] <- i
@@ -374,7 +374,7 @@ RiskyInterInterval <- function(a,
                                check,
                                verbose, 
                                extra_suppressed,
-                               rangeLimits_,
+                               intervalLimits_,
                                i) {
   
   cols <- seq_len(i)
@@ -390,7 +390,7 @@ RiskyInterInterval <- function(a,
   
   gauss_ranges <- intervals1$up[primary3] - intervals1$lo[primary3]
   
-  risky <- (gauss_ranges - rangeLimits_[primary3, "rlim"]) < 0
+  risky <- (gauss_ranges - intervalLimits_[primary3, "rlim"]) < 0
   risky[is.na(risky)] <- FALSE
   risky
 }

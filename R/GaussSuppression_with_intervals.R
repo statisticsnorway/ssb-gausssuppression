@@ -4,7 +4,7 @@ GaussSuppression_with_intervals <- function(x, candidates, primary, forced, hidd
                                             singleton, singletonMethod, 
                                             xExtraPrimary, 
                                             whenEmptyUnsuppressed = message, 
-                                            rangeLimits = NULL,
+                                            intervalLimits = NULL,
                                             lpPackage = NULL, 
                                             ..., 
                                             cell_grouping = NULL, 
@@ -43,7 +43,7 @@ GaussSuppression_with_intervals <- function(x, candidates, primary, forced, hidd
   
   if(!is.null(lpPackage)){
     
-    if (!is.null(rangeLimits)) {
+    if (!is.null(intervalLimits)) {
       interval_suppressed <- interval_suppression(x = x_interval, 
                                                   candidates = candidates, 
                                                   primary = primary, 
@@ -57,7 +57,7 @@ GaussSuppression_with_intervals <- function(x, candidates, primary, forced, hidd
                                                   ...,
                                                   xExtraPrimary = NULL,
                                                   lpPackage = lpPackage,
-                                                  rangeLimits = rangeLimits,
+                                                  intervalLimits = intervalLimits,
                                                   z = z,
                                                   printInc = printInc,
                                                   printXdim = printXdim,
