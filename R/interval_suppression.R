@@ -61,11 +61,12 @@ interval_suppression <- function(x,
     cell_grouping = cell_grouping
   )
   
-  gauss_ranges <- gauss_intervals[, 2] - gauss_intervals[, 1]
-  risky <- (gauss_ranges - intervalLimits[, "rlim"]) < 0
-  risky[!primary] <- FALSE
   
-  risky[is.na(risky)] <- FALSE    #  MISSING SET TO FALSE HERE, MISSING WILL CAUSE WARNING LATER
+  risky <- FindRisky(intervalLimits, 
+                     lo = gauss_intervals[, 1], 
+                     up = gauss_intervals[, 2])
+  
+  risky[!primary] <- FALSE
   
   
   colnames(gauss_intervals) <- paste(colnames(gauss_intervals), "1", sep = "_")
@@ -125,10 +126,16 @@ interval_suppression <- function(x,
   )
   
   
-  gauss_ranges <- gauss_intervals[, 2] - gauss_intervals[, 1]
-  risky <- (gauss_ranges - intervalLimits[, "rlim"]) < 0
+  risky <- FindRisky(intervalLimits, 
+                     lo = gauss_intervals[, 1], 
+                     up = gauss_intervals[, 2])
+  
   risky[!primary] <- FALSE
   
+  
+
+  # After introducing FindRisky() there will never be a warning.
+  # But that's ok since infinity as an interval limit is actually correct sometimes.
   if (any(is.na(risky))) {
     warning(paste("Missing values in final risk calculation"))
     risky[is.na(risky)] <- FALSE

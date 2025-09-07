@@ -387,14 +387,40 @@ RiskyInterInterval <- function(a,
   intervals1 <- ComputeIntervals1(ai, x, primary3, secondary3, minVal, allInt, lpPackage, sparseConstraints, AsMatrix, check, verbose,
                                   cell_diff3 = cell_diff3)
 
+  risky <- FindRisky(intervalLimits_[primary3, , drop = FALSE], 
+                     lo = intervals1$lo[primary3], 
+                     up = intervals1$up[primary3])
   
-  gauss_ranges <- intervals1$up[primary3] - intervals1$lo[primary3]
-  
-  risky <- (gauss_ranges - intervalLimits_[primary3, "rlim"]) < 0
-  risky[is.na(risky)] <- FALSE
   risky
 }
 
+# eps to allow for numerical error, and as large as 1e-05 since values may differ greatly in scale
+# NAs set to FALSE: prevents warnings later and ensures that | works correctly
+FindRisky <- function(intervalLimits, lo, up, eps = 1e-05) {
+  
+  risky <- rep(FALSE, nrow(intervalLimits))
+  
+  if ("rlim" %in% colnames(intervalLimits)) {
+    risky_12 <- ((up - lo) - (1 - eps) * intervalLimits[, "rlim"]) < 0
+    risky_12[is.na(risky_12)] <- FALSE
+    risky <- risky | risky_12
+  }
+  
+  if ("lomax" %in% colnames(intervalLimits)) {
+    risky_1 <- lo - (1 + eps) * intervalLimits[, "lomax"] > 0
+    risky_1[is.na(risky_1)] <- FALSE
+    risky <- risky | risky_1
+  }
+  
+  if ("upmin" %in% colnames(intervalLimits)) {
+    risky_2 <- up - (1 - eps) * intervalLimits[, "upmin"] < 0
+    risky_2[is.na(risky_2)] <- FALSE
+    risky <- risky | risky_2
+  }
+  
+  risky
+  
+}
 
 
 
