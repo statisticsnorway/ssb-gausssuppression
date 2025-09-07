@@ -49,7 +49,7 @@ RangeLimitsDefault <- function(...,
                                   intervalVar = NULL) {
   if (is.null(intervalVar)) {
     if (is.null(dominanceVar)) {
-      if (ncol(num) == 0) {
+      if (ncol(num) == sum(grepl("^(rlim_|lomax_|upmin_)", colnames(num)))) {
         intervalVar <- freqVar
       } else {
         intervalVar <- names(num)[1]

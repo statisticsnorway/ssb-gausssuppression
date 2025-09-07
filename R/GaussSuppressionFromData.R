@@ -817,9 +817,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   } else {
     intervalLimits <- NULL
   }
-  lim_names <- grep("^(rlim_|lomax_|upmin_)", names(num))
+  
+  lim_names <- grep("^(rlim_|lomax_|upmin_)", colnames(num))
   if(length(lim_names)) {
-    intervalLimits <-  num[lim_names]
+    if (anyDuplicated(colnames(num)[lim_names])) {
+      stop("Duplicate interval limits are not implemented yet")
+    }
+    intervalLimits <-  as.data.frame(num[ , lim_names, drop = FALSE])
   } else {
     intervalLimits <- NULL
   }
@@ -1130,7 +1134,7 @@ collapse_aware_table_memberships <- function(table_memberships, x, aggregatePack
 # Function to find vector with z-values for interval calculation
 z_interval <- function(..., freq, freqVar, num, dominanceVar = NULL, intervalVar = NULL) {
   intervalVar <- intervalVar[1]  # Only single intervalVar is (for now) supported in functions where this is used
-  if (identical(intervalVar, freqVar) | ncol(num) == 0) {
+  if (identical(intervalVar, freqVar) | ncol(num) == sum(grepl("^(rlim_|lomax_|upmin_)", colnames(num)))) {
     z <- freq
   } else {
     if (is.null(intervalVar)) {
