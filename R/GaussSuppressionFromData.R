@@ -821,7 +821,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   lim_names <- grep("^(rlim_|lomax_|upmin_)", colnames(num))
   if(length(lim_names)) {
     if (anyDuplicated(colnames(num)[lim_names])) {
-      stop("Duplicate interval limits are not implemented yet")
+      # Collapse duplicate rlim_/lomax_/upmin_ columns by rowwise max/min
+      num <- dedupe_range_limits(num)
+      lim_names <- grep("^(rlim_|lomax_|upmin_)", colnames(num))      
     }
     intervalLimits <-  as.data.frame(num[ , lim_names, drop = FALSE])
   } else {

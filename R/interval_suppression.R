@@ -212,6 +212,55 @@ split_by_intervalVar <- function(df) {  ##split_by_flower <- function(df) {
 # split_by_intervalVar(df)
 
 
+# Related function also written by ChatGPT
+# Collapse duplicate rlim_/lomax_/upmin_ columns by rowwise max/min
+# NA is ignored unless all values in a row are NA -> then NA
+dedupe_range_limits <- function(df) {
+  rx <- "^(rlim|lomax|upmin)_"
+  nms <- names(df)
+  tgt_idx <- which(grepl(rx, nms))
+  if (length(tgt_idx) == 0L) return(df)
+  
+  uniq <- unique(nms[tgt_idx])
+  to_drop <- integer(0)
+  
+  for (nm in uniq) {
+    idx <- which(nms == nm)
+    if (length(idx) <= 1L) next
+    
+    prefix <- sub("_.*$", "", nm)
+    cols <- lapply(idx, function(i) df[[i]])  # numeric/logical only
+    
+    # aggregator: lomax -> min, rlim/upmin -> max
+    agg_fun <- if (prefix == "lomax") pmin else pmax
+    combined <- do.call(agg_fun, c(cols, list(na.rm = TRUE)))
+    
+    # rows where all duplicates are NA should be NA
+    all_na <- Reduce("&", lapply(cols, is.na))
+    combined[all_na] <- NA_real_
+    
+    # keep the first, drop the rest
+    df[[idx[1]]] <- combined
+    to_drop <- c(to_drop, idx[-1])
+  }
+  
+  if (length(to_drop)) df <- df[, -to_drop, drop = FALSE]
+  df
+}
+
+# df <- data.frame(
+#   rlim_rose = c(1, NA, 3, NA),
+#   rlim_rose = c(2,  5, NA, NA),   # rowwise max
+#   lomax_lily = c(10, 8, NA, NA),
+#   lomax_lily = c( 9, 9, 12, NA),  # rowwise min
+#   upmin_tulip = c(NA, 4, 6, NA),
+#   upmin_tulip = c( 3, 2, 7, NA),  # rowwise max
+#   check.names = FALSE
+# )
+# dedupe_range_limits(df)
+# # rlim_rose   : 2, 5, 3, NA
+# # lomax_lily  : 9, 8, 12, NA
+# # upmin_tulip : 3, 4, 7, NA
 
 
 
