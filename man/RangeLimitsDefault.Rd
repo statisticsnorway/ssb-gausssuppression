@@ -51,14 +51,13 @@ SuppressDominantCells(data = dat,
     formula = ~sector2 * geo + sector4 * eu, 
     contributorVar = "company", 
     n = 1:2, k = c(80, 99), 
-    output = RangeOutputFunction, rangePercent = 10, rangeMin = 1)
+    rangePercent = 10, rangeMin = 1)
 
 SuppressDominantCells(data = dat, 
     numVar = c("value", "num2"), 
     formula = ~sector2 * geo + sector4 * eu, 
     contributorVar = "company", 
     n = 1:2, k = c(80, 99), 
-    output = RangeOutputFunction, 
     intervalVar = c("value","freq", "num2"), 
     rangePercent = c(10, 10, 30), rangeMin = c(1, 0.2222, 2.222))
 

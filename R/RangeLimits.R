@@ -27,14 +27,13 @@
 #'     formula = ~sector2 * geo + sector4 * eu, 
 #'     contributorVar = "company", 
 #'     n = 1:2, k = c(80, 99), 
-#'     output = RangeOutputFunction, rangePercent = 10, rangeMin = 1)
+#'     rangePercent = 10, rangeMin = 1)
 #' 
 #' SuppressDominantCells(data = dat, 
 #'     numVar = c("value", "num2"), 
 #'     formula = ~sector2 * geo + sector4 * eu, 
 #'     contributorVar = "company", 
 #'     n = 1:2, k = c(80, 99), 
-#'     output = RangeOutputFunction, 
 #'     intervalVar = c("value","freq", "num2"), 
 #'     rangePercent = c(10, 10, 30), rangeMin = c(1, 0.2222, 2.222))
 #' 
@@ -78,19 +77,3 @@ RangeLimitsDefault <- function(...,
   rangeLimits
 }
 
-
-#' Function used in RangeLimitsDefault example  
-#'
-#' @param ... parameters 
-#'
-#' @return Aggregated data with suppression information
-#' @export
-#' @keywords internal
-#'
-RangeOutputFunction <- function(...) {
-  rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
-  colnames(rangeLimits) <- paste("rlim", colnames(rangeLimits), sep = "_")
-  num <- cbind(num, as.data.frame(rangeLimits))
-  environment(TailGaussSuppressionFromData) <- environment()
-  return(TailGaussSuppressionFromData(...))
-}
