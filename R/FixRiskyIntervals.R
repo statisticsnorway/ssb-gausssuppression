@@ -8,7 +8,7 @@
 #' 
 #' @inheritParams ComputeIntervals
 #' @param candidates `candidates` as indices
-#' @param intervalLimits As computed by \code{\link{RangeLimitsDefault}} 
+#' @param intervalLimits As computed by \code{\link{IntervalLimits}} 
 #'
 #'
 #' @importFrom stats na.omit runif

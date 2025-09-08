@@ -136,7 +136,7 @@
 #'                   When non-NULL, intervals by \code{\link{ComputeIntervals}} 
 #'                   will be included in the output.
 #'                   See its documentation for valid parameter values for 'lpPackage'.
-#'                   If, additionally, at least one of the two \code{\link{RangeLimitsDefault}} parameters below is specified, 
+#'                   If, additionally, at least one of the two \code{\link{IntervalLimits}} parameters below is specified, 
 #'                   further suppression will be performed to satisfy the interval width requirements.
 #'        Then, the values in the output variable `suppressed_integer` means: 
 #'                   no suppression (0), 
@@ -812,7 +812,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   z <- z_interval(..., freq = freq, freqVar = freqVar, num = num)
   
   if(hasArg(rangePercent) | hasArg(rangeMin)) {
-    intervalLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+    intervalLimits <- IntervalLimits(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
     num <- cbind(num, intervalLimits)
   } else {
     intervalLimits <- NULL

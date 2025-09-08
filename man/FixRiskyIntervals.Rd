@@ -52,7 +52,7 @@ See \code{all.int} parameter in \code{lpSolve} and \code{types} parameter in \co
 solver. In the case of \code{lpSolve}, the sparse matrix is represented in triplet form
 as a dense matrix with three columns, and the \code{dense.const} parameter is utilized.}
 
-\item{intervalLimits}{As computed by \code{\link{RangeLimitsDefault}}}
+\item{intervalLimits}{As computed by \code{\link{IntervalLimits}}}
 
 \item{cell_grouping}{Numeric vector indicating group membership.
 Cells with the same value that is not 0 belong to the same group.

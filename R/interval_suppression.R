@@ -23,8 +23,6 @@ interval_suppression <- function(x,
     stop("forced when interval iteration not implemented")
   }
   
-  #intervalLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
-    
   intervalLimits <- split_by_intervalVar(intervalLimits)
   
   if (length(intervalLimits) != 1) {

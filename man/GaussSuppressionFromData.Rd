@@ -173,7 +173,7 @@ see details.}
 When non-NULL, intervals by \code{\link{ComputeIntervals}}
 will be included in the output.
 See its documentation for valid parameter values for 'lpPackage'.
-If, additionally, at least one of the two \code{\link{RangeLimitsDefault}} parameters below is specified,
+If, additionally, at least one of the two \code{\link{IntervalLimits}} parameters below is specified,
 further suppression will be performed to satisfy the interval width requirements.
 Then, the values in the output variable \code{suppressed_integer} means:
 no suppression (0),

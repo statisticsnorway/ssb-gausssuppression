@@ -37,7 +37,7 @@
 #'     intervalVar = c("value","freq", "num2"), 
 #'     rangePercent = c(10, 10, 30), rangeMin = c(1, 0.2222, 2.222))
 #' 
-RangeLimitsDefault <- function(..., 
+IntervalLimits <- function(..., 
                                   rangePercent = 0,
                                   rangeMin = 0,
                                   primary, 
