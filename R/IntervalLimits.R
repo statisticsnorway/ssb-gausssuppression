@@ -139,6 +139,10 @@ IntervalLimits <- function(...,
   }
   
   if (is.null(intervalVar)) {
+    intervalVar <- extract_intervalVar(colnames(num))
+  }
+  
+  if (!length(intervalVar)) {
     if (is.null(dominanceVar)) {
       if (ncol(num) == sum(grepl("^(rlim_|lomax_|upmin_)", colnames(num)))) {
         intervalVar <- freqVar

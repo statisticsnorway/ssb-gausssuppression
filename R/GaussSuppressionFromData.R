@@ -1133,6 +1133,12 @@ collapse_aware_table_memberships <- function(table_memberships, x, aggregatePack
 
 # Function to find vector with z-values for interval calculation
 z_interval <- function(..., freq, freqVar, num, dominanceVar = NULL, intervalVar = NULL) {
+  if (is.null(intervalVar)) {
+    intervalVar <- extract_intervalVar(colnames(num))
+  }
+  if (!length(intervalVar)) {
+    intervalVar <- NULL
+  }
   intervalVar <- intervalVar[1]  # Only single intervalVar is (for now) supported in functions where this is used
   if (identical(intervalVar, freqVar) | ncol(num) == sum(grepl("^(rlim_|lomax_|upmin_)", colnames(num)))) {
     z <- freq

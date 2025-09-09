@@ -210,6 +210,28 @@ split_by_intervalVar <- function(df) {  ##split_by_flower <- function(df) {
 # split_by_intervalVar(df)
 
 
+
+# Related function also written by ChatGPT
+extract_intervalVar <- function(varnames) { #  extract_flowers <- function(varnames) {
+  rx <- "^(rlim|lomax|upmin)_(.+)$"
+  m <- regexec(rx, varnames)
+  parts <- regmatches(varnames, m)
+  
+  flowers <- vapply(parts, function(p) {
+    if (length(p) == 3) p[3] else NA_character_
+  }, character(1))
+  
+  unique(flowers[!is.na(flowers)])
+}
+
+# Example usage:
+vars <- c("rlim_rose", "lomax_lily", "upmin_rose",
+          "lomax_rose", "upmin_tulip", "random_var")
+
+extract_intervalVar(vars)
+
+
+
 # Related function also written by ChatGPT
 # Collapse duplicate rlim_/lomax_/upmin_ columns by rowwise max/min
 # NA is ignored unless all values in a row are NA -> then NA
