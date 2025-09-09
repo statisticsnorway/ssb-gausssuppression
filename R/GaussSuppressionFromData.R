@@ -811,11 +811,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   z <- z_interval(..., freq = freq, freqVar = freqVar, num = num)
   
-  if(hasArg(rangePercent) | hasArg(rangeMin)) {
-    intervalLimits <- IntervalLimits(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  intervalLimits <- IntervalLimits(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  if (!is.null(intervalLimits)) {
     num <- cbind(num, intervalLimits)
-  } else {
-    intervalLimits <- NULL
   }
   
   lim_names <- grep("^(rlim_|lomax_|upmin_)", colnames(num))

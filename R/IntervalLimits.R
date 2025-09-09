@@ -90,6 +90,15 @@ IntervalLimits <- function(...,
                            freqVar,
                            dominanceVar = NULL, 
                            intervalVar = NULL) {
+  
+  rlim  <- any(rangePercent != 0) | any(rangeMin != 0)
+  lomax <- any(loProtectionPercent != 0) | any(loProtectionLimit != 0)
+  upmin <- any(protectionPercent != 0)   | any(protectionLimit != 0)
+  
+  if (!any(rlim | lomax | upmin)) {
+    return(NULL)
+  }
+  
   if (is.null(intervalVar)) {
     if (is.null(dominanceVar)) {
       if (ncol(num) == sum(grepl("^(rlim_|lomax_|upmin_)", colnames(num)))) {
@@ -101,10 +110,6 @@ IntervalLimits <- function(...,
       intervalVar <- dominanceVar
     }
   }
-  
-  rlim  <- any(rangePercent != 0) | any(rangeMin != 0)
-  lomax <- any(loProtectionPercent != 0) | any(loProtectionLimit != 0)
-  upmin <- any(protectionPercent != 0)   | any(protectionLimit != 0)
   
   if (rlim) {
     rangePercent <- rep_len(rangePercent, length(intervalVar))
