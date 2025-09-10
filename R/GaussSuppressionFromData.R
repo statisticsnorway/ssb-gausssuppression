@@ -157,11 +157,17 @@
 #'
 #'    - Intervals `[lo_1, up_1]` are calculated prior to additional suppression.
 #'    
+#'    - To disable additional suppression, set `intervalSuppression = FALSE`.  
+#'    
 #'                   Please note that additional suppression based on parameters other than
 #'                   rangePercent and rangeMin is currently considered experimental.
 #'                   In particular, the names of the newer parameters may still change.                   
 #'    
-#'                                 
+#' @param intervalSuppression
+#'   Logical. If `FALSE`, additional suppression to satisfy interval
+#'   requirements is disabled (default is `TRUE`). See description of
+#'   `lpPackage` above.
+#'                                                            
 #' @param aggregatePackage Package used to preAggregate/extraAggregate. 
 #'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
 #' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate/extraAggregate. 
@@ -321,6 +327,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            forcedInOutput = "ifNonNULL",
                            unsafeInOutput = "ifForcedInOutput",
                            lpPackage = NULL, 
+                           intervalSuppression = TRUE,
                            aggregatePackage = "base",
                            aggregateNA = TRUE,
                            aggregateBaseOrder = FALSE,
@@ -837,7 +844,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       num <- dedupe_range_limits(num)
       lim_names <- grep("^(rlim_|lomax_|upmin_)", colnames(num))      
     }
-    intervalLimits <-  as.data.frame(num[ , lim_names, drop = FALSE])
+    if (intervalSuppression) {
+      intervalLimits <-  as.data.frame(num[ , lim_names, drop = FALSE]) 
+    } else {
+      intervalLimits <- NULL
+    }
   } else {
     intervalLimits <- NULL
   }

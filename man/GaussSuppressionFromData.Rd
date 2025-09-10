@@ -38,6 +38,7 @@ GaussSuppressionFromData(
   forcedInOutput = "ifNonNULL",
   unsafeInOutput = "ifForcedInOutput",
   lpPackage = NULL,
+  intervalSuppression = TRUE,
   aggregatePackage = "base",
   aggregateNA = TRUE,
   aggregateBaseOrder = FALSE,
@@ -191,6 +192,7 @@ coded as:
 to linearly independent cells,
 4 = further suppression according to the final gauss algorithm.
 \item Intervals \verb{[lo_1, up_1]} are calculated prior to additional suppression.
+\item To disable additional suppression, set \code{intervalSuppression = FALSE}.
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{         Please note that additional suppression based on parameters other than
          rangePercent and rangeMin is currently considered experimental.
@@ -198,6 +200,10 @@ to linearly independent cells,
 }\if{html}{\out{</div>}}
 }
 }}
+
+\item{intervalSuppression}{Logical. If \code{FALSE}, additional suppression to satisfy interval
+requirements is disabled (default is \code{TRUE}). See description of
+\code{lpPackage} above.}
 
 \item{aggregatePackage}{Package used to preAggregate/extraAggregate.
 Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
