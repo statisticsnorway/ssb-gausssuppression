@@ -11,6 +11,17 @@
   - Note: The default for `action_unused_dots` is `"inform"` as a cautious starting point.
   This may change to `"warn"` in a future release.
   - Thanks to Jonas Lindblad for [issue #124](https://github.com/statisticsnorway/ssb-gausssuppression/issues/124).
+* Extended experimental support for interval protection with additional parameters.
+  - In particular, by specifying `lpPackage` together with 
+    `protectionIntervals = TRUE` in `SuppressDominantCells()`, tables can now 
+    be protected according to the protection levels described in 
+    *Handbook on Statistical Disclosure Control* (2nd ed., Ch. 4.2.2, 2025).
+  - A similar experimental extension is available in `SuppressSmallCounts()`.   
+  - See `?IntervalLimits` and the parameter description of `lpPackage` in 
+    `?GaussSuppressionFromData` for details.
+  - Addresses issue [issue #131](https://github.com/statisticsnorway/ssb-gausssuppression/issues/131).
+
+
 
 ## GaussSuppression 1.1.5
 * Major update to the functionality via **`SuppressLinkedTables()`** and **`linkedGauss`**:  
