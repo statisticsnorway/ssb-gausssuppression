@@ -117,8 +117,10 @@ prior to any summation. This corresponds to the old behavior of the function.}
 This parameter is needed when \code{protectZeros} is \code{TRUE}.}
 
 \item{protectionIntervals}{Logical. When \code{TRUE}, symmetric interval
-requirements from dominance rules or the p\% rule are included in the
-output. The corresponding variables are added with names starting
+requirements from dominance rules or the p\% rule are included in the output.
+Calculated according to formulas for upper protection levels
+in \emph{Handbook on Statistical Disclosure Control} (2nd ed., Ch. 4.2.2, 2025).
+The corresponding variables are added with names starting
 with \code{lomax_} and \code{upmin_}.}
 
 \item{intervalVar}{Numerical variable for interval calculations.}
