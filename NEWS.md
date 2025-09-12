@@ -19,7 +19,7 @@
   - A similar experimental extension is available in `SuppressSmallCounts()`.   
   - See `?IntervalLimits` and the parameter description of `lpPackage` in 
     `?GaussSuppressionFromData` for details.
-  - Addresses issue [issue #131](https://github.com/statisticsnorway/ssb-gausssuppression/issues/131).
+  - Addresses [issue #131](https://github.com/statisticsnorway/ssb-gausssuppression/issues/131).
 
 
 
