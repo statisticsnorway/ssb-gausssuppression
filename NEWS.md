@@ -20,6 +20,9 @@
   - See `?IntervalLimits` and the parameter description of `lpPackage` in 
     `?GaussSuppressionFromData` for details.
   - Addresses [issue #131](https://github.com/statisticsnorway/ssb-gausssuppression/issues/131).
+* New parameter `intervalSuppression` to `GaussSuppressionFromData()` and its wrappers. 
+  - Controls whether interval requirements are only calculated and reported, 
+    or also used for suppression (if `lpPackage` is specified).
 
 
 
