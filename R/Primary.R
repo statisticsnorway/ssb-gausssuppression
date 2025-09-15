@@ -101,10 +101,13 @@ Primary <- function(primary, crossTable, x, eachPrimary = FALSE, ...) {
 #' @param protectZeros When `TRUE`, cells with zero frequency are set as primary suppressed. 
 #' @param freqVar Character string used to select the appropriate value from `maxN` if it is a named object. 
 #'                see `maxN` above.
-#' @param protectionIntervals Logical. When `TRUE`, special interval requirements are included in the output. 
+#' @param protectionIntervals Logical. When `TRUE`, some interval requirements 
+#'   are included in the output as a safeguard against obvious weaknesses with 
+#'   respect to attribute disclosure.
 #'   The rule is that the upper bound must be at least 1 above the observed frequency, 
 #'   and the total interval width must be at least 2.
-#'   The corresponding variables are added with names starting with `upmin_` and `rlim_`                 
+#'   The corresponding variables are added with names starting with `upmin_` and `rlim_`.    
+#'    See [IntervalLimits()] for setting interval limits in general.           
 #' @param ... Unused parameters 
 #'
 #' @return primary, \code{\link[SSBtools]{GaussSuppression}} input 

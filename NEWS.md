@@ -16,7 +16,8 @@
     `protectionIntervals = TRUE` in `SuppressDominantCells()`, tables can now 
     be protected according to the protection levels described in 
     *Handbook on Statistical Disclosure Control* (2nd ed., Ch. 4.2.2, 2025).
-  - A similar experimental extension is available in `SuppressSmallCounts()`.   
+  - A similar experimental extension is available in `SuppressSmallCounts()`, 
+    where the `protectionIntervals` parameter can be used to include some interval requirements.
   - See `?IntervalLimits` and the parameter description of `lpPackage` in 
     `?GaussSuppressionFromData` for details.
   - Addresses [issue #131](https://github.com/statisticsnorway/ssb-gausssuppression/issues/131).
