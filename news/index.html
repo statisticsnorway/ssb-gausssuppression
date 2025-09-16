@@ -51,6 +51,15 @@
 <li>Note: The default for <code>action_unused_dots</code> is <code>"inform"</code> as a cautious starting point. This may change to <code>"warn"</code> in a future release.</li>
 <li>Thanks to Jonas Lindblad for <a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/124" class="external-link">issue </a><a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/124" class="external-link">#124</a>.</li>
 </ul></li>
+<li>Extended experimental support for interval protection with additional parameters.
+<ul><li>In particular, by specifying <code>lpPackage</code> together with <code>protectionIntervals = TRUE</code> in <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code>, tables can now be protected according to the protection levels described in <em>Handbook on Statistical Disclosure Control</em> (2nd ed., Ch. 4.2.2, 2025).</li>
+<li>A similar experimental extension is available in <code><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts()</a></code>, where the <code>protectionIntervals</code> parameter can be used to include some interval requirements.</li>
+<li>See <code><a href="../reference/IntervalLimits.html">?IntervalLimits</a></code> and the parameter description of <code>lpPackage</code> in <code><a href="../reference/GaussSuppressionFromData.html">?GaussSuppressionFromData</a></code> for details.</li>
+<li>Addresses <a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/131" class="external-link">issue </a><a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/131" class="external-link">#131</a>.</li>
+</ul></li>
+<li>New parameter <code>intervalSuppression</code> to <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> and its wrappers.
+<ul><li>Controls whether interval requirements are only calculated and reported, or also used for suppression (if <code>lpPackage</code> is specified).</li>
+</ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.5" id="gausssuppression-115">GaussSuppression 1.1.5<a class="anchor" aria-label="anchor" href="#gausssuppression-115"></a></h2><p class="text-muted">CRAN release: 2025-08-25</p>

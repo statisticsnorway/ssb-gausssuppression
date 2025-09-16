@@ -85,6 +85,7 @@ secondary suppression by Gaussian elimination by <code><a href="https://statisti
 <span>  forcedInOutput <span class="op">=</span> <span class="st">"ifNonNULL"</span>,</span>
 <span>  unsafeInOutput <span class="op">=</span> <span class="st">"ifForcedInOutput"</span>,</span>
 <span>  lpPackage <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  intervalSuppression <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  aggregatePackage <span class="op">=</span> <span class="st">"base"</span>,</span>
 <span>  aggregateNA <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  aggregateBaseOrder <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -284,22 +285,38 @@ see details.</p></dd>
 
 
 <dt id="arg-lppackage">lpPackage<a class="anchor" aria-label="anchor" href="#arg-lppackage"></a></dt>
-<dd><ul><li><p><strong><code>lpPackage</code>:</strong>
-When non-NULL, intervals by <code><a href="ComputeIntervals.html">ComputeIntervals</a></code>
-will be included in the output.
-See its documentation for valid parameter values for 'lpPackage'.
-If, additionally, at least one of the two <code><a href="RangeLimitsDefault.html">RangeLimitsDefault</a></code> parameters below is specified,
-further suppression will be performed to satisfy the interval width requirements.
-Then, the values in the output variable <code>suppressed_integer</code> means:
-no suppression (0),
-primary suppression (1),
-secondary suppression (2),
-additional suppression applied by an interval algorithm limited to linearly independent cells (3),
-and further suppression according to the final gauss algorithm (4).
-Intervals, <code>[lo_1, up_1]</code>, are intervals calculated prior to additional suppression.</p><ul><li><p><strong><code>rangePercent</code>:</strong> Required interval width expressed as a percentage</p></li>
-<li><p><strong><code>rangeMin</code>:</strong> Minimum required width of the interval</p></li>
+<dd><ul><li><p>When non-NULL, intervals computed by <code><a href="ComputeIntervals.html">ComputeIntervals()</a></code> will
+be included in the output. Valid values are the names of supported R
+packages for linear programming backends: <code>"highs"</code>, <code>"Rsymphony"</code>,
+<code>"Rglpk"</code>, or <code>"lpSolve"</code>.</p></li>
+<li><p>If interval requirements are specified, additional suppression will be
+performed to satisfy those requirements. Interval requirements can be
+set either through arguments of <code><a href="IntervalLimits.html">IntervalLimits()</a></code> or by enabling
+<code>protectionIntervals = TRUE</code> in the primary suppression functions.
+See <code><a href="IntervalLimits.html">IntervalLimits()</a></code> for a full description of the parameters
+(<code>protectionPercent</code>, <code>protectionLimit</code>, <code>loProtectionPercent</code>,
+<code>loProtectionLimit</code>, <code>rangePercent</code>, <code>rangeMin</code>) and how interval
+requirements are calculated.</p><ul><li><p>In the output variable <code>suppressed_integer</code>, suppression status is
+coded as:
+0 = no suppression,
+1 = primary suppression,
+2 = secondary suppression,
+3 = additional suppression applied by an interval algorithm limited
+to linearly independent cells,
+4 = further suppression according to the final gauss algorithm.</p></li>
+<li><p>Intervals <code>[lo_1, up_1]</code> are calculated prior to additional suppression.</p></li>
+<li><p>To disable additional suppression, set <code>intervalSuppression = FALSE</code>.</p>
+<p></p><div class="sourceCode"><pre><code><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>         Please note that additional suppression based on parameters other than</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>         rangePercent and rangeMin is currently considered experimental.</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>         In particular, the names of the newer parameters may still change.</span></code></pre><p></p></div></li>
 </ul></li>
 </ul></dd>
+
+
+<dt id="arg-intervalsuppression">intervalSuppression<a class="anchor" aria-label="anchor" href="#arg-intervalsuppression"></a></dt>
+<dd><p>Logical. If <code>FALSE</code>, additional suppression to satisfy interval
+requirements is disabled (default is <code>TRUE</code>). See description of
+<code>lpPackage</code> above.</p></dd>
 
 
 <dt id="arg-aggregatepackage">aggregatePackage<a class="anchor" aria-label="anchor" href="#arg-aggregatepackage"></a></dt>

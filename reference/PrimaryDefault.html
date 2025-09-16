@@ -45,7 +45,14 @@
 
     <div class="section level2">
     <h2 id="ref-usage">Usage<a class="anchor" aria-label="anchor" href="#ref-usage"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">PrimaryDefault</span><span class="op">(</span><span class="va">freq</span>, maxN <span class="op">=</span> <span class="fl">3</span>, protectZeros <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">freqVar</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">PrimaryDefault</span><span class="op">(</span></span>
+<span>  <span class="va">freq</span>,</span>
+<span>  maxN <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  protectZeros <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  protectionIntervals <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">freqVar</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -64,6 +71,16 @@ if available. If not found, the name <code>"freq"</code> is tried as an alternat
 
 <dt id="arg-protectzeros">protectZeros<a class="anchor" aria-label="anchor" href="#arg-protectzeros"></a></dt>
 <dd><p>When <code>TRUE</code>, cells with zero frequency are set as primary suppressed.</p></dd>
+
+
+<dt id="arg-protectionintervals">protectionIntervals<a class="anchor" aria-label="anchor" href="#arg-protectionintervals"></a></dt>
+<dd><p>Logical. When <code>TRUE</code>, some interval requirements
+are included in the output as a safeguard against obvious weaknesses with
+respect to attribute disclosure.
+The rule is that the upper bound must be at least 1 above the observed frequency,
+and the total interval width must be at least 2.
+The corresponding variables are added with names starting with <code>upmin_</code> and <code>rlim_</code>.
+See <code><a href="IntervalLimits.html">IntervalLimits()</a></code> for setting interval limits in general.</p></dd>
 
 
 <dt id="arg-freqvar">freqVar<a class="anchor" aria-label="anchor" href="#arg-freqvar"></a></dt>

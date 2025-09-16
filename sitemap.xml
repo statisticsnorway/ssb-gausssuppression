@@ -23,6 +23,7 @@
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/GetDefault.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/HierarchyContributors.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/IncrementalTimeSuppression.html</loc></url>
+<url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/IntervalLimits.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/KDisclosurePrimary.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/LazyLinkedTables.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/MagnitudeRule.html</loc></url>
@@ -36,8 +37,6 @@
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/PrimaryFromRiskyDefault.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/PrimaryFromSuppressedData.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/PrimaryRemoveWg.html</loc></url>
-<url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/RangeLimitsDefault.html</loc></url>
-<url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/RangeOutputFunction.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/SingletonDefault.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/SingletonUniqueContributor.html</loc></url>
 <url><loc>https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDirectDisclosure.html</loc></url>
