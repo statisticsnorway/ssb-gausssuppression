@@ -131,23 +131,43 @@
 #'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.
 #'               see details. 
 #'               
-#' @param  lpPackage 
-#'  * **`lpPackage`:**
-#'                   When non-NULL, intervals by \code{\link{ComputeIntervals}} 
-#'                   will be included in the output.
-#'                   See its documentation for valid parameter values for 'lpPackage'.
-#'                   If, additionally, at least one of the two \code{\link{RangeLimitsDefault}} parameters below is specified, 
-#'                   further suppression will be performed to satisfy the interval width requirements.
-#'        Then, the values in the output variable `suppressed_integer` means: 
-#'                   no suppression (0), 
-#'                   primary suppression (1), 
-#'                   secondary suppression (2), 
-#'                   additional suppression applied by an interval algorithm limited to linearly independent cells (3), 
-#'                   and further suppression according to the final gauss algorithm (4).
-#'        Intervals, `[lo_1, up_1]`, are intervals calculated prior to additional suppression.         
-#'    * **`rangePercent`:** Required interval width expressed as a percentage
-#'    * **`rangeMin`:** Minimum required width of the interval
-#'                                 
+#' @param lpPackage
+#'  * When non-NULL, intervals computed by [ComputeIntervals()] will
+#'    be included in the output. Valid values are the names of supported R
+#'    packages for linear programming backends: `"highs"`, `"Rsymphony"`,
+#'    `"Rglpk"`, or `"lpSolve"`. 
+#'
+#'  * If interval requirements are specified, additional suppression will be
+#'    performed to satisfy those requirements. Interval requirements can be
+#'    set either through arguments of [IntervalLimits()] or by enabling
+#'    `protectionIntervals = TRUE` in the primary suppression functions.
+#'    See [IntervalLimits()] for a full description of the parameters
+#'    (`protectionPercent`, `protectionLimit`, `loProtectionPercent`,
+#'    `loProtectionLimit`, `rangePercent`, `rangeMin`) and how interval
+#'    requirements are calculated.
+#'
+#'    - In the output variable `suppressed_integer`, suppression status is
+#'      coded as:
+#'      0 = no suppression,  
+#'      1 = primary suppression,  
+#'      2 = secondary suppression,  
+#'      3 = additional suppression applied by an interval algorithm limited
+#'          to linearly independent cells,  
+#'      4 = further suppression according to the final gauss algorithm.  
+#'
+#'    - Intervals `[lo_1, up_1]` are calculated prior to additional suppression.
+#'    
+#'    - To disable additional suppression, set `intervalSuppression = FALSE`.  
+#'    
+#'                   Please note that additional suppression based on parameters other than
+#'                   rangePercent and rangeMin is currently considered experimental.
+#'                   In particular, the names of the newer parameters may still change.                   
+#'    
+#' @param intervalSuppression
+#'   Logical. If `FALSE`, additional suppression to satisfy interval
+#'   requirements is disabled (default is `TRUE`). See description of
+#'   `lpPackage` above.
+#'                                                            
 #' @param aggregatePackage Package used to preAggregate/extraAggregate. 
 #'                         Parameter `pkg` to \code{\link[SSBtools]{aggregate_by_pkg}}.
 #' @param aggregateNA Whether to include NAs in the grouping variables while preAggregate/extraAggregate. 
@@ -307,6 +327,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            forcedInOutput = "ifNonNULL",
                            unsafeInOutput = "ifForcedInOutput",
                            lpPackage = NULL, 
+                           intervalSuppression = TRUE,
                            aggregatePackage = "base",
                            aggregateNA = TRUE,
                            aggregateBaseOrder = FALSE,
@@ -415,25 +436,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     OutputFunction <- output
     output <- "publish"
   } else {
-    if (!is.null(lpPackage)) {
-      if (!requireNamespace(lpPackage, quietly = TRUE)) {
-        on.exit(add = FALSE)  # Avoids unused-dots check on error
-        stop(paste0("Package '", lpPackage, "' is not available."))
-      }
-      if (hasArg(rangePercent) | hasArg(rangeMin)) {
-        # if (!(hasArg(rangePercent) & hasArg(rangeMin))) {
-        #   stop("Both rangePercent and rangeMin must be specified, not just one of them.")
-        # }
-        OutputFunction <- OutputFixRiskyIntervals
-      } else {
-        OutputFunction <- OutputIntervals
-      }
-      if( !(identical(linkedGauss, "global") | is.null(linkedGauss))) {    ### INTERVALS ANOTHER WAY 
-        OutputFunction <- NULL
-      } 
-    } else {
-      OutputFunction <- NULL
+    OutputFunction <- NULL
+  }  
+    
+  if (!is.null(lpPackage)){
+    if (!requireNamespace(lpPackage, quietly = TRUE)) {
+      on.exit(add = FALSE)  # Avoids unused-dots check on error
+      stop(paste0("Package '", lpPackage, "' is not available."))
     }
+    GaussSuppression <- GaussSuppression_with_intervals
   }
   
   
@@ -820,7 +831,27 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   z <- z_interval(..., freq = freq, freqVar = freqVar, num = num)
-  rangeLimits <- RangeLimitsDefault(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  
+  intervalLimits <- IntervalLimits(..., primary = primary, num = num, freq = freq, freqVar = freqVar)
+  if (!is.null(intervalLimits)) {
+    num <- cbind(num, intervalLimits)
+  }
+  
+  lim_names <- grep("^(rlim_|lomax_|upmin_)", colnames(num))
+  if(length(lim_names)) {
+    if (anyDuplicated(colnames(num)[lim_names])) {
+      # Collapse duplicate rlim_/lomax_/upmin_ columns by rowwise max/min
+      num <- dedupe_range_limits(num)
+      lim_names <- grep("^(rlim_|lomax_|upmin_)", colnames(num))      
+    }
+    if (intervalSuppression) {
+      intervalLimits <-  as.data.frame(num[ , lim_names, drop = FALSE]) 
+    } else {
+      intervalLimits <- NULL
+    }
+  } else {
+    intervalLimits <- NULL
+  }
   
   if( output %in% c("outputGaussSuppression", "outputGaussSuppression_x", "secondary")){
     rm(crossTable)
@@ -891,7 +922,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                                   unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking,
                                   super_consistent = super_consistent,
                                   z = z,
-                                  rangeLimits = rangeLimits,
+                                  intervalLimits = intervalLimits,
                                   lpPackage = lpPackage,
                                   linkedIntervals = linkedIntervals,
                                   ...)
@@ -900,7 +931,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                                   unsafeAsNegative = TRUE, table_memberships = table_memberships, cell_grouping = cell_grouping, iterBackTracking = iterBackTracking, 
                                   super_consistent = super_consistent,
                                   z = z,
-                                  rangeLimits = rangeLimits,
+                                  intervalLimits = intervalLimits,
                                   lpPackage = lpPackage,
                                   linkedIntervals = linkedIntervals,
                                   ...)
@@ -1127,8 +1158,14 @@ collapse_aware_table_memberships <- function(table_memberships, x, aggregatePack
 
 # Function to find vector with z-values for interval calculation
 z_interval <- function(..., freq, freqVar, num, dominanceVar = NULL, intervalVar = NULL) {
+  if (is.null(intervalVar)) {
+    intervalVar <- extract_intervalVar(colnames(num))
+  }
+  if (!length(intervalVar)) {
+    intervalVar <- NULL
+  }
   intervalVar <- intervalVar[1]  # Only single intervalVar is (for now) supported in functions where this is used
-  if (identical(intervalVar, freqVar) | ncol(num) == 0) {
+  if (identical(intervalVar, freqVar) | ncol(num) == sum(grepl("^(rlim_|lomax_|upmin_)", colnames(num)))) {
     z <- freq
   } else {
     if (is.null(intervalVar)) {
@@ -1165,3 +1202,10 @@ generate_touch_dots <- function(allowed_unused_dots, envir = parent.frame()){
   fun_txt <- paste("function(", paste(paste(a,"= 1"), collapse = ", "), ", ...){\n ", paste(paste("force(", a, ")"), collapse = "\n "), "\n }")
   eval(parse(text = fun_txt), envir = envir)
 }
+
+
+
+# To avoid check problems
+utils::globalVariables(c("rangeMin", "rangePercent"))
+
+
