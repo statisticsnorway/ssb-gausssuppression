@@ -368,34 +368,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   
   CheckInput(action_unused_dots, type = "character", alt = c("warn", "abort", "inform", "none"), okNULL = FALSE)
   
-  if (is.character(output)) {
-    if (output %in% c("inner", "inner_x", "input2functions", "primary", "inputGaussSuppression", "inputGaussSuppression_x")) {
-      action_unused_dots <- "none"
-    }
-  }
-  
-  if(action_unused_dots != "none") {
-    # extra_allowed_unused since these arguments may not be registered as used 
-    # in special cases, e.g. when no primary suppression occurs
-    extra_allowed_unused <- c(
-      "printXdim", "tolGauss", "whenEmptySuppressed", # SSBtools::GaussSuppression
-      "whenPrimaryForced", "iWait", "iFunction",      # SSBtools::GaussSuppression
-      "avoidHierarchical",    # SSBtools::Extend0fromModelMatrixInput and  SSBtools::FormulaSums
-      "hierarchical_extend0"  # SSBtools::Extend0fromModelMatrixInput
-      )
-    allowed_unused_dots <- unique(c(allowed_unused_dots, extra_allowed_unused)) 
-    if (hasArg("avoidHierarchical") & hasArg("avoid_hierarchical")) {   
-      # i.e. called from SSBtools::tables_by_formulas()
-      allowed_unused_dots <- unique(c(allowed_unused_dots, "avoid_hierarchical"))
-    }
-    rlang_warn_extra <- generate_rlang_warn_extra(action_unused_dots, 
-            note = "See arguments `action_unused_dots` and `allowed_unused_dots` in `?GaussSuppressionFromData`.")
-    ellipsis::check_dots_used(action = rlang_warn_extra)
-    touch_dots <- generate_touch_dots(allowed_unused_dots)
-    touch_dots(...)
-  }
-  
-  
   CheckInput(linkedGauss, type = "character", alt = c("global", "local", "consistent", "back-tracking", "local-bdiag", "super-consistent"), okNULL = TRUE)
   
   if (!is.null(lpPackage) & !is.null(linkedGauss)) {
@@ -411,14 +383,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     if (!is.null(linkedGauss)) {
       table_formulas <- attr(formula, "table_formulas")
       if (is.null(table_formulas)) {
-        on.exit(add = FALSE)  # Avoids unused-dots check on error
         stop("With 'linkedGauss', 'formula' must be either a list of formulas or have a 'table_formulas' attribute.")
       } 
     }
   }
   if (!is.null(linkedGauss) & !is.null(linkedTables)) {
     if (!all(unlist(linkedTables) %in% names(table_formulas))) {
-      on.exit(add = FALSE)  # Avoids unused-dots check on error
       stop("All tables in 'linkedTables' must exist in 'formula'.")
     }
     table_formulas <- lapply(linkedTables, function(x) combine_formulas(table_formulas[x]))
@@ -441,7 +411,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     
   if (!is.null(lpPackage)){
     if (!requireNamespace(lpPackage, quietly = TRUE)) {
-      on.exit(add = FALSE)  # Avoids unused-dots check on error
       stop(paste0("Package '", lpPackage, "' is not available."))
     }
     GaussSuppression <- GaussSuppression_with_intervals
@@ -451,7 +420,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   if(!(output %in% c("publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions", 
                      "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
                      "primary", "secondary", "all", "pre_gauss_env"))) {
-    on.exit(add = FALSE)  # Avoids unused-dots check on error
     stop('Allowed values of parameter output are "publish", "inner", "publish_inner", "publish_inner_x", "publish_x", "inner_x", "input2functions",
          "inputGaussSuppression", "inputGaussSuppression_x", "outputGaussSuppression", "outputGaussSuppression_x",
                      "primary", "secondary", "all", "pre_gauss_env")')
@@ -473,7 +441,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     singletonMethod <- "none"
   }
   if (!length(singletonMethod)) {
-    on.exit(add = FALSE)  # Avoids unused-dots check on error
     stop("A value of singletonMethod is required.")
   }
   
@@ -512,7 +479,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   if (is.null(dimVar) & is.null(hierarchies) & is.null(formula) & is.null(x)) {
-    on.exit(add = FALSE)  # Avoids unused-dots check on error
     stop("dimVar, hierarchies or formula must be specified")
   }
   
@@ -723,7 +689,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         flush.console()
       }
       if (!isTRUE(all.equal(data[unique(dVar)], charData[unique(dVar)]))) {
-        on.exit(add = FALSE)  # Avoids unused-dots check on error
         stop("dim variables not equal")
       }
       data[uniqueCharVar] <- charData[uniqueCharVar]
@@ -737,7 +702,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       flush.console()
     }
     if(!isTRUE(all.equal(crossTable, as.data.frame(xExtra$crossTable)))){
-      on.exit(add = FALSE)  # Avoids unused-dots check on error
       stop("crossTables not equal")
     }
     x <- xExtra$modelMatrix
@@ -785,7 +749,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   }
   
   if (!is.null(xExtraPrimary) & extraAggregate) {
-    on.exit(add = FALSE)  # Avoids unused-dots check on error
     stop("Combination of xExtraPrimary and extraAggregate is not implemented")
   }
   
@@ -807,7 +770,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     if (!is.logical(forced)) {   # logical allowed in  SSBtools::GaussSuppression
       if (length(forced)) {
         if (min(forced) < 0 | max(forced) > m) {
-          on.exit(add = FALSE)  # Avoids unused-dots check on error
           stop("forced input outside range")
         }
       }
@@ -816,7 +778,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       forced <- forcedA
     } else {
       if(length(forced) != m){
-        on.exit(add = FALSE)  # Avoids unused-dots check on error
         stop("wrong length of forced")
       }
     }
@@ -906,6 +867,34 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       }
     }
   }
+  
+  if (is.character(output)) {
+    if (output %in% c("inputGaussSuppression", "inputGaussSuppression_x")) {
+      action_unused_dots <- "none"
+    }
+  }
+  
+  if(action_unused_dots != "none") {
+    # extra_allowed_unused since these arguments may not be registered as used 
+    # in special cases, e.g. when no primary suppression occurs
+    extra_allowed_unused <- c(
+      "printXdim", "tolGauss", "whenEmptySuppressed", # SSBtools::GaussSuppression
+      "whenPrimaryForced", "iWait", "iFunction",      # SSBtools::GaussSuppression
+      "avoidHierarchical",    # SSBtools::Extend0fromModelMatrixInput and  SSBtools::FormulaSums
+      "hierarchical_extend0"  # SSBtools::Extend0fromModelMatrixInput
+    )
+    allowed_unused_dots <- unique(c(allowed_unused_dots, extra_allowed_unused)) 
+    if (hasArg("avoidHierarchical") & hasArg("avoid_hierarchical")) {   
+      # i.e. called from SSBtools::tables_by_formulas()
+      allowed_unused_dots <- unique(c(allowed_unused_dots, "avoid_hierarchical"))
+    }
+    rlang_warn_extra <- generate_rlang_warn_extra(action_unused_dots, 
+                                                  note = "See arguments `action_unused_dots` and `allowed_unused_dots` in `?GaussSuppressionFromData`.")
+    ellipsis::check_dots_used(action = rlang_warn_extra)
+    touch_dots <- generate_touch_dots(allowed_unused_dots)
+    touch_dots(...)
+  }
+  
   
   if (output == "pre_gauss_env") {
     r_rnd <-as.matrix(crossprod(x, as.matrix(data[r_rnd])))
