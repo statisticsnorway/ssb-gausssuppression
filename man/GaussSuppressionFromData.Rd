@@ -126,7 +126,11 @@ possible columns from  \code{xExtraPrimary} may also be included in the unsafe m
 \item{crossTable}{See above.}
 
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
-This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
+This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.
+When \code{FALSE}, no aggregation is performed.
+When \code{NA}, the function will automatically decide whether to aggregate:
+aggregation is applied unless \code{freqVar} is present and the data contain no duplicated rows with respect to
+the dimensional variables and \code{charVar}.}
 
 \item{extraAggregate}{When \code{TRUE}, the data will be aggregated by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula}.
 The aggregated data and the corresponding x-matrix will only be used as input to the singleton

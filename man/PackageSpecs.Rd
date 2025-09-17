@@ -30,7 +30,7 @@ different specs, and rows represent the parameter settings.\tabular{lllll}{
    \strong{candidates} \tab CandidatesDefault \tab CandidatesNum \tab CandidatesNum \tab DirectDisclosureCandidates \cr
    \strong{singleton} \tab SingletonDefault \tab SingletonUniqueContributor \tab SingletonUniqueContributor \tab SingletonDefault \cr
    \strong{extend0} \tab TRUE \tab FALSE \tab FALSE \tab TRUE \cr
-   \strong{preAggregate} \tab is.null(freqVar) \tab !is.null(charVar) \tab !is.null(charVar) \tab is.null(freqVar) \cr
+   \strong{preAggregate} \tab NA \tab !is.null(charVar) \tab !is.null(charVar) \tab NA \cr
    \strong{extraAggregate} \tab FALSE \tab TRUE \tab TRUE \tab FALSE \cr
    \strong{secondaryZeros} \tab FALSE \tab FALSE \tab FALSE \tab 1 \cr
    \strong{domWeightMethod} \tab  \tab "default" \tab  \tab  \cr
