@@ -98,6 +98,10 @@
 #' @param crossTable See above.  
 #' @param preAggregate When `TRUE`, the data will be aggregated within the function to an appropriate level. 
 #'        This is defined by the dimensional variables according to `dimVar`, `hierarchies` or `formula` and in addition `charVar`.
+#'        When `FALSE`, no aggregation is performed. 
+#'        When `NA`, the function will automatically decide whether to aggregate: 
+#'        aggregation is applied unless `freqVar` is present and the data contain no duplicated rows with respect to 
+#'        the dimensional variables and `charVar`.        
 #' @param extraAggregate When `TRUE`, the data will be aggregated by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
 #'                       The aggregated data and the corresponding x-matrix will only be used as input to the singleton 
 #'                       function and \code{\link[SSBtools]{GaussSuppression}}. 
@@ -245,7 +249,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas any_duplicated_rows
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -493,6 +497,17 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   charVar <- names(data[1, charVar, drop = FALSE])
   
   
+  dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
+  
+  if (is.na(preAggregate)) {
+    preAggregate <- TRUE
+    if (length(freqVar)) {
+      if (any_duplicated_rows(data, cols = unique(c(dVar, charVar))) == 0) {
+        preAggregate <- FALSE
+      } 
+    }
+  }
+  
   if (preAggregate | extraAggregate){
     if(nUniqueVar %in% names(data)){
       warning("nUniqueVar in input data ignored when preAggregate/extraAggregate")
@@ -506,18 +521,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
     }
-    
-    dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
-    
-    if (!length(dVar)) {
-      freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
-      if (!length(freqPlusVarName)) {
-        dVar <- names(data)
-      } else {
-        dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
-      }
-    }
-    dVar <- unique(dVar)
     
     if (!length(dimVar)){
       dimVar <- dVar

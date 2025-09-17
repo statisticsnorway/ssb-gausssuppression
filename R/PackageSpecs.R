@@ -13,7 +13,7 @@
 #'  |\strong{candidates}      |CandidatesDefault       |CandidatesNum              |CandidatesNum                |DirectDisclosureCandidates |
 #'  |\strong{singleton}       |SingletonDefault        |SingletonUniqueContributor |SingletonUniqueContributor   |SingletonDefault           |
 #'  |\strong{extend0}         |TRUE                    |FALSE                      |FALSE                        |TRUE                       |
-#'  |\strong{preAggregate}    |is.null(freqVar)        |!is.null(charVar)          |!is.null(charVar)            |is.null(freqVar)           |
+#'  |\strong{preAggregate}    |NA                      |!is.null(charVar)          |!is.null(charVar)            |NA                         |
 #'  |\strong{extraAggregate}  |FALSE                   |TRUE                       |TRUE                         |FALSE                      |
 #'  |\strong{secondaryZeros}  |FALSE                   |FALSE                      |FALSE                        |1                          |
 #'  |\strong{domWeightMethod} |                        |"default"                  |                             |                           |
@@ -41,7 +41,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         candidates = CandidatesDefault,
         singleton = SingletonDefault,
         extend0 = TRUE,
-        preAggregate = is.null(freqVar),
+        preAggregate = NA,
         extraAggregate = FALSE,
         secondaryZeros = FALSE
       )),
@@ -82,7 +82,7 @@ PackageSpecs <- function(x = NULL, printTable = FALSE) {
         extend0 = TRUE,
         singletonMethod = "anySumNOTprimary",
         singleton = SingletonDefault,
-        preAggregate = is.null(freqVar),
+        preAggregate = NA,
         extraAggregate = FALSE
       ))
   )
