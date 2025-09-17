@@ -73,14 +73,14 @@ and <code>printTable = FALSE</code>), or markdown table describing all specs (if
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The following table summarizes the built-in specs. Columns represent
-different specs, and rows represent the parameter settings.</p><table class="table table"><tr><td></td><td><strong>smallCountSpec</strong></td><td><strong>dominanceSpec</strong></td><td><strong>fewContributorsSpec</strong></td><td><strong>kDisclosureSpec</strong></td></tr><tr><td><strong>primary</strong></td><td>PrimaryDefault</td><td>MagnitudeRule</td><td>NContributorsRule</td><td>KDisclosurePrimary</td></tr><tr><td><strong>protectZeros</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>FALSE</td></tr><tr><td><strong>candidates</strong></td><td>CandidatesDefault</td><td>CandidatesNum</td><td>CandidatesNum</td><td>DirectDisclosureCandidates</td></tr><tr><td><strong>singleton</strong></td><td>SingletonDefault</td><td>SingletonUniqueContributor</td><td>SingletonUniqueContributor</td><td>SingletonDefault</td></tr><tr><td><strong>extend0</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>TRUE</td></tr><tr><td><strong>preAggregate</strong></td><td>is.null(freqVar)</td><td>!is.null(charVar)</td><td>!is.null(charVar)</td><td>is.null(freqVar)</td></tr><tr><td><strong>extraAggregate</strong></td><td>FALSE</td><td>TRUE</td><td>TRUE</td><td>FALSE</td></tr><tr><td><strong>secondaryZeros</strong></td><td>FALSE</td><td>FALSE</td><td>FALSE</td><td>1</td></tr><tr><td><strong>domWeightMethod</strong></td><td></td><td>"default"</td><td></td><td></td></tr><tr><td><strong>singletonMethod</strong></td><td></td><td>"numttHTT"</td><td>"numttHTT"</td><td>"anySumNOTprimary"</td></tr></table></div>
+different specs, and rows represent the parameter settings.</p><table class="table table"><tr><td></td><td><strong>smallCountSpec</strong></td><td><strong>dominanceSpec</strong></td><td><strong>fewContributorsSpec</strong></td><td><strong>kDisclosureSpec</strong></td></tr><tr><td><strong>primary</strong></td><td>PrimaryDefault</td><td>MagnitudeRule</td><td>NContributorsRule</td><td>KDisclosurePrimary</td></tr><tr><td><strong>protectZeros</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>FALSE</td></tr><tr><td><strong>candidates</strong></td><td>CandidatesDefault</td><td>CandidatesNum</td><td>CandidatesNum</td><td>DirectDisclosureCandidates</td></tr><tr><td><strong>singleton</strong></td><td>SingletonDefault</td><td>SingletonUniqueContributor</td><td>SingletonUniqueContributor</td><td>SingletonDefault</td></tr><tr><td><strong>extend0</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>TRUE</td></tr><tr><td><strong>preAggregate</strong></td><td>NA</td><td>!is.null(charVar)</td><td>!is.null(charVar)</td><td>NA</td></tr><tr><td><strong>extraAggregate</strong></td><td>FALSE</td><td>TRUE</td><td>TRUE</td><td>FALSE</td></tr><tr><td><strong>secondaryZeros</strong></td><td>FALSE</td><td>FALSE</td><td>FALSE</td><td>1</td></tr><tr><td><strong>domWeightMethod</strong></td><td></td><td>"default"</td><td></td><td></td></tr><tr><td><strong>singletonMethod</strong></td><td></td><td>"numttHTT"</td><td>"numttHTT"</td><td>"anySumNOTprimary"</td></tr></table></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">PackageSpecs</span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $smallCountSpec</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> list(primary = PrimaryDefault, protectZeros = TRUE, candidates = CandidatesDefault, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     singleton = SingletonDefault, extend0 = TRUE, preAggregate = is.null(freqVar), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     singleton = SingletonDefault, extend0 = TRUE, preAggregate = NA, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     extraAggregate = FALSE, secondaryZeros = FALSE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $dominanceSpec</span>
@@ -99,15 +99,15 @@ different specs, and rows represent the parameter settings.</p><table class="tab
 <span class="r-out co"><span class="r-pr">#&gt;</span> list(primary = KDisclosurePrimary, protectZeros = FALSE, secondaryZeros = 1, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     candidates = DirectDisclosureCandidates, extend0 = TRUE, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     singletonMethod = "anySumNOTprimary", singleton = SingletonDefault, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     preAggregate = is.null(freqVar), extraAggregate = FALSE)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     preAggregate = NA, extraAggregate = FALSE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">PackageSpecs</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> list(primary = PrimaryDefault, protectZeros = TRUE, candidates = CandidatesDefault, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     singleton = SingletonDefault, extend0 = TRUE, preAggregate = is.null(freqVar), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     singleton = SingletonDefault, extend0 = TRUE, preAggregate = NA, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     extraAggregate = FALSE, secondaryZeros = FALSE)</span>
 <span class="r-in"><span><span class="fu">PackageSpecs</span><span class="op">(</span><span class="st">"smallCountSpec"</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> list(primary = PrimaryDefault, protectZeros = TRUE, candidates = CandidatesDefault, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     singleton = SingletonDefault, extend0 = TRUE, preAggregate = is.null(freqVar), </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     singleton = SingletonDefault, extend0 = TRUE, preAggregate = NA, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     extraAggregate = FALSE, secondaryZeros = FALSE)</span>
 <span class="r-in"><span><span class="fu">PackageSpecs</span><span class="op">(</span>printTable <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
@@ -119,7 +119,7 @@ different specs, and rows represent the parameter settings.</p><table class="tab
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{candidates}      |CandidatesDefault       |CandidatesNum              |CandidatesNum                |DirectDisclosureCandidates |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{singleton}       |SingletonDefault        |SingletonUniqueContributor |SingletonUniqueContributor   |SingletonDefault           |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{extend0}         |TRUE                    |FALSE                      |FALSE                        |TRUE                       |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{preAggregate}    |is.null(freqVar)        |!is.null(charVar)          |!is.null(charVar)            |is.null(freqVar)           |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{preAggregate}    |NA                      |!is.null(charVar)          |!is.null(charVar)            |NA                         |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{extraAggregate}  |FALSE                   |TRUE                       |TRUE                         |FALSE                      |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{secondaryZeros}  |FALSE                   |FALSE                      |FALSE                        |1                          |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{domWeightMethod} |                        |"default"                  |                             |                           |</span>

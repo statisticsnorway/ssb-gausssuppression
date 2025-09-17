@@ -51,6 +51,13 @@
 <li>Note: The default for <code>action_unused_dots</code> is <code>"inform"</code> as a cautious starting point. This may change to <code>"warn"</code> in a future release.</li>
 <li>Thanks to Jonas Lindblad for <a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/124" class="external-link">issue </a><a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/124" class="external-link">#124</a>.</li>
 </ul></li>
+<li>New duplicate checking method to decide <code>preAggregate</code> in <code><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts()</a></code>.
+<ul><li>Same method added to the other frequency table wrapper, <code><a href="../reference/SuppressKDisclosure.html">SuppressKDisclosure()</a></code>.<br></li>
+<li>Implemented by adding support for <code>NA</code> in <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> and by updating the specs to use <code>NA</code> as default.
+<ul><li>When <code>preAggregate = NA</code>, the function now decides automatically: aggregation is applied unless <code>freqVar</code> is present and the data contain no duplicated rows with respect to the relevant variables.<br></li>
+<li>Previously, duplicate rows were not checked.</li>
+</ul></li>
+</ul></li>
 <li>Extended experimental support for interval protection with additional parameters.
 <ul><li>In particular, by specifying <code>lpPackage</code> together with <code>protectionIntervals = TRUE</code> in <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code>, tables can now be protected according to the protection levels described in <em>Handbook on Statistical Disclosure Control</em> (2nd ed., Ch. 4.2.2, 2025).</li>
 <li>A similar experimental extension is available in <code><a href="../reference/SuppressSmallCounts.html">SuppressSmallCounts()</a></code>, where the <code>protectionIntervals</code> parameter can be used to include some interval requirements.</li>

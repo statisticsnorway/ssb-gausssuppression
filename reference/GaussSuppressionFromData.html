@@ -222,7 +222,11 @@ possible columns from  <code>xExtraPrimary</code> may also be included in the un
 
 <dt id="arg-preaggregate">preAggregate<a class="anchor" aria-label="anchor" href="#arg-preaggregate"></a></dt>
 <dd><p>When <code>TRUE</code>, the data will be aggregated within the function to an appropriate level.
-This is defined by the dimensional variables according to <code>dimVar</code>, <code>hierarchies</code> or <code>formula</code> and in addition <code>charVar</code>.</p></dd>
+This is defined by the dimensional variables according to <code>dimVar</code>, <code>hierarchies</code> or <code>formula</code> and in addition <code>charVar</code>.
+When <code>FALSE</code>, no aggregation is performed.
+When <code>NA</code>, the function will automatically decide whether to aggregate:
+aggregation is applied unless <code>freqVar</code> is present and the data contain no duplicated rows with respect to
+the dimensional variables and <code>charVar</code>.</p></dd>
 
 
 <dt id="arg-extraaggregate">extraAggregate<a class="anchor" aria-label="anchor" href="#arg-extraaggregate"></a></dt>

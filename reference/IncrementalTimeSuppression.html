@@ -136,16 +136,20 @@ for publication. In other words, these totals are preferred for secondary suppre
 <span class="r-in"><span>          </span></span>
 <span class="r-in"><span><span class="co"># Default settings without suppressedData as input</span></span></span>
 <span class="r-in"><span><span class="va">a1</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">24</span>, <span class="op">]</span><span class="op">)</span>   </span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 24*3-&gt;24*3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 24*6-&gt;8*3]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 8*3-&gt;8*3]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .............</span>
 <span class="r-in"><span><span class="va">a2</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">48</span>, <span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 48*4-&gt;48*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 48*6-&gt;16*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 16*4-&gt;16*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .......................................</span>
 <span class="r-in"><span><span class="va">a3</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">72</span>, <span class="op">]</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 72*4-&gt;72*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 72*6-&gt;24*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 24*4-&gt;24*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .........................</span>
 <span class="r-in"><span><span class="va">a4</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span>, finalTotal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 96*4-&gt;96*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 96*6-&gt;32*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 32*4-&gt;32*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ................................</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># The quarters and named totals</span></span></span>
@@ -160,13 +164,16 @@ for publication. In other words, these totals are preferred for secondary suppre
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Default settings with suppressedData as input</span></span></span>
 <span class="r-in"><span><span class="va">b2</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">48</span>, <span class="op">]</span>, suppressedData <span class="op">=</span> <span class="va">a1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 48*4-&gt;48*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 48*6-&gt;16*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 16*4-&gt;16*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .....................................</span>
 <span class="r-in"><span><span class="va">b3</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">72</span>, <span class="op">]</span>, suppressedData <span class="op">=</span> <span class="va">b2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 72*4-&gt;72*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 72*6-&gt;24*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 24*4-&gt;24*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .............................................</span>
 <span class="r-in"><span><span class="va">b4</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span>, finalTotal <span class="op">=</span> <span class="cn">TRUE</span>, suppressedData <span class="op">=</span> <span class="va">b3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 96*4-&gt;96*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 96*6-&gt;32*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 32*4-&gt;32*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ............................</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Without totalPriority, suppression will be the same as before. </span></span></span>
@@ -183,13 +190,16 @@ for publication. In other words, these totals are preferred for secondary suppre
 <span class="r-in"><span><span class="co"># With totalPriority and  all the subtotals </span></span></span>
 <span class="r-in"><span><span class="co"># Note: subtotals are not prioritized</span></span></span>
 <span class="r-in"><span><span class="va">c2</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">48</span>, <span class="op">]</span>, subTotals <span class="op">=</span> <span class="cn">TRUE</span>, totalPriority <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 48*4-&gt;48*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 48*6-&gt;16*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 16*4-&gt;16*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .......................................</span>
 <span class="r-in"><span><span class="va">c3</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">72</span>, <span class="op">]</span>, subTotals <span class="op">=</span> <span class="cn">TRUE</span>, totalPriority <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 72*5-&gt;72*5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 72*7-&gt;24*5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 24*5-&gt;24*5]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ................................</span>
 <span class="r-in"><span><span class="va">c4</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span>, subTotals <span class="op">=</span> <span class="cn">TRUE</span>, finalTotal <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 96*6-&gt;96*6]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 96*8-&gt;32*6]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 32*6-&gt;32*6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ..............................</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">c2</span><span class="op">$</span><span class="va">quarter</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "quarter_Q1_Q2" "Q1"            "Q2"           </span>
@@ -287,13 +297,16 @@ for publication. In other words, these totals are preferred for secondary suppre
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Here we take into account previously published results.</span></span></span>
 <span class="r-in"><span><span class="va">d2</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">48</span>, <span class="op">]</span>, subTotals <span class="op">=</span> <span class="cn">TRUE</span>, totalPriority <span class="op">=</span> <span class="cn">TRUE</span>, suppressedData <span class="op">=</span> <span class="va">a1</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 48*4-&gt;48*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 48*6-&gt;16*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 16*4-&gt;16*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .....................................</span>
 <span class="r-in"><span><span class="va">d3</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">72</span>, <span class="op">]</span>, subTotals <span class="op">=</span> <span class="cn">TRUE</span>, totalPriority <span class="op">=</span> <span class="cn">TRUE</span>, suppressedData <span class="op">=</span> <span class="va">d2</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 72*5-&gt;72*5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 72*7-&gt;24*5]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 24*5-&gt;24*5]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: ............................</span>
 <span class="r-in"><span><span class="va">d4</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span>, subTotals <span class="op">=</span> <span class="cn">TRUE</span>, finalTotal <span class="op">=</span> <span class="cn">TRUE</span>, suppressedData <span class="op">=</span> <span class="va">d3</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 96*6-&gt;96*6]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 96*8-&gt;32*6]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 32*6-&gt;32*6]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .........................</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="fu">SSBtools</span><span class="fu">::</span><span class="fu"><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/SortRows.html" class="external-link">SortRows</a></span><span class="op">(</span><span class="va">d2</span><span class="op">[</span><span class="va">d2</span><span class="op">$</span><span class="va">suppressed</span>, <span class="op">]</span><span class="op">)</span></span></span>
@@ -387,7 +400,8 @@ for publication. In other words, these totals are preferred for secondary suppre
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># If necessary, several suppressed data sets can be taken into account</span></span></span>
 <span class="r-in"><span><span class="va">e4</span> <span class="op">&lt;-</span> <span class="fu">STS</span><span class="op">(</span><span class="va">d</span>, finalTotal <span class="op">=</span> <span class="cn">TRUE</span>, suppressedData <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="va">a1</span>, <span class="va">a2</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 96*4-&gt;96*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [preAggregate 96*6-&gt;32*4]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [extend0 32*4-&gt;32*4]</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> GaussSuppression_anySum: .............................</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
