@@ -493,6 +493,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   charVar <- names(data[1, charVar, drop = FALSE])
   
   
+  dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
+  
+  
   if (preAggregate | extraAggregate){
     if(nUniqueVar %in% names(data)){
       warning("nUniqueVar in input data ignored when preAggregate/extraAggregate")
@@ -506,18 +509,6 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       cat("[preAggregate ", dim(data)[1], "*", dim(data)[2], "->", sep = "")
       flush.console()
     }
-    
-    dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
-    
-    if (!length(dVar)) {
-      freqPlusVarName <- c(freqVar, numVar, weightVar, charVar)
-      if (!length(freqPlusVarName)) {
-        dVar <- names(data)
-      } else {
-        dVar <- names(data[1, !(names(data) %in% freqPlusVarName), drop = FALSE])
-      }
-    }
-    dVar <- unique(dVar)
     
     if (!length(dimVar)){
       dimVar <- dVar
