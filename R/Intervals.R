@@ -39,7 +39,7 @@
 #' @importFrom stats na.omit runif
 #' @importFrom utils flush.console
 #' @importFrom Matrix colSums t crossprod
-#' @importFrom SSBtools DummyDuplicated GaussIndependent Reduce0exact As_TsparseMatrix
+#' @importFrom SSBtools DummyDuplicated GaussIndependent Reduce0exact As_TsparseMatrix zero_col
 #' @importFrom methods as
 #'
 #' @export
@@ -293,7 +293,7 @@ ComputeIntervals1 <- function(a,
   
   # To prevent "lpSolve" and possibly other packages 
   # that require non-empty rows from failing.
-  zero_row_f.con <- SSBtools:::zero_col(f.con, rows = TRUE)
+  zero_row_f.con <- SSBtools::zero_col(f.con, rows = TRUE)
   if (any(zero_row_f.con)) {
     # A test could be added to check whether max(abs(f.rhs[zero_row_f.con])) is 0.
     # Precision errors must be taken into account (i.e. check if close to 0).
