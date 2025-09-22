@@ -249,7 +249,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas any_duplicated_rows
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas any_duplicated_rows get_colnames
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -486,15 +486,11 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     stop("dimVar, hierarchies or formula must be specified")
   }
   
-  if (!(preAggregate & aggregatePackage == "data.table")) {
-    data <- as.data.frame(data)
-  }
-  
-  dimVar <- names(data[1, dimVar, drop = FALSE])
-  freqVar <- names(data[1, freqVar, drop = FALSE])
-  numVar <- names(data[1, numVar, drop = FALSE])
-  weightVar <- names(data[1, weightVar, drop = FALSE])
-  charVar <- names(data[1, charVar, drop = FALSE])
+  dimVar <- get_colnames(data, dimVar)
+  freqVar <- get_colnames(data, freqVar)
+  numVar <- get_colnames(data, numVar)
+  weightVar <- get_colnames(data, weightVar)
+  charVar <- get_colnames(data, charVar)
   
   
   dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
@@ -506,6 +502,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         preAggregate <- FALSE
       } 
     }
+  }
+  
+  if (!(preAggregate & aggregatePackage == "data.table")) {
+    data <- as.data.frame(data)
   }
   
   if (preAggregate | extraAggregate){
