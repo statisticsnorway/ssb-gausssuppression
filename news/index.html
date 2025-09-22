@@ -67,6 +67,10 @@
 <li>New parameter <code>intervalSuppression</code> to <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> and its wrappers.
 <ul><li>Controls whether interval requirements are only calculated and reported, or also used for suppression (if <code>lpPackage</code> is specified).</li>
 </ul></li>
+<li>Bug fix implemented for interval calculations with lpSolve so that constraint matrices with empty rows do not produce an error.
+<ul><li>This fix also prepares for possible future lp-solver packages that may require non-empty rows.</li>
+<li>Thanks to Jonas Lindblad for <a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/130" class="external-link">issue </a><a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/130" class="external-link">#130</a>.</li>
+</ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.1.5" id="gausssuppression-115">GaussSuppression 1.1.5<a class="anchor" aria-label="anchor" href="#gausssuppression-115"></a></h2><p class="text-muted">CRAN release: 2025-08-25</p>
