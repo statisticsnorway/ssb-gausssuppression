@@ -30,6 +30,10 @@
 * New parameter `intervalSuppression` to `GaussSuppressionFromData()` and its wrappers. 
   - Controls whether interval requirements are only calculated and reported, 
     or also used for suppression (if `lpPackage` is specified).
+* Bug fix implemented for interval calculations with lpSolve so that 
+  constraint matrices with empty rows do not produce an error.
+  - This fix also prepares for possible future lp-solver packages that may require non-empty rows.
+  - Thanks to Jonas Lindblad for [issue #130](https://github.com/statisticsnorway/ssb-gausssuppression/issues/130).
 
 
 

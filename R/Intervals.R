@@ -39,7 +39,7 @@
 #' @importFrom stats na.omit runif
 #' @importFrom utils flush.console
 #' @importFrom Matrix colSums t crossprod
-#' @importFrom SSBtools DummyDuplicated GaussIndependent Reduce0exact As_TsparseMatrix
+#' @importFrom SSBtools DummyDuplicated GaussIndependent Reduce0exact As_TsparseMatrix zero_col
 #' @importFrom methods as
 #'
 #' @export
@@ -289,6 +289,20 @@ ComputeIntervals1 <- function(a,
       c(f.dir, rep(">=", length(primary3) + length(secondary3)))
     f.rhs <-
       c(f.rhs, rep(minVal, length(primary3) + length(secondary3)))
+  }
+  
+  # To prevent "lpSolve" and possibly other packages 
+  # that require non-empty rows from failing.
+  zero_row_f.con <- SSBtools::zero_col(f.con, rows = TRUE)
+  if (any(zero_row_f.con)) {
+    # A test could be added to check whether max(abs(f.rhs[zero_row_f.con])) is 0.
+    # Precision errors must be taken into account (i.e. check if close to 0).
+    # Still, there is a higher risk that such a test fails due to numerical issues
+    # than that the input itself is actually wrong. In any case, the input data
+    # is assumed to be correct.
+    f.con <- f.con[!zero_row_f.con, , drop = FALSE]
+    f.dir <- f.dir[!zero_row_f.con]
+    f.rhs <- f.rhs[!zero_row_f.con]
   }
   
   if (verbose) cat("\n")
