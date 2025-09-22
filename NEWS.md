@@ -11,6 +11,27 @@
   - Note: The default for `action_unused_dots` is `"inform"` as a cautious starting point.
   This may change to `"warn"` in a future release.
   - Thanks to Jonas Lindblad for [issue #124](https://github.com/statisticsnorway/ssb-gausssuppression/issues/124).
+* New duplicate checking method to decide `preAggregate` in `SuppressSmallCounts()`.
+  - Same method added to the other frequency table wrapper, `SuppressKDisclosure()`.  
+  - Implemented by adding support for `NA` in `GaussSuppressionFromData()` and by updating the specs to use `NA` as default.  
+    - When `preAggregate = NA`, the function now decides automatically: aggregation is applied unless `freqVar` is present 
+      and the data contain no duplicated rows with respect to the relevant variables.  
+    - Previously, duplicate rows were not checked.
+* Extended experimental support for interval protection with additional parameters.
+  - In particular, by specifying `lpPackage` together with 
+    `protectionIntervals = TRUE` in `SuppressDominantCells()`, tables can now 
+    be protected according to the protection levels described in 
+    *Handbook on Statistical Disclosure Control* (2nd ed., Ch. 4.2.2, 2025).
+  - A similar experimental extension is available in `SuppressSmallCounts()`, 
+    where the `protectionIntervals` parameter can be used to include some interval requirements.
+  - See `?IntervalLimits` and the parameter description of `lpPackage` in 
+    `?GaussSuppressionFromData` for details.
+  - Addresses [issue #131](https://github.com/statisticsnorway/ssb-gausssuppression/issues/131).
+* New parameter `intervalSuppression` to `GaussSuppressionFromData()` and its wrappers. 
+  - Controls whether interval requirements are only calculated and reported, 
+    or also used for suppression (if `lpPackage` is specified).
+
+
 
 ## GaussSuppression 1.1.5
 * Major update to the functionality via **`SuppressLinkedTables()`** and **`linkedGauss`**:  

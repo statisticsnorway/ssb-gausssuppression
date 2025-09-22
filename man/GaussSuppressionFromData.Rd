@@ -38,6 +38,7 @@ GaussSuppressionFromData(
   forcedInOutput = "ifNonNULL",
   unsafeInOutput = "ifForcedInOutput",
   lpPackage = NULL,
+  intervalSuppression = TRUE,
   aggregatePackage = "base",
   aggregateNA = TRUE,
   aggregateBaseOrder = FALSE,
@@ -125,7 +126,11 @@ possible columns from  \code{xExtraPrimary} may also be included in the unsafe m
 \item{crossTable}{See above.}
 
 \item{preAggregate}{When \code{TRUE}, the data will be aggregated within the function to an appropriate level.
-This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.}
+This is defined by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula} and in addition \code{charVar}.
+When \code{FALSE}, no aggregation is performed.
+When \code{NA}, the function will automatically decide whether to aggregate:
+aggregation is applied unless \code{freqVar} is present and the data contain no duplicated rows with respect to
+the dimensional variables and \code{charVar}.}
 
 \item{extraAggregate}{When \code{TRUE}, the data will be aggregated by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula}.
 The aggregated data and the corresponding x-matrix will only be used as input to the singleton
@@ -169,24 +174,40 @@ In addition, \code{TRUE} and \code{FALSE} are allowed as alternatives to  \code{
 see details.}
 
 \item{lpPackage}{\itemize{
-\item \strong{\code{lpPackage}:}
-When non-NULL, intervals by \code{\link{ComputeIntervals}}
-will be included in the output.
-See its documentation for valid parameter values for 'lpPackage'.
-If, additionally, at least one of the two \code{\link{RangeLimitsDefault}} parameters below is specified,
-further suppression will be performed to satisfy the interval width requirements.
-Then, the values in the output variable \code{suppressed_integer} means:
-no suppression (0),
-primary suppression (1),
-secondary suppression (2),
-additional suppression applied by an interval algorithm limited to linearly independent cells (3),
-and further suppression according to the final gauss algorithm (4).
-Intervals, \verb{[lo_1, up_1]}, are intervals calculated prior to additional suppression.
+\item When non-NULL, intervals computed by \code{\link[=ComputeIntervals]{ComputeIntervals()}} will
+be included in the output. Valid values are the names of supported R
+packages for linear programming backends: \code{"highs"}, \code{"Rsymphony"},
+\code{"Rglpk"}, or \code{"lpSolve"}.
+\item If interval requirements are specified, additional suppression will be
+performed to satisfy those requirements. Interval requirements can be
+set either through arguments of \code{\link[=IntervalLimits]{IntervalLimits()}} or by enabling
+\code{protectionIntervals = TRUE} in the primary suppression functions.
+See \code{\link[=IntervalLimits]{IntervalLimits()}} for a full description of the parameters
+(\code{protectionPercent}, \code{protectionLimit}, \code{loProtectionPercent},
+\code{loProtectionLimit}, \code{rangePercent}, \code{rangeMin}) and how interval
+requirements are calculated.
 \itemize{
-\item \strong{\code{rangePercent}:} Required interval width expressed as a percentage
-\item \strong{\code{rangeMin}:} Minimum required width of the interval
+\item In the output variable \code{suppressed_integer}, suppression status is
+coded as:
+0 = no suppression,
+1 = primary suppression,
+2 = secondary suppression,
+3 = additional suppression applied by an interval algorithm limited
+to linearly independent cells,
+4 = further suppression according to the final gauss algorithm.
+\item Intervals \verb{[lo_1, up_1]} are calculated prior to additional suppression.
+\item To disable additional suppression, set \code{intervalSuppression = FALSE}.
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{         Please note that additional suppression based on parameters other than
+         rangePercent and rangeMin is currently considered experimental.
+         In particular, the names of the newer parameters may still change.
+}\if{html}{\out{</div>}}
 }
 }}
+
+\item{intervalSuppression}{Logical. If \code{FALSE}, additional suppression to satisfy interval
+requirements is disabled (default is \code{TRUE}). See description of
+\code{lpPackage} above.}
 
 \item{aggregatePackage}{Package used to preAggregate/extraAggregate.
 Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}

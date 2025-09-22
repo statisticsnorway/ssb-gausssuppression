@@ -4,7 +4,14 @@
 \alias{PrimaryDefault}
 \title{Default primary function}
 \usage{
-PrimaryDefault(freq, maxN = 3, protectZeros = TRUE, freqVar, ...)
+PrimaryDefault(
+  freq,
+  maxN = 3,
+  protectZeros = TRUE,
+  protectionIntervals = FALSE,
+  freqVar,
+  ...
+)
 }
 \arguments{
 \item{freq}{Vector of output frequencies}
@@ -14,6 +21,14 @@ Can also be a named list or vector, where the value corresponding to \code{freqV
 if available. If not found, the name \code{"freq"} is tried as an alternative.}
 
 \item{protectZeros}{When \code{TRUE}, cells with zero frequency are set as primary suppressed.}
+
+\item{protectionIntervals}{Logical. When \code{TRUE}, some interval requirements
+are included in the output as a safeguard against obvious weaknesses with
+respect to attribute disclosure.
+The rule is that the upper bound must be at least 1 above the observed frequency,
+and the total interval width must be at least 2.
+The corresponding variables are added with names starting with \code{upmin_} and \code{rlim_}.
+See \code{\link[=IntervalLimits]{IntervalLimits()}} for setting interval limits in general.}
 
 \item{freqVar}{Character string used to select the appropriate value from \code{maxN} if it is a named object.
 see \code{maxN} above.}

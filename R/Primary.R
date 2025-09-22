@@ -101,11 +101,20 @@ Primary <- function(primary, crossTable, x, eachPrimary = FALSE, ...) {
 #' @param protectZeros When `TRUE`, cells with zero frequency are set as primary suppressed. 
 #' @param freqVar Character string used to select the appropriate value from `maxN` if it is a named object. 
 #'                see `maxN` above.
+#' @param protectionIntervals Logical. When `TRUE`, some interval requirements 
+#'   are included in the output as a safeguard against obvious weaknesses with 
+#'   respect to attribute disclosure.
+#'   The rule is that the upper bound must be at least 1 above the observed frequency, 
+#'   and the total interval width must be at least 2.
+#'   The corresponding variables are added with names starting with `upmin_` and `rlim_`.    
+#'    See [IntervalLimits()] for setting interval limits in general.           
 #' @param ... Unused parameters 
 #'
 #' @return primary, \code{\link[SSBtools]{GaussSuppression}} input 
 #' @export
-PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, freqVar, ...) {
+PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, 
+                           protectionIntervals = FALSE,
+                           freqVar, ...) {
   
   if(is.null(maxN))         stop("A non-NULL value of maxN is required.")
   if(is.null(protectZeros)) stop("A non-NULL value of protectZeros is required.")
@@ -115,6 +124,13 @@ PrimaryDefault <- function(freq, maxN = 3, protectZeros = TRUE, freqVar, ...) {
   primary <- freq <= maxN
   if (!protectZeros) 
     primary[freq == 0] <- FALSE
+  
+  if (protectionIntervals) {
+    intervalLimits <- data.frame(upmin = freq + 1, rlim = 2)
+    intervalLimits[!primary, ] <- NA
+    colnames(intervalLimits) <- paste(colnames(intervalLimits), freqVar, sep = "_")
+    return(list(primary = primary, numExtra = intervalLimits))
+  }
   
   primary
 }

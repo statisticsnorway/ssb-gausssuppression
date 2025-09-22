@@ -8,13 +8,14 @@
 #' 
 #' @inheritParams ComputeIntervals
 #' @param candidates `candidates` as indices
-#' @param rangeLimits As computed by \code{\link{RangeLimitsDefault}} 
+#' @param intervalLimits As computed by \code{\link{IntervalLimits}} 
 #'
 #'
 #' @importFrom stats na.omit runif
 #' @importFrom utils flush.console
 #' @importFrom Matrix colSums t crossprod solve
 #' @importFrom SSBtools DummyDuplicated GaussIndependent Reduce0exact As_TsparseMatrix
+#' @importFrom stats setNames
 #'
 #' @export
 #'
@@ -29,7 +30,7 @@ FixRiskyIntervals <-
            gaussI = FALSE,   # Here important parameter, FALSE for best results, gaussI2 instead below  
            allInt = FALSE,
            sparseConstraints = TRUE, 
-           rangeLimits,
+           intervalLimits,
            cell_grouping = rep(0, length(z))) {
     
 
@@ -65,11 +66,9 @@ FixRiskyIntervals <-
     
     candidates <- unique(c(candidates, seq_len(ncol(x))))
     
-    
-    rangeLimits_ <- rep(NaN, ncol(x))
-    rangeLimits_[primary] <- rangeLimits
-    
-    rangeLimits_ <-  rangeLimits_[candidates]
+    intervalLimits_ <- matrix(NA, ncol(x), ncol(intervalLimits), dimnames = list(NULL, names(intervalLimits)))
+    intervalLimits_[primary, ] <- as.matrix(intervalLimits)
+    intervalLimits_ <- intervalLimits_[candidates, , drop = FALSE]
     
     rearrange <- order(candidates)
     
@@ -93,7 +92,8 @@ FixRiskyIntervals <-
     if(any(cell_grouping != 0)){
       x <- cbind(x, x0diff(x, cell_grouping))
       z <- c(z, rep(0, ncol(x) - input_ncol_x))
-      rangeLimits_ <- c(rangeLimits_, rep(NA, ncol(x) - input_ncol_x))
+      intervalLimits_ <- rbind(intervalLimits_, matrix(NA, ncol(x) - input_ncol_x, ncol(intervalLimits_)))
+      
       avoid_duplicate_computation <- TRUE   # Similar code as in ComputeIntervals()
       if (avoid_duplicate_computation) {
           duplicated_cell_grouping <- which(cell_grouping != 0 & duplicated(cell_grouping))
@@ -125,7 +125,7 @@ FixRiskyIntervals <-
     x <- x[, c(published, cell_diff, primary, secondary), drop = FALSE]
     z <- z[c(published, cell_diff, primary, secondary)]
     
-    rangeLimits_ <- rangeLimits_[c(published, cell_diff, primary, secondary)] 
+    intervalLimits_ <- intervalLimits_[c(published, cell_diff, primary, secondary), , drop = FALSE] 
     
     published2 <- seq_len(length(published))
     cell_diff2 <- length(published) + seq_len(length(cell_diff))
@@ -150,7 +150,7 @@ FixRiskyIntervals <-
       x <- x[, idxDDunique, drop = FALSE]
       z <- z[idxDDunique]
       
-      rangeLimits_ <- rangeLimits_[idxDDunique]
+      intervalLimits_ <- intervalLimits_[idxDDunique, , drop = FALSE]
       
       candidates_published3 <- candidates_published[idxDDunique] 
       
@@ -302,7 +302,7 @@ FixRiskyIntervals <-
                                     check,
                                     verbose = FALSE, 
                                     extra_suppressed = c(extra_suppressed, extra_from_gaussI),
-                                    rangeLimits_,
+                                    intervalLimits_,
                                     i)
         
         best_ok[!risky & check] <- i
@@ -374,7 +374,7 @@ RiskyInterInterval <- function(a,
                                check,
                                verbose, 
                                extra_suppressed,
-                               rangeLimits_,
+                               intervalLimits_,
                                i) {
   
   cols <- seq_len(i)
@@ -387,11 +387,57 @@ RiskyInterInterval <- function(a,
   intervals1 <- ComputeIntervals1(ai, x, primary3, secondary3, minVal, allInt, lpPackage, sparseConstraints, AsMatrix, check, verbose,
                                   cell_diff3 = cell_diff3)
 
+  risky <- FindRisky(intervalLimits_[primary3, , drop = FALSE], 
+                     lo = intervals1$lo[primary3], 
+                     up = intervals1$up[primary3])
   
-  gauss_ranges <- intervals1$up[primary3] - intervals1$lo[primary3]
-  
-  risky <- (gauss_ranges - rangeLimits_[primary3]) < 0
-  risky[is.na(risky)] <- FALSE
   risky
 }
+
+# eps to allow for numerical error, and as large as 1e-05 since values may differ greatly in scale
+# NAs set to FALSE: prevents warnings later and ensures that | works correctly
+FindRisky <- function(intervalLimits, lo, up, eps = 1e-05) {
+  
+  risky <- rep(FALSE, nrow(intervalLimits))
+  
+  if ("rlim" %in% colnames(intervalLimits)) {
+    risky_12 <- ((up - lo) - (1 - eps) * intervalLimits[, "rlim"]) < 0
+    risky_12[is.na(risky_12)] <- FALSE
+    risky <- risky | risky_12
+  }
+  
+  if ("lomax" %in% colnames(intervalLimits)) {
+    risky_1 <- lo - (1 + eps) * intervalLimits[, "lomax"] > 0
+    risky_1[is.na(risky_1)] <- FALSE
+    risky <- risky | risky_1
+  }
+  
+  if ("upmin" %in% colnames(intervalLimits)) {
+    risky_2 <- up - (1 - eps) * intervalLimits[, "upmin"] < 0
+    risky_2[is.na(risky_2)] <- FALSE
+    risky <- risky | risky_2
+  }
+  
+  risky
+  
+}
+
+
+
+# Made by ChatGPT 
+# Function to adjust precision based on the magnitude of the number
+adjust_precision <- function(number) {
+  if(number < 0.001) {
+    return(formatC(number, format = "f", digits = 7))
+  } else if(number < 1) {
+    return(formatC(number, format = "f", digits = 4))
+  } else if(number < 10) {
+    return(formatC(number, format = "f", digits = 3))
+  } else if(number < 100) {
+    return(formatC(number, format = "f", digits = 2))
+  } else {
+    return(formatC(number, format = "f", digits = 1))
+  }
+}
+
 
