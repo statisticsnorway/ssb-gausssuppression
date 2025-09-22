@@ -14,7 +14,7 @@ Authors@R: c(person("Øyvind", "Langsrud", role = c("aut", "cre"),
                     comment = c(ORCID = "0000-0003-1925-5911")),
              person("Jonas", "Lindblad", role = c("ctb")),        
              person("Statistics Norway", role = "cph"))
-Imports: SSBtools (>= 1.8.1), RegSDC (>= 0.7.0), stats, methods, utils, Matrix, 
+Imports: SSBtools (>= 1.8.2), RegSDC (>= 0.7.0), stats, methods, utils, Matrix, 
          ellipsis, rlang
 Description: A statistical disclosure control tool to protect tables by suppression 
     using the Gaussian elimination secondary suppression algorithm 
