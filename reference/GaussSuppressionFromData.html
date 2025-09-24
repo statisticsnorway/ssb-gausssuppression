@@ -226,7 +226,8 @@ This is defined by the dimensional variables according to <code>dimVar</code>, <
 When <code>FALSE</code>, no aggregation is performed.
 When <code>NA</code>, the function will automatically decide whether to aggregate:
 aggregation is applied unless <code>freqVar</code> is present and the data contain no duplicated rows with respect to
-the dimensional variables and <code>charVar</code>.</p></dd>
+the dimensional variables and <code>charVar</code>.
+Exception: if a non-<code>NULL</code> <code>x</code> (the model matrix) is supplied, <code>NA</code> is treated as <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-extraaggregate">extraAggregate<a class="anchor" aria-label="anchor" href="#arg-extraaggregate"></a></dt>
