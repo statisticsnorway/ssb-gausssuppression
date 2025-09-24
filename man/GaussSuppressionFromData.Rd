@@ -130,7 +130,8 @@ This is defined by the dimensional variables according to \code{dimVar}, \code{h
 When \code{FALSE}, no aggregation is performed.
 When \code{NA}, the function will automatically decide whether to aggregate:
 aggregation is applied unless \code{freqVar} is present and the data contain no duplicated rows with respect to
-the dimensional variables and \code{charVar}.}
+the dimensional variables and \code{charVar}.
+Exception: if a non-\code{NULL} \code{x} (the model matrix) is supplied, \code{NA} is treated as \code{FALSE}.}
 
 \item{extraAggregate}{When \code{TRUE}, the data will be aggregated by the dimensional variables according to \code{dimVar}, \code{hierarchies} or \code{formula}.
 The aggregated data and the corresponding x-matrix will only be used as input to the singleton

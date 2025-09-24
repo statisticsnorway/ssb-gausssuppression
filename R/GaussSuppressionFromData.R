@@ -102,6 +102,7 @@
 #'        When `NA`, the function will automatically decide whether to aggregate: 
 #'        aggregation is applied unless `freqVar` is present and the data contain no duplicated rows with respect to 
 #'        the dimensional variables and `charVar`.        
+#'        Exception: if a non-`NULL` `x` (the model matrix) is supplied, `NA` is treated as `FALSE`.
 #' @param extraAggregate When `TRUE`, the data will be aggregated by the dimensional variables according to `dimVar`, `hierarchies` or `formula`.
 #'                       The aggregated data and the corresponding x-matrix will only be used as input to the singleton 
 #'                       function and \code{\link[SSBtools]{GaussSuppression}}. 
@@ -496,11 +497,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   dVar <- NamesFromModelMatrixInput(hierarchies = hierarchies, formula = formula, dimVar = dimVar)
   
   if (is.na(preAggregate)) {
-    preAggregate <- TRUE
-    if (length(freqVar)) {
-      if (any_duplicated_rows(data, cols = unique(c(dVar, charVar))) == 0) {
-        preAggregate <- FALSE
-      } 
+    if (!is.null(x)) {
+      preAggregate <- FALSE
+    } else {
+      preAggregate <- TRUE
+      if (length(freqVar)) {
+        if (any_duplicated_rows(data, cols = unique(c(dVar, charVar))) == 0) {
+          preAggregate <- FALSE
+        } 
+      }
     }
   }
   
