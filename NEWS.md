@@ -1,4 +1,4 @@
-## GaussSuppression 1.1.6
+## GaussSuppression 1.2.0
 * New checks for unused arguments in `...` using 
   [ellipsis::check_dots_used()](https://ellipsis.r-lib.org/reference/check_dots_used.html),
   so that misspelled or irrelevant arguments are not silently ignored.
