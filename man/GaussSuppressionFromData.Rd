@@ -49,6 +49,9 @@ GaussSuppressionFromData(
   recordAware = TRUE,
   collapseAware = FALSE,
   linkedTables = NULL,
+  da_vars = NULL,
+  da_fun = NULL,
+  da_args = NULL,
   action_unused_dots = getOption("GaussSuppression.action_unused_dots", "inform"),
   allowed_unused_dots = getOption("GaussSuppression.allowed_unused_dots", character(0))
 )
@@ -275,6 +278,12 @@ The corresponding tables will be combined and treated as a single table by the a
 For example: \code{linkedTables = list(c("table_1", "table_3"), "table_2")}.
 If \code{NULL} (default), each table in \code{formula} is used individually.}
 
+\item{da_vars}{da_vars}
+
+\item{da_fun}{da_fun}
+
+\item{da_args}{= da_args}
+
 \item{action_unused_dots}{Character string controlling how unused arguments
 in \code{...} are handled. Internally uses \code{\link[ellipsis:check_dots_used]{ellipsis::check_dots_used()}} with a
 custom action. One of "warn", "abort", "inform", or "none". The value "none"
@@ -303,7 +312,7 @@ secondary suppression by Gaussian elimination by \code{\link[SSBtools]{GaussSupp
 \details{
 The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments:
 \code{crossTable},  \code{x}, \code{freq}, \code{num}, \code{weight}, \code{maxN}, \code{protectZeros}, \code{secondaryZeros}, \code{data}, \code{freqVar}, \code{numVar}, \code{weightVar}, \code{charVar}, \code{dimVar}
-\code{aggregatePackage}, \code{aggregateNA}, \code{aggregateBaseOrder}, \code{rowGroupsPackage}, \code{structuralEmpty}, and \code{...}.
+\code{aggregatePackage}, \code{aggregateNA}, \code{aggregateBaseOrder}, \code{rowGroupsPackage}, \code{structuralEmpty},  \code{da_out}, and \code{...}.
 where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (\code{modelMatrix} renamed to \code{x}).
 The vector, \code{freq}, is aggregated counts (\code{t(x) \%*\% data[[freqVar]]}).
 In addition, the supplied \code{singleton} function also takes \code{nUniqueVar} and (output from) \code{primary} as input.
