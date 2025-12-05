@@ -229,9 +229,17 @@
 #'   For example: `linkedTables = list(c("table_1", "table_3"), "table_2")`.
 #'   If `NULL` (default), each table in `formula` is used individually.
 #'   
-#' @param da_vars da_vars 
-#' @param da_fun da_fun 
-#' @param da_args = da_args
+#' @param da_vars The `vars` argument passed to [SSBtools::dummy_aggregate()].
+#'   Together with the two parameters below, this enables computing results via
+#'   [SSBtools::aggregate_multiple_fun()] in the same way as when using
+#'   [SSBtools::model_aggregate()].  
+#'   The calculations are performed by calling [SSBtools::dummy_aggregate()] with
+#'   the model matrix (`x`) before any potential use of `extraAggregate`.  
+#'   Internally, the result is stored in a data frame named `da_out`, which is
+#'   available to the supplied functions in the same manner as `num`.  
+#'   The columns of `da_out` are added to the final output.
+#' @param da_fun The `fun` argument passed to [SSBtools::dummy_aggregate()].
+#' @param da_args A list of additional arguments passed to [SSBtools::dummy_aggregate()].
 #' 
 #' @param action_unused_dots Character string controlling how unused arguments
 #'   in `...` are handled. Internally uses [ellipsis::check_dots_used()] with a

@@ -278,11 +278,19 @@ The corresponding tables will be combined and treated as a single table by the a
 For example: \code{linkedTables = list(c("table_1", "table_3"), "table_2")}.
 If \code{NULL} (default), each table in \code{formula} is used individually.}
 
-\item{da_vars}{da_vars}
+\item{da_vars}{The \code{vars} argument passed to \code{\link[SSBtools:dummy_aggregate]{SSBtools::dummy_aggregate()}}.
+Together with the two parameters below, this enables computing results via
+\code{\link[SSBtools:aggregate_multiple_fun]{SSBtools::aggregate_multiple_fun()}} in the same way as when using
+\code{\link[SSBtools:model_aggregate]{SSBtools::model_aggregate()}}.
+The calculations are performed by calling \code{\link[SSBtools:dummy_aggregate]{SSBtools::dummy_aggregate()}} with
+the model matrix (\code{x}) before any potential use of \code{extraAggregate}.
+Internally, the result is stored in a data frame named \code{da_out}, which is
+available to the supplied functions in the same manner as \code{num}.
+The columns of \code{da_out} are added to the final output.}
 
-\item{da_fun}{da_fun}
+\item{da_fun}{The \code{fun} argument passed to \code{\link[SSBtools:dummy_aggregate]{SSBtools::dummy_aggregate()}}.}
 
-\item{da_args}{= da_args}
+\item{da_args}{A list of additional arguments passed to \code{\link[SSBtools:dummy_aggregate]{SSBtools::dummy_aggregate()}}.}
 
 \item{action_unused_dots}{Character string controlling how unused arguments
 in \code{...} are handled. Internally uses \code{\link[ellipsis:check_dots_used]{ellipsis::check_dots_used()}} with a
