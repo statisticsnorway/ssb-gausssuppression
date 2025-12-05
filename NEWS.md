@@ -1,3 +1,17 @@
+
+## GaussSuppression 1.2.1
+* Added three new parameters (`da_vars`, `da_fun`, and `da_args`) to enable
+  the use of `SSBtools::dummy_aggregate()` within `GaussSuppressionFromData()`
+  and its wrappers.
+  - This makes it possible to compute derived variables via
+    `SSBtools::aggregate_multiple_fun()` in the same way as when using
+    `SSBtools::model_aggregate()`.
+  - The intermediate result is stored in an internal data frame (`da_out`),
+    which is available to user-supplied functions and whose columns are added
+    to the final output.
+
+
+
 ## GaussSuppression 1.2.0
 * New checks for unused arguments in `...` using 
   [ellipsis::check_dots_used()](https://ellipsis.r-lib.org/reference/check_dots_used.html),
