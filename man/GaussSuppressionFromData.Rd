@@ -286,7 +286,8 @@ The calculations are performed by calling \code{\link[SSBtools:dummy_aggregate]{
 the model matrix (\code{x}) before any potential use of \code{extraAggregate}.
 Internally, the result is stored in a data frame named \code{da_out}, which is
 available to the supplied functions in the same manner as \code{num}.
-The columns of \code{da_out} are added to the final output.}
+The columns of \code{da_out} are added to the final output.
+See \code{\link[=SuppressDominantCells]{SuppressDominantCells()}} examples.}
 
 \item{da_fun}{The \code{fun} argument passed to \code{\link[SSBtools:dummy_aggregate]{SSBtools::dummy_aggregate()}}.}
 

@@ -238,6 +238,7 @@
 #'   Internally, the result is stored in a data frame named `da_out`, which is
 #'   available to the supplied functions in the same manner as `num`.  
 #'   The columns of `da_out` are added to the final output.
+#'   See [SuppressDominantCells()] examples. 
 #' @param da_fun The `fun` argument passed to [SSBtools::dummy_aggregate()].
 #' @param da_args A list of additional arguments passed to [SSBtools::dummy_aggregate()].
 #' 
