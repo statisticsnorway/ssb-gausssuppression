@@ -597,7 +597,8 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         if (!identical(data[unique(c(dVar, charVar))], da_data[unique(c(dVar, charVar))])) {
           stop("Not consistent aggregation")
         }
-        da_data <- da_data[fun_vars]
+        # As da_data[fun_vars], but trick to ensure last occurrence chosen
+        da_data <- da_data[ncol(da_data) + 1L - match(fun_vars, rev(names(da_data)))]
       }
         
       if (printInc) {
