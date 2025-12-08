@@ -9,7 +9,11 @@
   - The intermediate result is stored in an internal data frame (`da_out`),
     which is available to user-supplied functions and whose columns are added
     to the final output.
-
+* Improved handling of unused dots
+  - Default for `action_unused_dots` changed from `"inform"` to `"warn"` to make
+  messages easier for users to recognise and interpret as non-critical warnings.
+  - Internal list of allowed unused dots expanded to avoid unnecessary warnings
+  in additional special cases.
 
 
 ## GaussSuppression 1.2.0
