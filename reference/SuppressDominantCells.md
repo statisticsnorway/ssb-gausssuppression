@@ -562,16 +562,6 @@ tables_by_formulas(SSBtoolsData("magnitude1"),
    singletonMethod = "none")                             
 #> [preAggregate 23*6->10*6]
 #> GaussSuppression_none: ..............
-#> Arguments in `...` must be used.
-#> ✖ Problematic arguments:
-#> • n = ..2
-#> • k = ..3
-#> • pPercent = ..4
-#> • allDominance = ..5
-#> • sWeightVar = ..12
-#> • domWeightMethod = "default"
-#> ℹ Did you misspell an argument name?
-#> ℹ See arguments `action_unused_dots` and `allowed_unused_dots` in `?GaussSuppressionFromData`.
 #>         geo       sector4 freq value value_max company_freq_max primary
 #> 1     Total         Total   23 659.3      96.6                9   FALSE
 #> 2     Total       private   19 626.5      96.6                8   FALSE

@@ -99,7 +99,7 @@ secondary suppression by Gaussian elimination by <code><a href="https://statisti
 <span>  da_vars <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  da_fun <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  da_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  action_unused_dots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"GaussSuppression.action_unused_dots"</span>, <span class="st">"inform"</span><span class="op">)</span>,</span>
+<span>  action_unused_dots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"GaussSuppression.action_unused_dots"</span>, <span class="st">"warn"</span><span class="op">)</span>,</span>
 <span>  allowed_unused_dots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"GaussSuppression.allowed_unused_dots"</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -434,7 +434,7 @@ See <code><a href="SuppressDominantCells.html">SuppressDominantCells()</a></code
 in <code>...</code> are handled. Internally uses <code><a href="https://rlang.r-lib.org/reference/check_dots_used.html" class="external-link">ellipsis::check_dots_used()</a></code> with a
 custom action. One of "warn", "abort", "inform", or "none". The value "none"
 disables the check entirely. The default is taken from
-<code>getOption("GaussSuppression.action_unused_dots")</code>, falling back to "inform"
+<code>getOption("GaussSuppression.action_unused_dots")</code>, falling back to "warn"
 if the option is not set. Users can change the default globally with e.g.
 <code>options(GaussSuppression.action_unused_dots = "abort")</code>.</p></dd>
 
