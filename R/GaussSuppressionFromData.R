@@ -9,7 +9,7 @@
 #' 
 #' The supplied functions for generating \code{\link[SSBtools]{GaussSuppression}} input takes the following arguments: 
 #' `crossTable`,  `x`, `freq`, `num`, `weight`, `maxN`, `protectZeros`, `secondaryZeros`, `data`, `freqVar`, `numVar`, `weightVar`, `charVar`, `dimVar` 
-#' `aggregatePackage`, `aggregateNA`, `aggregateBaseOrder`, `rowGroupsPackage`, `structuralEmpty`, and `...`. 
+#' `aggregatePackage`, `aggregateNA`, `aggregateBaseOrder`, `rowGroupsPackage`, `structuralEmpty`,  `da_out`, and `...`. 
 #' where the two first are  \code{\link[SSBtools]{ModelMatrix}} outputs (`modelMatrix` renamed to `x`).
 #' The vector, `freq`, is aggregated counts (`t(x) %*% data[[freqVar]]`).
 #' In addition, the supplied `singleton` function also takes `nUniqueVar` and (output from) `primary` as input.
@@ -228,6 +228,19 @@
 #'   The corresponding tables will be combined and treated as a single table by the algorithm.
 #'   For example: `linkedTables = list(c("table_1", "table_3"), "table_2")`.
 #'   If `NULL` (default), each table in `formula` is used individually.
+#'   
+#' @param da_vars The `vars` argument passed to [SSBtools::dummy_aggregate()].
+#'   Together with the two parameters below, this enables computing results via
+#'   [SSBtools::aggregate_multiple_fun()] in the same way as when using
+#'   [SSBtools::model_aggregate()].  
+#'   The calculations are performed by calling [SSBtools::dummy_aggregate()] with
+#'   the model matrix (`x`) before any potential use of `extraAggregate`.  
+#'   Internally, the result is stored in a data frame named `da_out`, which is
+#'   available to the supplied functions in the same manner as `num`.  
+#'   The columns of `da_out` are added to the final output.
+#'   See [SuppressDominantCells()] examples. 
+#' @param da_fun The `fun` argument passed to [SSBtools::dummy_aggregate()].
+#' @param da_args A list of additional arguments passed to [SSBtools::dummy_aggregate()].
 #' 
 #' @param action_unused_dots Character string controlling how unused arguments
 #'   in `...` are handled. Internally uses [ellipsis::check_dots_used()] with a
@@ -250,7 +263,7 @@
 #'
 #' @return Aggregated data with suppression information
 #' @export
-#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas any_duplicated_rows get_colnames
+#' @importFrom SSBtools GaussSuppression ModelMatrix Extend0 NamesFromModelMatrixInput SeqInc aggregate_by_pkg Extend0fromModelMatrixInput IsExtend0 CheckInput combine_formulas any_duplicated_rows get_colnames dummy_aggregate fix_vars_amf
 #' @importFrom Matrix crossprod as.matrix
 #' @importFrom stats aggregate as.formula delete.response terms
 #' @importFrom utils flush.console
@@ -342,6 +355,9 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            recordAware = TRUE,
                            collapseAware = FALSE,
                            linkedTables = NULL,
+                           da_vars = NULL, 
+                           da_fun = NULL, 
+                           da_args = NULL,
                            action_unused_dots  = getOption("GaussSuppression.action_unused_dots", "inform"),
                            allowed_unused_dots = getOption("GaussSuppression.allowed_unused_dots", character(0))
                            ){ 
@@ -519,6 +535,19 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     }
   }
   
+  da_data <- NULL
+  
+  if (length(da_vars)) {
+    fun_vars <- do.call(
+      SSBtools::fix_vars_amf,
+      c(list(vars = da_vars, names_data = names(data)),
+        da_args))
+    fun_vars <- lapply(fun_vars, function(x) x[-(1:2)] )
+    fun_vars <- unique(unlist(fun_vars)) 
+  } else {
+    fun_vars <- character(0) 
+  }
+  
   isExtend0 <- IsExtend0(extend0)
   
   if (isExtend0 | preAggregate | extraAggregate | innerReturn | (is.null(hierarchies) & is.null(formula) & !length(dimVar))) {
@@ -536,6 +565,24 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         freqVar <- freqVarNew
         data[[freqVar]] <- 1L # entire data.frame is copied into memory when adding 1s. Improve?  
       } 
+      
+      if (length(da_vars)) {
+        if (aggregatePackage == "data.table") {  # Explicit list needed when data.table
+          fun_x_x <- function(x) list(x)         # Otherwise there will be more rows
+        } else {
+          fun_x_x <- function(x) x    
+        }
+        da_data <- aggregate_by_pkg(
+          data = data,
+          by = unique(c(dVar, charVar)),
+          var = fun_vars,
+          pkg =  aggregatePackage,
+          include_na = aggregateNA,
+          fun = fun_x_x,
+          base_order = aggregateBaseOrder,
+          simplify = FALSE)
+      }
+      
       # data <- aggregate(data[unique(c(freqVar, numVar, weightVar))], data[unique(c(dVar, charVar))], sum)
       data <- aggregate_by_pkg(
         data = data,
@@ -545,6 +592,15 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         include_na = aggregateNA,
         fun = sum,
         base_order = aggregateBaseOrder)
+      
+    
+      if (length(da_vars)) {
+        if (!identical(data[unique(c(dVar, charVar))], da_data[unique(c(dVar, charVar))])) {
+          stop("Not consistent aggregation")
+        }
+        # As da_data[fun_vars], but trick to ensure last occurrence chosen
+        da_data <- da_data[ncol(da_data) + 1L - match(fun_vars, rev(names(da_data)))]
+      }
         
       if (printInc) {
         cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
@@ -552,7 +608,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       }
     } else {
       ### START ### preliminary hack to include sWeightVar in SuppressDominantCells
-      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, r_rnd, MoreVars(...)))]
+      data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar, fun_vars, r_rnd, MoreVars(...)))]
       ### END ###  preliminary hack
       # data <- data[unique(c(dVar, charVar, freqVar, numVar, weightVar))]
     }
@@ -571,6 +627,13 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                                         dimVar = dimVar,
                                         extend0 = extend0, 
                                         dVar = dVar, ...)
+    
+    if (length(da_vars) & !is.null(da_data)) {
+      da_data_0 <- da_data[1, , drop = FALSE]
+      for (i in 1:ncol(da_data_0)) da_data_0[[i]][[1]] <- da_data_0[[i]][[1]][0]
+      da_data <- rbind(da_data, da_data_0[rep(1, nrow(data) - nrow(da_data)), , drop = FALSE])
+    }
+    
     if (printInc) {
       cat(dim(data)[1], "*", dim(data)[2], "]\n", sep = "")
       flush.console()
@@ -622,17 +685,29 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     weight <- as.vector(as.matrix(crossprod(x, as.matrix(data[, weightVar, drop = FALSE]))))
   }
   
-  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, ...))
+  if (length(da_vars)) {
+    if (is.null(da_data)) {
+      da_data <- data
+    }
+    da_out <- do.call(SSBtools::dummy_aggregate, 
+                      c(list(data = da_data, x = x, vars = da_vars, fun = da_fun), 
+                        da_args))
+    rm(da_data)
+  } else {
+    da_out <- NULL
+  }
   
-  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, ...)
+  if (output == "input2functions")           return(list(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, da_out = da_out, ...))
+  
+  if (is.function(candidates)) candidates <-  candidates(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, da_out = da_out, ...)
   
   if (is.function(primary) | is.list(primary))  
-               primary <-     Primary(primary = primary, crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, ...)
+               primary <-     Primary(primary = primary, crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, da_out = da_out, ...)
                if (output == "primary") return(primary)
   
-  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, ...)
+  if (is.function(forced))         forced <-      forced(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, da_out = da_out, ...)
   
-  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, ...)
+  if (is.function(hidden))         hidden <-      hidden(crossTable = crossTable, x = x, freq = freq, num = num, weight = weight, maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, charVar = charVar, dimVar = dimVar, aggregatePackage = aggregatePackage, aggregateNA = aggregateNA, aggregateBaseOrder = aggregateBaseOrder, rowGroupsPackage = rowGroupsPackage, structuralEmpty = structuralEmpty, da_out = da_out, ...)
 
   
   if(extraAggregate){
@@ -728,6 +803,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   if (is.null(freq)) freq <- matrix(0, m, 0)
   if (is.null(num)) num <- matrix(0, m, 0)
   if (is.null(weight)) weight <- matrix(0, m, 0)
+  if (is.null(da_out)) da_out <- matrix(0, m, 0)
   
   if(extraAggregate){
     if (printInc) {
@@ -1058,7 +1134,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
     forced <- matrix(0, m, 0)
   }
   
-  publish <- cbind(as.data.frame(crossTable), freq, num, weight, primary = primary, forced, unsafe, suppressed = suppressed)
+  publish <- cbind(as.data.frame(crossTable), freq, num, weight, da_out, primary = primary, forced, unsafe, suppressed = suppressed)
   rownames(publish) <- NULL
   
   startCol <- attr(x, "startCol", exact = TRUE)

@@ -120,7 +120,39 @@
 #'                    substitute_vars = list(region = c("geo", "eu"), region1 = "eu"), 
 #'                    collapse_vars = list(sector = c("sector2", "sector4")), 
 #'                    dominanceVar  = "value", pPercent = 10, contributorVar = "company")                       
-#'                       
+#'
+#'  
+#'  # Example using the dummy_aggregate parameters together with an extra
+#'  # primary rule. A cell becomes primary if the maximum input value
+#'  # exceeds 60% of the cell value.     
+#'  SuppressDominantCells(data = SSBtoolsData("magnitude1"), 
+#'            dominanceVar = "value", 
+#'            formula = ~sector2 * geo + sector4 * eu, 
+#'            contributorVar = "company", 
+#'            pPercent = 3,
+#'            primary = c(MagnitudeRule, 
+#'                        function(..., da_out, num){da_out[[1]]/num[[1]]>0.6}),
+#'            da_fun = c(mAx = function(x) suppressWarnings(max(x))),
+#'            da_vars = c(mAx = "value"),
+#'            da_args = list(name_sep = "__"))  
+#'            
+#'          
+#'  # More advanced example using dummy_aggregate parameters.
+#'  # The default primary function (MagnitudeRule) is removed.
+#'  # A cell becomes primary if the maximum input value exceeds 70% of
+#'  # the cell value, or if the number of contributions from a single
+#'  # company exceeds 55% of the total number of contributions.
+#'  # Change default preAggregate to speed up.              
+#'  SuppressDominantCells(data = SSBtoolsData("magnitude1")[c(1:3, 1:20),], 
+#'    dominanceVar = "value", 
+#'    formula = ~sector2 * geo + sector4 * eu, 
+#'    primary = function(..., da_out, num, freq){
+#'         da_out$value_max/num$value>0.7 |  da_out$company_freq_max/freq>0.55},
+#'    da_fun = c(max = max, freq_max = function(x){max(table(x))}),
+#'    da_vars = c(max = "value", freq_max = "company"),
+#'    preAggregate = TRUE,    # Since default FALSE without contributorVar
+#'    extraAggregate = FALSE, # Not needed since preAggregate and no contributorVar
+#'    singletonMethod = "none")                             
 #'                       
 SuppressDominantCells <- function(data,
                                   n = 1:length(k),
