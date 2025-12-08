@@ -1,9 +1,20 @@
 
 printInc <- FALSE
 
+options(GaussSuppression.action_unused_dots = "abort")
+
 test_that("Wrappers", {
   dataset <- SSBtoolsData("magnitude1")
   dataset$seq2 <- (1:nrow(dataset)-10)^2
+  
+  
+  # To test unused_dots checking with primary = NULL
+  SuppressFewContributors(data=dataset, 
+                          numVar = "value", 
+                          dimVar= c("sector4", "geo"), 
+                          maxN=1,
+                          printInc = printInc, 
+                          primary = NULL)
   
   # Table 3 in vignette  
   a1 <- SuppressFewContributors(data=dataset, 
@@ -62,6 +73,14 @@ test_that("Wrappers", {
   # FALSE when removeCodesForCandidates = FALSE
   expect_false(a5[a5$sector4 == "Entertainment" & a5$geo == "Iceland", "suppressed"])
   
+  
+  # To test unused_dots checking with primary = NULL
+  SuppressDominantCells(data=dataset, 
+                        numVar = "value", 
+                        dimVar= c("sector4", "geo"), 
+                        n = 1, k = 80, allDominance = TRUE,
+                        printInc = printInc, 
+                        primary = NULL)
   
   
   # Table 3 in vignette  
@@ -342,5 +361,18 @@ test_that("Wrappers", {
   expect_equal(g5[["n_contr_all"]], k[["nall"]])
   expect_equal(g5[["n_non0_contr_all"]], k[["nall"]] - k[["n0all"]])
   
+  
+  
+  
+  # To test unused_dots checking with primary = NULL
+  mun_accidents <- SSBtoolsData("mun_accidents")
+  SuppressSmallCounts(data = mun_accidents, maxN = 3, 
+                      dimVar = 1:2, freqVar = 3,
+                      primary = NULL)
+  
+  # To test unused_dots checking with primary = NULL
+  SuppressKDisclosure(mun_accidents, coalition = 1, 
+                      freqVar = "freq", formula = ~mun*inj,
+                      primary = NULL)
   
 })

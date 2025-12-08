@@ -246,7 +246,7 @@
 #'   in `...` are handled. Internally uses [ellipsis::check_dots_used()] with a
 #'   custom action. One of "warn", "abort", "inform", or "none". The value "none"
 #'   disables the check entirely. The default is taken from
-#'   `getOption("GaussSuppression.action_unused_dots")`, falling back to "inform"
+#'   `getOption("GaussSuppression.action_unused_dots")`, falling back to "warn"
 #'   if the option is not set. Users can change the default globally with e.g.
 #'   `options(GaussSuppression.action_unused_dots = "abort")`.
 #'
@@ -358,7 +358,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            da_vars = NULL, 
                            da_fun = NULL, 
                            da_args = NULL,
-                           action_unused_dots  = getOption("GaussSuppression.action_unused_dots", "inform"),
+                           action_unused_dots  = getOption("GaussSuppression.action_unused_dots", "warn"),
                            allowed_unused_dots = getOption("GaussSuppression.allowed_unused_dots", character(0))
                            ){ 
   if (!is.null(spec)) {
@@ -965,7 +965,12 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       "printXdim", "tolGauss", "whenEmptySuppressed", # SSBtools::GaussSuppression
       "whenPrimaryForced", "iWait", "iFunction",      # SSBtools::GaussSuppression
       "avoidHierarchical",    # SSBtools::Extend0fromModelMatrixInput and  SSBtools::FormulaSums
-      "hierarchical_extend0"  # SSBtools::Extend0fromModelMatrixInput
+      "hierarchical_extend0",  # SSBtools::Extend0fromModelMatrixInput
+      "whenPrimaryMatters", # SingletonUniqueContributor
+      "domWeightMethod", # PackageSpecs, dominanceSpec, MagnitudeRule
+      "n", "k", "pPercent", "allDominance", "sWeightVar", # SuppressDominantCells,  MagnitudeRule
+      "remove0", # SuppressFewContributors, NContributorsRule
+      "coalition", "mc_hierarchies", "upper_bound" # SuppressKDisclosure
     )
     allowed_unused_dots <- unique(c(allowed_unused_dots, extra_allowed_unused)) 
     if (hasArg("avoidHierarchical") & hasArg("avoid_hierarchical")) {   
