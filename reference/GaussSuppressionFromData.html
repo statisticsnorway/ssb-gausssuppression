@@ -96,6 +96,9 @@ secondary suppression by Gaussian elimination by <code><a href="https://statisti
 <span>  recordAware <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  collapseAware <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  linkedTables <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  da_vars <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  da_fun <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  da_args <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  action_unused_dots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"GaussSuppression.action_unused_dots"</span>, <span class="st">"inform"</span><span class="op">)</span>,</span>
 <span>  allowed_unused_dots <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"GaussSuppression.allowed_unused_dots"</span>, <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -405,6 +408,27 @@ For example: <code>linkedTables = list(c("table_1", "table_3"), "table_2")</code
 If <code>NULL</code> (default), each table in <code>formula</code> is used individually.</p></dd>
 
 
+<dt id="arg-da-vars">da_vars<a class="anchor" aria-label="anchor" href="#arg-da-vars"></a></dt>
+<dd><p>The <code>vars</code> argument passed to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/dummy_aggregate.html" class="external-link">SSBtools::dummy_aggregate()</a></code>.
+Together with the two parameters below, this enables computing results via
+<code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/aggregate_multiple_fun.html" class="external-link">SSBtools::aggregate_multiple_fun()</a></code> in the same way as when using
+<code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/model_aggregate.html" class="external-link">SSBtools::model_aggregate()</a></code>.
+The calculations are performed by calling <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/dummy_aggregate.html" class="external-link">SSBtools::dummy_aggregate()</a></code> with
+the model matrix (<code>x</code>) before any potential use of <code>extraAggregate</code>.
+Internally, the result is stored in a data frame named <code>da_out</code>, which is
+available to the supplied functions in the same manner as <code>num</code>.
+The columns of <code>da_out</code> are added to the final output.
+See <code><a href="SuppressDominantCells.html">SuppressDominantCells()</a></code> examples.</p></dd>
+
+
+<dt id="arg-da-fun">da_fun<a class="anchor" aria-label="anchor" href="#arg-da-fun"></a></dt>
+<dd><p>The <code>fun</code> argument passed to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/dummy_aggregate.html" class="external-link">SSBtools::dummy_aggregate()</a></code>.</p></dd>
+
+
+<dt id="arg-da-args">da_args<a class="anchor" aria-label="anchor" href="#arg-da-args"></a></dt>
+<dd><p>A list of additional arguments passed to <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/dummy_aggregate.html" class="external-link">SSBtools::dummy_aggregate()</a></code>.</p></dd>
+
+
 <dt id="arg-action-unused-dots">action_unused_dots<a class="anchor" aria-label="anchor" href="#arg-action-unused-dots"></a></dt>
 <dd><p>Character string controlling how unused arguments
 in <code>...</code> are handled. Internally uses <code><a href="https://rlang.r-lib.org/reference/check_dots_used.html" class="external-link">ellipsis::check_dots_used()</a></code> with a
@@ -434,7 +458,7 @@ globally with e.g.
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The supplied functions for generating <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/GaussSuppression.html" class="external-link">GaussSuppression</a></code> input takes the following arguments:
 <code>crossTable</code>,  <code>x</code>, <code>freq</code>, <code>num</code>, <code>weight</code>, <code>maxN</code>, <code>protectZeros</code>, <code>secondaryZeros</code>, <code>data</code>, <code>freqVar</code>, <code>numVar</code>, <code>weightVar</code>, <code>charVar</code>, <code>dimVar</code>
-<code>aggregatePackage</code>, <code>aggregateNA</code>, <code>aggregateBaseOrder</code>, <code>rowGroupsPackage</code>, <code>structuralEmpty</code>, and <code>...</code>.
+<code>aggregatePackage</code>, <code>aggregateNA</code>, <code>aggregateBaseOrder</code>, <code>rowGroupsPackage</code>, <code>structuralEmpty</code>,  <code>da_out</code>, and <code>...</code>.
 where the two first are  <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/ModelMatrix.html" class="external-link">ModelMatrix</a></code> outputs (<code>modelMatrix</code> renamed to <code>x</code>).
 The vector, <code>freq</code>, is aggregated counts (<code>t(x) %*% data[[freqVar]]</code>).
 In addition, the supplied <code>singleton</code> function also takes <code>nUniqueVar</code> and (output from) <code>primary</code> as input.</p>
@@ -905,7 +929,7 @@ Such cells will be protected while also being assigned the <code>NA</code> value
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
