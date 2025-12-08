@@ -158,6 +158,13 @@ MagnitudeRule <- function(data,
     k <- c(0, 0)
   }
   
+  if (!length(n)) {
+    n <- integer(0)
+  }
+  if (!length(k)) {
+    k <- numeric(0)
+  }
+  
   if (length(n) != length(k))
     stop("You must provide an equal number of inputs for n and k.")
   
@@ -272,7 +279,7 @@ MagnitudeRule <- function(data,
     
   max_contribution_ <- max_contribution(x,
                                         abs_inputnum,
-                                        n = max(n),
+                                        n = max(c(n, 0L)),
                                         id = charVar_groups,
                                         output = mc_output, 
                                         drop = FALSE, 
@@ -286,8 +293,10 @@ MagnitudeRule <- function(data,
   }
   
   if (allDominance) {
-    maxContribution_id <- max_contribution_[["id"]]
-    colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
+    maxContribution_id <- max_contribution_[["id"]] 
+    if( ncol(maxContribution_id) ) {
+      colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
+    }
     maxContribution_info <- cbind(as.data.frame(maxContribution_id),
                                   as.data.frame(max_contribution_[max_contribution_output]))
                                   
@@ -364,27 +373,38 @@ MagnitudeRule <- function(data,
   #       prim[, 1] is x1
   #       prim[, 2] is x1 + x2
   #
+  
+  pPercent_or_dominance <- ncol(maxContribution) > 0
 
-  if (is.null(pPercent)) {
-    primary <- sapply(seq_len(ncol(prim)), function(x) prim[, x] >= k[x]/100)
-    dominant <- apply(primary, 1, function(x) Reduce(`|`, x))
-    if (protectionIntervals) {
-      # computed similar to dominant above and consistent with Table 4.4 above 
-      protectionPart <- sapply(seq_len(ncol(prim)), function(x) pmax(0, prim[, x]/(k[x]/100) - 1))
-      protectionPart <- apply(protectionPart, 1, max)  ## row max 
+  if (pPercent_or_dominance) {
+    if (is.null(pPercent)) {
+      primary <- sapply(seq_len(ncol(prim)), function(x) prim[, x] >= k[x]/100)
+      dominant <- apply(primary, 1, function(x) Reduce(`|`, x))
+      if (protectionIntervals) {
+        # computed similar to dominant above and consistent with Table 4.4 above 
+        protectionPart <- sapply(seq_len(ncol(prim)), function(x) pmax(0, prim[, x]/(k[x]/100) - 1))
+        protectionPart <- apply(protectionPart, 1, max)  ## row max 
+      }
+    } else {
+      dominant <- abs(1 - prim[, 2]) < abs(pPercent/100 * prim[, 1])
+      if (protectionIntervals) {
+        # computed similar to dominant above and consistent with Table 4.4 above
+        protectionPart <- pmax(0, prim[, 2] + pPercent/100 * prim[, 1] - 1) 
+      }
     }
+    colnames(prim) <- paste0("dominant", paste(n, sep = ""))
   } else {
-    dominant <- abs(1 - prim[, 2]) < abs(pPercent/100 * prim[, 1])
-    if (protectionIntervals) {
-      # computed similar to dominant above and consistent with Table 4.4 above
-      protectionPart <- pmax(0, prim[, 2] + pPercent/100 * prim[, 1] - 1) 
-    }
+    force(protectionIntervals) # To avoid unused-dots-warning 
+    protectionIntervals <- FALSE
+    dominant <- rep(FALSE, ncol(x))
+    prim <- matrix(0, ncol(x), 0)
   }
-  colnames(prim) <- paste0("dominant", paste(n, sep = ""))
+  
   if (!protectZeros)
     output <- list(primary = dominant)
   else
     output <- list(primary = (dominant | zeros_to_be_protected))
+  
   if (outputWeightedNum) {
     wnum <- data.frame(v1 = as.vector(crossprod(x, sweight_original)),
                        v2 = as.vector(crossprod(x, sweight_original * data[[numVar]])))
