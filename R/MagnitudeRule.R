@@ -26,6 +26,23 @@
 #'  be suppressed.
 #'  Unless `structuralEmpty` is `TRUE` (see below), cells that result in a value 
 #'  of 0 due to removed `removeCode` contributions are also suppressed.
+#' @param min_n_contr
+#'   When the value is greater than 1 (default is 1), primary suppression is
+#'   applied when `n_contr > 0` and `n_contr < min_n_contr`.  
+#'   Here, `n_contr` is the number of contributors as defined in
+#'   `SSBtools::max_contribution()`, after excluding any codes specified by
+#'   the `removeCodes` parameter.  
+#'   The three parameters below use corresponding variables from the same
+#'   function.
+#' @param min_n_non0_contr
+#'   Same logic as `min_n_contr`, but based on `n_non0_contr`, which counts
+#'   contributors contributing a non-zero value.
+#' @param min_n_contr_all
+#'   Same as `min_n_contr`, but using `n_contr_all`, which counts all
+#'   contributors without considering `removeCodes`.
+#' @param min_n_non0_contr_all
+#'   Same as `min_n_non0_contr`, but using `n_non0_contr_all`, which counts all
+#'   contributors contributing a non-zero value, without considering `removeCodes`.
 #' @param charVar Variable in data holding grouping information. Dominance will
 #'  be calculated after aggregation within these groups.
 #' @param removeCodes A vector of `charVar` codes that are to be excluded when 
@@ -136,6 +153,10 @@ MagnitudeRule <- function(data,
                           k = NULL,
                           pPercent = NULL,
                           protectZeros = FALSE,
+                          min_n_contr = 1,
+                          min_n_non0_contr = 1, 
+                          min_n_contr_all = 1,
+                          min_n_non0_contr_all = 1, 
                           charVar = NULL,
                           removeCodes = character(0), 
                           removeCodesFraction = 1,
@@ -266,16 +287,31 @@ MagnitudeRule <- function(data,
   if(index | allDominance){
     mc_output <- c(mc_output, "id")
   }
-  if (allDominance) {
-    if (is.null(max_contribution_output)) {
-      if (is.null(remove_fraction)) {
-        max_contribution_output <- c("n_contr", "n_non0_contr")
-      } else {
-        max_contribution_output <- c("n_contr", "n_non0_contr", "n_contr_all", "n_non0_contr_all")
-      }
+  if (allDominance & !length(max_contribution_output)) {
+    if (is.null(remove_fraction)) {
+      max_contribution_output <- c("n_contr", "n_non0_contr")
+    } else {
+      max_contribution_output <- c("n_contr", "n_non0_contr", "n_contr_all", "n_non0_contr_all")
     }
-    mc_output <- unique(c(mc_output, max_contribution_output))
+  } else {
+    max_contribution_output <- character(0)
   }
+  
+  if (min_n_contr > 1) {
+    max_contribution_output <- unique(c(max_contribution_output, "n_contr"))
+  }
+  if (min_n_non0_contr > 1) {
+    max_contribution_output <- unique(c(max_contribution_output, "n_non0_contr"))
+  }
+  if (min_n_contr_all > 1) {
+    max_contribution_output <- unique(c(max_contribution_output, "n_contr_all"))
+  }
+  if (min_n_non0_contr_all > 1) {
+    max_contribution_output <- unique(c(max_contribution_output, "n_non0_contr_all"))
+  }
+  
+  mc_output <- unique(c(mc_output, max_contribution_output))
+  
     
   max_contribution_ <- max_contribution(x,
                                         abs_inputnum,
@@ -292,14 +328,18 @@ MagnitudeRule <- function(data,
     maxContribution <- max_contribution_[["y"]]
   }
   
+  if (length(max_contribution_output)) {
+    maxContribution_info <- as.data.frame(max_contribution_[max_contribution_output])
+  } else {
+    maxContribution_info <- as.data.frame(matrix(0, ncol(x), 0))
+  }
+  
   if (allDominance) {
     maxContribution_id <- max_contribution_[["id"]] 
     if( ncol(maxContribution_id) ) {
       colnames(maxContribution_id) <- paste0("max", seq_len(max(n)) ,"contributor")
     }
-    maxContribution_info <- cbind(as.data.frame(maxContribution_id),
-                                  as.data.frame(max_contribution_[max_contribution_output]))
-                                  
+    maxContribution_info <- cbind(as.data.frame(maxContribution_id), maxContribution_info)
   }
   
     if(!is.null(charVar_groups) & !tauArgusDominance & !is.null(sWeightVar)) {
@@ -401,9 +441,22 @@ MagnitudeRule <- function(data,
   }
   
   if (!protectZeros)
-    output <- list(primary = dominant)
+    primary <- dominant
   else
-    output <- list(primary = (dominant | zeros_to_be_protected))
+    primary <- (dominant | zeros_to_be_protected)
+  
+  
+  # n may be NULL → logical(0) → no effect (intended)
+  primary_n <- function(n, min_val) {
+    min_val > 1 & n > 0 & n < min_val
+  }
+  
+  primary[primary_n(maxContribution_info$n_contr,          min_n_contr)]           <- TRUE
+  primary[primary_n(maxContribution_info$n_non0_contr,     min_n_non0_contr)]      <- TRUE
+  primary[primary_n(maxContribution_info$n_contr_all,      min_n_contr_all)]       <- TRUE
+  primary[primary_n(maxContribution_info$n_non0_contr_all, min_n_non0_contr_all)]  <- TRUE
+  
+  output <- list(primary = primary)
   
   if (outputWeightedNum) {
     wnum <- data.frame(v1 = as.vector(crossprod(x, sweight_original)),
@@ -411,9 +464,14 @@ MagnitudeRule <- function(data,
     names(wnum) <- c(sWeightVarName, paste0("weighted.", numVar))
     output[["numExtra"]] <- wnum
   }
-  if (allDominance) {
-    numExtra <- cbind(as.data.frame(prim),
-                      maxContribution_info)
+  
+  if (allDominance | ncol(maxContribution_info)) {
+    if(allDominance) {
+      numExtra <- cbind(as.data.frame(prim),
+                        maxContribution_info)
+    } else {
+      numExtra <- maxContribution_info
+    }
     if ("numExtra" %in% names(output))
       output[["numExtra"]] <- cbind(output[["numExtra"]], numExtra)
     else 

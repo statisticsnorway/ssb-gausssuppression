@@ -14,6 +14,10 @@ MagnitudeRule(
   k = NULL,
   pPercent = NULL,
   protectZeros = FALSE,
+  min_n_contr = 1,
+  min_n_non0_contr = 1,
+  min_n_contr_all = 1,
+  min_n_non0_contr_all = 1,
   charVar = NULL,
   removeCodes = character(0),
   removeCodesFraction = 1,
@@ -56,6 +60,23 @@ be viewed by setting \code{allDominance = TRUE}.}
 be suppressed.
 Unless \code{structuralEmpty} is \code{TRUE} (see below), cells that result in a value
 of 0 due to removed \code{removeCode} contributions are also suppressed.}
+
+\item{min_n_contr}{When the value is greater than 1 (default is 1), primary suppression is
+applied when \code{n_contr > 0} and \code{n_contr < min_n_contr}.
+Here, \code{n_contr} is the number of contributors as defined in
+\code{SSBtools::max_contribution()}, after excluding any codes specified by
+the \code{removeCodes} parameter.
+The three parameters below use corresponding variables from the same
+function.}
+
+\item{min_n_non0_contr}{Same logic as \code{min_n_contr}, but based on \code{n_non0_contr}, which counts
+contributors contributing a non-zero value.}
+
+\item{min_n_contr_all}{Same as \code{min_n_contr}, but using \code{n_contr_all}, which counts all
+contributors without considering \code{removeCodes}.}
+
+\item{min_n_non0_contr_all}{Same as \code{min_n_non0_contr}, but using \code{n_non0_contr_all}, which counts all
+contributors contributing a non-zero value, without considering \code{removeCodes}.}
 
 \item{charVar}{Variable in data holding grouping information. Dominance will
 be calculated after aggregation within these groups.}
