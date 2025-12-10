@@ -2,6 +2,24 @@
 
 ## GaussSuppression 1.2.1
 
+- Added four new parameters (`min_n_contr`, `min_n_non0_contr`,
+  `min_n_contr_all`, `min_n_non0_contr_all`) to
+  [`MagnitudeRule()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/MagnitudeRule.md),
+  the primary-suppression function used by
+  [`SuppressDominantCells()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDominantCells.md).
+  - These parameters can now be used directly when calling
+    [`SuppressDominantCells()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDominantCells.md).
+  - It is now also possible to call
+    [`SuppressDominantCells()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDominantCells.md)
+    without specifying either `pPercent` or `k`.
+  - Together, these changes make it possible to replace typical uses of
+    [`SuppressFewContributors()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressFewContributors.md)
+    with corresponding calls to
+    [`SuppressDominantCells()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDominantCells.md)
+    using the new parameters.
+  - The new parameters are not yet mentioned in the documentation or
+    examples for
+    [`SuppressDominantCells()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDominantCells.md).
 - Added three new parameters (`da_vars`, `da_fun`, and `da_args`) to
   enable the use of
   [`SSBtools::dummy_aggregate()`](https://statisticsnorway.github.io/ssb-ssbtools/reference/dummy_aggregate.html)

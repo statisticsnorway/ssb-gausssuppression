@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -40,7 +40,13 @@
 
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.1" id="gausssuppression-121">GaussSuppression 1.2.1<a class="anchor" aria-label="anchor" href="#gausssuppression-121"></a></h2>
-<ul><li>Added three new parameters (<code>da_vars</code>, <code>da_fun</code>, and <code>da_args</code>) to enable the use of <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/dummy_aggregate.html" class="external-link">SSBtools::dummy_aggregate()</a></code> within <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> and its wrappers.
+<ul><li>Added four new parameters (<code>min_n_contr</code>, <code>min_n_non0_contr</code>, <code>min_n_contr_all</code>, <code>min_n_non0_contr_all</code>) to <code><a href="../reference/MagnitudeRule.html">MagnitudeRule()</a></code>, the primary-suppression function used by <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code>.
+<ul><li>These parameters can now be used directly when calling <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code>.</li>
+<li>It is now also possible to call <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code> without specifying either <code>pPercent</code> or <code>k</code>.</li>
+<li>Together, these changes make it possible to replace typical uses of <code><a href="../reference/SuppressFewContributors.html">SuppressFewContributors()</a></code> with corresponding calls to <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code> using the new parameters.</li>
+<li>The new parameters are not yet mentioned in the documentation or examples for <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code>.</li>
+</ul></li>
+<li>Added three new parameters (<code>da_vars</code>, <code>da_fun</code>, and <code>da_args</code>) to enable the use of <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/dummy_aggregate.html" class="external-link">SSBtools::dummy_aggregate()</a></code> within <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> and its wrappers.
 <ul><li>This makes it possible to compute derived variables via <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/aggregate_multiple_fun.html" class="external-link">SSBtools::aggregate_multiple_fun()</a></code> in the same way as when using <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/model_aggregate.html" class="external-link">SSBtools::model_aggregate()</a></code>.</li>
 <li>The intermediate result is stored in an internal data frame (<code>da_out</code>), which is available to user-supplied functions and whose columns are added to the final output.</li>
 </ul></li>

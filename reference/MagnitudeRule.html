@@ -11,7 +11,7 @@ contribution based on absolute values."><meta property="og:image" content="https
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -59,6 +59,10 @@ contribution based on absolute values.</p>
 <span>  k <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pPercent <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  protectZeros <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  min_n_contr <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  min_n_non0_contr <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  min_n_contr_all <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  min_n_non0_contr_all <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  charVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  removeCodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  removeCodesFraction <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -118,6 +122,31 @@ be viewed by setting <code>allDominance = TRUE</code>.</p></dd>
 be suppressed.
 Unless <code>structuralEmpty</code> is <code>TRUE</code> (see below), cells that result in a value
 of 0 due to removed <code>removeCode</code> contributions are also suppressed.</p></dd>
+
+
+<dt id="arg-min-n-contr">min_n_contr<a class="anchor" aria-label="anchor" href="#arg-min-n-contr"></a></dt>
+<dd><p>When the value is greater than 1 (default is 1), primary suppression is
+applied when <code>n_contr &gt; 0</code> and <code>n_contr &lt; min_n_contr</code>.
+Here, <code>n_contr</code> is the number of contributors as defined in
+<code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/max_contribution.html" class="external-link">SSBtools::max_contribution()</a></code>, after excluding any codes specified by
+the <code>removeCodes</code> parameter.
+The three parameters below use corresponding variables from the same
+function.</p></dd>
+
+
+<dt id="arg-min-n-non-contr">min_n_non0_contr<a class="anchor" aria-label="anchor" href="#arg-min-n-non-contr"></a></dt>
+<dd><p>Same logic as <code>min_n_contr</code>, but based on <code>n_non0_contr</code>, which counts
+contributors contributing a non-zero value.</p></dd>
+
+
+<dt id="arg-min-n-contr-all">min_n_contr_all<a class="anchor" aria-label="anchor" href="#arg-min-n-contr-all"></a></dt>
+<dd><p>Same as <code>min_n_contr</code>, but using <code>n_contr_all</code>, which counts all
+contributors without considering <code>removeCodes</code>.</p></dd>
+
+
+<dt id="arg-min-n-non-contr-all">min_n_non0_contr_all<a class="anchor" aria-label="anchor" href="#arg-min-n-non-contr-all"></a></dt>
+<dd><p>Same as <code>min_n_non0_contr</code>, but using <code>n_non0_contr_all</code>, which counts all
+contributors contributing a non-zero value, without considering <code>removeCodes</code>.</p></dd>
 
 
 <dt id="arg-charvar">charVar<a class="anchor" aria-label="anchor" href="#arg-charvar"></a></dt>

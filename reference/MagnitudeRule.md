@@ -15,6 +15,10 @@ MagnitudeRule(
   k = NULL,
   pPercent = NULL,
   protectZeros = FALSE,
+  min_n_contr = 1,
+  min_n_non0_contr = 1,
+  min_n_contr_all = 1,
+  min_n_non0_contr_all = 1,
   charVar = NULL,
   removeCodes = character(0),
   removeCodesFraction = 1,
@@ -72,6 +76,32 @@ PPercentRule(data, pPercent, protectZeros = FALSE, ...)
   Unless `structuralEmpty` is `TRUE` (see below), cells that result in a
   value of 0 due to removed `removeCode` contributions are also
   suppressed.
+
+- min_n_contr:
+
+  When the value is greater than 1 (default is 1), primary suppression
+  is applied when `n_contr > 0` and `n_contr < min_n_contr`. Here,
+  `n_contr` is the number of contributors as defined in
+  [`SSBtools::max_contribution()`](https://statisticsnorway.github.io/ssb-ssbtools/reference/max_contribution.html),
+  after excluding any codes specified by the `removeCodes` parameter.
+  The three parameters below use corresponding variables from the same
+  function.
+
+- min_n_non0_contr:
+
+  Same logic as `min_n_contr`, but based on `n_non0_contr`, which counts
+  contributors contributing a non-zero value.
+
+- min_n_contr_all:
+
+  Same as `min_n_contr`, but using `n_contr_all`, which counts all
+  contributors without considering `removeCodes`.
+
+- min_n_non0_contr_all:
+
+  Same as `min_n_non0_contr`, but using `n_non0_contr_all`, which counts
+  all contributors contributing a non-zero value, without considering
+  `removeCodes`.
 
 - charVar:
 
