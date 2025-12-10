@@ -47,6 +47,7 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 #' @inheritParams SingletonDefault
 #' @inheritParams DominanceRule
 #' @param nUniqueVar  A single variable holding the number of unique contributors.
+#' @param origIdxVar  A possible variable holding the original row index in cases where `nUniqueVar` equals 1.
 #' @param charVar Variable with contributor codes. 
 #' @param removeCodes Vector, list or data frame of codes considered non-singletons.
 #'                Single element lists and single column data frames behave just like vectors.
@@ -108,6 +109,7 @@ SingletonDefault <- function(data, freqVar, protectZeros, secondaryZeros, ...) {
 SingletonUniqueContributor <- function(data, 
                                        freqVar = NULL, 
                                        nUniqueVar=NULL, 
+                                       origIdxVar = NULL,
                                        charVar=NULL, 
                                        removeCodes = character(0), 
                                        integerSingleton = length(charVar) > 0,
@@ -166,7 +168,14 @@ SingletonUniqueContributor <- function(data,
       if (!is.vector(removeCodes)) {
         stop("removeCodes must be vector when empty charVar")
       }
-      singleton[as.integer(removeCodes)] <- FALSE
+      if (length(origIdxVar) &&
+          origIdxVar %in% names(data)) {
+        ma <- match(as.integer(removeCodes), data[[origIdxVar]])
+        singleton[ma[!is.na(ma)]] <- FALSE
+        
+      } else {
+        singleton[as.integer(removeCodes)] <- FALSE
+      }
     }
   }
   

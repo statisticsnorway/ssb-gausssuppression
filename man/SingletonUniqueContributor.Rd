@@ -9,6 +9,7 @@ SingletonUniqueContributor(
   data,
   freqVar = NULL,
   nUniqueVar = NULL,
+  origIdxVar = NULL,
   charVar = NULL,
   removeCodes = character(0),
   integerSingleton = length(charVar) > 0,
@@ -29,6 +30,8 @@ SingletonUniqueContributor0(data, numVar, dominanceVar = NULL, ...)
 \item{freqVar}{A single variable holding counts (input to \code{GaussSuppressionFromData})}
 
 \item{nUniqueVar}{A single variable holding the number of unique contributors.}
+
+\item{origIdxVar}{A possible variable holding the original row index in cases where \code{nUniqueVar} equals 1.}
 
 \item{charVar}{Variable with contributor codes.}
 

@@ -27,6 +27,13 @@
   messages easier for users to recognise and interpret as non-critical warnings.
   - Internal list of allowed unused dots expanded to avoid unnecessary warnings
   in additional special cases.
+* Fixed bug in how `removeCodes` without `contributorVar` (rare case) affects singleton
+  - Affected both `SuppressDominantCells()` and `SuppressFewContributors()`.
+  - The bug most likely caused errors due to indexes being outside the allowed range.
+  - The solution uses a new variable, `origIdxVar`, which is also introduced
+    as a new `GaussSuppressionFromData()` parameter and generated in the
+    `extraAggregate` step.
+
 
 
 ## GaussSuppression 1.2.0

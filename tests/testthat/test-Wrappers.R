@@ -83,6 +83,15 @@ test_that("Wrappers", {
                         primary = NULL)
   
   
+  # Warning and error without code utilizing origIdxVar
+  SuppressDominantCells(data=SSBtoolsData("magnitude1"), 
+                        dominanceVar = "value", 
+                        dimVar= c("sector4", "geo"), 
+                        n = 1, k = 80, allDominance = TRUE,
+                        printInc = printInc, 
+                        removeCodes = c(15, 20))
+  
+  
   # Table 3 in vignette  
   b1 <- SuppressDominantCells(data=dataset, 
                         numVar = "value", 
