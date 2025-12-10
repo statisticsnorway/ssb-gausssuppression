@@ -82,6 +82,7 @@ secondary suppression by Gaussian elimination by <code><a href="https://statisti
 <span>  specLock <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  freqVarNew <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/make.unique.html" class="external-link">make.unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="st">"freq"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>  nUniqueVar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/make.unique.html" class="external-link">make.unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="st">"nUnique"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
+<span>  origIdxVar <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rev.html" class="external-link">rev</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/make.unique.html" class="external-link">make.unique</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span>, <span class="st">"origIdx"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span>,</span>
 <span>  forcedInOutput <span class="op">=</span> <span class="st">"ifNonNULL"</span>,</span>
 <span>  unsafeInOutput <span class="op">=</span> <span class="st">"ifForcedInOutput"</span>,</span>
 <span>  lpPackage <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -277,6 +278,15 @@ This variable will be generated in the <code>extraAggregate</code> step.
 Default is <code>"nUnique"</code> provided this is not found in <code>names(data)</code>.
 If an existing variable is passed as input,
 this variable will apply only when <code>preAggregate</code>/<code>extraAggregate</code> is not done.</p></dd>
+
+
+<dt id="arg-origidxvar">origIdxVar<a class="anchor" aria-label="anchor" href="#arg-origidxvar"></a></dt>
+<dd><p>Name of the variable generated in the <code>extraAggregate</code> step
+when <code>preAggregate</code> is FALSE.
+The variable contains the original row index in cases where
+<code>nUniqueVar</code> equals 1.
+Default is <code>"origIdx"</code> provided this name is not already
+present in <code>names(data)</code>.</p></dd>
 
 
 <dt id="arg-forcedinoutput">forcedInOutput<a class="anchor" aria-label="anchor" href="#arg-forcedinoutput"></a></dt>

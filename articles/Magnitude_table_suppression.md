@@ -70,7 +70,7 @@ SuppressFewContributors(data=dataset,
                         numVar = "value", 
                         dimVar= c("sector4", "geo"), 
                         maxN=1)
-#> [extraAggregate 20*3->10*4] Checking ....
+#> [extraAggregate 20*3->10*5] Checking ....
 #> GaussSuppression_numttHTT: ..............::::
 #>          sector4      geo value nRule nAll primary suppressed
 #> 1          Total    Total 462.3    20   20   FALSE      FALSE
@@ -128,7 +128,7 @@ SuppressDominantCells(data=dataset,
                       numVar = "value", 
                       dimVar= c("sector4", "geo"), 
                       n = 1, k = 80, allDominance = TRUE)
-#> [extraAggregate 20*3->10*4] Checking ....
+#> [extraAggregate 20*3->10*5] Checking ....
 #> GaussSuppression_numttHTT: ..............::
 #>          sector4      geo value dominant1 max1contributor n_contr n_non0_contr
 #> 1          Total    Total 462.3 0.2089552               3      20           20
@@ -211,7 +211,7 @@ output <- SuppressDominantCells(data=dataset,
                                 numVar = "value", 
                                 dimVar= c("sector4", "sector2", "geo", "eu"), 
                                 n = 1:2, k = c(80, 99))
-#> [extraAggregate 20*5->10*6] Checking ....
+#> [extraAggregate 20*5->10*7] Checking ....
 #> GaussSuppression_numttHTT: .............::::::
 head(output)
 #>   sector4      geo value primary suppressed
@@ -275,7 +275,7 @@ output <- SuppressDominantCells(data=dataset,
                                 numVar = "value", 
                                 hierarchies = dimlists,  
                                 n = 1:2, k = c(80, 99))
-#> [extraAggregate 20*3->10*4] Checking ....
+#> [extraAggregate 20*3->10*5] Checking ....
 #> GaussSuppression_numttHTT: .............::::::
 ```
 
@@ -295,7 +295,7 @@ output <- SuppressFewContributors(data=dataset,
                                   formula = ~sector2*geo + sector4*eu, 
                                   maxN=2,
                                   removeEmpty = FALSE)
-#> [extraAggregate 20*5->10*6] Checking ....
+#> [extraAggregate 20*5->10*7] Checking ....
 #> GaussSuppression_numttHTT: ............:::::
 head(output)
 #>        geo sector4 value nRule nAll primary suppressed
@@ -541,7 +541,7 @@ output <- SuppressDominantCells(data = dataset,
                                 pPercent = 30, 
                                 rangePercent = 70, rangeMin = 80, 
                                 lpPackage = "Rglpk")
-#> [extraAggregate 20*4->10*5] Checking ....
+#> [extraAggregate 20*4->10*6] Checking ....
 #> GaussSuppression_numttHTT: ............
 #> (10*8-DDcol->10*6-0exact->10*5-GaussI->10*5)
 #> 

@@ -54,6 +54,11 @@
 <ul><li>Default for <code>action_unused_dots</code> changed from <code>"inform"</code> to <code>"warn"</code> to make messages easier for users to recognise and interpret as non-critical warnings.</li>
 <li>Internal list of allowed unused dots expanded to avoid unnecessary warnings in additional special cases.</li>
 </ul></li>
+<li>Fixed bug in how <code>removeCodes</code> without <code>contributorVar</code> (rare case) affects singleton
+<ul><li>Affected both <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code> and <code><a href="../reference/SuppressFewContributors.html">SuppressFewContributors()</a></code>.</li>
+<li>The bug most likely caused errors due to indexes being outside the allowed range.</li>
+<li>The solution uses a new variable, <code>origIdxVar</code>, which is also introduced as a new <code><a href="../reference/GaussSuppressionFromData.html">GaussSuppressionFromData()</a></code> parameter and generated in the <code>extraAggregate</code> step.</li>
+</ul></li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.2.0" id="gausssuppression-120">GaussSuppression 1.2.0<a class="anchor" aria-label="anchor" href="#gausssuppression-120"></a></h2><p class="text-muted">CRAN release: 2025-09-25</p>

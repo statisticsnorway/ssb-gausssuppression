@@ -204,7 +204,7 @@ contributor are primary suppressed.</p>
 <span>                        numVar <span class="op">=</span> <span class="st">"value"</span>, </span>
 <span>                        dimVar<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sector4"</span>, <span class="st">"geo"</span><span class="op">)</span>, </span>
 <span>                        maxN<span class="op">=</span><span class="fl">1</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [extraAggregate 20*3-&gt;10*4] Checking ....</span></span>
+<span><span class="co">#&gt; [extraAggregate 20*3-&gt;10*5] Checking ....</span></span>
 <span><span class="co">#&gt; GaussSuppression_numttHTT: ..............::::</span></span>
 <span><span class="co">#&gt;          sector4      geo value nRule nAll primary suppressed</span></span>
 <span><span class="co">#&gt; 1          Total    Total 462.3    20   20   FALSE      FALSE</span></span>
@@ -365,7 +365,7 @@ the cell total.</p>
 <span>                      numVar <span class="op">=</span> <span class="st">"value"</span>, </span>
 <span>                      dimVar<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sector4"</span>, <span class="st">"geo"</span><span class="op">)</span>, </span>
 <span>                      n <span class="op">=</span> <span class="fl">1</span>, k <span class="op">=</span> <span class="fl">80</span>, allDominance <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [extraAggregate 20*3-&gt;10*4] Checking ....</span></span>
+<span><span class="co">#&gt; [extraAggregate 20*3-&gt;10*5] Checking ....</span></span>
 <span><span class="co">#&gt; GaussSuppression_numttHTT: ..............::</span></span>
 <span><span class="co">#&gt;          sector4      geo value dominant1 max1contributor n_contr n_non0_contr</span></span>
 <span><span class="co">#&gt; 1          Total    Total 462.3 0.2089552               3      20           20</span></span>
@@ -551,7 +551,7 @@ including the variables “sector2” and “eu”.</p>
 <span>                                numVar <span class="op">=</span> <span class="st">"value"</span>, </span>
 <span>                                dimVar<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"sector4"</span>, <span class="st">"sector2"</span>, <span class="st">"geo"</span>, <span class="st">"eu"</span><span class="op">)</span>, </span>
 <span>                                n <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">99</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [extraAggregate 20*5-&gt;10*6] Checking ....</span></span>
+<span><span class="co">#&gt; [extraAggregate 20*5-&gt;10*7] Checking ....</span></span>
 <span><span class="co">#&gt; GaussSuppression_numttHTT: .............::::::</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   sector4      geo value primary suppressed</span></span>
@@ -785,7 +785,7 @@ input:</p>
 <span>                                numVar <span class="op">=</span> <span class="st">"value"</span>, </span>
 <span>                                hierarchies <span class="op">=</span> <span class="va">dimlists</span>,  </span>
 <span>                                n <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">2</span>, k <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">80</span>, <span class="fl">99</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [extraAggregate 20*3-&gt;10*4] Checking ....</span></span>
+<span><span class="co">#&gt; [extraAggregate 20*3-&gt;10*5] Checking ....</span></span>
 <span><span class="co">#&gt; GaussSuppression_numttHTT: .............::::::</span></span></code></pre></div>
 <p><br><br></p>
 </div>
@@ -802,7 +802,7 @@ contributors are primary suppressed.</p>
 <span>                                  formula <span class="op">=</span> <span class="op">~</span><span class="va">sector2</span><span class="op">*</span><span class="va">geo</span> <span class="op">+</span> <span class="va">sector4</span><span class="op">*</span><span class="va">eu</span>, </span>
 <span>                                  maxN<span class="op">=</span><span class="fl">2</span>,</span>
 <span>                                  removeEmpty <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [extraAggregate 20*5-&gt;10*6] Checking ....</span></span>
+<span><span class="co">#&gt; [extraAggregate 20*5-&gt;10*7] Checking ....</span></span>
 <span><span class="co">#&gt; GaussSuppression_numttHTT: ............:::::</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">output</span><span class="op">)</span></span>
 <span><span class="co">#&gt;        geo sector4 value nRule nAll primary suppressed</span></span>
@@ -1956,7 +1956,7 @@ required. Therefore, the cell on line 16 is additionally suppressed</p>
 <span>                                pPercent <span class="op">=</span> <span class="fl">30</span>, </span>
 <span>                                rangePercent <span class="op">=</span> <span class="fl">70</span>, rangeMin <span class="op">=</span> <span class="fl">80</span>, </span>
 <span>                                lpPackage <span class="op">=</span> <span class="st">"Rglpk"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; [extraAggregate 20*4-&gt;10*5] Checking ....</span></span>
+<span><span class="co">#&gt; [extraAggregate 20*4-&gt;10*6] Checking ....</span></span>
 <span><span class="co">#&gt; GaussSuppression_numttHTT: ............</span></span>
 <span><span class="co">#&gt; (10*8-DDcol-&gt;10*6-0exact-&gt;10*5-GaussI-&gt;10*5)</span></span>
 <span><span class="co">#&gt; </span></span>

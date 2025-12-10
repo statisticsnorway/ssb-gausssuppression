@@ -38,6 +38,7 @@ GaussSuppressionFromData(
   specLock = FALSE,
   freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
   nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
+  origIdxVar = rev(make.unique(c(names(data), "origIdx")))[1],
   forcedInOutput = "ifNonNULL",
   unsafeInOutput = "ifForcedInOutput",
   lpPackage = NULL,
@@ -266,6 +267,13 @@ GaussSuppressionFromData(
   `"nUnique"` provided this is not found in `names(data)`. If an
   existing variable is passed as input, this variable will apply only
   when `preAggregate`/`extraAggregate` is not done.
+
+- origIdxVar:
+
+  Name of the variable generated in the `extraAggregate` step when
+  `preAggregate` is FALSE. The variable contains the original row index
+  in cases where `nUniqueVar` equals 1. Default is `"origIdx"` provided
+  this name is not already present in `names(data)`.
 
 - forcedInOutput:
 

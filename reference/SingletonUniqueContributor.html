@@ -49,6 +49,7 @@
 <span>  <span class="va">data</span>,</span>
 <span>  freqVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  nUniqueVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  origIdxVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  charVar <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  removeCodes <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">character</a></span><span class="op">(</span><span class="fl">0</span><span class="op">)</span>,</span>
 <span>  integerSingleton <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">charVar</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">0</span>,</span>
@@ -78,6 +79,10 @@
 
 <dt id="arg-nuniquevar">nUniqueVar<a class="anchor" aria-label="anchor" href="#arg-nuniquevar"></a></dt>
 <dd><p>A single variable holding the number of unique contributors.</p></dd>
+
+
+<dt id="arg-origidxvar">origIdxVar<a class="anchor" aria-label="anchor" href="#arg-origidxvar"></a></dt>
+<dd><p>A possible variable holding the original row index in cases where <code>nUniqueVar</code> equals 1.</p></dd>
 
 
 <dt id="arg-charvar">charVar<a class="anchor" aria-label="anchor" href="#arg-charvar"></a></dt>

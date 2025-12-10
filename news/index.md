@@ -39,6 +39,18 @@
     non-critical warnings.
   - Internal list of allowed unused dots expanded to avoid unnecessary
     warnings in additional special cases.
+- Fixed bug in how `removeCodes` without `contributorVar` (rare case)
+  affects singleton
+  - Affected both
+    [`SuppressDominantCells()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressDominantCells.md)
+    and
+    [`SuppressFewContributors()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressFewContributors.md).
+  - The bug most likely caused errors due to indexes being outside the
+    allowed range.
+  - The solution uses a new variable, `origIdxVar`, which is also
+    introduced as a new
+    [`GaussSuppressionFromData()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/GaussSuppressionFromData.md)
+    parameter and generated in the `extraAggregate` step.
 
 ## GaussSuppression 1.2.0
 

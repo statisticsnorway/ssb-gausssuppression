@@ -44,7 +44,7 @@ dataset <- SSBtoolsData("magnitude1")
 
 a1 <- SuppressDominantCells(data = dataset, numVar = "value", 
        dimVar = c("sector4", "geo"), n = 1:2, k = c(77, 99))
-#> [extraAggregate 20*3->10*4] Checking ....
+#> [extraAggregate 20*3->10*5] Checking ....
 #> GaussSuppression_numttHTT: ............
 
 a1
@@ -80,7 +80,7 @@ wg
 a2 <- SuppressDominantCells(data = dataset, numVar = "value", 
        dimVar = c("sector4", "geo"), n = 1:2, k = c(77, 99), 
        wg = wg, primary = c(DominanceRule, PrimaryRemoveWg))
-#> [extraAggregate 20*3->10*4] Checking ....
+#> [extraAggregate 20*3->10*5] Checking ....
 #> GaussSuppression_numttHTT: ............:
 
 a2
@@ -111,7 +111,7 @@ a3 <- SuppressDominantCells(data = dataset, numVar = "value",
        dimVar = c("sector4", "geo"), n = 1:2, k = c(77, 99), 
        wg = wg, primary = c(DominanceRule, PrimaryRemoveWg), 
        candidates = CandidatesNumWg)
-#> [extraAggregate 20*3->10*4] Checking ....
+#> [extraAggregate 20*3->10*5] Checking ....
 #> GaussSuppression_numttHTT: ........:::::
 a3
 #>          sector4      geo value primary suppressed
@@ -140,7 +140,7 @@ a3
 a4 <- SuppressDominantCells(data = dataset, numVar = "value", 
        dimVar = c("sector4", "geo"), n = 1:2, k = c(77, 99), 
        wg = wg, forced = ForcedWg, whenPrimaryForced = message)
-#> [extraAggregate 20*3->10*4] Checking ....
+#> [extraAggregate 20*3->10*5] Checking ....
 #> Primary suppression of forced cells ignored
 #> GaussSuppression_numttHTT: ........:::::
 a4

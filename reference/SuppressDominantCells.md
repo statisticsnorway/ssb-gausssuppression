@@ -159,7 +159,7 @@ d <- data.frame(v1 = v1, num = num, sweight = sweight)
 
 # basic use
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1)
-#> [extraAggregate 18*2->7*3] Checking ....
+#> [extraAggregate 18*2->7*4] Checking ....
 #> GaussSuppression_numttHTT: ..
 #>   v1 num primary suppressed
 #> 1 v1 100    TRUE       TRUE
@@ -170,7 +170,7 @@ SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1
 #> 6 v6 100   FALSE      FALSE
 #> 7 v7 100   FALSE      FALSE
 SuppressDominantCells(d, k = c(80,70), numVar = "num", formula = ~v1 -1) # same as above
-#> [extraAggregate 18*2->7*3] Checking ....
+#> [extraAggregate 18*2->7*4] Checking ....
 #> GaussSuppression_numttHTT: ..
 #>   v1 num primary suppressed
 #> 1 v1 100    TRUE       TRUE
@@ -181,7 +181,7 @@ SuppressDominantCells(d, k = c(80,70), numVar = "num", formula = ~v1 -1) # same 
 #> 6 v6 100   FALSE      FALSE
 #> 7 v7 100   FALSE      FALSE
 SuppressDominantCells(d, pPercent = 7, numVar = "num", formula = ~v1 -1) 
-#> [extraAggregate 18*2->7*3] Checking ....
+#> [extraAggregate 18*2->7*4] Checking ....
 #> GaussSuppression_numttHTT: ...
 #>   v1 num primary suppressed
 #> 1 v1 100    TRUE       TRUE
@@ -195,7 +195,7 @@ SuppressDominantCells(d, pPercent = 7, numVar = "num", formula = ~v1 -1)
 # with weights
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num",
 dimVar = "v1", sWeightVar = "sweight")
-#> [extraAggregate 18*3->7*3] Checking ....
+#> [extraAggregate 18*3->7*4] Checking ....
 #> GaussSuppression_numttHTT: .......
 #>      v1 num sweight weighted.num primary suppressed
 #> 1 Total 700      24         1055   FALSE      FALSE
@@ -210,7 +210,7 @@ dimVar = "v1", sWeightVar = "sweight")
 # overwriting some parameters in default spec
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num",
 dimVar = "v1", sWeightVar = "sweight", domWeightMethod = "tauargus")
-#> [extraAggregate 18*3->7*3] Checking ....
+#> [extraAggregate 18*3->7*4] Checking ....
 #> GaussSuppression_numttHTT: ....
 #>      v1 num sweight weighted.num primary suppressed
 #> 1 Total 700      24         1055   FALSE      FALSE
@@ -225,7 +225,7 @@ dimVar = "v1", sWeightVar = "sweight", domWeightMethod = "tauargus")
 # using dominance and few contributors rule together, see second example compared to first
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1,
 primary = c(DominanceRule, NContributorsRule), maxN = 3, allDominance = TRUE)
-#> [extraAggregate 18*2->7*3] Checking ....
+#> [extraAggregate 18*2->7*4] Checking ....
 #> GaussSuppression_numttHTT: ..
 #>   v1 num dominant1 dominant2 max1contributor max2contributor n_contr
 #> 1 v1 100      1.00      1.00               1              NA       1
@@ -246,7 +246,7 @@ primary = c(DominanceRule, NContributorsRule), maxN = 3, allDominance = TRUE)
 
 SuppressDominantCells(d, n = c(1,2), k = c(80,70), numVar = "num", formula = ~v1 -1,
 primary = c(DominanceRule, NContributorsRule), maxN = 4, allDominance = TRUE)
-#> [extraAggregate 18*2->7*3] Checking ....
+#> [extraAggregate 18*2->7*4] Checking ....
 #> GaussSuppression_numttHTT: 
 #>   v1 num dominant1 dominant2 max1contributor max2contributor n_contr
 #> 1 v1 100      1.00      1.00               1              NA       1
@@ -273,7 +273,7 @@ d2$v <- rnorm(nrow(d2))^2
 # Hierarchical region variables are detected automatically -> same output column
 SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
                       dimVar = c("region", "county", "k_group"), allDominance = TRUE)
-#> [extraAggregate 44*4->11*5] Checking ....
+#> [extraAggregate 44*4->11*6] Checking ....
 #> GaussSuppression_numttHTT: ..............
 #>    region          v dominant1 dominant2 max1contributor max2contributor
 #> 1       1  3.1878024 0.3302228 0.5721194              23              34
@@ -321,7 +321,7 @@ SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v",
 # Formula. Hierarchical variables still detected automatically.
 SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
                       formula = ~main_income * k_group + region + county - k_group)
-#> [extraAggregate 44*5->44*6] Checking ....
+#> [extraAggregate 44*5->44*7] Checking ....
 #> GaussSuppression_numttHTT: .::::::::::::::::::::
 #>    main_income region          v primary suppressed
 #> 1        Total  Total 38.3477816   FALSE      FALSE
@@ -360,7 +360,7 @@ ml <- data.frame(levels = c("@", "@@", "@@@", "@@@", "@@@", "@@"),
         codes = c("Total", "not_assistance", "other", "pensions", "wages", "assistance"))
 SuppressDominantCells(data = d2, n = c(1, 2), k = c(70, 95), numVar = "v", 
                       hierarchies = list(main_income = ml, k_group = "Total_Norway"))
-#> [extraAggregate 44*3->8*4] Checking ....
+#> [extraAggregate 44*3->8*5] Checking ....
 #> GaussSuppression_numttHTT: ...............
 #>       main_income      k_group         v primary suppressed
 #> 1           Total Total_Norway 38.347782   FALSE      FALSE

@@ -10,6 +10,7 @@ SingletonUniqueContributor(
   data,
   freqVar = NULL,
   nUniqueVar = NULL,
+  origIdxVar = NULL,
   charVar = NULL,
   removeCodes = character(0),
   integerSingleton = length(charVar) > 0,
@@ -38,6 +39,11 @@ SingletonUniqueContributor0(data, numVar, dominanceVar = NULL, ...)
 - nUniqueVar:
 
   A single variable holding the number of unique contributors.
+
+- origIdxVar:
+
+  A possible variable holding the original row index in cases where
+  `nUniqueVar` equals 1.
 
 - charVar:
 
