@@ -35,6 +35,7 @@ GaussSuppressionFromData(
   specLock = FALSE,
   freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
   nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
+  origIdxVar = rev(make.unique(c(names(data), "origIdx")))[1],
   forcedInOutput = "ifNonNULL",
   unsafeInOutput = "ifForcedInOutput",
   lpPackage = NULL,
@@ -167,6 +168,13 @@ This variable will be generated in the \code{extraAggregate} step.
 Default is \code{"nUnique"} provided this is not found in \code{names(data)}.
 If an existing variable is passed as input,
 this variable will apply only when \code{preAggregate}/\code{extraAggregate} is not done.}
+
+\item{origIdxVar}{Name of the variable generated in the \code{extraAggregate} step
+when \code{preAggregate} is FALSE.
+The variable contains the original row index in cases where
+\code{nUniqueVar} equals 1.
+Default is \code{"origIdx"} provided this name is not already
+present in \code{names(data)}.}
 
 \item{forcedInOutput}{Whether to include \code{forced} as an output column.
 One of \code{"ifNonNULL"} (default), \code{"always"}, \code{"ifany"} and \code{"no"}.

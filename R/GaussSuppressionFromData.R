@@ -128,6 +128,12 @@
 #'                   Default is `"nUnique"` provided this is not found in `names(data)`.
 #'                   If an existing variable is passed as input, 
 #'                   this variable will apply only when `preAggregate`/`extraAggregate` is not done.
+#' @param origIdxVar Name of the variable generated in the `extraAggregate` step
+#'                   when `preAggregate` is FALSE.  
+#'                   The variable contains the original row index in cases where
+#'                   `nUniqueVar` equals 1.  
+#'                   Default is `"origIdx"` provided this name is not already
+#'                   present in `names(data)`.
 #' @param  forcedInOutput Whether to include `forced` as an output column.      
 #'               One of `"ifNonNULL"` (default), `"always"`, `"ifany"` and `"no"`. 
 #'               In addition, `TRUE` and `FALSE` are allowed as alternatives to  `"always"` and `"no"`.   
@@ -342,6 +348,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                            specLock = FALSE, 
                            freqVarNew = rev(make.unique(c(names(data), "freq")))[1],
                            nUniqueVar = rev(make.unique(c(names(data), "nUnique")))[1],
+                           origIdxVar = rev(make.unique(c(names(data), "origIdx")))[1],
                            forcedInOutput = "ifNonNULL",
                            unsafeInOutput = "ifForcedInOutput",
                            lpPackage = NULL, 
@@ -452,6 +459,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
   force(preAggregate)
   force(extraAggregate)
   force(nUniqueVar)
+  force(origIdxVar)
   
   if (length(singletonMethod)) { # Default is logical(0) when secondaryZeros is NULL
     if (all(singletonMethod == "none")) {
@@ -737,11 +745,16 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
         base_order = aggregateBaseOrder) 
     }
     data[[nUniqueVar]] <- 1L
+    if (!preAggregate) {               # Special case without preAggregate. 
+      data[[origIdxVar]] <- seq_len(nrow(data))
+    } else {
+      origIdxVar <- character(0)
+    }
     #data <- aggregate(data[unique(c(freqVar, numVar, weightVar, nUniqueVar))], data[unique(dVar)], sum) 
     data <- aggregate_by_pkg(
       data = data,
       by = unique(dVar),
-      var = unique(c(freqVar, numVar, weightVar, r_rnd, nUniqueVar)),
+      var = unique(c(freqVar, numVar, weightVar, r_rnd, nUniqueVar, origIdxVar)),
       pkg =  aggregatePackage,
       include_na = aggregateNA,
       fun = sum,
@@ -779,6 +792,10 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
       if (length(uniqueCharVar) == 1) {    # already NA when length(uniqueCharVar) > 1
         data[uniqueCharVar][data[[nUniqueVar]] > 1, ] <- NA  # uniqueCharVar created as the first row is ok when the first row is the only row
       }
+    }
+    if (length(origIdxVar) &&
+        origIdxVar %in% names(data)) {
+      data[origIdxVar][data[[nUniqueVar]] > 1, ] <- NA 
     }
     if (printInc) {
       cat(".")
@@ -842,7 +859,7 @@ GaussSuppressionFromData = function(data, dimVar = NULL, freqVar=NULL,
                              maxN = maxN, protectZeros = protectZeros, secondaryZeros = secondaryZeros, 
                              data = data, freqVar = freqVar, numVar = numVar, weightVar = weightVar, 
                              charVar = charVar, dimVar = dimVar, 
-                             nUniqueVar = nUniqueVar, primary = primary, 
+                             nUniqueVar = nUniqueVar, origIdxVar = origIdxVar, primary = primary, 
                              aggregatePackage = aggregatePackage, 
                              aggregateNA = aggregateNA, 
                              aggregateBaseOrder = aggregateBaseOrder, 
