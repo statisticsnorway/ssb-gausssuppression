@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.2</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -39,7 +39,7 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="1.2.1" id="gausssuppression-121">GaussSuppression 1.2.1<a class="anchor" aria-label="anchor" href="#gausssuppression-121"></a></h2>
+<h2 class="pkg-version" data-toc-text="1.2.2" id="gausssuppression-122">GaussSuppression 1.2.2<a class="anchor" aria-label="anchor" href="#gausssuppression-122"></a></h2>
 <ul><li>Added four new parameters (<code>min_n_contr</code>, <code>min_n_non0_contr</code>, <code>min_n_contr_all</code>, <code>min_n_non0_contr_all</code>) to <code><a href="../reference/MagnitudeRule.html">MagnitudeRule()</a></code>, the primary-suppression function used by <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code>.
 <ul><li>These parameters can now be used directly when calling <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code>.</li>
 <li>It is now also possible to call <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code> without specifying either <code>pPercent</code> or <code>k</code>.</li>
@@ -53,6 +53,11 @@
 <li>Improved handling of unused dots
 <ul><li>Default for <code>action_unused_dots</code> changed from <code>"inform"</code> to <code>"warn"</code> to make messages easier for users to recognise and interpret as non-critical warnings.</li>
 <li>Internal list of allowed unused dots expanded to avoid unnecessary warnings in additional special cases.</li>
+</ul></li>
+<li>Multiple total codes can now be specified due to updates in the <a href="https://CRAN.R-project.org/package=SSBtools" class="external-link">the SSBtools package</a> (version 1.8.6).
+<ul><li>The <code>total</code> parameter can be specified as a named vector or named list.</li>
+<li>The reexported function <code><a href="https://statisticsnorway.github.io/ssb-ssbtools/reference/tables_by_formulas.html" class="external-link">tables_by_formulas()</a></code> has been updated so that named total vectors are handled flexibly with both <code>substitute_vars</code> and <code>collapse_vars</code>.</li>
+<li>See <a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/118" class="external-link">issue </a><a href="https://github.com/statisticsnorway/ssb-gausssuppression/issues/118" class="external-link">#118</a> for an example, which also inspired this enhancement. There was no actual bug: previous behavior was only a consequence of how R coerces a named list to a character vector when used with <code><a href="https://rdrr.io/r/base/names.html" class="external-link">names()</a></code>, and the list names were not used.</li>
 </ul></li>
 <li>Fixed bug in how <code>removeCodes</code> without <code>contributorVar</code> (rare case) affects singleton
 <ul><li>Affected both <code><a href="../reference/SuppressDominantCells.html">SuppressDominantCells()</a></code> and <code><a href="../reference/SuppressFewContributors.html">SuppressFewContributors()</a></code>.</li>
