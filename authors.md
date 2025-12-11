@@ -23,13 +23,13 @@ Source:
 [`DESCRIPTION`](https://github.com/statisticsnorway/ssb-gausssuppression/blob/main/DESCRIPTION)
 
 Langsrud Ø, Lupp D (2025). *GaussSuppression: Tabular Data Suppression
-using Gaussian Elimination*. R package version 1.2.2,
+using Gaussian Elimination*. R package version 1.2.3,
 <https://github.com/statisticsnorway/ssb-gausssuppression>.
 
     @Manual{,
       title = {GaussSuppression: Tabular Data Suppression using Gaussian Elimination},
       author = {Øyvind Langsrud and Daniel Lupp},
       year = {2025},
-      note = {R package version 1.2.2},
+      note = {R package version 1.2.3},
       url = {https://github.com/statisticsnorway/ssb-gausssuppression},
     }

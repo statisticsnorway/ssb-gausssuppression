@@ -1,6 +1,8 @@
 # Changelog
 
-## GaussSuppression 1.2.2
+## GaussSuppression 1.2.3
+
+CRAN release: 2025-12-11
 
 - Added four new parameters (`min_n_contr`, `min_n_non0_contr`,
   `min_n_contr_all`, `min_n_non0_contr_all`) to
