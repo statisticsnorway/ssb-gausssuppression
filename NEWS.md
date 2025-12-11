@@ -1,5 +1,5 @@
 
-## GaussSuppression 1.2.2
+## GaussSuppression 1.2.3
 * Added four new parameters
   (`min_n_contr`, `min_n_non0_contr`, `min_n_contr_all`, `min_n_non0_contr_all`)
   to `MagnitudeRule()`, the primary-suppression function used by
