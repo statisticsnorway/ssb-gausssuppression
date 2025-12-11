@@ -1,5 +1,5 @@
 
-## GaussSuppression 1.2.1
+## GaussSuppression 1.2.2
 * Added four new parameters
   (`min_n_contr`, `min_n_non0_contr`, `min_n_contr_all`, `min_n_non0_contr_all`)
   to `MagnitudeRule()`, the primary-suppression function used by
@@ -27,6 +27,16 @@
   messages easier for users to recognise and interpret as non-critical warnings.
   - Internal list of allowed unused dots expanded to avoid unnecessary warnings
   in additional special cases.
+* Multiple total codes can now be specified due to updates in the 
+    [the SSBtools package](https://CRAN.R-project.org/package=SSBtools)
+    (version 1.8.6).   
+  - The `total` parameter can be specified as a named vector or named list.
+  - The reexported function `tables_by_formulas()` has been updated so that named
+    total vectors are handled flexibly with both `substitute_vars` and `collapse_vars`.
+  - See [issue #118](https://github.com/statisticsnorway/ssb-gausssuppression/issues/118)
+    for an example, which also inspired this enhancement. There was no actual bug:
+    previous behavior was only a consequence of how R coerces a named list to a
+    character vector when used with `names()`, and the list names were not used.
 * Fixed bug in how `removeCodes` without `contributorVar` (rare case) affects singleton
   - Affected both `SuppressDominantCells()` and `SuppressFewContributors()`.
   - The bug most likely caused errors due to indexes being outside the allowed range.
