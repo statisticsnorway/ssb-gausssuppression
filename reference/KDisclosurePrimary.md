@@ -14,6 +14,8 @@ KDisclosurePrimary(
   mc_hierarchies = NULL,
   coalition = 1,
   upper_bound = Inf,
+  targeting = default_targeting,
+  print_frames = FALSE,
   ...
 )
 ```
@@ -49,8 +51,27 @@ KDisclosurePrimary(
 
 - upper_bound:
 
-  numeric value representing minimum count considered safe. Default set
-  to `Inf`
+  Numeric value specifying the maximum cell frequency for which
+  disclosure of belonging to the cell may be regarded as unacceptable.
+  When freq \> upper_bound, disclosure of belonging to the cell is
+  regarded as acceptable regardless of the specification of the
+  `sensitive` parameter. Default is Inf. Note that this parameter may
+  also be useful for reducing computational burden.
+
+- targeting:
+
+  NULL, a list, or a function that returns a list specifying attribute
+  disclosure scenarios. See Details. Default is
+  [default_targeting](https://statisticsnorway.github.io/ssb-gausssuppression/reference/default_targeting.md).
+
+- print_frames:
+
+  Logical or character. If TRUE, additional data frames are printed to
+  the console. When `mc_hierarchies` is used, this includes a data frame
+  with hidden results. In addition, a data frame containing the primary
+  suppressed difference cells is printed. If set to `"primary_cells"`,
+  only the primary suppressed difference cells are printed. The default
+  is FALSE.
 
 - ...:
 
@@ -60,6 +81,54 @@ KDisclosurePrimary(
 
 dgCMatrix corresponding to primary suppressed cells
 
+## Details
+
+The `targeting` specification is a named list that may contain the
+following optional elements. References to `crossTable` below refer to a
+data frame that may be extended after applying `mc_hierarchies`.
+
+- `identifying`:
+
+  A data frame containing selected rows from `crossTable`. Membership in
+  the cells represented by these rows is regarded as information that an
+  intruder may already know. If omitted, it defaults to `crossTable`.
+
+- `sensitive`:
+
+  A data frame containing selected rows from `crossTable`. If an
+  intruder can infer membership in the cells represented by these rows,
+  this is considered an unacceptable disclosure, subject to any further
+  specification provided by `is_sensitive`. If omitted, it defaults to
+  `crossTable`.
+
+- `is_sensitive`:
+
+  A data frame with the same structure as `sensitive`, but with logical
+  variables. It indicates which codes in `sensitive` are regarded as
+  sensitive. When specified, disclosure is assessed by which codes
+  within a revealed cell are disclosed. If omitted, it is equivalent to
+  a data frame where all elements are `TRUE`.
+
+- `exclude_relations`:
+
+  A specification defining identifying–sensitive relations that are
+  ignored. This may be given either as a sparse logical matrix (or a
+  dummy matrix with values 0/1), or as a list of lists. In the matrix
+  form, rows correspond to rows in `sensitive` (or `crossTable` if
+  `sensitive` is not specified), and columns correspond to rows in
+  `identifying` (or `crossTable` if `identifying` is not specified). In
+  the list form, each list element specifies a set of relations by
+  selecting rows from `identifying` and/or `sensitive` defined above.
+  Each element may contain the components `identifying` and `sensitive`;
+  omitted components default to all rows of the corresponding element.
+  The full list jointly defines the relations to be excluded.
+
+- `include_relations`:
+
+  As for `exclude_relations`, but defining the identifying–sensitive
+  relations that are considered. Only the relations specified are
+  included; all others are ignored.
+
 ## Author
 
-Daniel P. Lupp
+Daniel P. Lupp and Øyvind Langsrud

@@ -9,7 +9,7 @@ difference cells"><meta property="og:image" content="https://statisticsnorway.gi
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -56,6 +56,8 @@ difference cells</p>
 <span>  mc_hierarchies <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  coalition <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  upper_bound <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  targeting <span class="op">=</span> <span class="va">default_targeting</span>,</span>
+<span>  print_frames <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -92,8 +94,27 @@ definition of k-disclosure.</p></dd>
 
 
 <dt id="arg-upper-bound">upper_bound<a class="anchor" aria-label="anchor" href="#arg-upper-bound"></a></dt>
-<dd><p>numeric value representing minimum count considered safe.
-Default set to <code>Inf</code></p></dd>
+<dd><p>Numeric value specifying the maximum cell frequency for which
+disclosure of belonging to the cell may be regarded as
+unacceptable. When freq &gt; upper_bound, disclosure of
+belonging to the cell is regarded as acceptable regardless
+of the specification of the <code>sensitive</code> parameter.
+Default is Inf. Note that this parameter may also be useful
+for reducing computational burden.</p></dd>
+
+
+<dt id="arg-targeting">targeting<a class="anchor" aria-label="anchor" href="#arg-targeting"></a></dt>
+<dd><p>NULL, a list, or a function that returns a list specifying
+attribute disclosure scenarios. See Details.
+Default is <a href="default_targeting.html">default_targeting</a>.</p></dd>
+
+
+<dt id="arg-print-frames">print_frames<a class="anchor" aria-label="anchor" href="#arg-print-frames"></a></dt>
+<dd><p>Logical or character. If TRUE, additional data frames are
+printed to the console. When <code>mc_hierarchies</code> is used, this includes a data
+frame with hidden results. In addition, a data frame containing the primary
+suppressed difference cells is printed. If set to <code>"primary_cells"</code>, only the
+primary suppressed difference cells are printed. The default is FALSE.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -105,8 +126,58 @@ Default set to <code>Inf</code></p></dd>
     <p>dgCMatrix corresponding to primary suppressed cells</p>
     </div>
     <div class="section level2">
+    <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
+    <p>The <code>targeting</code> specification is a named list that may contain the following
+optional elements. References to <code>crossTable</code> below refer to a data frame
+that may be extended after applying <code>mc_hierarchies</code>.</p>
+<dl><dt><code>identifying</code></dt>
+<dd><p>A data frame containing selected rows from
+<code>crossTable</code>. Membership in the cells represented by these rows is regarded
+as information that an intruder may already know. If omitted, it defaults
+to <code>crossTable</code>.</p></dd>
+
+
+<dt><code>sensitive</code></dt>
+<dd><p>A data frame containing selected rows from
+<code>crossTable</code>. If an intruder can infer membership in the cells represented
+by these rows, this is considered an unacceptable disclosure, subject to
+any further specification provided by <code>is_sensitive</code>. If omitted, it
+defaults to <code>crossTable</code>.</p></dd>
+
+
+<dt><code>is_sensitive</code></dt>
+<dd><p>A data frame with the same structure as
+<code>sensitive</code>, but with logical variables. It indicates which codes in
+<code>sensitive</code> are regarded as sensitive. When specified, disclosure is
+assessed by which codes within a revealed cell are disclosed. If omitted,
+it is equivalent to a data frame where all elements are <code>TRUE</code>.</p></dd>
+
+
+<dt><code>exclude_relations</code></dt>
+<dd><p>A specification defining identifying–sensitive
+relations that are ignored. This may be given either as a sparse logical
+matrix (or a dummy matrix with values 0/1), or as a list of lists.
+In the matrix form, rows correspond to rows in <code>sensitive</code> (or <code>crossTable</code>
+if <code>sensitive</code> is not specified), and columns correspond to rows in
+<code>identifying</code> (or <code>crossTable</code> if <code>identifying</code> is not specified).
+In the list form, each list element specifies a set of relations by
+selecting rows from <code>identifying</code> and/or <code>sensitive</code> defined above. Each
+element may contain the components <code>identifying</code> and <code>sensitive</code>; omitted
+components default to all rows of the corresponding element. The full list
+jointly defines the relations to be excluded.</p></dd>
+
+
+<dt><code>include_relations</code></dt>
+<dd><p>As for <code>exclude_relations</code>, but defining the
+identifying–sensitive relations that are considered. Only the relations
+specified are included; all others are ignored.</p></dd>
+
+
+
+</dl></div>
+    <div class="section level2">
     <h2 id="author">Author<a class="anchor" aria-label="anchor" href="#author"></a></h2>
-    <p>Daniel P. Lupp</p>
+    <p>Daniel P. Lupp and Øyvind Langsrud</p>
     </div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

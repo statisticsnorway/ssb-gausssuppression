@@ -44,7 +44,7 @@ different specs, and rows represent the parameter settings.
 | **extraAggregate**  | FALSE              | TRUE                       | TRUE                       | FALSE                      |
 | **secondaryZeros**  | FALSE              | FALSE                      | FALSE                      | 1                          |
 | **domWeightMethod** |                    | "default"                  |                            |                            |
-| **singletonMethod** |                    | "numttHTT"                 | "numttHTT"                 | "anySumNOTprimary"         |
+| **singletonMethod** |                    | "numttHTT"                 | "numttHTT"                 | "anySum0"                  |
 
 ## Examples
 
@@ -70,7 +70,7 @@ PackageSpecs()
 #> $kDisclosureSpec
 #> list(primary = KDisclosurePrimary, protectZeros = FALSE, secondaryZeros = 1, 
 #>     candidates = DirectDisclosureCandidates, extend0 = TRUE, 
-#>     singletonMethod = "anySumNOTprimary", singleton = SingletonDefault, 
+#>     singletonMethod = "anySum0", singleton = SingletonDefault, 
 #>     preAggregate = NA, extraAggregate = FALSE)
 #> 
 PackageSpecs(1)
@@ -95,5 +95,5 @@ PackageSpecs(printTable = TRUE)
 #> |\strong{extraAggregate}  |FALSE                   |TRUE                       |TRUE                         |FALSE                      |
 #> |\strong{secondaryZeros}  |FALSE                   |FALSE                      |FALSE                        |1                          |
 #> |\strong{domWeightMethod} |                        |"default"                  |                             |                           |
-#> |\strong{singletonMethod} |                        |"numttHTT"                 |"numttHTT"                   |"anySumNOTprimary"         |
+#> |\strong{singletonMethod} |                        |"numttHTT"                 |"numttHTT"                   |"anySum0"                  |
 ```

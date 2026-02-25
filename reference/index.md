@@ -115,3 +115,8 @@
 
 - [`SuppressionFromDecimals()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressionFromDecimals.md)
   : Cell suppression from synthetic decimal numbers
+
+- [`default_targeting()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/default_targeting.md)
+  :
+
+  Default `targeting` function for SuppressKDisclosure()

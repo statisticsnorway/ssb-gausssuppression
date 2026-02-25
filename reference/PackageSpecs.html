@@ -9,7 +9,7 @@ numerical indices or by specifying the spec name, see Details."><meta property="
 
     <a class="navbar-brand me-2" href="../index.html">GaussSuppression</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.2.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -73,7 +73,7 @@ and <code>printTable = FALSE</code>), or markdown table describing all specs (if
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>The following table summarizes the built-in specs. Columns represent
-different specs, and rows represent the parameter settings.</p><table class="table table"><tr><td></td><td><strong>smallCountSpec</strong></td><td><strong>dominanceSpec</strong></td><td><strong>fewContributorsSpec</strong></td><td><strong>kDisclosureSpec</strong></td></tr><tr><td><strong>primary</strong></td><td>PrimaryDefault</td><td>MagnitudeRule</td><td>NContributorsRule</td><td>KDisclosurePrimary</td></tr><tr><td><strong>protectZeros</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>FALSE</td></tr><tr><td><strong>candidates</strong></td><td>CandidatesDefault</td><td>CandidatesNum</td><td>CandidatesNum</td><td>DirectDisclosureCandidates</td></tr><tr><td><strong>singleton</strong></td><td>SingletonDefault</td><td>SingletonUniqueContributor</td><td>SingletonUniqueContributor</td><td>SingletonDefault</td></tr><tr><td><strong>extend0</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>TRUE</td></tr><tr><td><strong>preAggregate</strong></td><td>NA</td><td>!is.null(charVar)</td><td>!is.null(charVar)</td><td>NA</td></tr><tr><td><strong>extraAggregate</strong></td><td>FALSE</td><td>TRUE</td><td>TRUE</td><td>FALSE</td></tr><tr><td><strong>secondaryZeros</strong></td><td>FALSE</td><td>FALSE</td><td>FALSE</td><td>1</td></tr><tr><td><strong>domWeightMethod</strong></td><td></td><td>"default"</td><td></td><td></td></tr><tr><td><strong>singletonMethod</strong></td><td></td><td>"numttHTT"</td><td>"numttHTT"</td><td>"anySumNOTprimary"</td></tr></table></div>
+different specs, and rows represent the parameter settings.</p><table class="table table"><tr><td></td><td><strong>smallCountSpec</strong></td><td><strong>dominanceSpec</strong></td><td><strong>fewContributorsSpec</strong></td><td><strong>kDisclosureSpec</strong></td></tr><tr><td><strong>primary</strong></td><td>PrimaryDefault</td><td>MagnitudeRule</td><td>NContributorsRule</td><td>KDisclosurePrimary</td></tr><tr><td><strong>protectZeros</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>FALSE</td></tr><tr><td><strong>candidates</strong></td><td>CandidatesDefault</td><td>CandidatesNum</td><td>CandidatesNum</td><td>DirectDisclosureCandidates</td></tr><tr><td><strong>singleton</strong></td><td>SingletonDefault</td><td>SingletonUniqueContributor</td><td>SingletonUniqueContributor</td><td>SingletonDefault</td></tr><tr><td><strong>extend0</strong></td><td>TRUE</td><td>FALSE</td><td>FALSE</td><td>TRUE</td></tr><tr><td><strong>preAggregate</strong></td><td>NA</td><td>!is.null(charVar)</td><td>!is.null(charVar)</td><td>NA</td></tr><tr><td><strong>extraAggregate</strong></td><td>FALSE</td><td>TRUE</td><td>TRUE</td><td>FALSE</td></tr><tr><td><strong>secondaryZeros</strong></td><td>FALSE</td><td>FALSE</td><td>FALSE</td><td>1</td></tr><tr><td><strong>domWeightMethod</strong></td><td></td><td>"default"</td><td></td><td></td></tr><tr><td><strong>singletonMethod</strong></td><td></td><td>"numttHTT"</td><td>"numttHTT"</td><td>"anySum0"</td></tr></table></div>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
@@ -98,7 +98,7 @@ different specs, and rows represent the parameter settings.</p><table class="tab
 <span class="r-out co"><span class="r-pr">#&gt;</span> $kDisclosureSpec</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> list(primary = KDisclosurePrimary, protectZeros = FALSE, secondaryZeros = 1, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     candidates = DirectDisclosureCandidates, extend0 = TRUE, </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     singletonMethod = "anySumNOTprimary", singleton = SingletonDefault, </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     singletonMethod = "anySum0", singleton = SingletonDefault, </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     preAggregate = NA, extraAggregate = FALSE)</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span><span class="fu">PackageSpecs</span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span></span>
@@ -123,7 +123,7 @@ different specs, and rows represent the parameter settings.</p><table class="tab
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{extraAggregate}  |FALSE                   |TRUE                       |TRUE                         |FALSE                      |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{secondaryZeros}  |FALSE                   |FALSE                      |FALSE                        |1                          |</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{domWeightMethod} |                        |"default"                  |                             |                           |</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{singletonMethod} |                        |"numttHTT"                 |"numttHTT"                   |"anySumNOTprimary"         |</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> |\strong{singletonMethod} |                        |"numttHTT"                 |"numttHTT"                   |"anySum0"                  |</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
