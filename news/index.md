@@ -1,6 +1,8 @@
 # Changelog
 
-## GaussSuppression 1.2.4
+## GaussSuppression 1.3.0
+
+CRAN release: 2026-02-26
 
 - Major update of
   [`SuppressKDisclosure()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressKDisclosure.md)
