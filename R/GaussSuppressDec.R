@@ -87,7 +87,10 @@ GaussSuppressDec = function(data,
                             iter = 100,
                             mismatchWarning = TRUE,
                             whenDuplicatedInner = NULL,
-                            whenMixedDuplicatedInner = warning){
+                            whenMixedDuplicatedInner = warning,
+                            formula = NULL,
+                            linkedTables = NULL,
+                            linked_rep = FALSE){
 
   if (!is.null(rndSeed)) {
     if (!exists(".Random.seed")) 
@@ -97,6 +100,28 @@ GaussSuppressDec = function(data,
     on.exit(.Random.seed <<- exitSeed)
     set.seed(rndSeed)
   }
+  
+  
+  
+  # Some of the code below is similar to code in GaussSuppressionFromData()
+  if (linked_rep) {
+    if (is.list(formula)) {
+      table_formulas <- formula
+    } else {
+      table_formulas <- attr(formula, "table_formulas")
+    }
+    if (!is.null(linkedTables)) {
+      if (!all(unlist(linkedTables) %in% names(table_formulas))) {
+        stop("All tables in 'linkedTables' must exist in 'formula'.")
+      }
+      table_formulas <- lapply(linkedTables, function(x) combine_formulas(table_formulas[x]))
+    }
+  } else {
+    table_formulas <- NULL
+  }
+  if (is.null(table_formulas)) {
+    linked_rep <- FALSE
+  }  
   
   if(!is.null(output)){
     if(!(output %in% c("publish_inner_x", "publish_inner", "inner", "publish")))
@@ -113,7 +138,7 @@ GaussSuppressDec = function(data,
     freqDecNames <- paste0("freqDec", paste(seq_len(nRep)))[seq_len(nRep)]
   }
   
-  a <- fun(data, ..., output = "publish_inner_x")
+  a <- fun(data, ..., formula = formula, linkedTables = linkedTables, output = "publish_inner_x")
   
   startRow <- attr(a$publish, "startRow", exact = TRUE)
 
@@ -152,8 +177,25 @@ GaussSuppressDec = function(data,
   y <- as.matrix(freq_for_dec_inner)
   
   if (nRep) {
-    yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
-    zDec <- RoundWhole(as.matrix(Matrix::crossprod(a$x, yDec)), digits = digits)
+    if(linked_rep) {
+      yDec <- matrix(0, nrow(y), nRep * length(table_formulas))
+      zDec <- matrix(0, nrow(z), nRep * length(table_formulas))
+      for(i in seq_along(table_formulas)) {
+        ind <- seq_len(nRep)  + (i - 1L) * nRep
+        selection <- formula_selection(a$x,  table_formulas[[i]], logical = TRUE)
+        a_x <- a$x[, selection, drop = FALSE]
+        yDec[, ind] <- SuppressDec(a_x, 
+                                   z = z[selection, , drop = FALSE], 
+                                   y = y, 
+                                   suppressed = a$publish$suppressed[selection], 
+                                   digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
+        zDec[selection, ind] <- RoundWhole(as.matrix(Matrix::crossprod(a_x, yDec[, ind])), digits = digits)
+      }
+      freqDecNames <- as.vector(outer(freqDecNames, names(table_formulas), paste, sep = "_"))
+    } else {
+      yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
+      zDec <- RoundWhole(as.matrix(Matrix::crossprod(a$x, yDec)), digits = digits) 
+    }
   } else {
     yDec <- matrix(0, nrow(y),0)
     zDec <- matrix(0, nrow(z),0)
