@@ -256,6 +256,10 @@ ComputeIntervals1 <- function(a,
   lo <- rep(NA_integer_, ncol(x))
   up <- lo
   
+  if (lpPackage == "highs") {
+    lpPackage <- "highs2"
+  }
+  
   
   if (lpPackage == "lpSolve"){
     eqtxt <- "="
@@ -338,34 +342,63 @@ ComputeIntervals1 <- function(a,
   if (lpPackage == "Rglpk") PackageVal = RglpkVal
   if (lpPackage == "highs") PackageVal = highsVal
   
+  if (lpPackage == "highs2") {
+    PackageVal <- highsVal2(
+      mat = f.con,
+      dir = f.dir,
+      rhs = f.rhs,
+      types = c("C", "I")[1 + allInt]
+    )
+  }
   
-  for (j in which(check)) {  # for (j in seq_along(primary3)) {
+  
+  for (j in which(check)) {
+    
     if (verbose) if (j %% max(1, length(primary3) %/% 50) == 0) {
       cat("-")
       flush.console()
     }
+    
     i <- primary3[j]
     flush.console()
+    
     f.obj <- as.vector(x[!a$yKnown, i])
     
-    lo[i] <- PackageVal(
-      max = FALSE,
-      obj = f.obj,
-      mat = f.con,
-      dir = f.dir,
-      rhs = f.rhs,
-      types = c("C", "I")[1 + allInt]
-    )
-    up[i] <- PackageVal(
-      max = TRUE,
-      obj = f.obj,
-      mat = f.con,
-      dir = f.dir,
-      rhs = f.rhs,
-      types = c("C", "I")[1 + allInt]
-    )
+    if (lpPackage == "highs2") {
+      
+      lo[i] <- PackageVal(
+        max = FALSE,
+        obj = f.obj
+      )
+      
+      up[i] <- PackageVal(
+        max = TRUE,
+        obj = f.obj
+      )
+      
+    } else {
+      
+      lo[i] <- PackageVal(
+        max = FALSE,
+        obj = f.obj,
+        mat = f.con,
+        dir = f.dir,
+        rhs = f.rhs,
+        types = c("C", "I")[1 + allInt]
+      )
+      
+      up[i] <- PackageVal(
+        max = TRUE,
+        obj = f.obj,
+        mat = f.con,
+        dir = f.dir,
+        rhs = f.rhs,
+        types = c("C", "I")[1 + allInt]
+      )
+    }
+  }
+  
     
-}
 
 # Add values "removed" by Reduce0exact
 # a$y: A version of y (freq here) with known values correct and others zero
