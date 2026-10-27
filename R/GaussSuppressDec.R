@@ -227,7 +227,24 @@ GaussSuppressDec = function(data,
     }
     
     # Re-use primary-function originally made for SuppressionFromDecimals
-    suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
+    
+    if(linked_rep) {
+      suppressionFromDecimals <- a$publish$suppressed
+      for(i in seq_along(table_formulas)) {
+        ind <- seq_len(nRep)  + (i - 1L) * nRep
+        selection <- formula_selection(a$x,  table_formulas[[i]], logical = TRUE)
+        suppressionFromDecimals_i <- a$publish$suppressed
+        suppressionFromDecimals_i[selection] <- 
+          PrimaryDecimals(freq = freq_for_dec_publish[selection], 
+                          num = a$publish[selection, freqDecNames[ind], drop = FALSE], 
+                          nDec = nRep, 
+                          digitsPrimary = digitsPrimary)
+        mismatch_rows <- suppressionFromDecimals_i != a$publish$suppressed
+        suppressionFromDecimals[mismatch_rows] <- suppressionFromDecimals_i[mismatch_rows]
+      }
+    } else {
+      suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
+    }
     
     if (any(a$publish$suppressed != suppressionFromDecimals)) {
       incorrectly_suppressed <- !a$publish$suppressed & suppressionFromDecimals
