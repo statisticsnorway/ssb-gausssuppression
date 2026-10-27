@@ -191,7 +191,7 @@ GaussSuppressDec = function(data,
                                    digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
         zDec[selection, ind] <- RoundWhole(as.matrix(Matrix::crossprod(a_x, yDec[, ind])), digits = digits)
       }
-      freqDecNames <- as.vector(outer(freqDecNames, names(table_formulas), paste, sep = "_"))
+      freqDecNames <- as.vector(t(outer(names(table_formulas), freqDecNames, paste, sep = "_")))
     } else {
       yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
       zDec <- RoundWhole(as.matrix(Matrix::crossprod(a$x, yDec)), digits = digits) 
