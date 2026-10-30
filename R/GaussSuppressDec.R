@@ -40,6 +40,16 @@
 #'                            several input cells (aggregated) since they correspond to published cells. 
 #' @param whenMixedDuplicatedInner Function to be called in the case above when some inner cells correspond
 #'                                 to published cells (aggregated) and some not (not aggregated).
+#' @param formula `formula` passed to [GaussSuppressionFromData()].
+#'   Included as a formal argument in this function.    
+#' @param linkedTables `linkedTables` passed to [GaussSuppressionFromData()].
+#'   Included as a formal argument in this function. 
+#' @param linked_rep Logical (default FALSE).
+#'   Used together with the `linkedGauss` parameter of
+#'   [GaussSuppressionFromData()] to generate separate sets of
+#'   `nRep` decimal numbers for each linked table.
+#'   The decimal number variables are named using the table names as prefixes.                                  
+#'                                 
 #' @return A data frame where inner cells and cells to be published are combined or output according to parameter `output`. 
 #' 
 #' @importFrom SSBtools RoundWhole Match Mipf RbindAll
@@ -49,6 +59,12 @@
 #' @export
 #' 
 #' @author Øyvind Langrsud
+#' 
+#' @references
+#' Langsrud (2019). \doi{10.1007/s11222-018-9848-9}.
+#'
+#' Langsrud and Bøvelstad (2022).
+#' \doi{10.1007/978-3-031-13945-1_8}.
 #' 
 #' @seealso [SuppressionFromDecimals()]
 #' 
@@ -87,7 +103,10 @@ GaussSuppressDec = function(data,
                             iter = 100,
                             mismatchWarning = TRUE,
                             whenDuplicatedInner = NULL,
-                            whenMixedDuplicatedInner = warning){
+                            whenMixedDuplicatedInner = warning,
+                            formula = NULL,
+                            linkedTables = NULL,
+                            linked_rep = FALSE){
 
   if (!is.null(rndSeed)) {
     if (!exists(".Random.seed")) 
@@ -97,6 +116,32 @@ GaussSuppressDec = function(data,
     on.exit(.Random.seed <<- exitSeed)
     set.seed(rndSeed)
   }
+  
+  
+  
+  # Some of the code below is similar to code in GaussSuppressionFromData()
+  if (linked_rep) {
+    if (is.list(formula)) {
+      table_formulas <- formula
+    } else {
+      table_formulas <- attr(formula, "table_formulas")
+    }
+    if (!is.null(linkedTables)) {
+      if (!all(unlist(linkedTables) %in% names(table_formulas))) {
+        stop("All tables in 'linkedTables' must exist in 'formula'.")
+      }
+      table_formulas <- lapply(linkedTables, function(x) combine_formulas(table_formulas[x]))
+    }
+  } else {
+    table_formulas <- NULL
+  }
+  if (is.null(table_formulas)) {
+    linked_rep <- FALSE
+  } else {
+    if (is.null(names(table_formulas)) || anyNA(names(table_formulas)) || any(!nzchar(names(table_formulas)))) {
+      stop("The list of table formulas must have non-empty names.")
+    }
+  }  
   
   if(!is.null(output)){
     if(!(output %in% c("publish_inner_x", "publish_inner", "inner", "publish")))
@@ -113,7 +158,7 @@ GaussSuppressDec = function(data,
     freqDecNames <- paste0("freqDec", paste(seq_len(nRep)))[seq_len(nRep)]
   }
   
-  a <- fun(data, ..., output = "publish_inner_x")
+  a <- fun(data, ..., formula = formula, linkedTables = linkedTables, output = "publish_inner_x")
   
   startRow <- attr(a$publish, "startRow", exact = TRUE)
 
@@ -152,8 +197,25 @@ GaussSuppressDec = function(data,
   y <- as.matrix(freq_for_dec_inner)
   
   if (nRep) {
-    yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
-    zDec <- RoundWhole(as.matrix(Matrix::crossprod(a$x, yDec)), digits = digits)
+    if(linked_rep) {
+      yDec <- matrix(0, nrow(y), nRep * length(table_formulas))
+      zDec <- matrix(0, nrow(z), nRep * length(table_formulas))
+      for(i in seq_along(table_formulas)) {
+        ind <- seq_len(nRep)  + (i - 1L) * nRep
+        selection <- formula_selection(a$x,  table_formulas[[i]], logical = TRUE)
+        a_x <- a$x[, selection, drop = FALSE]
+        yDec[, ind] <- SuppressDec(a_x, 
+                                   z = z[selection, , drop = FALSE], 
+                                   y = y, 
+                                   suppressed = a$publish$suppressed[selection], 
+                                   digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
+        zDec[selection, ind] <- RoundWhole(as.matrix(Matrix::crossprod(a_x, yDec[, ind])), digits = digits)
+      }
+      freqDecNames <- as.vector(t(outer(names(table_formulas), freqDecNames, paste, sep = "_")))
+    } else {
+      yDec <- SuppressDec(a$x, z = z, y = y, suppressed = a$publish$suppressed, digits = digits, nRep = nRep, rmse = rmse, sparseLimit = sparseLimit)
+      zDec <- RoundWhole(as.matrix(Matrix::crossprod(a$x, yDec)), digits = digits) 
+    }
   } else {
     yDec <- matrix(0, nrow(y),0)
     zDec <- matrix(0, nrow(z),0)
@@ -185,7 +247,24 @@ GaussSuppressDec = function(data,
     }
     
     # Re-use primary-function originally made for SuppressionFromDecimals
-    suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
+    
+    if(linked_rep) {
+      suppressionFromDecimals <- a$publish$suppressed
+      for(i in seq_along(table_formulas)) {
+        ind <- seq_len(nRep)  + (i - 1L) * nRep
+        selection <- formula_selection(a$x,  table_formulas[[i]], logical = TRUE)
+        suppressionFromDecimals_i <- a$publish$suppressed
+        suppressionFromDecimals_i[selection] <- 
+          PrimaryDecimals(freq = freq_for_dec_publish[selection], 
+                          num = a$publish[selection, freqDecNames[ind], drop = FALSE], 
+                          nDec = nRep, 
+                          digitsPrimary = digitsPrimary)
+        mismatch_rows <- suppressionFromDecimals_i != a$publish$suppressed
+        suppressionFromDecimals[mismatch_rows] <- suppressionFromDecimals_i[mismatch_rows]
+      }
+    } else {
+      suppressionFromDecimals <- PrimaryDecimals(freq = freq_for_dec_publish, num = a$publish[freqDecNames[1:nRep]], nDec = nRep, digitsPrimary = digitsPrimary)
+    }
     
     if (any(a$publish$suppressed != suppressionFromDecimals)) {
       incorrectly_suppressed <- !a$publish$suppressed & suppressionFromDecimals

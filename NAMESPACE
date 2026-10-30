@@ -54,65 +54,73 @@ export(X_from_mc_remove_noinner)
 export(default_targeting)
 export(formula_selection)
 export(tables_by_formulas)
-importFrom(Matrix,as.matrix)
-importFrom(Matrix,colSums)
-importFrom(Matrix,crossprod)
-importFrom(Matrix,drop0)
-importFrom(Matrix,rowSums)
-importFrom(Matrix,solve)
-importFrom(Matrix,t)
+importFrom(Matrix,
+  as.matrix,
+  colSums,
+  crossprod,
+  drop0,
+  rowSums,
+  solve,
+  t
+)
 importFrom(RegSDC,SuppressDec)
-importFrom(SSBtools,As_TsparseMatrix)
-importFrom(SSBtools,AutoHierarchies)
-importFrom(SSBtools,CheckInput)
-importFrom(SSBtools,DummyDuplicated)
-importFrom(SSBtools,DummyHierarchies)
-importFrom(SSBtools,Extend0)
-importFrom(SSBtools,Extend0fromModelMatrixInput)
-importFrom(SSBtools,FindDisclosiveCells)
-importFrom(SSBtools,FormulaSelection)
-importFrom(SSBtools,GaussIndependent)
-importFrom(SSBtools,GaussSuppression)
-importFrom(SSBtools,Hierarchies2ModelMatrix)
-importFrom(SSBtools,HierarchyCompute)
-importFrom(SSBtools,HierarchyCompute2)
-importFrom(SSBtools,IsExtend0)
-importFrom(SSBtools,Match)
-importFrom(SSBtools,Mipf)
-importFrom(SSBtools,ModelMatrix)
-importFrom(SSBtools,NamesFromModelMatrixInput)
-importFrom(SSBtools,NumSingleton)
-importFrom(SSBtools,RbindAll)
-importFrom(SSBtools,Reduce0exact)
-importFrom(SSBtools,RoundWhole)
-importFrom(SSBtools,RowGroups)
-importFrom(SSBtools,SSBtoolsData)
-importFrom(SSBtools,SeqInc)
-importFrom(SSBtools,SortRows)
-importFrom(SSBtools,WildcardGlobbing)
-importFrom(SSBtools,aggregate_by_pkg)
-importFrom(SSBtools,any_duplicated_rows)
-importFrom(SSBtools,combine_formulas)
-importFrom(SSBtools,dummy_aggregate)
-importFrom(SSBtools,fix_vars_amf)
-importFrom(SSBtools,formula_selection)
-importFrom(SSBtools,get_colnames)
-importFrom(SSBtools,max_contribution)
-importFrom(SSBtools,table_all_integers)
-importFrom(SSBtools,tables_by_formulas)
-importFrom(SSBtools,zero_col)
+importFrom(SSBtools,
+  As_TsparseMatrix,
+  AutoHierarchies,
+  CheckInput,
+  DummyDuplicated,
+  DummyHierarchies,
+  Extend0,
+  Extend0fromModelMatrixInput,
+  FindDisclosiveCells,
+  FormulaSelection,
+  GaussIndependent,
+  GaussSuppression,
+  Hierarchies2ModelMatrix,
+  HierarchyCompute,
+  HierarchyCompute2,
+  IsExtend0,
+  Match,
+  Mipf,
+  ModelMatrix,
+  NamesFromModelMatrixInput,
+  NumSingleton,
+  RbindAll,
+  Reduce0exact,
+  RoundWhole,
+  RowGroups,
+  SSBtoolsData,
+  SeqInc,
+  SortRows,
+  WildcardGlobbing,
+  aggregate_by_pkg,
+  any_duplicated_rows,
+  combine_formulas,
+  dummy_aggregate,
+  fix_vars_amf,
+  formula_selection,
+  get_colnames,
+  max_contribution,
+  table_all_integers,
+  tables_by_formulas,
+  zero_col
+)
 importFrom(ellipsis,check_dots_used)
-importFrom(methods,as)
-importFrom(methods,formalArgs)
-importFrom(methods,hasArg)
-importFrom(methods,new)
+importFrom(methods,
+  as,
+  formalArgs,
+  hasArg,
+  new
+)
 importFrom(rlang,warn)
-importFrom(stats,aggregate)
-importFrom(stats,as.formula)
-importFrom(stats,delete.response)
-importFrom(stats,na.omit)
-importFrom(stats,runif)
-importFrom(stats,setNames)
-importFrom(stats,t.test)
-importFrom(stats,terms)
+importFrom(stats,
+  aggregate,
+  as.formula,
+  delete.response,
+  na.omit,
+  runif,
+  setNames,
+  t.test,
+  terms
+)
 importFrom(utils,flush.console)

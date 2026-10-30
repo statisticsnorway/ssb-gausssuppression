@@ -20,7 +20,10 @@ GaussSuppressDec(
   iter = 100,
   mismatchWarning = TRUE,
   whenDuplicatedInner = NULL,
-  whenMixedDuplicatedInner = warning
+  whenMixedDuplicatedInner = warning,
+  formula = NULL,
+  linkedTables = NULL,
+  linked_rep = FALSE
 )
 }
 \arguments{
@@ -74,6 +77,18 @@ several input cells (aggregated) since they correspond to published cells.}
 
 \item{whenMixedDuplicatedInner}{Function to be called in the case above when some inner cells correspond
 to published cells (aggregated) and some not (not aggregated).}
+
+\item{formula}{\code{formula} passed to \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
+Included as a formal argument in this function.}
+
+\item{linkedTables}{\code{linkedTables} passed to \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
+Included as a formal argument in this function.}
+
+\item{linked_rep}{Logical (default FALSE).
+Used together with the \code{linkedGauss} parameter of
+\code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}} to generate separate sets of
+\code{nRep} decimal numbers for each linked table.
+The decimal number variables are named using the table names as prefixes.}
 }
 \value{
 A data frame where inner cells and cells to be published are combined or output according to parameter \code{output}.
@@ -101,6 +116,12 @@ b
 # FormulaSelection() works on this output as well 
 FormulaSelection(b, ~sector2 * geo)                       
                       
+}
+\references{
+Langsrud (2019). \doi{10.1007/s11222-018-9848-9}.
+
+Langsrud and Bøvelstad (2022).
+\doi{10.1007/978-3-031-13945-1_8}.
 }
 \seealso{
 \code{\link[=SuppressionFromDecimals]{SuppressionFromDecimals()}}
