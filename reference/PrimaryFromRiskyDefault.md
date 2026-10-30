@@ -61,6 +61,7 @@ below the examples.
 ## Examples
 
 ``` r
+
 # Example inspired by suppression with maxN = 5
 d1 <- SSBtoolsData("d1")
 mm <- SSBtools::ModelMatrix(d1, dimVar = 1:2, crossTable = TRUE)

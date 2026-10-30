@@ -18,6 +18,7 @@ We begin by importing the necessary dependencies as well as loading a
 test data set provided in the SSBtools package.
 
 ``` r
+
 library(SSBtools)
 library(GaussSuppression)
 
@@ -62,7 +63,8 @@ package is always in long format.
 
 [TABLE]
 
-**Table 1**: `dataset` reshaped to wide format.
+**Table 1**: `dataset` reshaped to wide format. {.table .table
+.table-bordered style="font-size: 14px; width: auto !important; "}
 
   
 
@@ -79,6 +81,7 @@ provided, including marginals. For example, the following function call
 creates a one dimensional frequency table over the variable region.
 
 ``` r
+
 GaussSuppressionFromData(data = dataset,
                          dimVar = "region",
                          freqVar = "freq",
@@ -123,6 +126,7 @@ In a similar fashion, we can include multiple variables in the `dimVar`
 parameter:
 
 ``` r
+
 GaussSuppressionFromData(data = dataset,
                          dimVar = c("region", "main_income"),
                          freqVar = "freq",
@@ -180,13 +184,15 @@ that also occur as input/inner cells have white background.
 |      F |     4 |     2 |         18 |       11 |    35 |
 |  Total |    26 |    22 |        178 |      112 |   338 |
 
-**Table 3**: `dimVar = c("region", "main_income")`
+**Table 3**: `dimVar = c("region", "main_income")` {.table .table
+.table-bordered style="font-size: 14px; "}
 
   
 
 Note in particular what happens when we provide two regional variables:
 
 ``` r
+
 GaussSuppressionFromData(data = dataset,
                          dimVar = c("region", "county"),
                          freqVar = "freq",
@@ -231,6 +237,7 @@ hand and include them explicitly in the function call. This also works
 for non-nested hierarchies:
 
 ``` r
+
 GaussSuppressionFromData(data = dataset,
                          dimVar = c("region", "county", "size"),
                          freqVar = "freq",
@@ -273,6 +280,7 @@ GaussSuppressionFromData(data = dataset,
 We can combine all the dimensional variables in our example data:
 
 ``` r
+
 output <- GaussSuppressionFromData(data = dataset,
                                    dimVar = c("region", "county", "size", "main_income"),
                                    freqVar = "freq",
@@ -314,6 +322,7 @@ be found; users familiar with DimLists used in other SDC packages can
 for example use the following:
 
 ``` r
+
 FindDimLists(dataset[c("region", "county")])
 #> $region
 #>    levels    codes
@@ -363,6 +372,7 @@ Finally, for illustration purposes, we see that the same function calls
 work with microdata as input:
 
 ``` r
+
 GaussSuppressionFromData(data = microdata,
                          dimVar = c("region", "county", "size"),
                          freqVar = "freq",
@@ -403,6 +413,7 @@ translated to one another using functions from `SSBtools`. Let us begin
 by defining two hierarchies by using dimlists:
 
 ``` r
+
 region_dim <- data.frame(levels = c("@", "@@", rep("@@@", 2), rep("@@", 4)),
                          codes = c("Total", "AB", LETTERS[1:6]))
 region_dim
@@ -443,6 +454,7 @@ names correspond to variables in the data, and the list elements
 correspond to hierarchies we wish to include.
 
 ``` r
+
 GaussSuppressionFromData(data = dataset,
                          hierarchies = list(region = region_dim, main_income = income_dim),
                          freqVar = "freq",
@@ -521,6 +533,7 @@ non-nested hierarchies natively. We achieve this by having multiple
 elements with the same name in the `hierarchies` list:
 
 ``` r
+
 region2_dim <- data.frame(levels = c("@", rep(c("@@", rep("@@@", 2)), 2), rep("@@", 2)),
                           codes = c("Total", "AD", "A", "D",  
                                     "BF", "B", "F", 
@@ -577,6 +590,7 @@ Finally, as before, all of this functionality works with microdata as
 input as well.
 
 ``` r
+
 GaussSuppressionFromData(data = microdata,
                          hierarchies = list(region = region_dim, region = region2_dim),
                          freqVar = "freq",
@@ -609,6 +623,7 @@ hierarchical relationship between these variables is detected
 automatically:
 
 ``` r
+
 GaussSuppressionFromData(data = microdata,
                          formula = ~ region + county,
                          freqVar = "freq",
@@ -651,6 +666,7 @@ multiplication in the `formula` and specification in `dimVar` yield the
 same results.
 
 ``` r
+
 
 GaussSuppressionFromData(data = microdata,
                          formula = ~ county * main_income,
@@ -725,6 +741,7 @@ this with the use of the addition operator:
 
 ``` r
 
+
 GaussSuppressionFromData(data = microdata,
                          formula = ~ county + main_income,
                          freqVar = "freq",
@@ -760,6 +777,7 @@ one-dimensional table for main_income. Similarly, we can use the colon
 (“:”) operator to omit row and column marginals:
 
 ``` r
+
 GaussSuppressionFromData(data = microdata,
                          formula = ~ county:main_income,
                          freqVar = "freq",
@@ -809,6 +827,7 @@ To do this, we begin by adding a column encoding whether the main source
 of income was “wages” or “not_wages”.
 
 ``` r
+
 dataset$income2 <- ifelse(dataset$main_income == "wages", "wages", "not_wages")
 microdata$income2 <- ifelse(microdata$main_income == "wages", "wages", "not_wages")
 head(dataset)
@@ -824,6 +843,7 @@ head(dataset)
 Then we can specify the desired output with the following formula:
 
 ``` r
+
 GaussSuppressionFromData(data = dataset,
                          formula = ~ region * income2 + (county + size) * main_income,
                          freqVar = "freq",
@@ -939,6 +959,7 @@ microdata. Therefore, let us add a fake numerical variable to our
 microdata:
 
 ``` r
+
 set.seed(12345)
 microdata$num <- sample(0:1000, nrow(microdata), replace = TRUE) 
 ```
@@ -948,6 +969,7 @@ contributions to `num` are aggregated, we supply this as a parameter to
 `GaussSuppressionFromData`:
 
 ``` r
+
 GaussSuppressionFromData(data = microdata,
                          formula = ~ region * income2 + (county + size) * main_income,
                          numVar = "num",
@@ -1007,24 +1029,25 @@ GaussSuppressionFromData(data = microdata,
 
   
 
-|   region |        other |        wages |   assistance |     pensions |     not_wages |         Total |
-|---------:|-------------:|-------------:|-------------:|-------------:|--------------:|--------------:|
-|        A |              |   5372 ( 11) |              |              |   45268 ( 93) |   50640 (104) |
-|        B |              |     886 ( 1) |              |              |   26500 ( 50) |   27386 ( 51) |
-|        C |              |    3715 ( 8) |              |              |   32111 ( 65) |   35826 ( 73) |
-|        D |              |              |              |              |    5730 ( 14) |    5730 ( 14) |
-|        E |              |              |              |              |   30295 ( 61) |   30295 ( 61) |
-|        F |              |    1671 ( 2) |              |              |   17295 ( 33) |   18966 ( 35) |
-| county-1 |    1260 ( 5) |   5372 ( 11) |  33024 ( 64) |  16714 ( 38) |               |   56370 (118) |
-| county-2 |    4696 ( 8) |    4601 ( 9) |  33424 ( 64) |  20491 ( 43) |               |   63212 (124) |
-| county-3 |   7044 ( 13) |    1671 ( 2) |  25541 ( 50) |  15005 ( 31) |               |   49261 ( 96) |
-|    small |   8113 ( 16) |    1671 ( 2) |  29582 ( 59) |  15625 ( 33) |               |   54991 (110) |
-|      BIG |   4887 ( 10) |   9973 ( 20) |  62407 (119) |  36585 ( 79) |               |  113852 (228) |
-|    Total |  13000 ( 26) |  11644 ( 22) |  91989 (178) |  52210 (112) |  157199 (316) |  168843 (338) |
+| region | other | wages | assistance | pensions | not_wages | Total |
+|---:|---:|---:|---:|---:|---:|---:|
+| A |  | 5372 ( 11) |  |  | 45268 ( 93) | 50640 (104) |
+| B |  | 886 ( 1) |  |  | 26500 ( 50) | 27386 ( 51) |
+| C |  | 3715 ( 8) |  |  | 32111 ( 65) | 35826 ( 73) |
+| D |  |  |  |  | 5730 ( 14) | 5730 ( 14) |
+| E |  |  |  |  | 30295 ( 61) | 30295 ( 61) |
+| F |  | 1671 ( 2) |  |  | 17295 ( 33) | 18966 ( 35) |
+| county-1 | 1260 ( 5) | 5372 ( 11) | 33024 ( 64) | 16714 ( 38) |  | 56370 (118) |
+| county-2 | 4696 ( 8) | 4601 ( 9) | 33424 ( 64) | 20491 ( 43) |  | 63212 (124) |
+| county-3 | 7044 ( 13) | 1671 ( 2) | 25541 ( 50) | 15005 ( 31) |  | 49261 ( 96) |
+| small | 8113 ( 16) | 1671 ( 2) | 29582 ( 59) | 15625 ( 33) |  | 54991 (110) |
+| BIG | 4887 ( 10) | 9973 ( 20) | 62407 (119) | 36585 ( 79) |  | 113852 (228) |
+| Total | 13000 ( 26) | 11644 ( 22) | 91989 (178) | 52210 (112) | 157199 (316) | 168843 (338) |
 
 **Table 14**:
 `formula = ~ region * income2 + (county + size) * main_income`  
-In each cell: `num` with frequencies in parenthesis.
+In each cell: `num` with frequencies in parenthesis. {.table .table
+.table-bordered style="font-size: 14px; "}
 
   
 
@@ -1045,6 +1068,7 @@ can provide it in addition to `numVar` and the method will use that
 information instead:
 
 ``` r
+
 GaussSuppressionFromData(data = microdata,
                          formula = ~ region * income2 + (county + size) * main_income,
                          freqVar = "freq",

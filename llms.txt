@@ -1,7 +1,7 @@
 # R package GaussSuppression
 
-| [GaussSuppression on CRAN](https://cran.r-project.org/package=GaussSuppression) |     | [pkgdown website](https://statisticsnorway.github.io/ssb-gausssuppression/) |     | [GitHub Repository](https://github.com/statisticsnorway/ssb-gausssuppression) |
-|---------------------------------------------------------------------------------|-----|-----------------------------------------------------------------------------|-----|-------------------------------------------------------------------------------|
+| [GaussSuppression on CRAN](https://cran.r-project.org/package=GaussSuppression) |  | [pkgdown website](https://statisticsnorway.github.io/ssb-gausssuppression/) |  | [GitHub Repository](https://github.com/statisticsnorway/ssb-gausssuppression) |
+|----|----|----|----|----|
 
 ------------------------------------------------------------------------
 
@@ -48,6 +48,7 @@ GaussSuppression](https://cran.r-project.org/web/packages/GaussSuppression/vigne
 You can install GaussSuppression from CRAN with
 
 ``` r
+
 install.packages("GaussSuppression")
 ```
 

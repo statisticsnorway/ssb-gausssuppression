@@ -50,6 +50,7 @@ In this function, the parameters `makeForced` and `forceNotPrimary` to
 ## Examples
 
 ``` r
+
 z1 <- SSBtoolsData("z1")
 z2 <- SSBtoolsData("z2")
 z2b <- z2[3:5]  # As in ChainedSuppression example 

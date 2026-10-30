@@ -99,6 +99,7 @@ created.
 ## Examples
 
 ``` r
+
 mm <- SSBtools::ModelMatrix(SSBtoolsData("example1"), 
      formula = ~age * eu + geo, crossTable = TRUE)
 crossTable <- mm$crossTable

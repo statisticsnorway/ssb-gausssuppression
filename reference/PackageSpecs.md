@@ -32,19 +32,19 @@ and `printTable = FALSE`), or markdown table describing all specs (if
 The following table summarizes the built-in specs. Columns represent
 different specs, and rows represent the parameter settings.
 
-|                     |                    |                            |                            |                            |
-|---------------------|--------------------|----------------------------|----------------------------|----------------------------|
-|                     | **smallCountSpec** | **dominanceSpec**          | **fewContributorsSpec**    | **kDisclosureSpec**        |
-| **primary**         | PrimaryDefault     | MagnitudeRule              | NContributorsRule          | KDisclosurePrimary         |
-| **protectZeros**    | TRUE               | FALSE                      | FALSE                      | FALSE                      |
-| **candidates**      | CandidatesDefault  | CandidatesNum              | CandidatesNum              | DirectDisclosureCandidates |
-| **singleton**       | SingletonDefault   | SingletonUniqueContributor | SingletonUniqueContributor | SingletonDefault           |
-| **extend0**         | TRUE               | FALSE                      | FALSE                      | TRUE                       |
-| **preAggregate**    | NA                 | !is.null(charVar)          | !is.null(charVar)          | NA                         |
-| **extraAggregate**  | FALSE              | TRUE                       | TRUE                       | FALSE                      |
-| **secondaryZeros**  | FALSE              | FALSE                      | FALSE                      | 1                          |
-| **domWeightMethod** |                    | "default"                  |                            |                            |
-| **singletonMethod** |                    | "numttHTT"                 | "numttHTT"                 | "anySum0"                  |
+|  |  |  |  |  |
+|----|----|----|----|----|
+|  | **smallCountSpec** | **dominanceSpec** | **fewContributorsSpec** | **kDisclosureSpec** |
+| **primary** | PrimaryDefault | MagnitudeRule | NContributorsRule | KDisclosurePrimary |
+| **protectZeros** | TRUE | FALSE | FALSE | FALSE |
+| **candidates** | CandidatesDefault | CandidatesNum | CandidatesNum | DirectDisclosureCandidates |
+| **singleton** | SingletonDefault | SingletonUniqueContributor | SingletonUniqueContributor | SingletonDefault |
+| **extend0** | TRUE | FALSE | FALSE | TRUE |
+| **preAggregate** | NA | !is.null(charVar) | !is.null(charVar) | NA |
+| **extraAggregate** | FALSE | TRUE | TRUE | FALSE |
+| **secondaryZeros** | FALSE | FALSE | FALSE | 1 |
+| **domWeightMethod** |  | "default" |  |  |
+| **singletonMethod** |  | "numttHTT" | "numttHTT" | "anySum0" |
 
 ## Examples
 

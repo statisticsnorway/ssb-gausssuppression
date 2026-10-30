@@ -208,6 +208,7 @@ as shown in the examples below.
 ## Examples
 
 ``` r
+
 ### The first example can be performed in three ways
 ### Alternatives are possible since only the formula parameter varies between the linked tables
  

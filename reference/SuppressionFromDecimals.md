@@ -66,6 +66,16 @@ Aggregated data with suppression information
 Several decimal number variables reduce the probability of obtaining
 whole numbers by chance.
 
+## References
+
+Langsrud (2019).
+[doi:10.1007/s11222-018-9848-9](https://doi.org/10.1007/s11222-018-9848-9)
+.
+
+Langsrud and Bøvelstad (2022).
+[doi:10.1007/978-3-031-13945-1_8](https://doi.org/10.1007/978-3-031-13945-1_8)
+.
+
 ## Author
 
 Øyvind Langsrud
@@ -116,13 +126,13 @@ b2 <- SuppressionFromDecimals(b1[b1$isInner, ],
 #> GaussSuppression_none: 
 FormulaSelection(b2, ~sector2 * eu)                                 
 #>    sector4    eu       freqDec value primary suppressed
-#> 1    Total Total  1.110223e-16 462.3   FALSE      FALSE
-#> 2  private Total -1.110223e-16 429.5   FALSE      FALSE
-#> 3   public Total  2.220446e-16  32.8   FALSE      FALSE
-#> 8    Total    EU  5.551115e-16 425.2   FALSE      FALSE
-#> 9    Total nonEU -4.440892e-16  37.1   FALSE      FALSE
-#> 10 private    EU  3.330669e-16 392.4   FALSE      FALSE
-#> 11 private nonEU -4.440892e-16  37.1   FALSE      FALSE
-#> 12  public    EU  2.220446e-16  32.8   FALSE      FALSE
+#> 1    Total Total  8.881784e-16 462.3   FALSE      FALSE
+#> 2  private Total  0.000000e+00 429.5   FALSE      FALSE
+#> 3   public Total  8.881784e-16  32.8   FALSE      FALSE
+#> 8    Total    EU  1.443290e-15 425.2   FALSE      FALSE
+#> 9    Total nonEU -5.551115e-16  37.1   FALSE      FALSE
+#> 10 private    EU  5.551115e-16 392.4   FALSE      FALSE
+#> 11 private nonEU -5.551115e-16  37.1   FALSE      FALSE
+#> 12  public    EU  8.881784e-16  32.8   FALSE      FALSE
                               
 ```

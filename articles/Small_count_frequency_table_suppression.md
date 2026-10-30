@@ -12,6 +12,7 @@ We begin by creating datasets to be used below. The first examples are
 based on `dataset_a`, which has six rows.
 
 ``` r
+
 library(GaussSuppression)
 dataset <- SSBtoolsData("example1")
 dataset_a <- dataset[dataset$year == "2014", -4]
@@ -35,6 +36,7 @@ considered in the define-tables vignette. In the first example, we use
 `maxN = 1` which means that zeros and ones are primary suppressed.
 
 ``` r
+
 SuppressSmallCounts(data = dataset_a, 
                     dimVar = c("age", "geo"), 
                     freqVar = "freq", 
@@ -76,6 +78,7 @@ The same output is obtained if microdata is sent as input as illustrated
 by de code below.
 
 ``` r
+
 microdata_a <- SSBtools::MakeMicro(dataset_a, "freq")[-4]
 output <- SuppressSmallCounts(data = microdata_a, 
                               dimVar = c("age", "geo"), 
@@ -96,6 +99,7 @@ important.
 A more advanced example is obtained by including the variable “eu”.
 
 ``` r
+
 SuppressSmallCounts(data = dataset_a, 
                     dimVar = c("age", "geo", "eu"), 
                     freqVar = "freq", 
@@ -142,6 +146,7 @@ automatically. The same output is obtained if we first generate
 hierarchies by:
 
 ``` r
+
 dimlists <- SSBtools::FindDimLists(dataset_a[c("age", "geo", "eu")])
 dimlists
 #> $age
@@ -163,6 +168,7 @@ dimlists
 And thereafter run SuppressSmallCounts with these hierarchies as input:
 
 ``` r
+
 SuppressSmallCounts(data = dataset_a[c("age", "geo", "freq")], 
                     hierarchies = dimlists, 
                     freqVar = "freq", 
@@ -175,6 +181,7 @@ Using the formula interface is one way to achieve fewer cells in the
 output:
 
 ``` r
+
 SuppressSmallCounts(data = dataset_a, 
                     formula = ~age:eu + geo, 
                     freqVar = "freq", 
@@ -218,6 +225,7 @@ several options for handling exceptions.
 One option is to use `protectZeros = FALSE`.
 
 ``` r
+
 SuppressSmallCounts(data = dataset_a, 
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
@@ -262,6 +270,7 @@ SuppressSmallCounts(data = dataset_a,
 Another possibility that gives the same output is:
 
 ``` r
+
 output <- SuppressSmallCounts(data = dataset_a[-3, ], 
                               dimVar = c("age", "geo", "eu"),  
                               freqVar = "freq", 
@@ -286,6 +295,7 @@ non-structural zeros.
 We can combine `protectZeros = FALSE` with `secondaryZeros = TRUE`.
 
 ``` r
+
 SuppressSmallCounts(data = dataset_a, 
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
@@ -333,6 +343,7 @@ SuppressSmallCounts(data = dataset_a,
 The example below uses `dataset_b`, which has two zeros.
 
 ``` r
+
   dataset_b
 #>      age      geo    eu freq
 #> 7  young    Spain    EU    5
@@ -349,6 +360,7 @@ particular zero and retain the other. As a general rule, we will exclude
 all structural zeros.
 
 ``` r
+
 SuppressSmallCounts(data = dataset_b[-2,  ], 
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
@@ -397,6 +409,7 @@ To get the same output with the formula interface, we can use the
 following code:
 
 ``` r
+
 SuppressSmallCounts(data = dataset_b[-2,  ], 
                     formula = ~age * (geo + eu),  
                     freqVar = "freq", 
@@ -418,6 +431,7 @@ When using the standard suppression technique on table `dataset_b`, many
 cells are suppressed.
 
 ``` r
+
 SuppressSmallCounts(data = dataset_b, 
                     dimVar = c("age", "geo", "eu"),  
                     freqVar = "freq", 
@@ -473,6 +487,7 @@ This problem occurs when `protectZeros = FALSE` and
 that uses `dataset` which has 18 rows.
 
 ``` r
+
 output <- SuppressSmallCounts(data = dataset, 
                               formula = ~age*geo*year + eu*year,  
                               freqVar = "freq", 
@@ -536,6 +551,7 @@ standard Gaussian suppression algorithm. Since a minimum width of 5 is
 required, the two cells for Spain are additionally suppressed.
 
 ``` r
+
 output <- SuppressSmallCounts(data = dataset, 
                               formula = ~age*geo,  
                               freqVar = "freq", 

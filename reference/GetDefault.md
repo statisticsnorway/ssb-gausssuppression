@@ -19,8 +19,6 @@ GetDefault(fun, parameter, ifnotfound = NULL)
 
   parameter name
 
-- ifnotfound:
-
 ## Value
 
 The default parameter, possibly evaluated.

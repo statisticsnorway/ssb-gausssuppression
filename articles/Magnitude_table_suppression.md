@@ -12,6 +12,7 @@ secondary suppression is performed using the Gauss method.
 We begin by loading a dataset to be used below.
 
 ``` r
+
 library(GaussSuppression)
 dataset <- SSBtoolsData("magnitude1")
 dataset
@@ -53,7 +54,8 @@ data can then be reformatted and illustrated like this:
 |  Governmental |               |  21.6, 2.0 |         6.5, 2.7 |
 |      Industry | 9.6, 8.8, 1.9 |  25.7, 3.4 |              8.4 |
 
-**Table 1**: Input data with the 20 contributions.
+**Table 1**: Input data with the 20 contributions. {.table .table
+.table-bordered style="font-size: 14px; "}
 
   
 
@@ -66,6 +68,7 @@ This means that cells based on a single contributor are primary
 suppressed.
 
 ``` r
+
 SuppressFewContributors(data=dataset, 
                         numVar = "value", 
                         dimVar= c("sector4", "geo"), 
@@ -113,7 +116,8 @@ suppressed cells are labeled in purple.
 |         Total |  37.1 (4) |  162.5 (8) |  262.7 (8) |  462.3 (20) |
 
 **Table 2**: Output from `SuppressFewContributors` with `maxN = 1`
-(number of contributors in parenthesis)
+(number of contributors in parenthesis) {.table .table .table-bordered
+style="font-size: 14px; "}
 
   
 
@@ -124,6 +128,7 @@ In the second example, we use `SuppressDominantCells` with `n = 1` and
 largest contribution exceeds 80% of the cell total.
 
 ``` r
+
 SuppressDominantCells(data=dataset, 
                       numVar = "value", 
                       dimVar= c("sector4", "geo"), 
@@ -190,7 +195,8 @@ version of this output is given in Table 3 below.
 
 **Table 3**: Output from `SuppressDominantCells`  
 with `n = 1` and `k = 80`  
-(percentage from largest contribution in parenthesis)
+(percentage from largest contribution in parenthesis) {.table .table
+.table-bordered style="font-size: 14px; "}
 
 Note that this table, as well as Table 2, is discussed below in the
 section on the singleton problem.  
@@ -207,6 +213,7 @@ In addition, the example below is made even more advanced by including
 the variables “sector2” and “eu”.
 
 ``` r
+
 output <- SuppressDominantCells(data=dataset, 
                                 numVar = "value", 
                                 dimVar= c("sector4", "sector2", "geo", "eu"), 
@@ -236,7 +243,8 @@ head(output)
 |         Total |    37.1 |    162.5 | 262.7 |  37.1 | 425.2 | 462.3 |
 
 **Table 4**: Output from `SuppressDominantCells`  
-with `n = 1:2` and `k = c(80, 99)`
+with `n = 1:2` and `k = c(80, 99)` {.table .table .table-bordered
+style="font-size: 14px; "}
 
   
 
@@ -245,6 +253,7 @@ automatically. The same output is obtained if we first generate
 hierarchies by:
 
 ``` r
+
 dimlists <- SSBtools::FindDimLists(dataset[c("sector4", "sector2", "geo", "eu")])
 dimlists
 #> $sector4
@@ -271,6 +280,7 @@ And thereafter run SuppressDominantCells with these hierarchies as
 input:
 
 ``` r
+
 output <- SuppressDominantCells(data=dataset, 
                                 numVar = "value", 
                                 hierarchies = dimlists,  
@@ -290,6 +300,7 @@ means that table cells based on one or two contributors are primary
 suppressed.
 
 ``` r
+
 output <- SuppressFewContributors(data=dataset, 
                                   numVar = "value", 
                                   formula = ~sector2*geo + sector4*eu, 
@@ -320,18 +331,19 @@ are not included in the output.
 
   
 
-|       sector4 |   Iceland |   Portugal |      Spain |     nonEU |          EU |       Total |
-|--------------:|----------:|-----------:|-----------:|----------:|------------:|------------:|
-|   Agriculture |           |            |            |     0 (0) |   240.2 (4) |   240.2 (4) |
-| Entertainment |           |            |            |  16.8 (1) |   114.7 (5) |   131.5 (6) |
-|  Governmental |           |            |            |     0 (0) |    32.8 (4) |    32.8 (4) |
-|      Industry |           |            |            |  20.3 (3) |    37.5 (3) |    57.8 (6) |
-|       private |  37.1 (4) |  138.9 (6) |  253.5 (6) |           |             |  429.5 (16) |
-|        public |     0 (0) |   23.6 (2) |    9.2 (2) |           |             |    32.8 (4) |
-|         Total |  37.1 (4) |  162.5 (8) |  262.7 (8) |  37.1 (4) |  425.2 (16) |  462.3 (20) |
+| sector4 | Iceland | Portugal | Spain | nonEU | EU | Total |
+|---:|---:|---:|---:|---:|---:|---:|
+| Agriculture |  |  |  | 0 (0) | 240.2 (4) | 240.2 (4) |
+| Entertainment |  |  |  | 16.8 (1) | 114.7 (5) | 131.5 (6) |
+| Governmental |  |  |  | 0 (0) | 32.8 (4) | 32.8 (4) |
+| Industry |  |  |  | 20.3 (3) | 37.5 (3) | 57.8 (6) |
+| private | 37.1 (4) | 138.9 (6) | 253.5 (6) |  |  | 429.5 (16) |
+| public | 0 (0) | 23.6 (2) | 9.2 (2) |  |  | 32.8 (4) |
+| Total | 37.1 (4) | 162.5 (8) | 262.7 (8) | 37.1 (4) | 425.2 (16) | 462.3 (20) |
 
 **Table 5**: Output from `SuppressFewContributors` with `maxN = 2`  
-(number of contributors in parenthesis)
+(number of contributors in parenthesis) {.table .table .table-bordered
+style="font-size: 14px; "}
 
   
 
@@ -354,18 +366,18 @@ example data aggregated in this way is shown below.
 
   
 
-|       sector4 |              Iceland |              Portugal |                          Spain |                nonEU |                               EU |                            Total |
-|--------------:|---------------------:|----------------------:|-------------------------------:|---------------------:|---------------------------------:|---------------------------------:|
-|   Agriculture |                      |        A=75.9, B=24.5 |                 A=96.6, B=43.2 |                      |                  A=172.5, B=67.7 |                  A=172.5, B=67.7 |
-| Entertainment |               B=16.8 |          B=7.1, D=2.3 |         A=77.4, B=11.5, C=16.4 |               B=16.8 |    A=77.4, B=18.6, C=16.4, D=2.3 |    A=77.4, B=35.4, C=16.4, D=2.3 |
-|  Governmental |                      |         B=21.6, D=2.0 |                   C=6.5, D=2.7 |                      |             B=21.6, C=6.5, D=4.7 |             B=21.6, C=6.5, D=4.7 |
-|      Industry |  B=9.6, C=8.8, D=1.9 |         B=25.7, D=3.4 |                          C=8.4 |  B=9.6, C=8.8, D=1.9 |             B=25.7, C=8.4, D=3.4 |            B=35.3, C=17.2, D=5.3 |
-|       private | B=26.4, C=8.8, D=1.9 | A=75.9, B=57.3, D=5.7 |        A=174.0, B=54.7, C=24.8 | B=26.4, C=8.8, D=1.9 |  A=249.9, B=112.0, C=24.8, D=5.7 |  A=249.9, B=138.4, C=33.6, D=7.6 |
-|        public |                      |         B=21.6, D=2.0 |                   C=6.5, D=2.7 |                      |             B=21.6, C=6.5, D=4.7 |             B=21.6, C=6.5, D=4.7 |
-|         Total | B=26.4, C=8.8, D=1.9 | A=75.9, B=78.9, D=7.7 | A=174.0, B=54.7, C=31.3, D=2.7 | B=26.4, C=8.8, D=1.9 | A=249.9, B=133.6, C=31.3, D=10.4 | A=249.9, B=160.0, C=40.1, D=12.3 |
+| sector4 | Iceland | Portugal | Spain | nonEU | EU | Total |
+|---:|---:|---:|---:|---:|---:|---:|
+| Agriculture |  | A=75.9, B=24.5 | A=96.6, B=43.2 |  | A=172.5, B=67.7 | A=172.5, B=67.7 |
+| Entertainment | B=16.8 | B=7.1, D=2.3 | A=77.4, B=11.5, C=16.4 | B=16.8 | A=77.4, B=18.6, C=16.4, D=2.3 | A=77.4, B=35.4, C=16.4, D=2.3 |
+| Governmental |  | B=21.6, D=2.0 | C=6.5, D=2.7 |  | B=21.6, C=6.5, D=4.7 | B=21.6, C=6.5, D=4.7 |
+| Industry | B=9.6, C=8.8, D=1.9 | B=25.7, D=3.4 | C=8.4 | B=9.6, C=8.8, D=1.9 | B=25.7, C=8.4, D=3.4 | B=35.3, C=17.2, D=5.3 |
+| private | B=26.4, C=8.8, D=1.9 | A=75.9, B=57.3, D=5.7 | A=174.0, B=54.7, C=24.8 | B=26.4, C=8.8, D=1.9 | A=249.9, B=112.0, C=24.8, D=5.7 | A=249.9, B=138.4, C=33.6, D=7.6 |
+| public |  | B=21.6, D=2.0 | C=6.5, D=2.7 |  | B=21.6, C=6.5, D=4.7 | B=21.6, C=6.5, D=4.7 |
+| Total | B=26.4, C=8.8, D=1.9 | A=75.9, B=78.9, D=7.7 | A=174.0, B=54.7, C=31.3, D=2.7 | B=26.4, C=8.8, D=1.9 | A=249.9, B=133.6, C=31.3, D=10.4 | A=249.9, B=160.0, C=40.1, D=12.3 |
 
 **Table 6**: The “value” data aggregated according to hierarchy and
-contributor
+contributor {.table .table .table-bordered style="font-size: 14px; "}
 
   
 
@@ -373,6 +385,7 @@ Below we take into account contributor IDs when using few contributors
 primary suppression.
 
 ``` r
+
 output <- SuppressFewContributors(data=dataset, 
                                   numVar = "value", 
                                   dimVar = c("sector4", "sector2", "geo", "eu"),
@@ -405,6 +418,7 @@ head(output)
 
 **Table 7**: Output from `SuppressFewContributors` with `maxN = 2` and
 with `contributorVar = "company"` (number contributors in parenthesis)
+{.table .table .table-bordered style="font-size: 14px; "}
 
   
 
@@ -412,6 +426,7 @@ Below we take into account contributor IDs when using dominant cell
 primary suppression.
 
 ``` r
+
 output <- SuppressDominantCells(data=dataset, 
                                 numVar = "value", 
                                 formula = ~sector2*geo + sector4*eu,
@@ -445,7 +460,8 @@ Here we have also made use of the formula interface.
 |         Total |    37.1 |    162.5 | 262.7 |  37.1 | 425.2 | 462.3 |
 
 **Table 8**: Output from `SuppressDominantCells` with `n = 1:2` and  
-`k = c(80, 99)` and with `contributorVar = "company"`
+`k = c(80, 99)` and with `contributorVar = "company"` {.table .table
+.table-bordered style="font-size: 14px; "}
 
   
   
@@ -456,6 +472,7 @@ Below, the data is suppressed in the same way as in Table 7, but with a
 different formula.  
 
 ``` r
+
 output <- SuppressDominantCells(data=dataset,
                                 numVar = "value", 
                                 formula = ~sector4*geo + sector2*eu,
@@ -487,7 +504,8 @@ head(output)
 |         Total |    37.1 |    162.5 | 262.7 |  37.1 | 425.2 | 462.3 |
 
 **Table 9**: Output from `SuppressDominantCells` with `n = 1:2` and
-`k = c(80, 99)` and with `contributorVar = "company"`
+`k = c(80, 99)` and with `contributorVar = "company"` {.table .table
+.table-bordered style="font-size: 14px; "}
 
   
 
@@ -535,6 +553,7 @@ and 20 are 60.7, which is too narrow since a minimum width of 80 is
 required. Therefore, the cell on line 16 is additionally suppressed
 
 ``` r
+
 output <- SuppressDominantCells(data = dataset, 
                                 numVar = "value", 
                                 dimVar = c("geo", "sector2", "sector4"), 
@@ -580,17 +599,18 @@ given in parentheses.
 
   
 
-|       sector4 |           Iceland |           Portugal |                 Spain |            Total |
-|--------------:|------------------:|-------------------:|----------------------:|-----------------:|
-|   Agriculture |                 0 | 100.4 \[0, 199.6\] | 139.8 \[40.6, 240.2\] |            240.2 |
-| Entertainment | 16.8 \[0, 131.5\] |   9.4 \[0, 131.5\] |    105.3 \[0, 131.5\] |            131.5 |
-|  Governmental |                 0 |   23.6 \[0, 90.6\] |       9.2 \[0, 90.6\] | 32.8 \[0, 90.6\] |
-|      Industry |  20.3 \[0, 90.6\] |   29.1 \[0, 90.6\] |       8.4 \[0, 90.6\] |             57.8 |
-|       private |              37.1 |              138.9 |                 253.5 |            429.5 |
-|        public |                 0 |   23.6 \[0, 90.6\] |       9.2 \[0, 90.6\] | 32.8 \[0, 90.6\] |
-|         Total |              37.1 |              162.5 |                 262.7 |            462.3 |
+| sector4 | Iceland | Portugal | Spain | Total |
+|---:|---:|---:|---:|---:|
+| Agriculture | 0 | 100.4 \[0, 199.6\] | 139.8 \[40.6, 240.2\] | 240.2 |
+| Entertainment | 16.8 \[0, 131.5\] | 9.4 \[0, 131.5\] | 105.3 \[0, 131.5\] | 131.5 |
+| Governmental | 0 | 23.6 \[0, 90.6\] | 9.2 \[0, 90.6\] | 32.8 \[0, 90.6\] |
+| Industry | 20.3 \[0, 90.6\] | 29.1 \[0, 90.6\] | 8.4 \[0, 90.6\] | 57.8 |
+| private | 37.1 | 138.9 | 253.5 | 429.5 |
+| public | 0 | 23.6 \[0, 90.6\] | 9.2 \[0, 90.6\] | 32.8 \[0, 90.6\] |
+| Total | 37.1 | 162.5 | 262.7 | 462.3 |
 
 **Table 10**: Output from `SuppressDominantCells` with `pPercent = 30`,
-`rangePercent = 70`, `rangeMin = 80`, `lpPackage = "Rglpk"`
+`rangePercent = 70`, `rangeMin = 80`, `lpPackage = "Rglpk"` {.table
+.table .table-bordered style="font-size: 14px; "}
 
   

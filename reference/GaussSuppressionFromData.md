@@ -546,6 +546,7 @@ will be protected while also being assigned the `NA` value in the
 ## Examples
 
 ``` r
+
 z1 <- SSBtoolsData("z1")
 GaussSuppressionFromData(z1, 1:2, 3)
 #> GaussSuppression_anySum: ..........................................

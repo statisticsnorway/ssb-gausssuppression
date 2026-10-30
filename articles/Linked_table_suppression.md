@@ -26,6 +26,7 @@ Finally, an example with interval protection is also shown.
 We use a modified version of the *example 1* dataset used elsewhere.
 
 ``` r
+
 library(GaussSuppression)
 dataset <- SSBtoolsData("example1")
 dataset <- dataset[c(1, 2, 4, 6, 8, 10, 12, 13, 14, 15), ]
@@ -191,6 +192,7 @@ is a list, with one element for each of the linked tables.
 ## `SuppressLinkedTables()` with `dimVar`
 
 ``` r
+
 output <- SuppressLinkedTables(data = dataset,
               fun = SuppressSmallCounts, 
               withinArg = list(table_1 = list(dimVar = c("age", "eu", "year")), 
@@ -265,6 +267,7 @@ separately with
 [`SSBtools::FindDimLists()`](https://statisticsnorway.github.io/ssb-ssbtools/reference/FindDimLists.html).
 
 ``` r
+
 h_age  <- SSBtools::FindDimLists(dataset["age"])[[1]]
 h_geo  <- SSBtools::FindDimLists(dataset["geo"])[[1]]
 h_eu   <- SSBtools::FindDimLists(dataset["eu"])[[1]]
@@ -298,6 +301,7 @@ The output is identical to using `dimVar`, so we only show the code.
 Note that the only difference is the `withinArg` argument.
 
 ``` r
+
 output <- SuppressLinkedTables(data = dataset,
               fun = SuppressSmallCounts, 
               withinArg = 
@@ -321,6 +325,7 @@ However, note that we have omitted `removeEmpty = TRUE` here, since this
 is the default when a formula is used as input.
 
 ``` r
+
 output <- SuppressLinkedTables(data = dataset,
               fun = SuppressSmallCounts, 
               withinArg = list(table_1 = list(formula = ~age*eu*year), 
@@ -340,6 +345,7 @@ directly with `formula` as a list and the `linkedGauss` parameter
 specified. Here we show 10 output rows.
 
 ``` r
+
 output <- SuppressSmallCounts(data = dataset,
               formula = list(table_1 = ~age*eu*year, table_2 = ~geo*year),   
               freqVar = "freq",
@@ -373,6 +379,7 @@ membership variables are included in the output. Again, 10 output rows
 are shown.
 
 ``` r
+
 output <-  tables_by_formulas(data = dataset,
               table_fun = SuppressSmallCounts,                
               table_formulas = list(table_1 = ~age*eu*year, table_2 = ~geo*year),   
@@ -483,6 +490,7 @@ is shown
 with `dimVar`.
 
 ``` r
+
 output <- SuppressLinkedTables(data = dataset,
                                fun = SuppressSmallCounts, 
                                withinArg = list(table_1 = list(dimVar = c("age", "eu", "year")), 

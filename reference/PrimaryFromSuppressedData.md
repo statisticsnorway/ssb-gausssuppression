@@ -75,6 +75,7 @@ individual results of each data frame.
 ## Examples
 
 ``` r
+
 z2 <- SSBtoolsData("z2")
 
 # Data to be used as suppressedData

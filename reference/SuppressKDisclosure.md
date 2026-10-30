@@ -134,6 +134,21 @@ In addition, the
 parameters `targeting_include` and `targeting_exclude` may also be used
 (see examples).
 
+## References
+
+Langsrud (2026).
+[doi:10.1007/978-3-032-37883-5_8](https://doi.org/10.1007/978-3-032-37883-5_8)
+.
+
+Lupp and Langsrud (2023). Disclosure-Driven Suppression in Frequency
+Tables. Archived unpublished manuscript.
+<https://research.lupp.no/K_disclosure.pdf>.
+
+Lupp and Langsrud (2021). Suppression of directly-disclosive cells in
+frequency tables. Joint UNECE/Eurostat Expert Meeting on Statistical
+Data Confidentiality, Poznań, Poland.
+<https://unece.org/sites/default/files/2021-12/SDC2021_Day2_Lupp_AD.pdf>.
+
 ## Author
 
 Daniel P. Lupp and Øyvind Langsrud

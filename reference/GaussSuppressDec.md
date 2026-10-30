@@ -24,7 +24,10 @@ GaussSuppressDec(
   iter = 100,
   mismatchWarning = TRUE,
   whenDuplicatedInner = NULL,
-  whenMixedDuplicatedInner = warning
+  whenMixedDuplicatedInner = warning,
+  formula = NULL,
+  linkedTables = NULL,
+  linked_rep = FALSE
 )
 ```
 
@@ -137,10 +140,41 @@ GaussSuppressDec(
   correspond to published cells (aggregated) and some not (not
   aggregated).
 
+- formula:
+
+  `formula` passed to
+  [`GaussSuppressionFromData()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/GaussSuppressionFromData.md).
+  Included as a formal argument in this function.
+
+- linkedTables:
+
+  `linkedTables` passed to
+  [`GaussSuppressionFromData()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/GaussSuppressionFromData.md).
+  Included as a formal argument in this function.
+
+- linked_rep:
+
+  Logical (default FALSE). Used together with the `linkedGauss`
+  parameter of
+  [`GaussSuppressionFromData()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/GaussSuppressionFromData.md)
+  to generate separate sets of `nRep` decimal numbers for each linked
+  table. The decimal number variables are named using the table names as
+  prefixes.
+
 ## Value
 
 A data frame where inner cells and cells to be published are combined or
 output according to parameter `output`.
+
+## References
+
+Langsrud (2019).
+[doi:10.1007/s11222-018-9848-9](https://doi.org/10.1007/s11222-018-9848-9)
+.
+
+Langsrud and Bøvelstad (2022).
+[doi:10.1007/978-3-031-13945-1_8](https://doi.org/10.1007/978-3-031-13945-1_8)
+.
 
 ## See also
 

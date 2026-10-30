@@ -1,5 +1,30 @@
 # Changelog
 
+## GaussSuppression 1.3.1
+
+- Documentation of
+  [`SuppressKDisclosure()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressKDisclosure.md)
+  improved.
+  - Added a reference to the *“Privacy in Statistical Databases 2026”*
+    paper, [Langsrud
+    (2026)](https://doi.org/10.1007/978-3-032-37883-5_8).
+  - Earlier references by Lupp and Langsrud
+    ([2021](https://unece.org/sites/default/files/2021-12/SDC2021_Day2_Lupp_AD.pdf),
+    [2023](https://research.lupp.no/K_disclosure.pdf)) are now also
+    included in the function documentation.
+- [`GaussSuppressDec()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/GaussSuppressDec.md)
+  updated.
+  - New parameter `linked_rep`, used together with the `linkedGauss`
+    parameter of
+    [`GaussSuppressionFromData()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/GaussSuppressionFromData.md)
+    to generate separate sets of decimal numbers for each linked table.
+  - References to [Langsrud
+    (2019)](https://doi.org/10.1007/s11222-018-9848-9) and [Langsrud and
+    Bøvelstad (2022)](https://doi.org/10.1007/978-3-031-13945-1_8) added
+    to the documentation of this function and
+    [`SuppressionFromDecimals()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressionFromDecimals.md).
+- Package DESCRIPTION updated with additional references.
+
 ## GaussSuppression 1.3.0
 
 CRAN release: 2026-02-26
@@ -390,6 +415,7 @@ CRAN release: 2024-12-09
     be used directly as input. Example of usage:
 
     ``` r
+
      a <- get_klass(classification = "24")
      b <- hier_create(root = "Total", nodes = LETTERS[1:5])
      mydata <- data.frame(tree = sample(a$code[nchar(a$code) > 1], 200, replace = TRUE), 
