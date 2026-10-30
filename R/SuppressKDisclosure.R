@@ -53,6 +53,21 @@
 #' @export
 #'
 #' @author Daniel P. Lupp and Øyvind Langsrud
+#' 
+#' @references
+#' Langsrud (2026).
+#' \doi{10.1007/978-3-032-37883-5_8}.
+#'
+#' Lupp and Langsrud (2023).
+#' Disclosure-Driven Suppression in Frequency Tables.
+#' Archived unpublished manuscript.
+#' \url{https://research.lupp.no/K_disclosure.pdf}.
+#'
+#' Lupp and Langsrud (2021).
+#' Suppression of directly-disclosive cells in frequency tables.
+#' Joint UNECE/Eurostat Expert Meeting on Statistical Data Confidentiality,
+#' Poznań, Poland.
+#' \url{https://unece.org/sites/default/files/2021-12/SDC2021_Day2_Lupp_AD.pdf}.
 #'
 #' @examples
 #' # data

@@ -72,6 +72,12 @@ b2 <- SuppressionFromDecimals(b1[b1$isInner, ],
 FormulaSelection(b2, ~sector2 * eu)                                 
                               
 }
+\references{
+Langsrud (2019). \doi{10.1007/s11222-018-9848-9}.
+
+Langsrud and Bøvelstad (2022).
+\doi{10.1007/978-3-031-13945-1_8}.
+}
 \author{
 Øyvind Langsrud
 }
