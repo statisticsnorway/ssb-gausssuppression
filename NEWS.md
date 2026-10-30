@@ -1,5 +1,5 @@
 
-## GaussSuppression 1.3.1
+## GaussSuppression 1.3.2
 * Documentation of `SuppressKDisclosure()` improved.
   - Added a reference to the *"Privacy in Statistical Databases 2026"* paper, 
     [Langsrud (2026)](https://doi.org/10.1007/978-3-032-37883-5_8).
