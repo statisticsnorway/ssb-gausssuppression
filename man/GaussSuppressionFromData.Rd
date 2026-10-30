@@ -228,7 +228,7 @@ Parameter \code{pkg} to \code{\link[SSBtools]{aggregate_by_pkg}}.}
 Parameter \code{include_na} to \code{\link[SSBtools]{aggregate_by_pkg}}.
 Note that NAs will not be present in the output table's dimensions regardless of the value of \code{aggregateNA}.
 When using the formula interface, this is controlled by the \code{NAomit} parameter (default \code{TRUE}),
-which is passed to the function \code{\link[SSBtools:FormulaSums]{SSBtools::Formula2ModelMatrix()}}.
+which is passed to the function \code{\link[SSBtools:Formula2ModelMatrix]{SSBtools::Formula2ModelMatrix()}}.
 It is through this use of the formula interface that NAs in the input data make sense.
 Note that under normal circumstances, grouping variables should not use NA to represent a category.
 As such, if NAs are present in the grouping variables, using the \code{dimVar} or \code{hierarchies} interfaces

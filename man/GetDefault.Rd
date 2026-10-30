@@ -10,8 +10,6 @@ GetDefault(fun, parameter, ifnotfound = NULL)
 \item{fun}{A function}
 
 \item{parameter}{parameter name}
-
-\item{ifnotfound}{}
 }
 \value{
 The default parameter, possibly evaluated.
