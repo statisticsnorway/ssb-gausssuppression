@@ -22,11 +22,15 @@ Description: A statistical disclosure control tool to protect tables by suppress
     to start by working with functions SuppressSmallCounts() and 
     SuppressDominantCells(). These functions use primary suppression functions for 
     the minimum frequency rule and the dominance rule, respectively. Novel 
-    functionality for suppression of disclosive cells is also included. General 
+    functionality for targeted attribute disclosure protection is also included. 
+    See Langsrud (2026) <doi:10.1007/978-3-032-37883-5_8> and references therein.
+    General 
     primary suppression functions can be supplied as input to the general working 
     horse function, GaussSuppressionFromData(). Suppressed frequencies can be 
     replaced by synthetic decimal numbers as described in 
     Langsrud (2019) <doi:10.1007/s11222-018-9848-9>.
+    This approach can also be used as a flexible tool for suppression of post-published 
+    tabular data (Langsrud and Bøvelstad, 2022) <doi:10.1007/978-3-031-13945-1_8>.
 License: MIT + file LICENSE
 URL: https://github.com/statisticsnorway/ssb-gausssuppression, https://statisticsnorway.github.io/ssb-gausssuppression/
 BugReports: https://github.com/statisticsnorway/ssb-gausssuppression/issues
