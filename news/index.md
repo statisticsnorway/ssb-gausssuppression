@@ -1,6 +1,6 @@
 # Changelog
 
-## GaussSuppression 1.3.1
+## GaussSuppression 1.3.2
 
 - Documentation of
   [`SuppressKDisclosure()`](https://statisticsnorway.github.io/ssb-gausssuppression/reference/SuppressKDisclosure.md)
