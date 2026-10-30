@@ -40,6 +40,16 @@
 #'                            several input cells (aggregated) since they correspond to published cells. 
 #' @param whenMixedDuplicatedInner Function to be called in the case above when some inner cells correspond
 #'                                 to published cells (aggregated) and some not (not aggregated).
+#' @param formula `formula` passed to [GaussSuppressionFromData()].
+#'   Included as a formal argument in this function.    
+#' @param linkedTables `linkedTables` passed to [GaussSuppressionFromData()].
+#'   Included as a formal argument in this function. 
+#' @param linked_rep Logical (default FALSE).
+#'   Used together with the `linkedGauss` parameter of
+#'   [GaussSuppressionFromData()] to generate separate sets of
+#'   `nRep` decimal numbers for each linked table.
+#'   The decimal number variables are named using the table names as prefixes.                                  
+#'                                 
 #' @return A data frame where inner cells and cells to be published are combined or output according to parameter `output`. 
 #' 
 #' @importFrom SSBtools RoundWhole Match Mipf RbindAll
