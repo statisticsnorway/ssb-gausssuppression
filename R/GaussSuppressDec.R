@@ -137,6 +137,10 @@ GaussSuppressDec = function(data,
   }
   if (is.null(table_formulas)) {
     linked_rep <- FALSE
+  } else {
+    if (is.null(names(table_formulas)) || anyNA(names(table_formulas)) || any(!nzchar(names(table_formulas)))) {
+      stop("The list of table formulas must have non-empty names.")
+    }
   }  
   
   if(!is.null(output)){
