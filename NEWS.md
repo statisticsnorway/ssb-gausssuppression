@@ -1,4 +1,8 @@
 
+## GaussSuppression 1.3.1
+* `GaussSuppressDec()` updated.
+  - New parameterparam `linked_rep` used together with the `linkedGauss` parameter of
+   `GaussSuppressionFromData()` to generate separate sets of decimal numbers.
 
 ## GaussSuppression 1.3.0
 * Major update of `SuppressKDisclosure()` and related functions.
