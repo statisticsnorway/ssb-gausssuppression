@@ -53,6 +53,7 @@ export(X_from_mc_remove)
 export(X_from_mc_remove_noinner)
 export(default_targeting)
 export(formula_selection)
+export(suppress_double)
 export(tables_by_formulas)
 importFrom(Matrix,
   as.matrix,

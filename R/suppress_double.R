@@ -1,3 +1,63 @@
+#' Cell Suppression with Double Coding and Difference Cells
+#'
+#' A wrapper for cell suppression when data contain two alternative
+#' classifications of the same variable. The function supports simultaneous
+#' protection of tables based on both classifications, with optional
+#' prioritization and special handling of difference groups.
+#'
+#' The function was developed with Eurostat's requirements for double
+#' reporting during the revision of the Statistical Classification of
+#' Economic Activities (NACE) in mind.
+#'
+#' @param data The input data to be processed by `suppress_fun`.
+#' @param formula A formula or a named list of formulas, as in
+#'   [GaussSuppressionFromData()], but using the variable names defined
+#'   in `double_vars` instead of the original classification variables.
+#' @param suppress_fun The suppression function to be used.
+#'   Defaults to [SuppressDominantCells()].
+#' @param double_vars A named list specifying pairs of variables representing
+#'   alternative classifications. For example,
+#'   `list(nace_2 = c("nace_2_A", "nace_2_B"),
+#'         nace_3 = c("nace_3_A", "nace_3_B"))`.
+#'   The list names (`nace_2` and `nace_3`) are used in `formula`,
+#'   while the corresponding variables must exist in `data`.
+#' @param double_priority Controls prioritization between the two
+#'   classifications and allows special processing modes.
+#'   Possible values are:
+#'   * `0`: Only difference-group cells are given lower priority.
+#'   * `1`: The first classification is prioritized.
+#'   * `2`: The second classification is prioritized.
+#'   * `-1`: Process only the first classification.
+#'   * `-2`: Process only the second classification.
+#'   * `-9`: Process without prioritization, primarily for testing.
+#' @param use_diff_groups Controls whether difference cells are
+#'   generated and included in the suppression process.
+#'   Possible values are:
+#'   * `FALSE`: Do not generate difference cells.
+#'   * `TRUE`: Generate basic difference cells.
+#'   * `"extra"`: Also generate additional difference cells when found.
+#'
+#'   Difference cells are generated using [SSBtools::data_diff_groups()].
+#'   The value `"extra"` corresponds to `diff_extra = TRUE` in that function.
+#' @param remove_diff_vars Logical. If `TRUE` (the default), generated
+#'   difference-group variables are removed from the ordinary data frame
+#'   output. If `FALSE`, these variables are retained.
+#'   Some difference-group variable names may appear unintuitive because
+#'   different names for variables representing identical groupings are
+#'   avoided.
+#' @param ... Additional arguments passed to `suppress_fun`.
+#' @param candidates As the `candidates` parameter in
+#'   [GaussSuppressionFromData()]. Included as a formal argument because
+#'   candidate ordering is modified according to `double_priority`.
+#' @param output As the `output` parameter in [GaussSuppressionFromData()].
+#'   In addition, `"double"` can be specified to return a list containing
+#'   separate outputs for the two classifications.
+#'
+#' @returns The suppression result in the format specified by `output`.
+#'   When `output = "double"`, a list with elements `a` and `b` is returned,
+#'   corresponding to the first and second classifications, respectively.
+#'
+#' @export
 suppress_double <- function(data,
                             formula,
                             suppress_fun = SuppressDominantCells,
