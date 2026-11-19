@@ -18,6 +18,7 @@ suppress_double <- function(data,
   rename_extra <- NULL
   ignore_vars <- list()
   added_names <- character(0)
+  double_vars_input <- double_vars
   
   if (!is.null(double_vars)) {
     if (double_priority %in% c(-1, -2)) {
