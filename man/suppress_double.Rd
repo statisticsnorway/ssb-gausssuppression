@@ -89,3 +89,90 @@ The function was developed with Eurostat's requirements for double
 reporting during the revision of the Statistical Classification of
 Economic Activities (NACE) in mind.
 }
+\examples{
+
+# First, generate example data to be used below 
+a <- SSBtoolsData("magnitude1")
+k <- c("50.1", "50.2", "70.1", "70.2")
+b <- data.frame(nace_3_A = c(k, k), nace_3_B = c(k, k))
+b[5:8, 2] <- b[c(6, 5, 8, 5), 2]
+b$nace_2_A <- substr(b[[1]], 1, 2)
+b$nace_2_B <- substr(b[[2]], 1, 2)
+set.seed(559)
+d <- cbind(a, b[sample.int(8, 40, replace = TRUE, prob = 8:1), ])
+d$id <- paste0("id_", 1:40)
+rownames(d) <- NULL
+
+
+# In this first example, no primary suppressed cells are visible in the output.
+# Only difference cells are primary suppressed, but these are not shown
+# in the default output (remove_diff_vars = TRUE).
+suppress_double(d, numVar = "value", formula = ~nace_2 * eu + nace_3,
+                contributorVar = "id", pPercent = 5,
+                double_vars = list(nace_2 = c("nace_2_A", "nace_2_B"),
+                                   nace_3 = c("nace_3_A", "nace_3_B")),
+                double_priority = 1,
+                use_diff_groups = TRUE)
+
+
+# Define eight combinations of parameters
+arg <- data.frame(
+  use_diff_groups = I(rep(list(TRUE), 8)),
+  double_priority = 1,
+  remove_diff_vars = TRUE,
+  output = "publish"
+)
+
+arg$output[4:5] <- "double"
+arg$use_diff_groups[c(1, 6)] <- list(FALSE, FALSE)
+arg$use_diff_groups[[3]] <- "extra"
+arg$double_priority[5] <- 2
+arg$remove_diff_vars[4:8] <- FALSE
+arg$use_diff_groups[[8]] <- "extra"
+
+# Run suppression with the different parameter combinations
+output <- vector("list", nrow(arg))
+
+for (i in seq_along(output)) {
+  output[[i]] <- suppress_double(
+    data = d,
+    numVar = "value",
+    formula = ~nace_2 * geo + nace_3 * eu,
+    contributorVar = "company",
+    k = c(80, 99),
+    double_vars = list(
+      nace_2 = c("nace_2_A", "nace_2_B"),
+      nace_3 = c("nace_3_A", "nace_3_B")
+    ),
+    double_priority = arg$double_priority[i],
+    remove_diff_vars = arg$remove_diff_vars[i],
+    use_diff_groups = arg$use_diff_groups[[i]],
+    output = arg$output[i]
+  )
+}
+
+arg
+
+# Number of suppressed cells with use_diff_groups FALSE, TRUE and "extra"
+sum(output[[1]]$suppressed)
+sum(output[[2]]$suppressed)
+sum(output[[3]]$suppressed)
+
+# Effect of double_priority on the two classifications
+sum(output[[4]]$a$suppressed)
+sum(output[[4]]$b$suppressed)
+sum(output[[5]]$a$suppressed)
+sum(output[[5]]$b$suppressed)
+
+# Difference cells returned when output = "double"
+output[[5]]$diff
+
+# Output variables with remove_diff_vars = FALSE and
+# use_diff_groups FALSE, TRUE and "extra"
+# With avoidHierarchical = TRUE, variables are not combined
+# as they are in output[[8]]
+head(output[[6]])
+head(output[[7]])
+head(output[[8]])
+
+}
