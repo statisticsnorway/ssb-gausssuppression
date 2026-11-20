@@ -56,6 +56,7 @@
 #'
 #' @returns The suppression result as specified by `output`.
 #'
+#' @importFrom stats reformulate
 #' @export
 #' 
 #' @examples
