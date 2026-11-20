@@ -56,7 +56,7 @@
 #'
 #' @returns The suppression result as specified by `output`.
 #'
-#' @importFrom stats reformulate
+#' @importFrom SSBtools formula_setdiff
 #' @export
 #' 
 #' @examples
@@ -378,14 +378,6 @@ substitute_double_vars <- function(formula, double_vars, double_priority) {
 
 
 
-formula_setdiff <- function(formula_x, formula_y) {
-  diff_terms <- setdiff(
-    SSBtools::formula_term_labels(formula_x),
-    SSBtools::formula_term_labels(formula_y)
-  )
-  intercept <- "(Intercept)" %in% diff_terms
-  reformulate(setdiff(diff_terms, "(Intercept)"), intercept = intercept)
-}
   
 
 
