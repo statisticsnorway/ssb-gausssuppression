@@ -45,6 +45,9 @@
 #'   Some difference-group variable names may appear unintuitive because
 #'   different names for variables representing identical groupings are
 #'   avoided.
+#' @param total As the `total` parameter in [SSBtools::ModelMatrix()].
+#'   Included as a formal argument because new difference variables may be
+#'   generated, inheriting total codes from corresponding existing variables.     
 #' @param ... Additional arguments passed to `suppress_fun`.
 #' @param candidates As the `candidates` parameter in
 #'   [GaussSuppressionFromData()]. Included as a formal argument because
@@ -152,6 +155,7 @@ suppress_double <- function(data,
                             double_priority = 0,
                             use_diff_groups = FALSE, 
                             remove_diff_vars = TRUE,
+                            total = "Total",
                             ...,
                             candidates = GetDefault(suppress_fun, "candidates"),
                             output = "publish") {
@@ -230,10 +234,21 @@ suppress_double <- function(data,
     output_ <- output
   }
   
+  # Add missing total values based on existing variables in double_vars
+  total <- unlist(total)
+  if (!is.null(names(total)))  for (vars in double_vars) {
+    missing <- setdiff(vars, names(total))
+    existing <- intersect(vars, names(total))
+    
+    if (length(missing) && length(existing)) {
+      total[missing] <- total[existing[1]]
+    }
+  }
   
   out <- suppress_fun(data = data,
                       formula = unlist(formula),
                       hierarchies = NULL,
+                      total = total,
                       ...,
                       candidates = candidates_ignore_vars,
                       ignore_vars = ignore_vars,

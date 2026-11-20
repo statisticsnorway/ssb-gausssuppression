@@ -12,6 +12,7 @@ suppress_double(
   double_priority = 0,
   use_diff_groups = FALSE,
   remove_diff_vars = TRUE,
+  total = "Total",
   ...,
   candidates = GetDefault(suppress_fun, "candidates"),
   output = "publish"
@@ -63,6 +64,10 @@ output. If \code{FALSE}, these variables are retained.
 Some difference-group variable names may appear unintuitive because
 different names for variables representing identical groupings are
 avoided.}
+
+\item{total}{As the \code{total} parameter in \code{\link[SSBtools:ModelMatrix]{SSBtools::ModelMatrix()}}.
+Included as a formal argument because new difference variables may be
+generated, inheriting total codes from corresponding existing variables.}
 
 \item{...}{Additional arguments passed to \code{suppress_fun}.}
 
