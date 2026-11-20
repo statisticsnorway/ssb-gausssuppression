@@ -80,7 +80,7 @@
 #' # In this first example, no primary suppressed cells are visible in the output.
 #' # Only difference cells are primary suppressed, but these are not shown
 #' # in the default output (remove_diff_vars = TRUE).
-#' suppress_double(d, numVar = "value", formula = ~nace_2 * eu + nace_3,
+#' suppress_double(d, numVar = "value", formula = ~nace_2 * eu + nace_3 + geo,
 #'                 contributorVar = "id", pPercent = 5,
 #'                 double_vars = list(nace_2 = c("nace_2_A", "nace_2_B"),
 #'                                    nace_3 = c("nace_3_A", "nace_3_B")),
@@ -148,6 +148,30 @@
 #' head(output[[7]])
 #' head(output[[8]])
 #' 
+#' 
+#' # Similar to the first example, but using tables_by_formulas()
+#' tables_by_formulas(
+#'   d,
+#'   table_fun = suppress_double,
+#'   numVar = "value",
+#'   table_formulas = list(
+#'     table_1 = ~nace_2 * eu,
+#'     table_2 = ~nace_3 + geo
+#'   ),
+#'   contributorVar = "id",
+#'   pPercent = 5,
+#'   double_vars = list(
+#'     nace_2 = c("nace_2_A", "nace_2_B"),
+#'     nace_3 = c("nace_3_A", "nace_3_B")
+#'   ),
+#'   double_priority = 1,
+#'   total = c(nace = "T", region = "Europe"),
+#'   use_diff_groups = TRUE,
+#'   collapse_vars = list(
+#'     nace = c("nace_2", "nace_3"),
+#'     region = c("geo", "eu")
+#'   )
+#' )
 suppress_double <- function(data,
                             formula,
                             suppress_fun = SuppressDominantCells,
