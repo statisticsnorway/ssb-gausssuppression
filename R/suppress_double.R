@@ -253,7 +253,8 @@ suppress_double <- function(data,
                       candidates = candidates_ignore_vars,
                       ignore_vars = ignore_vars,
                       candidates_input = candidates,
-                      output = output_)
+                      output = output_,
+                      total_copy = total)
   
   
   if (!output %in% c("publish", "double") || is.null(double_vars)) {
@@ -316,13 +317,25 @@ my_data_diff_groups <- function(data, diff_name, ...) {
 
 
 
-candidates_ignore_vars <- function(ignore_vars, candidates_input,..., x, crossTable) {
+candidates_ignore_vars <- function(ignore_vars, candidates_input, total_copy,
+                                   ..., x, crossTable) {
   candidates <- candidates_input(..., x = x, crossTable = crossTable)
   empty <- colSums(x) == 0
+  
   for (j in seq_along(ignore_vars)) {
     to_ignore <- rep(FALSE, length(candidates))
+    
     for (i in seq_along(ignore_vars[[j]])) {
-      to_ignore[(crossTable[[ignore_vars[[j]][i]]])[candidates] != "Total"] <- TRUE
+      var <- ignore_vars[[j]][i]
+      
+      total_code <- if (is.null(names(total_copy))) {
+        total_copy[1]
+      } else {
+        total_copy[[var]]
+      }
+      
+      to_ignore[crossTable[[var]][candidates] != total_code] <- TRUE
+      
       # empty not ignored to avoid warning 
       #         "Cells with empty input will never be secondary suppressed...."
       to_ignore[empty[candidates]] <- FALSE
