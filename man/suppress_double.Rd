@@ -37,7 +37,7 @@ while the corresponding variables must exist in \code{data}.}
 classifications and allows special processing modes.
 Possible values are:
 \itemize{
-\item \code{0}: Only difference-group cells are given lower priority.
+\item \code{0}: Only difference cells are given lower priority.
 \item \code{1}: The first classification is prioritized.
 \item \code{2}: The second classification is prioritized.
 \item \code{-1}: Process only the first classification.
@@ -72,18 +72,17 @@ candidate ordering is modified according to \code{double_priority}.}
 
 \item{output}{As the \code{output} parameter in \code{\link[=GaussSuppressionFromData]{GaussSuppressionFromData()}}.
 In addition, \code{"double"} can be specified to return a list containing
-separate outputs for the two classifications.}
+separate outputs for the two classifications, along with difference cells
+when \code{remove_diff_vars = FALSE}}
 }
 \value{
-The suppression result in the format specified by \code{output}.
-When \code{output = "double"}, a list with elements \code{a} and \code{b} is returned,
-corresponding to the first and second classifications, respectively.
+The suppression result as specified by \code{output}.
 }
 \description{
 A wrapper for cell suppression when data contain two alternative
 classifications of the same variable. The function supports simultaneous
 protection of tables based on both classifications, with optional
-prioritization and special handling of difference groups.
+prioritization and special handling of difference cells.
 }
 \details{
 The function was developed with Eurostat's requirements for double

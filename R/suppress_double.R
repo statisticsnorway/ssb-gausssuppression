@@ -3,7 +3,7 @@
 #' A wrapper for cell suppression when data contain two alternative
 #' classifications of the same variable. The function supports simultaneous
 #' protection of tables based on both classifications, with optional
-#' prioritization and special handling of difference groups.
+#' prioritization and special handling of difference cells.
 #'
 #' The function was developed with Eurostat's requirements for double
 #' reporting during the revision of the Statistical Classification of
@@ -24,7 +24,7 @@
 #' @param double_priority Controls prioritization between the two
 #'   classifications and allows special processing modes.
 #'   Possible values are:
-#'   * `0`: Only difference-group cells are given lower priority.
+#'   * `0`: Only difference cells are given lower priority.
 #'   * `1`: The first classification is prioritized.
 #'   * `2`: The second classification is prioritized.
 #'   * `-1`: Process only the first classification.
@@ -51,11 +51,10 @@
 #'   candidate ordering is modified according to `double_priority`.
 #' @param output As the `output` parameter in [GaussSuppressionFromData()].
 #'   In addition, `"double"` can be specified to return a list containing
-#'   separate outputs for the two classifications.
+#'   separate outputs for the two classifications, along with difference cells 
+#'   when `remove_diff_vars = FALSE`
 #'
-#' @returns The suppression result in the format specified by `output`.
-#'   When `output = "double"`, a list with elements `a` and `b` is returned,
-#'   corresponding to the first and second classifications, respectively.
+#' @returns The suppression result as specified by `output`.
 #'
 #' @export
 suppress_double <- function(data,
@@ -128,6 +127,9 @@ suppress_double <- function(data,
     formula <- substitute_double_vars(formula, double_vars,
                                       double_priority)
     
+    formula_diff <- formula_setdiff(combine_formulas(unlist(formula)), 
+                                    combine_formulas(unlist(formula_no_diff))) 
+    
   }
    
   
@@ -151,8 +153,15 @@ suppress_double <- function(data,
                       output = output_)
   
   
-  if (!output %in% c("publish", "double")) {
+  if (!output %in% c("publish", "double") || is.null(double_vars)) {
     return(out)
+  }
+  
+  if (!remove_diff_vars & output == "double") {
+    diff_out <- FormulaSelection(out, formula_diff)
+    remove_diff_vars <- TRUE
+  } else {
+    diff_out <- NULL
   }
   
   if (remove_diff_vars & (!is.null(double_vars)) & (!isFALSE(use_diff_groups))) {
@@ -172,8 +181,11 @@ suppress_double <- function(data,
   
   
   if (output == "double") {
-    return(list(a = FormulaSelection(out, combine_formulas(unlist(formula_no_diff[1]))),
-                b = FormulaSelection(out, combine_formulas(unlist(formula_no_diff[2])))))
+    out <- list(a = FormulaSelection(out, combine_formulas(unlist(formula_no_diff[1]))),
+                b = FormulaSelection(out, combine_formulas(unlist(formula_no_diff[2]))))
+    if (!is.null(diff_out)) {
+      out <- c(out, list(diff = diff_out)) 
+    }
   }
   
   out
@@ -275,6 +287,19 @@ substitute_double_vars <- function(formula, double_vars, double_priority) {
   
   formula
 }
+
+
+
+formula_setdiff <- function(formula_x, formula_y) {
+  diff_terms <- setdiff(
+    SSBtools::formula_term_labels(formula_x),
+    SSBtools::formula_term_labels(formula_y)
+  )
+  intercept <- "(Intercept)" %in% diff_terms
+  reformulate(setdiff(diff_terms, "(Intercept)"), intercept = intercept)
+}
+  
+
 
 
 
