@@ -1,5 +1,7 @@
 test_that("suppress_double", {
   
+  printInc <- FALSE
+  
   # A test using modified code from the suppress_double() examples
   
   # First, generate example data to be used below 
@@ -24,7 +26,8 @@ test_that("suppress_double", {
                                      nace_3 = c("nace_3_A", "nace_3_B")),
                   double_priority = 1,
                   use_diff_groups = TRUE,
-                  remove_diff_vars = FALSE)
+                  remove_diff_vars = FALSE,
+                  printInc = printInc)
 
   
   
@@ -61,7 +64,8 @@ test_that("suppress_double", {
     collapse_vars = list(
       nace = c("nace_2", "nace_3"),
       region = c("geo", "eu")
-    )
+    ),
+    printInc = printInc
   )
   
   nam <- intersect(names(out1), names(out2))
@@ -77,5 +81,38 @@ test_that("suppress_double", {
   expect_equal(out1, out2)
   
   expect_equal(sum(out1$suppressed), 6)
+  
+
+  # Examples demonstrating the suppressed_data parameter
+  
+  # Suppression based on the first classification only
+  out3 <- SuppressDominantCells(
+    d, numVar = "value", formula = ~nace_2_A * geo + nace_3_A * eu,
+    contributorVar = "company", pPercent = 1,
+    printInc = printInc
+  )
+  
+  # Suppression of both classifications, taking previous suppression into account
+  out4 <- suppress_double(
+    d, numVar = "value", formula = ~nace_2 * geo + nace_3 * eu,
+    contributorVar = "company", pPercent = 1,
+    double_vars = list(nace_2 = c("nace_2_A", "nace_2_B"),
+                       nace_3 = c("nace_3_A", "nace_3_B")),
+    use_diff_groups = TRUE,
+    suppressed_data = out3,
+    output = "double",
+    printInc = printInc
+  )
+  
+  out3 <- out3[names(out3)]
+  out5 <- out4$a[names(out3)]
+  ma <- SSBtools::Match(out3[1:2], out5[1:2])
+  out5 <- out5[ma, ]
+  rownames(out3) <- NULL
+  rownames(out5) <- NULL
+  expect_equal(out3, out5)
+  
+  expect_equal(sum(out4$b$suppressed), 14)
+  
   
 })

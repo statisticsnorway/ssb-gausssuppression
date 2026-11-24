@@ -172,6 +172,31 @@
 #'     region = c("geo", "eu")
 #'   )
 #' )
+#' 
+#' 
+#' # Examples demonstrating the suppressed_data parameter
+#'
+#' # Suppression based on the first classification only
+#' out1 <- SuppressDominantCells(
+#'   d, numVar = "value", formula = ~nace_2_A * geo + nace_3_A * eu,
+#'   contributorVar = "company", pPercent = 1
+#' )
+#'
+#' # Suppression of both classifications, taking previous suppression into account
+#' out2 <- suppress_double(
+#'   d, numVar = "value", formula = ~nace_2 * geo + nace_3 * eu,
+#'   contributorVar = "company", pPercent = 1,
+#'   double_vars = list(nace_2 = c("nace_2_A", "nace_2_B"),
+#'                      nace_3 = c("nace_3_A", "nace_3_B")),
+#'   use_diff_groups = TRUE,
+#'   suppressed_data = out1,
+#'   output = "double"
+#' )
+#'
+#' # Display suppressed cells
+#' out1[out1$suppressed, ]
+#' out2$a[out2$a$suppressed, ]  # Should match the suppressed cells in out1
+#' out2$b[out2$b$suppressed, ]
 suppress_double <- function(data,
                             formula,
                             suppress_fun = SuppressDominantCells,
