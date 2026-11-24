@@ -446,10 +446,44 @@ substitute_double_vars <- function(formula, double_vars, double_priority) {
 
 
 
+
+AdditionalSuppression <- function(data, ..., 
+                                  fun = GaussSuppressionFromData,  
+                                  primary = GetDefault(fun, "primary"), 
+                                  suppressedData = NULL, 
+                                  makePrimary = TRUE, 
+                                  makeForced = TRUE, 
+                                  forceNotPrimary = TRUE) {
   
-
-
-
+  
+  if (!is.data.frame(suppressedData)) {  # empty list as NULL
+    if (is.list(suppressedData))
+      if (!length(suppressedData)) {
+        suppressedData <- NULL
+      }
+  }
+  
+  
+  if(is.null(suppressedData)){
+    return(fun(data = data, ..., primary = primary))
+  }
+  
+  if(makePrimary){
+    primary <- c(primary, PrimaryFromSuppressedData)
+  }
+  
+  if(forceNotPrimary){
+    primary <- c(primary, NotPrimaryFromSuppressedData)
+  }
+  
+  
+  if(!makeForced){
+    return(fun(data = data, ..., primary = primary, suppressedData = suppressedData))
+  }
+  
+  fun(data = data, ..., primary = primary, forced = ForcedFromSuppressedData, suppressedData = suppressedData)
+  
+} 
 
 
 
