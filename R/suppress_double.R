@@ -181,6 +181,7 @@ suppress_double <- function(data,
                             remove_diff_vars = TRUE,
                             total = "Total",
                             suppressed_data = NULL,
+                            via_AdditionalSuppression = FALSE,
                             ...,
                             candidates = GetDefault(suppress_fun, "candidates"),
                             output = "publish") {
@@ -270,6 +271,12 @@ suppress_double <- function(data,
     }
   }
   
+  if (via_AdditionalSuppression) {
+    additional_suppression <- AdditionalSuppression
+  } else {
+    additional_suppression <- special_additional_suppression
+  }
+  
   if (is.null(suppressed_data)) {
     out <- suppress_fun(data = data,
                         formula = unlist(formula),
@@ -282,7 +289,7 @@ suppress_double <- function(data,
                         output = output_,
                         total_copy = total)
   } else {
-    out <- AdditionalSuppression(data = data,
+    out <- additional_suppression(data = data,
                         formula = unlist(formula),
                         hierarchies = NULL,
                         total = total,
@@ -294,6 +301,11 @@ suppress_double <- function(data,
                         candidates_input = candidates,
                         output = output_,
                         total_copy = total)
+    
+    if (!via_AdditionalSuppression) {
+      out$suppressed[is.na(out$suppressed)] <- TRUE
+    }
+    
   }
   
   
@@ -447,14 +459,9 @@ substitute_double_vars <- function(formula, double_vars, double_priority) {
 
 
 
-AdditionalSuppression <- function(data, ..., 
+special_additional_suppression <- function(data, ..., 
                                   fun = GaussSuppressionFromData,  
-                                  primary = GetDefault(fun, "primary"), 
-                                  suppressedData = NULL, 
-                                  makePrimary = TRUE, 
-                                  makeForced = TRUE, 
-                                  forceNotPrimary = TRUE) {
-  
+                                  suppressedData = NULL) {
   
   if (!is.data.frame(suppressedData)) {  # empty list as NULL
     if (is.list(suppressedData))
@@ -463,25 +470,11 @@ AdditionalSuppression <- function(data, ...,
       }
   }
   
-  
   if(is.null(suppressedData)){
-    return(fun(data = data, ..., primary = primary))
+    return(fun(data = data, ...))
   }
   
-  if(makePrimary){
-    primary <- c(primary, PrimaryFromSuppressedData)
-  }
-  
-  if(forceNotPrimary){
-    primary <- c(primary, NotPrimaryFromSuppressedData)
-  }
-  
-  
-  if(!makeForced){
-    return(fun(data = data, ..., primary = primary, suppressedData = suppressedData))
-  }
-  
-  fun(data = data, ..., primary = primary, forced = ForcedFromSuppressedData, suppressedData = suppressedData)
+  fun(data = data, ..., hidden = PrimaryFromSuppressedData, forced = ForcedFromSuppressedData, suppressedData = suppressedData)
   
 } 
 
