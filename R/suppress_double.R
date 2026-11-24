@@ -180,6 +180,7 @@ suppress_double <- function(data,
                             use_diff_groups = FALSE, 
                             remove_diff_vars = TRUE,
                             total = "Total",
+                            suppressed_data = NULL,
                             ...,
                             candidates = GetDefault(suppress_fun, "candidates"),
                             output = "publish") {
@@ -269,16 +270,31 @@ suppress_double <- function(data,
     }
   }
   
-  out <- suppress_fun(data = data,
-                      formula = unlist(formula),
-                      hierarchies = NULL,
-                      total = total,
-                      ...,
-                      candidates = candidates_ignore_vars,
-                      ignore_vars = ignore_vars,
-                      candidates_input = candidates,
-                      output = output_,
-                      total_copy = total)
+  if (is.null(suppressed_data)) {
+    out <- suppress_fun(data = data,
+                        formula = unlist(formula),
+                        hierarchies = NULL,
+                        total = total,
+                        ...,
+                        candidates = candidates_ignore_vars,
+                        ignore_vars = ignore_vars,
+                        candidates_input = candidates,
+                        output = output_,
+                        total_copy = total)
+  } else {
+    out <- AdditionalSuppression(data = data,
+                        formula = unlist(formula),
+                        hierarchies = NULL,
+                        total = total,
+                        fun = suppress_fun,
+                        suppressedData = suppressed_data,
+                        ...,
+                        candidates = candidates_ignore_vars,
+                        ignore_vars = ignore_vars,
+                        candidates_input = candidates,
+                        output = output_,
+                        total_copy = total)
+  }
   
   
   if (!output %in% c("publish", "double") || is.null(double_vars)) {

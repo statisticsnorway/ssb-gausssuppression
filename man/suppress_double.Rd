@@ -13,6 +13,7 @@ suppress_double(
   use_diff_groups = FALSE,
   remove_diff_vars = TRUE,
   total = "Total",
+  suppressed_data = NULL,
   ...,
   candidates = GetDefault(suppress_fun, "candidates"),
   output = "publish"
