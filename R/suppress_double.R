@@ -250,6 +250,7 @@ suppress_double <- function(data,
     warning("The 'hierarchies' parameter is ignored in 'suppress_double()'.")
   }
   
+  SSBtools::CheckInput(double_priority, type = "integer", alt = c(-9, -2:2))
   
   ncol_input_data <- ncol(data)
   rename_extra <- NULL
@@ -433,6 +434,8 @@ candidates_ignore_vars <- function(ignore_vars, candidates_input, total_copy,
                                    ..., x, crossTable) {
   candidates <- candidates_input(..., x = x, crossTable = crossTable)
   empty <- colSums(x) == 0
+  
+  force(total_copy)  # To avoid unused-dots-warning 
   
   for (j in seq_along(ignore_vars)) {
     to_ignore <- rep(FALSE, length(candidates))
