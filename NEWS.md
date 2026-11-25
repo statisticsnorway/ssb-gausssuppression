@@ -1,3 +1,13 @@
+## GaussSuppression x.x.x
+* New wrapper function `suppress_double()` to handle two alternative 
+  classifications of the same variable.
+  - One of the two classifications can be prioritized.
+  - Alternatively, previously published results for one of the classifications 
+    can be supplied as input (experimental functionality).
+  -  The function was developed with Eurostat's requirements for double
+     reporting during the revision of the Statistical Classification of
+     Economic Activities (NACE) in mind.
+
 
 ## GaussSuppression 1.3.2
 * Documentation of `SuppressKDisclosure()` improved.
