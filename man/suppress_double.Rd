@@ -71,6 +71,15 @@ avoided.}
 Included as a formal argument because new difference variables may be
 generated, inheriting total codes from corresponding existing variables.}
 
+\item{suppressed_data}{Output containing previously suppressed cells.
+Intended for use when tables based on either the first or the second
+classification have already been published (see Details).}
+
+\item{via_AdditionalSuppression}{Logical. Whether to use
+\code{\link[=AdditionalSuppression]{AdditionalSuppression()}} when \code{suppressed_data} is specified.
+The default is \code{FALSE}, meaning that a specialized internal function
+is used instead (see Details).}
+
 \item{...}{Additional arguments passed to \code{suppress_fun}.}
 
 \item{candidates}{As the \code{candidates} parameter in
@@ -95,6 +104,34 @@ prioritization and special handling of difference cells.
 The function was developed with Eurostat's requirements for double
 reporting during the revision of the Statistical Classification of
 Economic Activities (NACE) in mind.
+
+\strong{Handling previously suppressed cells}
+
+The \code{suppressed_data} parameter corresponds to the \code{suppressedData}
+parameter in \code{\link[=AdditionalSuppression]{AdditionalSuppression()}}. The reason for not using
+\code{\link[=AdditionalSuppression]{AdditionalSuppression()}} by default is related to the singleton
+methods described in \code{\link[SSBtools:NumSingleton]{SSBtools::NumSingleton()}}.
+When previously secondary suppressed cells are treated as primary
+suppressed cells, unnecessary additional secondary suppressions may
+occur.
+This is because protection may be applied to prevent a singleton
+contributor from inferring a secondary cell that was only included
+to protect that same contributor.
+
+Instead, a specialized internal function is used, in which cells
+suppressed in \code{suppressed_data} are treated as hidden cells in the
+algorithm. Treating these cells as hidden is considered appropriate
+in this context because the primary suppressed cells are identified
+again through the usual calculations. This assumes that the input
+data and parameter settings are exactly the same as those used
+to produce \code{suppressed_data}.
+
+Note that the internal use of \code{hidden} means that the \code{hidden}
+parameter cannot be specified separately in \code{suppress_double()}.
+
+The functionality associated with \code{suppressed_data} is considered
+experimental. In particular, the \code{via_AdditionalSuppression}
+parameter may be removed in a future version.
 }
 \examples{
 

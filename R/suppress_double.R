@@ -8,6 +8,34 @@
 #' The function was developed with Eurostat's requirements for double
 #' reporting during the revision of the Statistical Classification of
 #' Economic Activities (NACE) in mind.
+#' 
+#' **Handling previously suppressed cells**
+#'
+#' The `suppressed_data` parameter corresponds to the `suppressedData`
+#' parameter in [AdditionalSuppression()]. The reason for not using
+#' [AdditionalSuppression()] by default is related to the singleton
+#' methods described in [SSBtools::NumSingleton()].
+#' When previously secondary suppressed cells are treated as primary
+#' suppressed cells, unnecessary additional secondary suppressions may
+#' occur. 
+#' This is because protection may be applied to prevent a singleton
+#' contributor from inferring a secondary cell that was only included
+#' to protect that same contributor.
+#'
+#' Instead, a specialized internal function is used, in which cells
+#' suppressed in `suppressed_data` are treated as hidden cells in the
+#' algorithm. Treating these cells as hidden is considered appropriate
+#' in this context because the primary suppressed cells are identified
+#' again through the usual calculations. This assumes that the input
+#' data and parameter settings are exactly the same as those used
+#' to produce `suppressed_data`.
+#'
+#' Note that the internal use of `hidden` means that the `hidden`
+#' parameter cannot be specified separately in `suppress_double()`.
+#'
+#' The functionality associated with `suppressed_data` is considered
+#' experimental. In particular, the `via_AdditionalSuppression`
+#' parameter may be removed in a future version.
 #'
 #' @param data The input data to be processed by `suppress_fun`.
 #' @param formula A formula or a named list of formulas, as in
@@ -56,6 +84,13 @@
 #'   In addition, `"double"` can be specified to return a list containing
 #'   separate outputs for the two classifications, along with difference cells 
 #'   when `remove_diff_vars = FALSE`
+#' @param suppressed_data Output containing previously suppressed cells.
+#'   Intended for use when tables based on either the first or the second
+#'   classification have already been published (see Details).
+#' @param via_AdditionalSuppression Logical. Whether to use
+#'   [AdditionalSuppression()] when `suppressed_data` is specified.
+#'   The default is `FALSE`, meaning that a specialized internal function
+#'   is used instead (see Details).
 #'
 #' @returns The suppression result as specified by `output`.
 #'
